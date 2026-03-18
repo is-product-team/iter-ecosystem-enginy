@@ -1,5 +1,5 @@
 services:
-  # Base de Datos
+  # Base de Datos Local
   db:
     image: postgres:15-alpine
     container_name: iter_postgres
@@ -25,7 +25,7 @@ services:
     networks:
       - iter-network
 
-  # Service de Instalación y Setup (Premium Optimization)
+  # Service de Instalación y Setup
   setup:
     build:
       context: .
@@ -43,14 +43,13 @@ services:
     networks:
       - iter-network
 
-  # Backend API
+  # Backend API (Dev)
   api:
     build:
       context: .
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    # Usamos npx turbo directamente, dependiendo de que 'setup' haya terminado
     command: npx turbo dev --filter=api
     volumes:
       - .:/app
@@ -65,7 +64,7 @@ services:
     networks:
       - iter-network
 
-  # Frontend Web
+  # Frontend Web (Dev)
   web:
     build:
       context: .
@@ -83,24 +82,6 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
-    networks:
-      - iter-network
-
-  # Ngrok Tunnel for API
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: iter_ngrok
-    restart: always
-    environment:
-      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
-    command:
-      - http
-      - --host-header=rewrite
-      - api:3000
-    depends_on:
-      - api
-    ports:
-      - "4040:4040"
     networks:
       - iter-network
 

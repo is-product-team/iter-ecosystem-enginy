@@ -1,0 +1,38 @@
+services:
+  # Backend API (Producción)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner-api
+    container_name: muvv_api
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    env_file:
+      - .env
+    networks:
+      - red_proxy
+
+  # Frontend Web (Producción)
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner-web
+      args:
+        - NEXT_PUBLIC_API_URL=https://api.muvv.projects.kore29.com
+    container_name: muvv_web
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    env_file:
+      - .env
+    networks:
+      - red_proxy
+
+networks:
+  red_proxy:
+    external: true

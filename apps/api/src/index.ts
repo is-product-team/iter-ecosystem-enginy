@@ -14,14 +14,12 @@ app.set('trust proxy', 1);
 
 // ... (allowedOrigins logic remains same)
 const allowedOrigins = [
-  'https://iter.kore29.com', // Prod Domain (Web & API)
-  'http://iter.kore29.com',
+  'https://muvv.projects.kore29.com',
+  'https://api.muvv.projects.kore29.com',
+  'https://iter.kore29.com', // Prod Domain (Legacy)
   'http://localhost:8002',
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://127.0.0.1:8002',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:3001',
 ];
 
 if (process.env.CORS_ORIGIN) {
@@ -34,7 +32,7 @@ if (process.env.CORS_ORIGIN) {
 }
 
 app.use(cors({
-  origin: function (origin, callback) {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // permitir peticiones sin origen (como apps móviles o curl) si es necesario, 
     // pero para web restringir a la lista
     if (!origin || allowedOrigins.includes(origin)) {
@@ -51,10 +49,9 @@ app.use(cors({
 
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
-app.use('/api/uploads', express.static('uploads'));
 
-// Rutas API
-app.use('/api', routes);
+// Rutas API servidas desde la raíz (subdominio api.muvv...)
+app.use('/', routes);
 
 // Error Handler (Debe ir después de las rutas)
 app.use(errorHandler);
