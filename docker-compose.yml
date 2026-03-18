@@ -4,12 +4,14 @@ services:
     image: postgres:15-alpine
     container_name: iter_postgres
     restart: always
+    env_file:
+      - ./apps/api/.env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: iter_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-root}
+      POSTGRES_DB: ${POSTGRES_DB:-iter_db}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -76,7 +78,7 @@ services:
       - .:/app
       - node_modules_cache:/app/node_modules
     ports:
-      - "8002:3000"
+      - "8002:3001"
     env_file:
       - ./apps/web/.env
     depends_on:
