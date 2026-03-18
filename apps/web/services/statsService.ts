@@ -7,23 +7,21 @@ export interface StatusStat {
 }
 
 export interface PopularStat {
-  _id: number;
+  _id: string; // Títol del taller
   total_solicitudes: number;
   alumnes_totals: number;
 }
 
-export interface OccupancyStat {
-  zona: string;
-  percentatge_ocupacio: number;
-}
-
 export interface ActivityLog {
-  _id: string;
+  id_log: number;
   tipus_accio: string;
-  centre_id: number;
-  taller_id: number;
-  timestamp: string;
-  detalls: any;
+  id_usuari?: number;
+  data_hora: string;
+  descripcio: string;
+  usuari?: {
+    nom: string;
+    email: string;
+  };
 }
 
 const statsService = {
@@ -42,29 +40,9 @@ const statsService = {
     const response = await api.get<ActivityLog[]>("/stats/activity");
     return response.data;
   },
-  search: async (term: string, types?: string): Promise<any[]> => {
-    const api = getApi();
-    const response = await api.get<any[]>("/stats/search", { params: { term, types } });
-    return response.data;
-  },
-  queryByStep: async (): Promise<any[]> => {
-    const api = getApi();
-    const response = await api.get<any[]>("/stats/query-step");
-    return response.data;
-  },
-  addChecklistStep: async (id: number, pas_nom: string): Promise<{ success: boolean; modified: number }> => {
-    const api = getApi();
-    const response = await api.patch<{ success: boolean; modified: number }>(`/stats/checklist/${id}/step`, { pas_nom });
-    return response.data;
-  },
   cleanupLogs: async (): Promise<{ success: boolean; deletedCount: number; message: string }> => {
     const api = getApi();
     const response = await api.delete<{ success: boolean; deletedCount: number; message: string }>("/stats/logs/cleanup");
-    return response.data;
-  },
-  getOccupancyByZone: async (): Promise<OccupancyStat[]> => {
-    const api = getApi();
-    const response = await api.get<OccupancyStat[]>("/stats/occupancy-by-zone");
     return response.data;
   }
 };

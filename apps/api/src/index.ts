@@ -8,7 +8,6 @@ import routes from './routes/index.js';
 import logger from './lib/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import prisma from './lib/prisma.js';
-import { connectToDatabase, closeConnection } from './lib/mongodb.js';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -73,18 +72,10 @@ const server = app.listen(PORT, async () => {
   } catch (e) {
     logger.error(`🗄️  DATABASE STATUS: PostgreSQL Connection failed`);
   }
-
-  // Conexión MongoDB (Opcional en el arranque)
-  try {
-    await connectToDatabase();
-  } catch (e) {
-    logger.warn(`🗄️  DATABASE STATUS: MongoDB Connection skipped or failed`);
-  }
 });
 
 process.on('SIGINT', async () => {
   logger.info('Shutting down server...');
-  await closeConnection();
   await prisma.$disconnect();
   server.close(() => {
     logger.info('Server closed');

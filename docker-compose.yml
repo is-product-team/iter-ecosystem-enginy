@@ -5,7 +5,7 @@ services:
     container_name: iter_postgres
     restart: always
     env_file:
-      - ./apps/api/.env
+      - apps/api/.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-root}
@@ -23,7 +23,7 @@ services:
     container_name: iter_adminer
     restart: always
     ports:
-      - "8080:8080"
+      - "${ADMINER_PORT:-8080}:8080"
     networks:
       - iter-network
 
@@ -39,7 +39,7 @@ services:
       - node_modules_cache:/app/node_modules
     command: sh -c "npm install && npx turbo db:generate --filter=api && npx prisma db push --accept-data-loss --schema=apps/api/prisma/schema.prisma && npx turbo db:seed --filter=api"
     env_file:
-      - ./apps/api/.env
+      - apps/api/.env
     depends_on:
       - db
     networks:
@@ -57,9 +57,9 @@ services:
       - .:/app
       - node_modules_cache:/app/node_modules
     ports:
-      - "3000:3000"
+      - "${API_PORT:-3000}:${PORT:-3000}"
     env_file:
-      - ./apps/api/.env
+      - apps/api/.env
     depends_on:
       setup:
         condition: service_completed_successfully
@@ -78,9 +78,9 @@ services:
       - .:/app
       - node_modules_cache:/app/node_modules
     ports:
-      - "8002:3001"
+      - "${WEB_PORT:-8002}:${PORT:-3001}"
     env_file:
-      - ./apps/web/.env
+      - apps/web/.env
     depends_on:
       setup:
         condition: service_completed_successfully

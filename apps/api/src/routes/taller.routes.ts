@@ -5,19 +5,11 @@ import { authenticateToken, isAdmin } from '../middlewares/authMiddleware';
 import { validateData } from '../middlewares/validateMiddleware';
 import { createTallerSchema, updateTallerSchema } from '../schemas/taller.schema';
 
-import * as tallerMetadataController from '../controllers/taller-metadata.controller';
-
-// GET /api/tallers - Listar todos los talleres (público o protegido, según decidas)
+// GET /api/tallers - Listar todos los talleres
 router.get('/', tallerController.getTallers);
 
 // GET /api/tallers/:id - Detalle de un taller
 router.get('/:id', tallerController.getTallerById);
-
-// POST /api/tallers/:id/metadata - Actualizar configuración variable (ESPECÍFIC)
-router.post('/:id/metadata', authenticateToken, isAdmin, tallerMetadataController.updateWorkshopMetadata);
-
-// POST /api/tallers/:id/book - Reserva atómica de plaza (ESPECÍFIC $inc)
-router.post('/:id/book', authenticateToken, tallerMetadataController.bookWorkshopPlace);
 
 // POST /api/tallers - Crear taller (Solo Admin)
 router.post('/', authenticateToken, isAdmin, validateData(createTallerSchema), tallerController.createTaller);

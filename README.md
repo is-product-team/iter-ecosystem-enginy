@@ -73,7 +73,7 @@ Gràcies a la nostra **Optimització Premium**, l'arrencada és totalment automa
 ### 1. Variables d'Entorn
 
 1. Copia l'arxiu `.env.example` a `.env` a l'arrel.
-2. Configura les variables necessàries per a cada aplicació a `apps/api/.env`, `apps/web/.env` i `apps/mobile/.env`.
+2. Configura las variables necessàries per a cada aplicació a `apps/api/.env`, `apps/web/.env` i `apps/mobile/.env`.
 
 ### 2. Arrencada amb Docker
 
@@ -144,4 +144,3 @@ Per a més detalls, consulta els manuals a la carpeta `/doc`:
 👉 **[Documentació Tècnica (DOCS.md)](https://www.google.com/search?q=./doc/DOCS.md)**: Detalls d'infraestructura, volums i xarxes.
 👉 **[Arquitectura Backend (BACKEND_TECH.md)](https://www.google.com/search?q=./doc/BACKEND_TECH.md)**: Detalls de professionalització, validació i optimització.
 👉 **[Guia d'Ús (USAGE.md)](https://www.google.com/search?q=./doc/USAGE.md)**: Fluxos de treball, migracions i manteniment.
-👉 **[Justificació MongoDB (MONGODB_JUSTIFICACIO.md)](https://www.google.com/search?q=./doc/MONGODB_JUSTIFICACIO.md)**: Justificació de requisits de l'Activitat 3 (Repte 2).

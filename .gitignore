@@ -4,10 +4,10 @@ node_modules/
 # package-lock.json  <-- Nota: Normalmente se sube para fijar versiones en prod, pero si quieres ignorarlo, descomenta esto.
 
 # --- Archivos de Entorno (MÁXIMA SEGURIDAD) ---
-.env*
 **/.env*
 !.env.example
 **/.env.example
+!.env # Permitimos el de la raíz porque ahora solo tiene puertos de Docker
 
 # --- Compilación y Salida (Builds) ---
 .next/

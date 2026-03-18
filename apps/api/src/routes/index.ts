@@ -2,23 +2,23 @@ import express from 'express';
 const router = express.Router();
 
 // Importar archivos de rutas individuales
-import authRoutes from './auth.routes';
-import tallerRoutes from './taller.routes';
-import centroRoutes from './centro.routes';
-import peticioRoutes from './peticio.routes'; // Nueva ruta para el flujo de reservas
-import assignacioRoutes from './assignacio.routes';
-import alumneRoutes from './alumne.routes';
-import professorRoutes from './professor.routes';
-import calendarRoutes from './calendar.routes';
-import faseRoutes from './fase.routes';
-import statsRoutes from './stats.routes';
-import sectorRoutes from './sector.routes';
-import assistenciaRoutes from './assistencia.routes';
-import notificacioRoutes from './notificacio.routes';
-import evaluationRoutes from './evaluation.routes'; // Rutas de IA (Voz)
-import avaluacioRoutes from './avaluacio.routes';
-import questionariRoutes from './questionari.routes';
-import uploadRoutes from './upload.routes';
+import authRoutes from './auth.routes.js';
+import tallerRoutes from './taller.routes.js';
+import centroRoutes from './centro.routes.js';
+import peticioRoutes from './peticio.routes.js'; 
+import assignacioRoutes from './assignacio.routes.js';
+import alumneRoutes from './alumne.routes.js';
+import professorRoutes from './professor.routes.js';
+import calendarRoutes from './calendar.routes.js';
+import faseRoutes from './fase.routes.js';
+import statsRoutes from './stats.routes.js';
+import sectorRoutes from './sector.routes.js';
+import assistenciaRoutes from './assistencia.routes.js';
+import notificacioRoutes from './notificacio.routes.js';
+import evaluationRoutes from './evaluation.routes.js'; 
+import avaluacioRoutes from './avaluacio.routes.js';
+import questionariRoutes from './questionari.routes.js';
+import uploadRoutes from './upload.routes.js';
 
 // --- Definir las rutas base ---
 
@@ -45,7 +45,7 @@ router.use('/assistencia', assistenciaRoutes);
 router.use('/calendar', calendarRoutes);
 router.use('/fases', faseRoutes);
 
-// Rutas de Estadísticas (MongoDB)
+// Rutas de Estadísticas
 router.use('/stats', statsRoutes);
 
 // Rutas de Evaluación y Cuestionarios

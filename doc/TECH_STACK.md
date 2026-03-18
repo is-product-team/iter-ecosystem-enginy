@@ -57,12 +57,11 @@ Servidor RESTful robust i escalable.
 | **Winston** | 3.19.0 | Sistema de logging professional i estructurat. |
 | **Multer** | 1.4.5 | Middleware per a la gestió de pujada de fitxers (multipart/form-data). |
 
-### Base de Dades Híbrida
+### Persistència de Dades
 
-L'arquitectura utilitza una estratègia de persistència políglota:
+L'arquitectura utilitza una base de dades relacional centralitzada:
 
-1.  **PostgreSQL 15** (Principal): Emmagatzema totes les dades relacionals (Usuaris, Peticions, Assignacions, Assistència). Gestionada via Prisma.
-2.  **MongoDB** (Secundària): Utilitzada per a dades semi-estructurades o metadades de tallers (`workshop_metadata`) que requereixen esquemes flexibles (Activitat 3). Gestionada via driver natiu `mongodb`.
+*   **PostgreSQL 15**: Emmagatzema totes les dades del sistema (Usuaris, Peticions, Assignacions, Assistència, Logs d'Auditoria). Gestionada via **Prisma ORM**.
 
 ---
 

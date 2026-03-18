@@ -1,6 +1,5 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
-import { connectToDatabase } from '../lib/mongodb';
 
 // GET: Ver notificaciones (Filtradas por centro o usuario)
 export const getNotificacions = async (req: Request, res: Response) => {
@@ -88,17 +87,6 @@ export const createNotificacioInterna = async (data: {
         importancia: data.importancia || 'INFO'
       }
     });
-
-    // Auditoría en MongoDB
-    try {
-      const { db } = await connectToDatabase();
-      await db.collection('notification_audit').insertOne({
-        ...notif,
-        timestamp: new Date()
-      });
-    } catch (mongoError) {
-      console.warn('⚠️ MongoDB: No se pudo auditar la notificación:', mongoError);
-    }
 
     return notif;
   } catch (error) {

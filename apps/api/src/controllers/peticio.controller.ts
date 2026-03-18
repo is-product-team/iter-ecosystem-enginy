@@ -1,9 +1,8 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 import { EstadoPeticion } from '@iter/shared';
-import { connectToDatabase } from '../lib/mongodb';
-import { isPhaseActive, PHASES } from '../lib/phaseUtils';
-import { createNotificacioInterna } from './notificacio.controller';
+import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
+import { createNotificacioInterna } from './notificacio.controller.js';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
 export const getPeticions = async (req: Request, res: Response) => {
@@ -103,7 +102,7 @@ export const createPeticio = async (req: Request, res: Response) => {
     const totalAlumnesC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
     if (totalAlumnesC + alumnes_aprox > 12) {
       return res.status(400).json({
-        error: `Límit superat. L'institut ja té ${totalAlumnesC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
+        error: `Límit superat. L'institut ya té ${totalAlumnesC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
       });
     }
   }
@@ -117,7 +116,7 @@ export const createPeticio = async (req: Request, res: Response) => {
     });
 
     if (existingPeticio) {
-      return res.status(400).json({ error: 'Aquest centre ja ha realitzat una sol·licitud per a aquest taller.' });
+      return res.status(400).json({ error: 'Aquest centre ya ha realitzat una sol·licitud per a aquest taller.' });
     }
 
     const nuevaPeticio = await prisma.peticio.create({
@@ -135,47 +134,6 @@ export const createPeticio = async (req: Request, res: Response) => {
         taller: true
       }
     });
-
-    // --- INTEGRACIÓN MONGODB (REPTE 2) ---
-    try {
-      const { db } = await connectToDatabase();
-
-      // 1. Crear Checklist Dinámica (Arrays y Objetos imbricados)
-      await db.collection('request_checklists').insertOne({
-        id_peticio: nuevaPeticio.id_peticio,
-        id_centre: nuevaPeticio.id_centre,
-        id_taller: nuevaPeticio.id_taller,
-        workshop_title: nuevaPeticio.taller.titol,
-        status: 'pendent',
-        passos: [
-          { pas: 'Revisió de coordinació', completat: false, data: new Date() },
-          { pas: 'Assignació de material', completat: false, data: new Date() },
-          { pas: 'Confirmació de dates', completat: false, data: new Date() }
-        ],
-        metadata: {
-          created_at: new Date(),
-          source: 'web_app',
-          priority: nuevaPeticio.modalitat === 'C' ? 'high' : 'normal'
-        }
-      });
-
-      // 2. Log de Actividad (Agregaciones futuras)
-      await db.collection('activity_logs').insertOne({
-        tipus_accio: 'CREATE_PETICIO',
-        centre_id: nuevaPeticio.id_centre,
-        taller_id: nuevaPeticio.id_taller,
-        workshop_title: nuevaPeticio.taller.titol,
-        timestamp: new Date(),
-        detalls: {
-          modalitat: nuevaPeticio.modalitat,
-          alumnes_aprox: nuevaPeticio.alumnes_aprox
-        }
-      });
-
-
-    } catch (mongoError) {
-      console.warn('⚠️ MongoDB: No se pudo registrar el checklist/log:', mongoError);
-    }
 
     res.json(nuevaPeticio);
   } catch (error) {
@@ -249,7 +207,7 @@ export const updatePeticio = async (req: Request, res: Response) => {
       const totalAlumnesC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
       if (totalAlumnesC + nuevosAlumnes > 12) {
         return res.status(400).json({
-          error: `Límit superat. L'institut ja té ${totalAlumnesC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosAlumnes}) superaria el màxim de 12.`
+          error: `Límit superat. L'institut ya té ${totalAlumnesC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosAlumnes}) superaria el màxim de 12.`
         });
       }
     }
@@ -266,24 +224,6 @@ export const updatePeticio = async (req: Request, res: Response) => {
         taller: true
       }
     });
-
-    // Log de actividad
-    try {
-      const { db } = await connectToDatabase();
-      await db.collection('activity_logs').insertOne({
-        tipus_accio: 'UPDATE_PETICIO',
-        centre_id: existingPeticio.id_centre,
-        taller_id: existingPeticio.id_taller,
-        peticio_id: existingPeticio.id_peticio,
-        timestamp: new Date(),
-        detalls: {
-          previous_alumnes: existingPeticio.alumnes_aprox,
-          new_alumnes: alumnes_aprox
-        }
-      });
-    } catch (e) {
-      console.warn('Could not log activity', e);
-    }
 
     res.json(updatedPeticio);
   } catch (error) {
@@ -311,24 +251,6 @@ export const updatePeticioStatus = async (req: Request, res: Response) => {
       tipus: 'PETICIO',
       importancia: updated.estat === 'Aprovada' ? 'INFO' : 'WARNING'
     });
-
-    // --- INTEGRACIÓN MONGODB ---
-    try {
-      const { db } = await connectToDatabase();
-      await db.collection('request_checklists').updateOne(
-        { id_peticio: updated.id_peticio },
-        { $set: { status: updated.estat.toLowerCase() } }
-      );
-      await db.collection('activity_logs').insertOne({
-        tipus_accio: updated.estat === 'Aprovada' ? 'APPROVE_PETICIO' : 'REJECT_PETICIO',
-        centre_id: updated.id_centre,
-        taller_id: updated.id_taller,
-        timestamp: new Date(),
-        detalls: { estat_anterior: 'Pendent', estat_nou: updated.estat }
-      });
-    } catch (mongoError) {
-      console.warn('⚠️ MongoDB Sync Error:', mongoError);
-    }
 
     res.json(updated);
   } catch (error) {

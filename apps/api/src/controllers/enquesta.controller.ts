@@ -1,6 +1,5 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
-import { connectToDatabase } from '../lib/mongodb';
 import { Prisma, Destinatari } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -85,7 +84,6 @@ export const getEnquestaByToken = async (req: Request, res: Response) => {
         }
 
         // Obtener preguntas del modelo (según destinatario)
-        // Asumimos que existe un modelo base. Si no, devolvemos preguntas hardcoded o de DB
         const model = await prisma.modelQuestionari.findFirst({
             where: { destinatari: enquesta.destinatari },
             include: { preguntes: true }
@@ -103,7 +101,7 @@ export const getEnquestaByToken = async (req: Request, res: Response) => {
 // POST: Enviar respuesta encuesta
 export const submitEnquesta = async (req: Request, res: Response) => {
     const token = req.params.token as string;
-    const { respostes } = req.body; // Objeto { id_pregunta: valor, ... } o estructura flexible
+    // const { respostes } = req.body; 
 
     try {
         const enquesta = await prisma.enquesta.findUnique({ where: { token } });
@@ -111,17 +109,7 @@ export const submitEnquesta = async (req: Request, res: Response) => {
         if (!enquesta) return res.status(404).json({ error: 'Encuesta no encontrada' });
         if (enquesta.completa) return res.status(400).json({ error: 'Encuesta ya completada' });
 
-        // 1. Guardar respuestas detalladas en MongoDB
-        const { db } = await connectToDatabase();
-        await db.collection('survey_responses').insertOne({
-            enquesta_id: enquesta.id_enquesta,
-            assignacio_id: enquesta.id_assignacio,
-            destinatari: enquesta.destinatari,
-            respostes, // Guardamos el JSON flexible
-            submitted_at: new Date()
-        });
-
-        // 2. Marcar como completada en Postgres
+        // 1. Marcar como completada en Postgres
         await prisma.enquesta.update({
             where: { token },
             data: {

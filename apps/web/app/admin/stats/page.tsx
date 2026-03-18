@@ -4,20 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import statsService, { StatusStat, PopularStat, ActivityLog } from '@/services/statsService';
+import statsService, { StatusStat, PopularStat } from '@/services/statsService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
-import ConfirmDialog from '@/components/ConfirmDialog';
 import {
   BarChart3,
   PieChart as PieChartIcon,
-  Search,
-  History,
-  Trash2,
-  PlusCircle,
-  Database,
   TrendingUp,
-  Activity
+  ShieldCheck
 } from 'lucide-react';
 import {
   StatusDistribution,
@@ -28,37 +22,18 @@ export default function AdminStatsPage() {
   const { user, loading: authLoading } = useAuth();
   const [statusStats, setStatusStats] = useState<StatusStat[]>([]);
   const [popularStats, setPopularStats] = useState<PopularStat[]>([]);
-  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-
-  // Dialog states
-  const [confirmConfig, setConfirmConfig] = useState<{
-    isOpen: boolean;
-    title: string;
-    message: string;
-    onConfirm: () => void;
-    isDestructive?: boolean;
-  }>({
-    isOpen: false,
-    title: '',
-    message: '',
-    onConfirm: () => { },
-  });
 
   const router = useRouter();
 
   const fetchData = async () => {
     try {
-      const [statusData, popularData, activityData] = await Promise.all([
+      const [statusData, popularData] = await Promise.all([
         statsService.getByStatus(),
-        statsService.getPopular(),
-        statsService.getActivity()
+        statsService.getPopular()
       ]);
       setStatusStats(statusData);
       setPopularStats(popularData);
-      setActivityLogs(activityData);
     } catch (err) {
       console.error("Error fetching stats:", err);
       toast.error('Error al carregar les estadístiques.');
@@ -78,49 +53,6 @@ export default function AdminStatsPage() {
     }
   }, [user, authLoading, router]);
 
-  const handleCleanup = () => {
-    setConfirmConfig({
-      isOpen: true,
-      title: 'Netejar Logs',
-      message: 'Vols netejar els logs antics (>30 dies)? Aquesta acció no es pot desfer.',
-      isDestructive: true,
-      onConfirm: async () => {
-        try {
-          const res = await statsService.cleanupLogs();
-          toast.success(res.message);
-          fetchData();
-        } catch (err) {
-          toast.error('Error en netejar els logs.');
-        }
-        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
-      }
-    });
-  };
-
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) return;
-    try {
-      const res = await statsService.search(searchTerm);
-      setSearchResults(res);
-      if (res.length === 0) toast.info('No s\'han trobat resultats.');
-    } catch (err) {
-      toast.error('Error en la cerca.');
-    }
-  };
-
-  const handleAddStep = async (id: number) => {
-    const pas_nom = prompt('Nom del nou pas:');
-    if (pas_nom) {
-      try {
-        await statsService.addChecklistStep(id, pas_nom);
-        toast.success("Pas afegit correctament.");
-        handleSearch();
-      } catch (err) {
-        toast.error('Error en afegir el pas.');
-      }
-    }
-  };
-
   if (authLoading || !user || loading) {
     return <Loading fullScreen message="Generant analítica professional..." />;
   }
@@ -128,7 +60,7 @@ export default function AdminStatsPage() {
   return (
     <DashboardLayout
       title="Dashboard Analític"
-      subtitle="Visualització de dades generades en temps real des de MongoDB Atlas"
+      subtitle="Visualització de dades de gestió del programa"
     >
       <div className="space-y-8 animate-in fade-in duration-700">
 
@@ -136,27 +68,20 @@ export default function AdminStatsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-background-surface p-6 text-text-primary shadow-sm border-l-8 border-consorci-darkBlue">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Activity className="w-5 h-5 text-consorci-lightBlue animate-pulse" />
+              <ShieldCheck className="w-5 h-5 text-consorci-lightBlue" />
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-consorci-lightBlue">
-                DATA SYNC ACTIVE
+                SECURE DATA HUB ACTIVE
               </div>
             </div>
             <h2 className="text-xl font-black uppercase tracking-tight text-consorci-darkBlue">Estadístiques de Gestió</h2>
           </div>
           <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
-            <div className="text-right hidden sm:block">
-              <div className="text-[10px] font-black text-text-muted uppercase mb-0.5 tracking-tighter">Global Requests</div>
+            <div className="text-right">
+              <div className="text-[10px] font-black text-text-muted uppercase mb-0.5 tracking-tighter">Total Peticions</div>
               <div className="text-3xl font-black leading-none text-consorci-darkBlue">
                 {statusStats.reduce((acc, s) => acc + s.total, 0)}
               </div>
             </div>
-            <button
-              onClick={handleCleanup}
-              className="group relative flex items-center gap-2 bg-background-subtle hover:bg-red-50 px-6 py-3 border border-border-subtle hover:border-red-200 transition-all duration-300"
-            >
-              <Trash2 className="w-4 h-4 text-text-secondary group-hover:text-red-600 group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary group-hover:text-red-700">Netejar Històric</span>
-            </button>
           </div>
         </div>
 
@@ -196,156 +121,7 @@ export default function AdminStatsPage() {
             </div>
           </div>
         </div>
-
-
-        {/* MongoDB Management (Checklists) */}
-        <div className="bg-background-surface border border-border-subtle shadow-lg">
-          <div className="p-6 border-b border-border-subtle bg-background-subtle flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <Search className="w-5 h-5 text-consorci-darkBlue dark:text-consorci-lightBlue" />
-              <div>
-                <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Gestió Dinàmica de Checklists</h3>
-                <p className="text-[9px] font-bold text-text-muted uppercase mt-0.5">Consulta de documents a col·lecció 'request_checklists'</p>
-              </div>
-            </div>
-            <div className="flex w-full md:w-auto">
-              <input
-                type="text"
-                placeholder="Ex: Robòtica, Aprovada..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="bg-background-surface border-2 border-r-0 border-border-subtle px-6 py-3 text-xs focus:outline-none focus:border-consorci-darkBlue dark:focus:border-consorci-lightBlue w-full md:w-80 transition-all font-bold placeholder:text-text-muted placeholder:italic text-text-primary"
-              />
-              <button
-                onClick={handleSearch}
-                className="bg-consorci-darkBlue text-white px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-colors whitespace-nowrap"
-              >
-                Cercar Docs
-              </button>
-            </div>
-          </div>
-
-          <div className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {searchResults.length > 0 ? searchResults.map((result) => (
-                <div key={result._id} className="group border border-border-subtle bg-background-subtle/30 hover:bg-background-surface hover:border-consorci-darkBlue dark:hover:border-consorci-lightBlue hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <h4 className="text-sm font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-tight leading-none mb-2">{result.workshop_title}</h4>
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                        <span className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-tighter">{result.status}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 mb-6 flex-1">
-                    {result.passos.map((p: any, idx: number) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <div className={`w-3 h-3 border rounded-full ${p.completat ? 'bg-consorci-darkBlue border-consorci-darkBlue dark:bg-consorci-lightBlue dark:border-consorci-lightBlue' : 'bg-background-surface border-border-subtle'}`}></div>
-                        <span className={`text-[10px] font-bold ${p.completat ? 'text-consorci-darkBlue dark:text-consorci-lightBlue' : 'text-text-muted italic font-medium line-through'}`}>
-                          {p.pas}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => handleAddStep(result.id_peticio)}
-                    className="flex items-center justify-center gap-2 w-full py-3 border border-consorci-darkBlue dark:border-consorci-lightBlue text-consorci-darkBlue dark:text-consorci-lightBlue hover:bg-consorci-darkBlue dark:hover:bg-consorci-lightBlue hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
-                  >
-                    <PlusCircle className="w-3 h-3" />
-                    Nou Pas Checklist
-                  </button>
-                </div>
-              )) : (
-                <div className="col-span-full py-20 text-center border-2 border-dashed border-border-subtle bg-background-subtle/20">
-                  <Search className="w-10 h-10 text-text-muted mx-auto mb-4" />
-                  <p className="text-text-muted text-[10px] font-black uppercase tracking-widest">Inicia una cerca per visualitzar llistats nominals</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Audit Log (Activity) */}
-        <div className="bg-background-surface border border-border-subtle overflow-hidden">
-          <div className="p-6 border-b border-border-subtle bg-background-subtle flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <History className="w-5 h-5 text-consorci-darkBlue dark:text-consorci-lightBlue" />
-              <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Registre Logístic d'Activitat</h3>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-[11px] border-collapse">
-              <thead>
-                <tr className="bg-background-surface text-consorci-darkBlue dark:text-consorci-lightBlue border-b border-border-subtle">
-                  <th className="px-6 py-5 font-black uppercase tracking-tighter w-48">Timestamp</th>
-                  <th className="px-6 py-5 font-black uppercase tracking-tighter w-48">Mètode Execució</th>
-                  <th className="px-6 py-5 font-black uppercase tracking-tighter">Payload Documental (Metadata)</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {activityLogs.length > 0 ? activityLogs.map((log) => (
-                  <tr key={log._id} className="hover:bg-background-subtle/80 transition-colors">
-                    <td className="px-6 py-4 font-black text-text-muted italic">
-                      {new Date(log.timestamp).toLocaleTimeString()} · {new Date(log.timestamp).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
-                        <span className="font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase text-[10px]">
-                          {log.tipus_accio}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="bg-consorci-darkBlue/5 dark:bg-consorci-lightBlue/10 p-3 font-mono text-[9px] text-consorci-darkBlue/80 dark:text-consorci-lightBlue/80 leading-relaxed border-l-2 border-consorci-darkBlue/20 dark:border-consorci-lightBlue/20">
-                        {JSON.stringify(log.detalls)}
-                      </div>
-                    </td>
-                  </tr>
-                )) : (
-                  <tr key="no-activity">
-                    <td colSpan={3} className="px-6 py-20 text-center">
-                      <p className="text-text-muted text-xs font-bold uppercase tracking-widest italic tracking-widest">Sincronitzant historial de logs...</p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Sync Atlas (Full Width) */}
-        <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-50 dark:bg-purple-900/20">
-              <Database className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div>
-              <h3 className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">MongoDB Atlas Data Sync</h3>
-              <p className="text-[9px] font-bold text-text-muted uppercase mt-1">
-                Cluster: <span className="text-consorci-actionBlue">iter-main</span> · Node: <span className="text-consorci-actionBlue">GCP-Brussels</span> · Status: <span className="text-green-500 font-black">Connected</span>
-              </p>
-            </div>
-          </div>
-          <div className="text-[10px] text-text-muted font-bold uppercase tracking-tight text-center md:text-right max-w-md hidden sm:block">
-            Sincronització de dades documentals activa. Qualsevol canvi en les peticions es reflecteix en temps real en els gràfics analítics superiors mitjançant pipelines d'agregació.
-          </div>
-        </div>
       </div>
-
-      <ConfirmDialog
-        isOpen={confirmConfig.isOpen}
-        title={confirmConfig.title}
-        message={confirmConfig.message}
-        onConfirm={confirmConfig.onConfirm}
-        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
-        isDestructive={confirmConfig.isDestructive}
-      />
     </DashboardLayout>
   );
 }
