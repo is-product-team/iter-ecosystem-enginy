@@ -33,7 +33,7 @@ router.get('/', authenticateToken, async (_req: Request, res: Response) => {
 router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
   const { id } = req.params;
   const { data_inici, data_fi, activa, nom, descripcio } = req.body;
-  const { user } = req as any;
+  const user = req.user!;
 
   if (user.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Accés denegat: Només els administradors poden modificar les fases.' });

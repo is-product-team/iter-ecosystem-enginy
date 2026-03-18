@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 
 export const getProfessors = async (req: Request, res: Response) => {
-  const { centreId, role } = (req as any).user || {};
+  const { centreId, role } = req.user! || {};
 
   try {
     const where: any = {};
@@ -36,11 +36,11 @@ export const getProfessors = async (req: Request, res: Response) => {
 };
 
 export const createProfessor = async (req: Request, res: Response) => {
-  const { centreId } = (req as any).user;
+  const { centreId } = req.user!;
   const { nom, contacte, password } = req.body;
   
   try {
-    const finalCentreId = centreId ? parseInt(centreId) : req.body.id_centre;
+    const finalCentreId = centreId ? centreId : req.body.id_centre;
 
     if (!finalCentreId) {
       return res.status(400).json({ error: 'ID de centre requerit.' });
@@ -119,7 +119,7 @@ export const deleteProfessor = async (req: Request, res: Response) => {
 };
 
 export const getProfessorAssignments = async (req: Request, res: Response) => {
-  const { userId, centreId } = (req as any).user;
+  const { userId, centreId } = req.user!;
 
   try {
     // Verify user belongs to center or is admin (optional safety check)
@@ -130,9 +130,9 @@ export const getProfessorAssignments = async (req: Request, res: Response) => {
     const assignments = await prisma.assignacio.findMany({
       where: {
         OR: [
-           { professors: { some: { id_usuari: parseInt(userId) } } },
-           { prof1: { id_usuari: parseInt(userId) } },
-           { prof2: { id_usuari: parseInt(userId) } }
+           { professors: { some: { id_usuari: userId } } },
+           { prof1: { id_usuari: userId } },
+           { prof2: { id_usuari: userId } }
         ]
       },
       include: {
@@ -170,7 +170,7 @@ export const getProfessorAssignments = async (req: Request, res: Response) => {
 
 export const getProfessorsByCentre = async (req: Request, res: Response) => {
   const { idCentre } = req.params;
-  const { centreId, role } = (req as any).user || {};
+  const { centreId, role } = req.user! || {};
 
   try {
     // Scoping check

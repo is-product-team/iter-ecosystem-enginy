@@ -8,7 +8,7 @@ import { ROLES } from '@iter/shared';
  */
 export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
   const { idAssignacio } = req.params;
-  const file = (req as any).file;
+  const file = req.file;
 
   if (!file) {
     return res.status(400).json({ error: 'No files were uploaded.' });

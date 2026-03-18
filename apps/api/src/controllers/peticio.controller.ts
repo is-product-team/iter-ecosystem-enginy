@@ -6,8 +6,8 @@ import { createNotificacioInterna } from './notificacio.controller.js';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
 export const getPeticions = async (req: Request, res: Response) => {
-  const { centreId, role } = (req as any).user || {};
-  const { page = 1, limit = 10 } = req.query as any;
+  const { centreId, role } = req.user || {};
+  const { page = 1, limit = 10 } = req.query;
   const isAll = Number(limit) === 0;
   const skip = isAll ? undefined : (Number(page) - 1) * Number(limit);
   const take = isAll ? undefined : Number(limit);
@@ -67,7 +67,7 @@ export const createPeticio = async (req: Request, res: Response) => {
     prof2_id,
     modalitat
   } = req.body;
-  const { centreId } = (req as any).user;
+  const { centreId } = req.user!;
 
   if (!id_taller || !centreId || !prof1_id || !prof2_id) {
     return res.status(400).json({ error: 'Falten camps obligatoris (id_taller, centreId, prof1_id, prof2_id)' });
@@ -94,7 +94,7 @@ export const createPeticio = async (req: Request, res: Response) => {
     // Comprobar límite total de 12 alumnos para el centro en Modalidad C
     const peticionsC = await prisma.peticio.findMany({
       where: {
-        id_centre: parseInt(centreId),
+        id_centre: centreId,
         modalitat: 'C'
       }
     });
@@ -110,7 +110,7 @@ export const createPeticio = async (req: Request, res: Response) => {
   try {
     const existingPeticio = await prisma.peticio.findFirst({
       where: {
-        id_centre: parseInt(centreId),
+        id_centre: centreId,
         id_taller: parseInt(id_taller)
       }
     });
@@ -121,7 +121,7 @@ export const createPeticio = async (req: Request, res: Response) => {
 
     const nuevaPeticio = await prisma.peticio.create({
       data: {
-        id_centre: parseInt(centreId),
+        id_centre: centreId,
         id_taller: parseInt(id_taller),
         alumnes_aprox: parseInt(alumnes_aprox),
         comentaris,
@@ -151,7 +151,7 @@ export const updatePeticio = async (req: Request, res: Response) => {
     prof1_id,
     prof2_id,
   } = req.body;
-  const { centreId, role } = (req as any).user;
+  const { centreId, role } = req.user!;
 
   try {
     const peticioId = parseInt(id as string);
@@ -164,7 +164,7 @@ export const updatePeticio = async (req: Request, res: Response) => {
     }
 
     // Verificar permisos: Coordinador solo edita las suyas
-    if (role !== 'ADMIN' && existingPeticio.id_centre !== parseInt(centreId)) {
+    if (role !== 'ADMIN' && existingPeticio.id_centre !== (centreId ? (typeof centreId === 'string' ? centreId : centreId) : 0)) {
       return res.status(403).json({ error: 'No tens permís per editar aquesta petició.' });
     }
 

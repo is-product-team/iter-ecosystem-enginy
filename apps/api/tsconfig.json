@@ -13,8 +13,9 @@
     "resolveJsonModule": true,
     "declaration": true,
     "sourceMap": true,
-    "ignoreDeprecations": "5.0"
+    "ignoreDeprecations": "5.0",
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*", "prisma/**/*", "scripts/**/*"],
+  "include": ["src/**/*", "src/types/**/*.d.ts", "prisma/**/*", "scripts/**/*"],
   "exclude": ["node_modules", "dist"]
 }

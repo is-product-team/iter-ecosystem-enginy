@@ -2,11 +2,11 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export class AvaluacioService {
+export class EvaluationService {
     /**
      * Obtiene la evaluación docente de una inscripción específica.
      */
-    async getAvaluacioInscripcio(id_inscripcio: number) {
+    async getEvaluationByInscripcio(id_inscripcio: number) {
         return await prisma.avaluacioDocent.findUnique({
             where: { id_inscripcio },
             include: {
@@ -22,7 +22,7 @@ export class AvaluacioService {
     /**
      * Crea o actualiza una evaluación docente.
      */
-    async upsertAvaluacio(data: {
+    async upsertEvaluation(data: {
         id_inscripcio: number;
         percentatge_asistencia: number;
         numero_retards: number;

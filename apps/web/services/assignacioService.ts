@@ -20,7 +20,7 @@ const assignacioService = {
   getByCentre: async (idCentre: number): Promise<Assignacio[]> => {
     const api = getApi();
     try {
-      const response = await api.get<Assignacio[]>(`/assignacions/centre/${idCentre}`);
+      const response = await api.get<Assignacio[]>(`/assignments/centre/${idCentre}`);
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.getByCentre:", error);
@@ -34,7 +34,7 @@ const assignacioService = {
   createFromPeticio: async (idPeticio: number): Promise<Assignacio> => {
     const api = getApi();
     try {
-      const response = await api.post<Assignacio>("/assignacions", { idPeticio });
+      const response = await api.post<Assignacio>("/assignments", { idPeticio });
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.createFromPeticio:", error);
@@ -48,7 +48,7 @@ const assignacioService = {
   updateChecklistItem: async (idItem: number, completat: boolean, url_evidencia?: string): Promise<any> => {
     const api = getApi();
     try {
-      const response = await api.patch(`/assignacions/checklist/${idItem}`, { completat, url_evidencia });
+      const response = await api.patch(`/assignments/checklist/${idItem}`, { completat, url_evidencia });
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.updateChecklistItem:", error);
@@ -62,7 +62,7 @@ const assignacioService = {
   runTetris: async (): Promise<any> => {
     const api = getApi();
     try {
-      const response = await api.post("/assignacions/tetris");
+      const response = await api.post("/assignments/tetris");
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.runTetris:", error);
@@ -76,7 +76,7 @@ const assignacioService = {
   getAll: async (): Promise<Assignacio[]> => {
     const api = getApi();
     try {
-      const response = await api.get<Assignacio[]>("/assignacions");
+      const response = await api.get<Assignacio[]>("/assignments");
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.getAll:", error);
@@ -90,7 +90,7 @@ const assignacioService = {
   sendDocumentNotification: async (idAssignacio: number, documentName: string, comment: string, greeting: string): Promise<any> => {
     const api = getApi();
     try {
-      const response = await api.post(`/assignacions/${idAssignacio}/document-notification`, { documentName, comment, greeting });
+      const response = await api.post(`/assignments/${idAssignacio}/document-notification`, { documentName, comment, greeting });
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.sendDocumentNotification:", error);
@@ -104,7 +104,7 @@ const assignacioService = {
   validateDocument: async (idInscripcio: number, field: string, valid: boolean): Promise<any> => {
     const api = getApi();
     try {
-      const response = await api.patch(`/assignacions/inscripcions/${idInscripcio}/validate`, { field, valid });
+      const response = await api.patch(`/assignments/inscripcions/${idInscripcio}/validate`, { field, valid });
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.validateDocument:", error);

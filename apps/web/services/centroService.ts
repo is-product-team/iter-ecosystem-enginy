@@ -16,7 +16,7 @@ const centroService = {
   getAll: async (): Promise<Centre[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: Centre[], meta: any }>("/centres");
+      const response = await api.get<{ data: Centre[], meta: any }>("/centers");
       return response.data.data;
     } catch (error) {
       console.error("Error en centroService.getAll:", error);
@@ -30,7 +30,7 @@ const centroService = {
   create: async (centroData: Omit<Centre, 'id_centre'>): Promise<Centre> => {
     const api = getApi();
     try {
-      const response = await api.post("/centres", centroData);
+      const response = await api.post("/centers", centroData);
       return response.data;
     } catch (error: any) {
       console.error("Error en centroService.create:", error);
@@ -49,7 +49,7 @@ const centroService = {
       // But usually we need more. Let's look at the controller again.
       // It only has getCentres, getCentreById, createCentre, updateCentreAttendance.
       // I'll implement what's available and assume more might be needed or added.
-      const response = await api.patch(`/centres/${id}`, centroData);
+      const response = await api.patch(`/centers/${id}`, centroData);
       return response.data;
     } catch (error: any) {
       console.error("Error en centroService.update:", error);
@@ -64,7 +64,7 @@ const centroService = {
   delete: async (id: number): Promise<void> => {
     const api = getApi();
     try {
-      await api.delete(`/centres/${id}`);
+      await api.delete(`/centers/${id}`);
     } catch (error: any) {
       console.error("Error en centroService.delete:", error);
       const errorMessage = error.response?.data?.message || "No se pudo eliminar el centro";

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 
 // GET: Ver notificaciones (Filtradas por centro o usuario)
 export const getNotificacions = async (req: Request, res: Response) => {
-  const { centreId, userId, role } = (req as any).user || {};
+  const { centreId, userId, role } = req.user! || {};
 
   try {
     const where: any = {

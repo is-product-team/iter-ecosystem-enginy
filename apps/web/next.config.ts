@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  transpilePackages: ["@iter/shared", "@iter/ui"],
+  transpilePackages: ["@iter/shared", ],
 };
 
 export default nextConfig;

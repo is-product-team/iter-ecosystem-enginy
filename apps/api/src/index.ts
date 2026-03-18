@@ -13,7 +13,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ... (allowedOrigins logic remains same)
-const allowedOrigins = [
+const defaultAllowedOrigins = [
   'https://projects.kore29.com',
   'https://projects.kore29.com/iter',
   'https://iter.kore29.com',
@@ -22,23 +22,16 @@ const allowedOrigins = [
   'http://localhost:3001',
 ];
 
-if (process.env.CORS_ORIGIN) {
-  const envOrigins = process.env.CORS_ORIGIN.split(',').map((o) => o.trim());
-  envOrigins.forEach((origin) => {
-    if (!allowedOrigins.includes(origin)) {
-      allowedOrigins.push(origin);
-    }
-  });
-}
+const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS 
+  ? process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : defaultAllowedOrigins;
 
 app.use(cors({
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    // permitir peticiones sin origen (como apps móviles o curl) si es necesario, 
-    // pero para web restringir a la lista
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('No permitido por CORS'));
+      callback(new Error('CORS Policy: Origin not allowed'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

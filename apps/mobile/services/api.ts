@@ -2,6 +2,15 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { router } from 'expo-router';
+import type { 
+  Rol, 
+  Fase, 
+  Notificacio, 
+  Assistencia,
+  Inscripcio,
+  Alumne,
+  Assignacio
+} from '@iter/shared';
 
 const getBaseURL = () => {
   let url = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
@@ -19,8 +28,6 @@ const api = axios.create({
   },
 });
 
-console.log('📡 [API] Base URL:', api.defaults.baseURL);
-
 api.interceptors.request.use(
   async (config) => {
     try {
@@ -28,9 +35,6 @@ api.interceptors.request.use(
       if (Platform.OS === 'web') {
         token = localStorage.getItem('token');
       } else {
-        // En iOS/Android, intentamos recuperar el token del almacenamiento seguro.
-        // Añadimos un try/catch específico aquí porque SecureStore puede fallar
-        // si el llavero (keychain) está bloqueado o en estados de transición.
         token = await SecureStore.getItemAsync('token');
       }
 
@@ -40,39 +44,19 @@ api.interceptors.request.use(
       
       // @ts-ignore
       config.metadata = { startTime: new Date() };
-      console.log(`📡 [API] Request: ${config.method?.toUpperCase()} ${config.url}`);
     } catch (error) {
-      console.warn('⚠️ [API] No se pudo leer el token del almacenamiento seguro:', error);
-      // No lanzamos el error para permitir que la petición se envíe (fallará con 401 si es necesaria la auth)
+      console.warn('⚠️ [API] Token read error:', error);
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  (response) => {
-    // @ts-ignore
-    const startTime = response.config.metadata?.startTime;
-    if (startTime) {
-      const duration = new Date().getTime() - startTime.getTime();
-      console.log(`✅ [API] Response: ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status} (${duration}ms)`);
-    }
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    // @ts-ignore
-    const startTime = error.config?.metadata?.startTime;
-    if (startTime) {
-      const duration = new Date().getTime() - startTime.getTime();
-      console.log(`❌ [API] Error: ${error.config?.method?.toUpperCase()} ${error.config?.url} - ${error.response?.status || 'Network Error'} (${duration}ms)`);
-    }
     if (error.response?.status === 401) {
-      console.warn('📡 [API] Sesión expirada o inválida (401). Redirigiendo a login...');
       await logout();
-      // Pequeño delay para asegurar que el estado se limpie antes de redirigir
       setTimeout(() => {
         router.replace('/login');
       }, 100);
@@ -95,16 +79,43 @@ export const logout = async () => {
   }
 };
 
-export const login = (data: any) => api.post('auth/login', data);
+// --- Auth ---
+export const login = (data: { email: string; password?: string }) => 
+  api.post<{ token: string; user: { userId: number; role: Rol; centreId?: number } }>('auth/login', data);
 
-export const getMyAssignments = () => api.get('professors/me/assignments');
-export const getChecklist = (id: string) => api.get(`assignacions/${id}/checklist`);
-export const getStudents = (id: string) => api.get(`assignacions/${id}/students`);
-export const getAttendance = (idAssignacio: string) => api.get(`assistencia/assignacio/${idAssignacio}`);
-export const postAttendance = (data: any) => api.post('assistencia', data);
-export const postIncidencia = (data: any) => api.post('assignacions/incidencies', data);
-export const getFases = () => api.get('fases');
-export const getCalendar = () => api.get('calendar');
-export const getNotificacions = () => api.get('notificacions');
+// --- Assignments & Professors ---
+export const getMyAssignments = () => 
+  api.get<Assignacio[]>('teachers/me/assignments');
+
+export const getChecklist = (id: string | number) => 
+  api.get(`assignments/${id}/checklist`);
+
+export const getStudents = (id: string | number) => 
+  api.get<(Inscripcio & { alumne: Alumne })[]>(`assignments/${id}/students`);
+
+// --- Attendance ---
+export const getAttendance = (idAssignment: string | number) => 
+  api.get<Assistencia[]>(`attendance/assignments/${idAssignment}`);
+
+export const postAttendance = (data: { 
+  id_inscripcio: number; 
+  numero_sessio: number; 
+  estat: string; 
+  observacions?: string;
+  data_sessio?: string;
+}) => api.post<Assistencia>('attendance', data);
+
+// --- Other Services ---
+export const postIncidencia = (data: { id_assignacio: number; titol: string; descripcio: string }) => 
+  api.post('assignments/incidencies', data);
+
+export const getPhases = () => 
+  api.get<Fase[]>('phases');
+
+export const getCalendar = () => 
+  api.get('calendar');
+
+export const getNotifications = () => 
+  api.get<Notificacio[]>('notifications');
 
 export default api;

@@ -16,7 +16,6 @@ import sectorRoutes from './sector.routes.js';
 import assistenciaRoutes from './assistencia.routes.js';
 import notificacioRoutes from './notificacio.routes.js';
 import evaluationRoutes from './evaluation.routes.js'; 
-import avaluacioRoutes from './avaluacio.routes.js';
 import questionariRoutes from './questionari.routes.js';
 import uploadRoutes from './upload.routes.js';
 
@@ -26,31 +25,30 @@ import uploadRoutes from './upload.routes.js';
 router.use('/auth', authRoutes);
 
 // Rutas de Maestros
-router.use('/tallers', tallerRoutes);
-router.use('/centres', centroRoutes);
+router.use('/workshops', tallerRoutes);
+router.use('/centers', centroRoutes);
 router.use('/sectors', sectorRoutes);
 
 // Rutas del Flujo de Negocio (Solicitudes y Asignaciones)
-router.use('/peticions', peticioRoutes);
-router.use('/assignacions', assignacioRoutes);
-router.use('/notificacions', notificacioRoutes);
-router.use('/evaluation', evaluationRoutes); // Usar rutas de evaluación
+router.use('/requests', peticioRoutes);
+router.use('/assignments', assignacioRoutes);
+router.use('/notifications', notificacioRoutes);
+router.use('/evaluation', evaluationRoutes); 
 
 // Rutas de Alumnos y Profesores
-router.use('/alumnes', alumneRoutes);
-router.use('/professors', professorRoutes);
-router.use('/assistencia', assistenciaRoutes);
+router.use('/students', alumneRoutes);
+router.use('/teachers', professorRoutes);
+router.use('/attendance', assistenciaRoutes);
 
 // Rutas de Calendario
 router.use('/calendar', calendarRoutes);
-router.use('/fases', faseRoutes);
+router.use('/phases', faseRoutes);
 
 // Rutas de Estadísticas
 router.use('/stats', statsRoutes);
 
 // Rutas de Evaluación y Cuestionarios
-router.use('/evaluacions', avaluacioRoutes);
-router.use('/questionaris', questionariRoutes);
+router.use('/questionnaires', questionariRoutes);
 
 // Rutas de Carga de Archivos
 router.use('/upload', uploadRoutes);

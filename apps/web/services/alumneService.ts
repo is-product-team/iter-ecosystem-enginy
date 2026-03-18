@@ -13,22 +13,22 @@ export interface Alumne {
 const alumneService = {
   getAll: async (): Promise<Alumne[]> => {
     const api = getApi();
-    const response = await api.get<Alumne[]>("/alumnes");
+    const response = await api.get<Alumne[]>("/students");
     return response.data;
   },
   create: async (data: Omit<Alumne, 'id_alumne'>): Promise<Alumne> => {
     const api = getApi();
-    const response = await api.post<Alumne>("/alumnes", data);
+    const response = await api.post<Alumne>("/students", data);
     return response.data;
   },
   update: async (id: number, data: Partial<Alumne>): Promise<Alumne> => {
     const api = getApi();
-    const response = await api.put<Alumne>(`/alumnes/${id}`, data);
+    const response = await api.put<Alumne>(`/students/${id}`, data);
     return response.data;
   },
   delete: async (id: number): Promise<void> => {
     const api = getApi();
-    await api.delete(`/alumnes/${id}`);
+    await api.delete(`/students/${id}`);
   }
 };
 

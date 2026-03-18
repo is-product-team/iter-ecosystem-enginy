@@ -4,7 +4,7 @@ import { ROLES } from '@iter/shared';
 
 export const getCalendarEvents = async (req: Request, res: Response) => {
   try {
-    const { user } = req as any;
+    const user = req.user!;
     const { start, end } = req.query;
 
     // 1. Obtener el profesor asociado al usuario (si es rol profesor) de forma directa por ID

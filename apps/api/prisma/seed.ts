@@ -1,47 +1,41 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { PHASES, ROLES } from '@iter/shared';
 
 const prisma = new PrismaClient();
 
-const PHASES = {
-  SOLICITUD: 'Sol·licitud i Inscripció',
-  PLANIFICACION: 'Planificació i Assignació',
-  EJECUCION: 'Execució i Seguiment',
-  CIERRE: 'Tancament i Avaluació'
-} as const;
-
 async function cleanDatabase() {
-  console.log('🧹 Netejant base de dades...');
-  const tables = [
-    'respostes_questionari', 'enviaments_questionaris', 'preguntes', 'model_questionaris',
-    'autoconsultes_alumnes', 'avaluacio_competencial', 'avaluacions_docents',
-    'assistencia', 'inscripcions', 'checklist_assignacio', 'assignacio_professors',
-    'assignacions', 'peticions', 'tallers', 'alumnes', 'professors', 'incidencies',
-    'notificacions', 'logs_auditoria', 'calendari_events', 'fases', 'enquestes',
-    'certificats', 'usuaris', 'centres', 'sectors', 'rols', 'competencies'
-  ];
+  console.log('🧹 Netejant base de dades dinàmicament...');
+  
+  // Obtener todas las tablas del esquema público
+  const tables: { tablename: string }[] = await prisma.$queryRaw`
+    SELECT tablename FROM pg_tables WHERE schemaname = 'public'
+  `;
 
-  for (const table of tables) {
+  for (const { tablename } of tables) {
+    if (tablename === '_prisma_migrations') continue;
     try {
-      await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE`);
+      await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${tablename}" RESTART IDENTITY CASCADE`);
     } catch (e) {
-      // Ignorar si la tabla no existe o hay error de truncado
+      console.warn(`⚠️ No s'ha pogut truncar la taula ${tablename}:`, e);
     }
   }
 }
 
 async function seedInfrastructure() {
   console.log('🏗️ Generant rols i sectors...');
-  const rolAdmin = await prisma.rol.create({ data: { nom_rol: 'ADMIN' } });
-  const rolCoord = await prisma.rol.create({ data: { nom_rol: 'COORDINADOR' } });
-  const rolProfe = await prisma.rol.create({ data: { nom_rol: 'PROFESSOR' } });
+  const rolesMap = {
+    ADMIN: await prisma.rol.create({ data: { nom_rol: ROLES.ADMIN } }),
+    COORDINADOR: await prisma.rol.create({ data: { nom_rol: ROLES.COORDINADOR } }),
+    PROFESSOR: await prisma.rol.create({ data: { nom_rol: ROLES.PROFESOR } }),
+  };
 
   const sectorTecno = await prisma.sector.create({ data: { nom: 'Transformació Digital' } });
   const sectorCreacio = await prisma.sector.create({ data: { nom: 'Creació Artística' } });
   const sectorIndus = await prisma.sector.create({ data: { nom: 'Industrial i Logística' } });
 
   return { 
-    roles: { rolAdmin, rolCoord, rolProfe }, 
+    roles: rolesMap, 
     sectors: { sectorTecno, sectorCreacio, sectorIndus } 
   };
 }

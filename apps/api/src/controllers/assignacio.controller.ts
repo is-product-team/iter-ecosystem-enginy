@@ -6,7 +6,7 @@ import { createNotificacioInterna } from './notificacio.controller.js';
 
 // GET: Todas las asignaciones (Admin solo)
 export const getAssignacions = async (req: Request, res: Response) => {
-  const { role } = (req as any).user;
+  const { role } = req.user!;
 
   if (role !== 'ADMIN') {
     return res.status(403).json({ error: 'Accés denegat' });
@@ -39,7 +39,7 @@ export const getAssignacions = async (req: Request, res: Response) => {
 // GET: Una asignación por ID (Detalle completo)
 export const getAssignacioById = async (req: Request, res: Response) => {
   const id = req.params.id as string;
-  const { centreId, role } = (req as any).user;
+  const { centreId, role } = req.user!;
 
   try {
     const assignacio = await prisma.assignacio.findUnique({
@@ -90,7 +90,7 @@ export const getAssignacioById = async (req: Request, res: Response) => {
 // GET: Listar asignaciones de un centro
 export const getAssignacionsByCentre = async (req: Request, res: Response) => {
   const { idCentre } = req.params;
-  const { centreId, role } = (req as any).user;
+  const { centreId, role } = req.user!;
 
   // Security Scoping
   if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
@@ -137,7 +137,7 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
 // GET: Obtener alumnos inscritos en una asignación
 export const getStudents = async (req: Request, res: Response) => {
   const { idAssignacio } = req.params;
-  const { userId, role } = (req as any).user;
+  const { userId, role } = req.user!;
 
   try {
     const inscripcions = await prisma.inscripcio.findMany({
@@ -201,7 +201,7 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
 // GET: Incidencias de un centro
 export const getIncidenciesByCentre = async (req: Request, res: Response) => {
   const { idCentre } = req.params;
-  const { centreId, role } = (req as any).user;
+  const { centreId, role } = req.user!;
 
   // Security Scoping
   if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
@@ -276,7 +276,7 @@ export const validateDocumentUpload = async (req: Request, res: Response) => {
 // POST: Crear Asignación desde Petición (Admin Only)
 export const createAssignacioFromPeticio = async (req: Request, res: Response) => {
   const { idPeticio } = req.body;
-  const { role } = (req as any).user;
+  const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) {
     return res.status(403).json({ error: 'Només els administradors poden realitzar assignacions.' });
@@ -334,7 +334,7 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
 
 // POST: Publicar Asignaciones (Admin Only)
 export const publishAssignments = async (req: Request, res: Response) => {
-  const { role } = (req as any).user;
+  const { role } = req.user!;
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autoritzat' });
 
   try {
@@ -480,7 +480,7 @@ export const designateProfessors = async (req: Request, res: Response) => {
 export const validateCenterData = async (req: Request, res: Response) => {
   const idAssignacio = req.params.idAssignacio as string;
   const { aprobado, feedback } = req.body;
-  const { role } = (req as any).user;
+  const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
 
@@ -509,7 +509,7 @@ export const validateCenterData = async (req: Request, res: Response) => {
 export const sendDocumentNotification = async (req: Request, res: Response) => {
   const idAssignacio = req.params.idAssignacio as string;
   const { documentName, comment, greeting } = req.body;
-  const { role } = (req as any).user;
+  const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
 
@@ -547,7 +547,7 @@ export const sendDocumentNotification = async (req: Request, res: Response) => {
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';
 
 export const generateAutomaticAssignments = async (req: Request, res: Response) => {
-  const { role } = (req as any).user;
+  const { role } = req.user!;
   // if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
 
   try {
@@ -672,7 +672,7 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
 export const validateInscripcioDocument = async (req: Request, res: Response) => {
     const { idInscripcio } = req.params;
     const { field, valid } = req.body; // field: 'validat_acord_pedagogic', etc.
-    const { role } = (req as any).user;
+    const { role } = req.user!;
 
     if (role !== ROLES.ADMIN) {
         return res.status(403).json({ error: 'Només els administradors poden validar documents.' });

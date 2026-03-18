@@ -25,7 +25,7 @@ const tallerService = {
   getAll: async (): Promise<Taller[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: any[], meta: any }>("/tallers?limit=0");
+      const response = await api.get<{ data: any[], meta: any }>("/workshops?limit=0");
       const tallersData = response.data.data;
 
       return tallersData.map((t: any) => ({
@@ -65,7 +65,7 @@ const tallerService = {
         dies_execucio: tallerData.dies_execucio,
       };
 
-      const response = await api.post("/tallers", payload);
+      const response = await api.post("/workshops", payload);
       const t = response.data;
 
       return {
@@ -107,7 +107,7 @@ const tallerService = {
         if (tallerData.detalls_tecnics.places_maximes) payload.places_maximes = tallerData.detalls_tecnics.places_maximes;
       }
 
-      const response = await api.put(`/tallers/${id}`, payload);
+      const response = await api.put(`/workshops/${id}`, payload);
       const t = response.data;
 
       return {
@@ -140,7 +140,7 @@ const tallerService = {
   delete: async (id: string): Promise<void> => {
     const api = getApi();
     try {
-      await api.delete(`/tallers/${id}`);
+      await api.delete(`/workshops/${id}`);
     } catch (error: any) {
       console.error("Error en tallerService.delete:", error);
       const errorMessage = error.response?.data?.message || "No se pudo eliminar el taller";

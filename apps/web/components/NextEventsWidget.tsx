@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { CalendarEvent } from '@iter/ui';
+import { CalendarEvent } from './ui/Calendar';
 import getApi from '@/services/api';
 import { useRouter } from 'next/navigation';
 

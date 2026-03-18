@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Calendar, CalendarEvent } from "@iter/ui";
+import Calendar, { CalendarEvent } from "../../components/ui/Calendar";
 import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 

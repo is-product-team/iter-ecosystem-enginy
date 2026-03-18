@@ -2,7 +2,7 @@ import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 
 export const getAlumnes = async (req: Request, res: Response) => {
-  const { centreId, role } = (req as any).user || {};
+  const { centreId, role } = req.user! || {};
 
   try {
     const where: any = {};
@@ -26,12 +26,12 @@ export const getAlumnes = async (req: Request, res: Response) => {
 };
 
 export const createAlumne = async (req: Request, res: Response) => {
-  const { centreId } = (req as any).user;
+  const { centreId } = req.user!;
   try {
     const alumne = await prisma.alumne.create({
       data: {
         ...req.body,
-        id_centre_procedencia: centreId ? parseInt(centreId) : req.body.id_centre_procedencia
+        id_centre_procedencia: centreId ? centreId : req.body.id_centre_procedencia
       }
     });
     res.json(alumne);

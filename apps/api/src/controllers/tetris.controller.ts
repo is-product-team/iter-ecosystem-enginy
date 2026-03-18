@@ -3,7 +3,7 @@ import { runTetris } from '../services/tetris.service.js';
 import { ROLES } from '@iter/shared';
 
 export const triggerTetris = async (req: Request, res: Response) => {
-  const { role } = (req as any).user;
+  const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) {
     return res.status(403).json({ error: 'Only admins can trigger the assignment process.' });

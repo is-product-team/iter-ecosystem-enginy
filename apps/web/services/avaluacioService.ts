@@ -4,23 +4,23 @@ const api = getApi();
 
 export const avaluacioService = {
     getAvaluacioInscripcio: (id_inscripcio: number) =>
-        api.get(`/evaluacions/inscripcio/${id_inscripcio}`),
+        api.get(`/evaluation/inscripcio/${id_inscripcio}`),
 
-    upsetAvaluacio: (data: any) =>
-        api.post('/evaluacions/upset', data),
+    upsertAvaluacio: (data: any) =>
+        api.post('/evaluation/upsert', data),
 
     getCompetencies: () =>
-        api.get('/evaluacions/competencies'),
+        api.get('/evaluation/competencies'),
 
     getModels: () =>
-        api.get('/questionaris/models'),
+        api.get('/questionnaires/models'),
 
     analyzeObservations: (text: string) =>
-        api.post('/evaluacions/analyze', { text }),
+        api.post('/evaluation/analyze', { text }),
 
     submitAutoconsulta: (data: any) =>
-        api.post('/questionaris/autoconsulta', data),
+        api.post('/questionnaires/autoconsulta', data),
 
     getReports: () =>
-        api.get('/questionaris/reports'),
+        api.get('/questionnaires/reports'),
 };

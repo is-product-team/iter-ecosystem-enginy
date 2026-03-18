@@ -29,7 +29,7 @@ const peticioService = {
   getAll: async (): Promise<Peticio[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: Peticio[], meta: any }>("/peticions?limit=0");
+      const response = await api.get<{ data: Peticio[], meta: any }>("/requests?limit=0");
       return response.data.data;
     } catch (error) {
       console.error("Error en peticioService.getAll:", error);
@@ -50,7 +50,7 @@ const peticioService = {
   }): Promise<Peticio> => {
     const api = getApi();
     try {
-      const response = await api.post<Peticio>("/peticions", data);
+      const response = await api.post<Peticio>("/requests", data);
       return response.data;
     } catch (error: any) {
       console.error("Error en peticioService.create:", error);
@@ -70,7 +70,7 @@ const peticioService = {
   }): Promise<Peticio> => {
     const api = getApi();
     try {
-      const response = await api.put<Peticio>(`/peticions/${id}`, data);
+      const response = await api.put<Peticio>(`/requests/${id}`, data);
       return response.data;
     } catch (error: any) {
       console.error("Error en peticioService.update:", error);
@@ -85,7 +85,7 @@ const peticioService = {
   updateStatus: async (id: number, estat: string): Promise<Peticio> => {
     const api = getApi();
     try {
-      const response = await api.patch<Peticio>(`/peticions/${id}/status`, { estat });
+      const response = await api.patch<Peticio>(`/requests/${id}/status`, { estat });
       return response.data;
     } catch (error) {
       console.error("Error en peticioService.updateStatus:", error);

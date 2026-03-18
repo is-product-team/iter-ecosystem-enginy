@@ -3,11 +3,15 @@ import { THEME } from './theme.js';
 
 export { THEME };
 
+// Exportar tipos de Prisma para que estén disponibles en todo el monorepo
+// Nota: Requiere que la API haya ejecutado "npx prisma generate"
+export type * from '@prisma/client';
+
 // Definimos los roles exactos que espera la Base de Datos
 export const ROLES = {
   ADMIN: 'ADMIN',
   COORDINADOR: 'COORDINADOR',
-  PROFESOR: 'PROFESSOR'
+  PROFESSOR: 'PROFESSOR'
 } as const;
 
 export type Rol = typeof ROLES[keyof typeof ROLES];
