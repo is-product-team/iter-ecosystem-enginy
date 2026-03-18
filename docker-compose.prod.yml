@@ -7,11 +7,11 @@ services:
       target: runner-api
     container_name: muvv_api
     restart: always
+    env_file:
+      - apps/api/.env.production
     environment:
       - NODE_ENV=production
       - PORT=3000
-    env_file:
-      - .env
     networks:
       - red_proxy
 
@@ -22,14 +22,14 @@ services:
       dockerfile: Dockerfile
       target: runner-web
       args:
-        - NEXT_PUBLIC_API_URL=https://api.muvv.projects.kore29.com
+        - NEXT_PUBLIC_API_URL=https://projects.kore29.com/muvv/api
     container_name: muvv_web
     restart: always
+    env_file:
+      - apps/web/.env.production
     environment:
       - NODE_ENV=production
       - PORT=3000
-    env_file:
-      - .env
     networks:
       - red_proxy
 

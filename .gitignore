@@ -1,6 +1,52 @@
-.env
-.env.prod
-apps/mobile/.env
+# --- Dependencias (Global y Subcarpetas) ---
+node_modules/
+**/node_modules/
+# package-lock.json  <-- Nota: Normalmente se sube para fijar versiones en prod, pero si quieres ignorarlo, descomenta esto.
 
-/node_modules
-/packages/shared/dist
+# --- Archivos de Entorno (MÁXIMA SEGURIDAD) ---
+.env*
+**/.env*
+!.env.example
+**/.env.example
+
+# --- Compilación y Salida (Builds) ---
+.next/
+**/dist/
+**/build/
+**/out/
+**/release/
+**/.turbo/
+
+# --- Prisma (Backend) ---
+apps/api/prisma/dev.db
+apps/api/prisma/dev.db-journal
+apps/api/prisma/migrations/
+# Nota: Las migraciones de Prisma se suelen subir, pero si es un proyecto experimental, puedes ignorarlas.
+
+# --- Mobile (Expo & Native) ---
+.expo/
+**/.expo/
+apps/mobile/android/
+apps/mobile/ios/
+*.jks
+*.p8
+*.pyc
+*.keystore
+
+# --- Electron ---
+apps/electron/dist/
+apps/electron/release/
+
+# --- Assets y Subidas (No subir archivos dinámicos) ---
+**/uploads/
+**/storage/
+*.log
+npm-debug.log*
+
+# --- IDEs & OS ---
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
