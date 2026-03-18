@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import * as xlsx from 'xlsx';
 import { ROLES } from '@iter/shared';
 

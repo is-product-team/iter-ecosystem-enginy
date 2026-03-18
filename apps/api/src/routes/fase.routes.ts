@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken } from '../middlewares/authMiddleware';
-import prisma from '../lib/prisma';
-import { createNotificacioInterna } from '../controllers/notificacio.controller';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
+import prisma from '../lib/prisma.js';
+import { createNotificacioInterna } from '../controllers/notificacio.controller.js';
 import { PHASES } from '@iter/shared';
 
 const router = Router();

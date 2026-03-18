@@ -1,9 +1,9 @@
 // apps/api/src/controllers/auth.controller.ts
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import logger from '../lib/logger';
+import logger from '../lib/logger.js';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;

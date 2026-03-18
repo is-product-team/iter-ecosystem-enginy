@@ -1,6 +1,6 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { EstatPeticio } from '@prisma/client';
-import { createNotificacioInterna } from '../controllers/notificacio.controller';
+import { createNotificacioInterna } from '../controllers/notificacio.controller.js';
 
 export interface TetrisStats {
   totalPetitions: number;
@@ -71,7 +71,7 @@ export async function runTetris() {
       include: { peticio: true }
     });
 
-    const occupiedPlazas = existingAssignments.reduce((sum, a) => {
+    const occupiedPlazas = (existingAssignments as any[]).reduce((sum: number, a: any) => {
       return sum + (a.peticio?.alumnes_aprox || 0);
     }, 0);
 

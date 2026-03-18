@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 
 // GET: Ver notificaciones (Filtradas por centro o usuario)

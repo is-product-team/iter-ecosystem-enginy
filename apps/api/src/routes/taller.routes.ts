@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import * as tallerController from '../controllers/taller.controller';
-import { authenticateToken, isAdmin } from '../middlewares/authMiddleware';
-import { validateData } from '../middlewares/validateMiddleware';
-import { createTallerSchema, updateTallerSchema } from '../schemas/taller.schema';
+import * as tallerController from '../controllers/taller.controller.js';
+import { authenticateToken, isAdmin } from '../middlewares/authMiddleware.js';
+import { validateData } from '../middlewares/validateMiddleware.js';
+import { createTallerSchema, updateTallerSchema } from '../schemas/taller.schema.js';
 
 // GET /api/tallers - Listar todos los talleres
 router.get('/', tallerController.getTallers);

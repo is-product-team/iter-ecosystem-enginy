@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { ROLES } from '@iter/shared';
 
 export const getCalendarEvents = async (req: Request, res: Response) => {

@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 import { Prisma, Destinatari } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';

@@ -1,5 +1,5 @@
 // apps/api/src/controllers/taller.controller.ts
-import prisma from '../lib/prisma'; // Importamos nuestro cliente singleton
+import prisma from '../lib/prisma.js'; // Importamos nuestro cliente singleton
 import { Request, Response } from 'express';
 
 // GET: Listar todos los talleres con paginación

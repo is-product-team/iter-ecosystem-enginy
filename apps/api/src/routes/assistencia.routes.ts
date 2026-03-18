@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
-import * as assistenciaController from '../controllers/assistencia.controller';
-import { authenticateToken } from '../middlewares/authMiddleware';
+import * as assistenciaController from '../controllers/assistencia.controller.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 // /api/assistencia
 router.post('/', authenticateToken, assistenciaController.registerAssistencia);

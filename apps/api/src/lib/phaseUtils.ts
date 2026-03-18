@@ -1,5 +1,5 @@
 import { PHASES } from '@iter/shared';
-import prisma from './prisma';
+import prisma from './prisma.js';
 
 /**
  * Checks if a phase is active and the current date is within the phase's start and end dates.

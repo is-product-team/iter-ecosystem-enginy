@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import * as authController from '../controllers/auth.controller';
+import * as authController from '../controllers/auth.controller.js';
 
 // POST /api/auth/register - Registrar nuevo usuario (generalmente Admin o script semilla)
 router.post('/register', authController.register);

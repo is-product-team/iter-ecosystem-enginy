@@ -1,5 +1,5 @@
 import express from 'express';
-import * as sectorController from '../controllers/sector.controller';
+import * as sectorController from '../controllers/sector.controller.js';
 
 const router = express.Router();
 

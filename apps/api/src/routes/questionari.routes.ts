@@ -7,8 +7,8 @@ import {
     submitRespostes,
     submitAutoconsulta,
     getReports
-} from '../controllers/questionari.controller';
-import { authenticateToken } from '../middlewares/authMiddleware';
+} from '../controllers/questionari.controller.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 

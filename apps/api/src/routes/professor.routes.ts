@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
-import * as professorController from '../controllers/professor.controller';
-import { authenticateToken } from '../middlewares/authMiddleware';
+import * as professorController from '../controllers/professor.controller.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 router.get('/me/assignments', authenticateToken, professorController.getProfessorAssignments);
 router.get('/centre/:idCentre', authenticateToken, professorController.getProfessorsByCentre);

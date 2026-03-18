@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import * as assignacioController from '../controllers/assignacio.controller';
-import * as tetrisController from '../controllers/tetris.controller';
-import * as enrollmentController from '../controllers/enrollment.controller';
-import { authenticateToken } from '../middlewares/authMiddleware';
+import * as assignacioController from '../controllers/assignacio.controller.js';
+import * as tetrisController from '../controllers/tetris.controller.js';
+import * as enrollmentController from '../controllers/enrollment.controller.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 import multer from 'multer';
 
 const upload = multer({ storage: multer.memoryStorage() });

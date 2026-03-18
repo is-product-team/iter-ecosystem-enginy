@@ -1,6 +1,6 @@
 
-import { SessionService } from '../src/services/session.service';
-import prisma from '../src/lib/prisma';
+import { SessionService } from '../src/services/session.service.js';
+import prisma from '../src/lib/prisma.js';
 
 async function main() {
     console.log('--- Verifying Phase 3 Backend Implementation ---');
@@ -10,7 +10,7 @@ async function main() {
     const startDate = new Date('2026-01-13T00:00:00Z'); // Tuesday
     const dates = SessionService.generateSessionDates(startDate, 3);
     console.log('Start:', startDate.toISOString());
-    console.log('Generated (3 sessions):', dates.map(d => d.toISOString()));
+    console.log('Generated (3 sessions):', dates.map((d: any) => d.toISOString()));
 
     if (dates.length !== 3) throw new Error('Date generation failed count');
     if (dates[1].getTime() - dates[0].getTime() !== 7 * 24 * 3600 * 1000) throw new Error('Date generation interval failed');

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AvaluacioService } from '../services/avaluacio.service';
-import prisma from '../lib/prisma'; // Import prisma to lookup inscripcio
+import { AvaluacioService } from '../services/avaluacio.service.js';
+import prisma from '../lib/prisma.js'; // Import prisma to lookup inscripcio
 
 const avaluacioService = new AvaluacioService();
 

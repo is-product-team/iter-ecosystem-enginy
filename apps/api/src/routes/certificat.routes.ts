@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middlewares/authMiddleware';
-import * as certificatController from '../controllers/certificat.controller';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
+import * as certificatController from '../controllers/certificat.controller.js';
 
 const router = Router();
 

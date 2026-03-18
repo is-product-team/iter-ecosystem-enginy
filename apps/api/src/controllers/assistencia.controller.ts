@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import prisma from '../lib/prisma';
-import { isPhaseActive, PHASES } from '../lib/phaseUtils';
+import prisma from '../lib/prisma.js';
+import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
 
 /**
  * Registra o actualiza la asistencia de un alumno en una sesión.

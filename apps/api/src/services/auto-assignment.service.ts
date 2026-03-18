@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 
 interface PendingCenter {
     centerId: number;
@@ -44,7 +44,7 @@ export class AutoAssignmentService {
 
         // 2. Group Petitions by Taller
         const workshopMap = new Map<number, typeof petitions>();
-        petitions.forEach(p => {
+        petitions.forEach((p: any) => {
             if (!workshopMap.has(p.id_taller)) {
                 workshopMap.set(p.id_taller, []);
             }
@@ -64,7 +64,7 @@ export class AutoAssignmentService {
                 include: { inscripcions: true }
             });
 
-            const occupiedPlazas = existingAssignments.reduce((sum, a) => sum + a.inscripcions.length, 0);
+            const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => sum + a.inscripcions.length, 0);
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
 
             console.log(`📊 AutoAssignment: Taller ID ${tallerId} (${taller.titol}): Capacity: ${taller.places_maximes}, Occupied: ${occupiedPlazas}, Remaining: ${remainingCapacity}`);
@@ -82,7 +82,7 @@ export class AutoAssignmentService {
             // The requirement implies "Fairness between Centers", so we should aggregate by Center.
             const centerMap = new Map<number, PendingCenter>();
 
-            workshopPetitions.forEach(p => {
+            workshopPetitions.forEach((p: any) => {
                 if (!p.alumnes || p.alumnes.length === 0) return;
 
                 if (!centerMap.has(p.id_centre)) {
@@ -96,7 +96,7 @@ export class AutoAssignmentService {
                 }
                 const entry = centerMap.get(p.id_centre)!;
                 // Add students
-                p.alumnes.forEach(a => entry.students.push(a.id_alumne));
+                p.alumnes.forEach((a: any) => entry.students.push(a.id_alumne));
                 // Keep the earliest timestamp for priority
                 if (p.data_peticio < entry.timestamp) {
                     entry.timestamp = p.data_peticio;
@@ -104,14 +104,14 @@ export class AutoAssignmentService {
             });
 
             const centers = Array.from(centerMap.values());
-            const totalDemand = centers.reduce((sum, c) => sum + c.students.length, 0);
+            const totalDemand = centers.reduce((sum: number, c: any) => sum + c.students.length, 0);
 
             // DISTRIBUTION LOGIC
             let allocated = 0;
 
             if (totalDemand <= remainingCapacity) {
                 // Happy Path: Give everyone everything
-                centers.forEach(c => c.assignedCount = c.students.length);
+                centers.forEach((c: any) => c.assignedCount = c.students.length);
                 allocated = totalDemand;
             } else {
                 // Scarcity Logic: Fair Share
@@ -121,7 +121,7 @@ export class AutoAssignmentService {
                 // 1. Base Allocation
                 let leftoverSpots = remainingCapacity;
                 
-                centers.forEach(c => {
+                centers.forEach((c: any) => {
                     const allocation = Math.min(c.students.length, baseShare);
                     c.assignedCount = allocation;
                     leftoverSpots -= allocation;

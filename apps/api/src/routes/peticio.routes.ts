@@ -1,10 +1,10 @@
 import express from 'express';
 const router = express.Router();
 // Tendremos que crear este controlador en el siguiente paso
-import * as peticioController from '../controllers/peticio.controller';
-import { authenticateToken, isAdmin, isCoordinator } from '../middlewares/authMiddleware';
-import { validateData } from '../middlewares/validateMiddleware';
-import { createPeticioSchema, updatePeticioStatusSchema, updatePeticioSchema } from '../schemas/peticio.schema';
+import * as peticioController from '../controllers/peticio.controller.js';
+import { authenticateToken, isAdmin, isCoordinator } from '../middlewares/authMiddleware.js';
+import { validateData } from '../middlewares/validateMiddleware.js';
+import { createPeticioSchema, updatePeticioStatusSchema, updatePeticioSchema } from '../schemas/peticio.schema.js';
 
 // GET /api/peticions - Admin ve todas, Coordinador ve las suyas
 router.get('/', authenticateToken, peticioController.getPeticions);

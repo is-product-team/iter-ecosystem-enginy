@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 
 // POST: Generar certificados para una asignación (Automático al cerrar)
@@ -25,7 +25,7 @@ export const generateCertificates = async (req: Request, res: Response) => {
         let certificatesIssued = 0;
 
         for (const inscripcio of assignacio.inscripcions) {
-            const attendedCount = inscripcio.assistencia.filter(a =>
+            const attendedCount = (inscripcio.assistencia as any[]).filter((a: any) =>
                 a.estat === 'Present' || a.estat === 'Retard'
             ).length;
 

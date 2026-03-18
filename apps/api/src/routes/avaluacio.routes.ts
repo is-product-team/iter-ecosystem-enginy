@@ -4,8 +4,8 @@ import {
     upsetAvaluacioDocent,
     getCompetencies,
     analyzeObservations
-} from '../controllers/avaluacio.controller';
-import { authenticateToken } from '../middlewares/authMiddleware';
+} from '../controllers/avaluacio.controller.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 

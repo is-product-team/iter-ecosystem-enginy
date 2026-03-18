@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { runTetris } from '../services/tetris.service';
+import { runTetris } from '../services/tetris.service.js';
 import { ROLES } from '@iter/shared';
 
 export const triggerTetris = async (req: Request, res: Response) => {

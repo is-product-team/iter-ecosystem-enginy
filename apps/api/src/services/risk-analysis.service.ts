@@ -1,5 +1,5 @@
-import prisma from '../lib/prisma';
-import { createNotificacioInterna } from '../controllers/notificacio.controller';
+import prisma from '../lib/prisma.js';
+import { createNotificacioInterna } from '../controllers/notificacio.controller.js';
 
 export interface RiskResult {
     studentId: number;
@@ -33,7 +33,7 @@ export class RiskAnalysisService {
             let absences = 0;
             let late = 0;
 
-            recentAttendance.forEach((a) => {
+            recentAttendance.forEach((a: any) => {
                 if (a.estat === 'Absencia') absences++;
                 if (a.estat === 'Retard') late++;
             });

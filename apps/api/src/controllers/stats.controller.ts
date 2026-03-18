@@ -14,7 +14,7 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
       }
     });
 
-    const stats = counts.map(c => ({
+    const stats = counts.map((c: any) => ({
       estat: c.estat.toLowerCase(),
       total: c._count._all,
       last_update: new Date()
@@ -38,11 +38,11 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
       take: 10
     });
 
-    const stats = tallers.map(t => ({
+    const stats = tallers.map((t: any) => ({
       _id: t.titol,
       total_solicitudes: t.peticions.length,
-      alumnes_totals: t.peticions.reduce((acc, p) => acc + (p.alumnes_aprox || 0), 0)
-    })).sort((a, b) => b.total_solicitudes - a.total_solicitudes);
+      alumnes_totals: t.peticions.reduce((acc: number, p: any) => acc + (p.alumnes_aprox || 0), 0)
+    })).sort((a: any, b: any) => b.total_solicitudes - a.total_solicitudes);
 
     res.json(stats);
   } catch (error) {

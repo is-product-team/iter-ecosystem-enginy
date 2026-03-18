@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { QuestionariService } from '../services/questionari.service';
+import { QuestionariService } from '../services/questionari.service.js';
 
 const questionariService = new QuestionariService();
 

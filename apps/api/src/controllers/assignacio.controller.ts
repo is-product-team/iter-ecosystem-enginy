@@ -1,8 +1,8 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 import { AssignmentChecklistSchema, ROLES } from '@iter/shared';
-import { isPhaseActive, PHASES } from '../lib/phaseUtils';
-import { createNotificacioInterna } from './notificacio.controller';
+import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
+import { createNotificacioInterna } from './notificacio.controller.js';
 
 // GET: Todas las asignaciones (Admin solo)
 export const getAssignacions = async (req: Request, res: Response) => {
@@ -237,7 +237,7 @@ export const createIncidencia = async (req: Request, res: Response) => {
 };
 
 // POST: Validar subida de documento (Vision AI)
-import { VisionService } from '../services/vision.service';
+import { VisionService } from '../services/vision.service.js';
 
 export const validateDocumentUpload = async (req: Request, res: Response) => {
   try {
@@ -544,7 +544,7 @@ export const sendDocumentNotification = async (req: Request, res: Response) => {
 };
 
 // POST: Generar Asignaciones Automáticas (AI)
-import { AutoAssignmentService } from '../services/auto-assignment.service';
+import { AutoAssignmentService } from '../services/auto-assignment.service.js';
 
 export const generateAutomaticAssignments = async (req: Request, res: Response) => {
   const { role } = (req as any).user;
@@ -602,7 +602,7 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
                 where: { id_professor: { in: [assignacio.prof1_id, assignacio.prof2_id].filter(Boolean) as number[] } },
                 select: { id_usuari: true }
             });
-            const referentUserIds = referentProfessors.map(p => p.id_usuari).filter(Boolean) as number[];
+            const referentUserIds = referentProfessors.map((p: any) => p.id_usuari).filter(Boolean) as number[];
 
             // Iterar por semanas desde startDate hasta endDate
             let currentPointer = new Date(startDate);

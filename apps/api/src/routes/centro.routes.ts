@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import * as centroController from '../controllers/centro.controller';
-import { authenticateToken, isAdmin } from '../middlewares/authMiddleware';
-import { validateData } from '../middlewares/validateMiddleware';
-import { createCentreSchema, updateCentreSchema } from '../schemas/centro.schema';
+import * as centroController from '../controllers/centro.controller.js';
+import { authenticateToken, isAdmin } from '../middlewares/authMiddleware.js';
+import { validateData } from '../middlewares/validateMiddleware.js';
+import { createCentreSchema, updateCentreSchema } from '../schemas/centro.schema.js';
 
 router.get('/', authenticateToken, centroController.getCentres);
 router.get('/:id', authenticateToken, centroController.getCentreById);

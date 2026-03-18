@@ -1,5 +1,5 @@
 import { addWeeks, isSameDay, setDay, nextDay, addDays, getDay, startOfDay } from 'date-fns';
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 
 export class SessionService {
     /**

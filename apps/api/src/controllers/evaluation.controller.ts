@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import prisma from '../lib/prisma';
-import { NLPService } from '../services/nlp.service';
+import prisma from '../lib/prisma.js';
+import { NLPService } from '../services/nlp.service.js';
 
 export const processVoiceEvaluation = async (req: Request, res: Response) => {
     const { text, studentId, sessionId, assignacioId } = req.body;
