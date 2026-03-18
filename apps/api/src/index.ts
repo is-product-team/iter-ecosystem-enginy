@@ -4,10 +4,11 @@ dotenv.config();
 import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
-import routes from './routes';
-import logger from './lib/logger';
-import { errorHandler } from './middlewares/errorHandler';
-import prisma from './lib/prisma';
+import routes from './routes/index.js';
+import logger from './lib/logger.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import prisma from './lib/prisma.js';
+import { connectToDatabase, closeConnection } from './lib/mongodb.js';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -64,16 +65,22 @@ const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, async () => {
   logger.info(`🚀 Servidor listo en puerto: ${PORT}`);
   logger.info(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Conexión PostgreSQL (Opcional en el arranque)
   try {
     await prisma.$queryRaw`SELECT 1`;
     logger.info(`🗄️  DATABASE STATUS: Connected to PostgreSQL`);
   } catch (e) {
-    logger.error(`🗄️  DATABASE STATUS: Connection failed`);
+    logger.error(`🗄️  DATABASE STATUS: PostgreSQL Connection failed`);
+  }
+
+  // Conexión MongoDB (Opcional en el arranque)
+  try {
+    await connectToDatabase();
+  } catch (e) {
+    logger.warn(`🗄️  DATABASE STATUS: MongoDB Connection skipped or failed`);
   }
 });
-
-// Gestió de connexions implementada (obertura i tancament) - REQUISITO CHECKLIST
-import { closeConnection } from './lib/mongodb';
 
 process.on('SIGINT', async () => {
   logger.info('Shutting down server...');

@@ -13,9 +13,14 @@ if (!uri || uri.includes('<db_password>')) {
 let client: MongoClient | null = null;
 let db: Db | null = null;
 
-export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
+export async function connectToDatabase(): Promise<{ client: MongoClient | null; db: Db | null }> {
   if (client && db) {
     return { client, db };
+  }
+
+  if (!uri || uri.includes('<db_password>')) {
+    console.warn('⚠️ MONGODB_URI no configurada o inválida. Saltando conexión MongoDB...');
+    return { client: null, db: null };
   }
 
   try {
