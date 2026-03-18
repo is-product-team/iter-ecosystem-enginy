@@ -1,23 +1,30 @@
 name: 🚀 Manual Deploy (Self-Hosted)
 
 on:
-  workflow_dispatch: # Permite ejecutarlo manualmente desde el botón de GitHub Actions
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: self-hosted # IMPORTANTE: Esto le dice a GitHub que use TU runner
+    runs-on: self-hosted
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔑 Create .env file from Secrets
+      - name: 🔑 Create Environment Files from Secrets
         run: |
-          echo "${{ secrets.PROD_ENV_FILE }}" > .env
-          # Opcional: Si necesitas archivos .env específicos en las carpetas:
-          # echo "${{ secrets.PROD_API_ENV }}" > apps/api/.env
-          # echo "${{ secrets.PROD_WEB_ENV }}" > apps/web/.env
+          # Crear el .env de la API
+          echo "${{ secrets.PROD_API_ENV }}" > apps/api/.env.production
+          
+          # Crear el .env de la Web
+          echo "${{ secrets.PROD_WEB_ENV }}" > apps/web/.env.production
+          
+          # Opcional: Crear el .env del Mobile (si lo necesitas en el servidor)
+          echo "${{ secrets.PROD_MOBILE_ENV }}" > apps/mobile/.env.production
 
       - name: 🐳 Deploy with Docker Compose
         run: |
+          # Usamos el archivo de producción que configuramos
           docker compose -f docker-compose.prod.yml up -d --build
-          docker image prune -f # Limpia imágenes antiguas para ahorrar espacio en el LXC
+          
+          # Limpieza de imágenes huérfanas para ahorrar espacio en el LXC
+          docker image prune -f

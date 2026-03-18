@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runner-api
-    container_name: muvv_api
+    container_name: iter_api
     restart: always
     env_file:
       - apps/api/.env.production
@@ -22,8 +22,8 @@ services:
       dockerfile: Dockerfile
       target: runner-web
       args:
-        - NEXT_PUBLIC_API_URL=https://projects.kore29.com/muvv/api
-    container_name: muvv_web
+        - NEXT_PUBLIC_API_URL=https://projects.kore29.com/iter/api
+    container_name: iter_web
     restart: always
     env_file:
       - apps/web/.env.production

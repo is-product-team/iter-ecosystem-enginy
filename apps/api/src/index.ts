@@ -15,9 +15,6 @@ app.set('trust proxy', 1);
 // ... (allowedOrigins logic remains same)
 const allowedOrigins = [
   'https://projects.kore29.com',
-  'https://muvv.projects.kore29.com',
-  'https://api.muvv.projects.kore29.com',
-  'https://iter.kore29.com', // Prod Domain (Legacy)
   'http://localhost:8002',
   'http://localhost:3000',
   'http://localhost:3001',
@@ -54,7 +51,7 @@ app.use(express.json());
 const API_PREFIX = process.env.API_PREFIX || '';
 app.use(`${API_PREFIX}/uploads`, express.static('uploads'));
 
-// Rutas API servidas con prefijo si existe (ej: /muvv/api)
+// Rutas API servidas con prefijo si existe (ej: /iter/api)
 app.use(`${API_PREFIX}/`, routes);
 
 // Error Handler (Debe ir después de las rutas)
