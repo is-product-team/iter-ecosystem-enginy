@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma.js';
-import { EstatPeticio } from '@prisma/client';
-import { createNotificacioInterna } from '../controllers/notificacio.controller.js';
+import { RequestStatus } from '@prisma/client';
+import { createNotificationInterna } from '../controllers/notificacio.controller.js';
 
 export interface TetrisStats {
   totalPetitions: number;
@@ -27,10 +27,10 @@ export async function runTetris() {
   };
 
   // 1. Get all approved (or pending) petitions that don't have an assignment yet
-  const petitions = await prisma.peticio.findMany({
+  const petitions = await prisma.request.findMany({
     where: {
-      estat: { in: [EstatPeticio.Aprovada, EstatPeticio.Pendent] },
-      assignacions: { none: {} }
+      estat: { in: [RequestStatus.Aprovada, RequestStatus.Pendent] },
+      assignments: { none: {} }
     },
     include: {
       taller: true,
@@ -50,13 +50,13 @@ export async function runTetris() {
     console.log(`🚀 TetrisService: Starting assignment for ${petitions.length} petitions...`);
   }
 
-  // Group by Taller
+  // Group by Workshop
   const tallerGroups: Record<number, typeof petitions> = {};
   for (const p of petitions) {
-    if (!tallerGroups[p.id_taller]) {
-      tallerGroups[p.id_taller] = [];
+    if (!tallerGroups[p.id_workshop]) {
+      tallerGroups[p.id_workshop] = [];
     }
-    tallerGroups[p.id_taller].push(p);
+    tallerGroups[p.id_workshop].push(p);
   }
 
   const createdAssignments = [];
@@ -66,8 +66,8 @@ export async function runTetris() {
     const taller = (tallerPetitions[0] as any).taller;
 
     // 1. Calculate strictly occupied capacity from existing assignments
-    const existingAssignments = await prisma.assignacio.findMany({
-      where: { id_taller: parseInt(tallerId) },
+    const existingAssignments = await prisma.assignment.findMany({
+      where: { id_workshop: parseInt(tallerId) },
       include: { peticio: true }
     });
 
@@ -77,10 +77,10 @@ export async function runTetris() {
 
     let currentCapacity = taller.places_maximes - occupiedPlazas;
 
-    console.log(`📊 Taller ID ${tallerId} (${taller.titol}): Plazas Totales: ${taller.places_maximes}, Ocupadas: ${occupiedPlazas}, Disponibles: ${currentCapacity}`);
+    console.log(`📊 Workshop ID ${tallerId} (${taller.titol}): Plazas Totales: ${taller.places_maximes}, Ocupadas: ${occupiedPlazas}, Disponibles: ${currentCapacity}`);
 
     if (currentCapacity <= 0) {
-      console.log(`🚫 Taller ${tallerId} está lleno. Saltando ${tallerPetitions.length} peticiones.`);
+      console.log(`🚫 Workshop ${tallerId} está lleno. Saltando ${tallerPetitions.length} peticiones.`);
       stats.workshopsFull++;
       continue;
     }
@@ -89,20 +89,20 @@ export async function runTetris() {
 
       if (currentCapacity >= neededPlazas) {
         // 1. If petition is Pendent, approve it automatically
-        if (petition.estat === EstatPeticio.Pendent) {
-          console.log(`✅ TetrisService: Auto-approving petition ${petition.id_peticio} for center ID ${petition.id_centre}`);
-          await prisma.peticio.update({
-            where: { id_peticio: petition.id_peticio },
-            data: { estat: EstatPeticio.Aprovada }
+        if (petition.estat === RequestStatus.Pendent) {
+          console.log(`✅ TetrisService: Auto-approving petition ${petition.id_request} for center ID ${petition.id_center}`);
+          await prisma.request.update({
+            where: { id_request: petition.id_request },
+            data: { estat: RequestStatus.Aprovada }
           });
         }
 
         // 2. Create Assignment
-        const assignacio = await prisma.assignacio.create({
+        const assignacio = await prisma.assignment.create({
           data: {
-            id_peticio: petition.id_peticio,
-            id_centre: petition.id_centre,
-            id_taller: petition.id_taller,
+            id_request: petition.id_request,
+            id_center: petition.id_center,
+            id_workshop: petition.id_workshop,
             prof1_id: petition.prof1_id,
             prof2_id: petition.prof2_id,
             estat: 'PUBLISHED',
@@ -118,8 +118,8 @@ export async function runTetris() {
         });
 
         // 3. Send Notification
-        await createNotificacioInterna({
-          id_centre: petition.id_centre,
+        await createNotificationInterna({
+          id_center: petition.id_center,
           titol: 'Sol·licitud Assignada Automàticament',
           missatge: `La teva sol·licitud per al taller "${taller.titol}" ha estat acceptada i assignada via procés automàtic.`,
           tipus: 'PETICIO',
@@ -131,7 +131,7 @@ export async function runTetris() {
         stats.assignedPetitions++;
         stats.assignedStudents += neededPlazas;
       } else {
-        console.log(`⚠️ TetrisService: Skipping petition ${petition.id_peticio} due to insufficient capacity in taller ${tallerId} (Needed: ${neededPlazas}, Available: ${currentCapacity})`);
+        console.log(`⚠️ TetrisService: Skipping petition ${petition.id_request} due to insufficient capacity in taller ${tallerId} (Needed: ${neededPlazas}, Available: ${currentCapacity})`);
       }
     }
 

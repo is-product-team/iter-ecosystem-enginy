@@ -56,7 +56,7 @@ export const submitRespostes = async (req: Request, res: Response) => {
 
 export const submitAutoconsulta = async (req: Request, res: Response) => {
     try {
-        const result = await questionariService.submitAutoconsultaAlumne(req.body);
+        const result = await questionariService.submitAutoconsultaStudent(req.body);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: 'Error al enviar la autoevaluación' });

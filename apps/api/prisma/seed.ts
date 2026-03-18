@@ -25,9 +25,9 @@ async function cleanDatabase() {
 async function seedInfrastructure() {
   console.log('🏗️ Generant rols i sectors...');
   const rolesMap = {
-    ADMIN: await prisma.rol.create({ data: { nom_rol: ROLES.ADMIN } }),
-    COORDINADOR: await prisma.rol.create({ data: { nom_rol: ROLES.COORDINADOR } }),
-    PROFESSOR: await prisma.rol.create({ data: { nom_rol: ROLES.PROFESOR } }),
+    ADMIN: await prisma.role.create({ data: { nom_role: ROLES.ADMIN } }),
+    COORDINADOR: await prisma.role.create({ data: { nom_role: ROLES.COORDINADOR } }),
+    PROFESSOR: await prisma.role.create({ data: { nom_role: ROLES.PROFESOR } }),
   };
 
   const sectorTecno = await prisma.sector.create({ data: { nom: 'Transformació Digital' } });
@@ -44,56 +44,55 @@ async function seedUsers(roles: any, passDefault: string) {
   console.log('👥 Generant usuaris i centres...');
   
   // 1. Admin Global
-  await prisma.usuari.create({
+  await prisma.user.create({
     data: {
       nom_complet: 'Administrador Global',
       email: 'admin@admin.com',
       password_hash: passDefault,
-      id_rol: roles.rolAdmin.id_rol
+      id_role: roles.ADMIN.id_role
     }
   });
 
   // 2. Centro Joan Brossa
-  const centroBrossa = await prisma.centre.create({
+  const centroBrossa = await prisma.center.create({
     data: { 
-      codi_centre: '08014231', 
+      codi_center: '08014231', 
       nom: 'Institut Joan Brossa', 
       email_contacte: 'a8014231@xtec.cat',
       adreca: 'Carrer de la Mare de Déu del Port, 397',
       telefon_contacte: '934 32 30 54'
     }
   });
-  await prisma.usuari.create({
+  await prisma.user.create({
     data: {
       nom_complet: 'Coord. Joan Brossa',
       email: 'coordinacion@brossa.cat',
       password_hash: passDefault,
-      id_rol: roles.rolCoord.id_rol,
-      id_centre: centroBrossa.id_centre
+      id_role: roles.COORDINADOR.id_role,
+      id_center: centroBrossa.id_center
     }
   });
 
   // 3. Centro Pau Claris
-  const centroPauClaris = await prisma.centre.create({
+  const centroPauClaris = await prisma.center.create({
     data: { 
-      codi_centre: '08013147', 
+      codi_center: '08013147', 
       nom: 'Institut Pau Claris', 
       email_contacte: 'a8013147@xtec.cat',
       adreca: 'Passeig de Lluís Companys, 18',
       telefon_contacte: '932 68 02 11'
     }
   });
-  await prisma.usuari.create({
+  await prisma.user.create({
     data: {
       nom_complet: 'Coord. Pau Claris',
       email: 'coordinacion@pauclaris.cat',
       password_hash: passDefault,
-      id_rol: roles.rolCoord.id_rol,
-      id_centre: centroPauClaris.id_centre
+      id_role: roles.COORDINADOR.id_role,
+      id_center: centroPauClaris.id_center
     }
   });
 
-  // ... (rest of the professors and students logic)
   const profesBrossa = [];
   const profesClaris = [];
 
@@ -103,33 +102,33 @@ async function seedUsers(roles: any, passDefault: string) {
   for (let i = 0; i < 4; i++) {
     const name = brossaProfsNames[i];
     const email = `${name.toLowerCase().replace(' ', '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@brossa.cat`;
-    const userB = await prisma.usuari.create({
+    const userB = await prisma.user.create({
       data: {
         nom_complet: name,
         email: email,
         password_hash: passDefault,
-        id_rol: roles.rolProfe.id_rol,
-        id_centre: centroBrossa.id_centre
+        id_role: roles.PROFESSOR.id_role,
+        id_center: centroBrossa.id_center
       }
     });
-    const pb = await prisma.professor.create({
-      data: { nom: name, contacte: email, id_centre: centroBrossa.id_centre, id_usuari: userB.id_usuari }
+    const pb = await prisma.teacher.create({
+      data: { nom: name, contacte: email, id_center: centroBrossa.id_center, id_user: userB.id_user }
     });
     profesBrossa.push(pb);
 
     const nameClaris = clarisProfsNames[i];
     const emailC = `${nameClaris.toLowerCase().replace(' ', '.').normalize("NFD").replace(/[\u0300-\u036f]/g, "")}@pauclaris.cat`;
-    const userP = await prisma.usuari.create({
+    const userP = await prisma.user.create({
       data: {
         nom_complet: nameClaris,
         email: emailC,
         password_hash: passDefault,
-        id_rol: roles.rolProfe.id_rol,
-        id_centre: centroPauClaris.id_centre
+        id_role: roles.PROFESSOR.id_role,
+        id_center: centroPauClaris.id_center
       }
     });
-    const pc = await prisma.professor.create({
-      data: { nom: nameClaris, contacte: emailC, id_centre: centroPauClaris.id_centre, id_usuari: userP.id_usuari }
+    const pc = await prisma.teacher.create({
+      data: { nom: nameClaris, contacte: emailC, id_center: centroPauClaris.id_center, id_user: userP.id_user }
     });
     profesClaris.push(pc);
   }
@@ -149,22 +148,22 @@ async function seedUsers(roles: any, passDefault: string) {
   ];
 
   for (let i = 0; i < 10; i++) {
-    await prisma.alumne.create({
+    await prisma.student.create({
       data: { 
         nom: brossaStudents[i].n, 
         cognoms: brossaStudents[i].c, 
         idalu: `B${100+i}`, 
         curs: '4t ESO', 
-        id_centre_procedencia: centroBrossa.id_centre 
+        id_center_origin: centroBrossa.id_center 
       }
     });
-    await prisma.alumne.create({
+    await prisma.student.create({
       data: { 
         nom: clarisStudents[i].n, 
         cognoms: clarisStudents[i].c, 
         idalu: `P${100+i}`, 
         curs: '3r ESO', 
-        id_centre_procedencia: centroPauClaris.id_centre 
+        id_center_origin: centroPauClaris.id_center 
       }
     });
   }
@@ -254,7 +253,7 @@ async function seedTallers(sectors: any) {
 
   const creadosTallers = [];
   for (const t of tallers) {
-    const nuevo = await prisma.taller.create({
+    const nuevo = await prisma.workshop.create({
       data: {
         titol: t.titol,
         modalitat: t.modalitat as any,
@@ -314,7 +313,7 @@ async function seedFases() {
   ];
 
   for (const fase of fasesData) {
-    await prisma.fase.create({ data: fase });
+    await prisma.phase.create({ data: fase });
   }
 }
 
@@ -335,10 +334,10 @@ async function seedCompetencies() {
   ];
 
   for (const c of tecniques) {
-    await prisma.competencia.create({ data: { nom: c, tipus: 'Tecnica' } });
+    await prisma.competence.create({ data: { nom: c, tipus: 'Tecnica' } });
   }
   for (const c of transversals) {
-    await prisma.competencia.create({ data: { nom: c, tipus: 'Transversal' } });
+    await prisma.competence.create({ data: { nom: c, tipus: 'Transversal' } });
   }
 }
 
@@ -346,15 +345,15 @@ async function seedQuestionnaires() {
   console.log('📝 Generant qüestionaris...');
   
   // Qüestionari de Qualitat del Taller (Professor)
-  const qTaller = await prisma.modelQuestionari.create({
+  await prisma.questionnaireModel.create({
     data: {
       titol: "Qüestionari de Qualitat del Taller",
-      destinatari: "PROFESSOR",
-      preguntes: {
+      target: "TEACHER",
+      questions: {
         create: [
-          { enunciat: "Satisfacció general amb el taller", tipus_resposta: "Likert_1_5" },
-          { enunciat: "Valoració de l'organització i recursos", tipus_resposta: "Likert_1_5" },
-          { enunciat: "Observacions i suggeriments", tipus_resposta: "Oberta" }
+          { enunciat: "Satisfacció general amb el taller", response_type: "Likert_1_5" },
+          { enunciat: "Valoració de l'organització i resources", response_type: "Likert_1_5" },
+          { enunciat: "Observacions i suggeriments", response_type: "Oberta" }
         ]
       }
     }
@@ -370,18 +369,15 @@ async function main() {
   const salt = await bcrypt.genSalt(10);
   const passDefault = await bcrypt.hash('Iter@1234', salt);
   
-  const centrosData = await seedUsers(infra.roles, passDefault);
-  const tallers = await seedTallers(infra.sectors);
+  await seedUsers(infra.roles, passDefault);
+  await seedTallers(infra.sectors);
   
   await seedFases();
   await seedCompetencies();
   await seedQuestionnaires();
-  // await seedAssignments(centrosData, tallers);
 
   console.log('✅ Seed finalitzat amb èxit (Amb dades de prova i sessions).');
 }
-
-// function seedAssignments has been removed
 
 main()
   .catch((e) => {

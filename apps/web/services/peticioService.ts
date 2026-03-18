@@ -1,9 +1,9 @@
 import getApi from "./api";
 
-export interface Peticio {
-  id_peticio: number;
-  id_centre: number;
-  id_taller: number;
+export interface Request {
+  id_request: number;
+  id_center: number;
+  id_workshop: number;
   alumnes_aprox: number | null;
   comentaris: string | null;
   data_peticio: string;
@@ -26,10 +26,10 @@ const peticioService = {
   /**
    * Obtiene las peticiones.
    */
-  getAll: async (): Promise<Peticio[]> => {
+  getAll: async (): Promise<Request[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: Peticio[], meta: any }>("/requests?limit=0");
+      const response = await api.get<{ data: Request[], meta: any }>("/requests?limit=0");
       return response.data.data;
     } catch (error) {
       console.error("Error en peticioService.getAll:", error);
@@ -41,16 +41,16 @@ const peticioService = {
    * Crea una nueva petición.
    */
   create: async (data: {
-    id_taller: number;
+    id_workshop: number;
     alumnes_aprox: number;
     comentaris?: string;
     prof1_id?: number;
     prof2_id?: number;
     modalitat?: string;
-  }): Promise<Peticio> => {
+  }): Promise<Request> => {
     const api = getApi();
     try {
-      const response = await api.post<Peticio>("/requests", data);
+      const response = await api.post<Request>("/requests", data);
       return response.data;
     } catch (error: any) {
       console.error("Error en peticioService.create:", error);
@@ -67,10 +67,10 @@ const peticioService = {
     comentaris?: string;
     prof1_id?: number;
     prof2_id?: number;
-  }): Promise<Peticio> => {
+  }): Promise<Request> => {
     const api = getApi();
     try {
-      const response = await api.put<Peticio>(`/requests/${id}`, data);
+      const response = await api.put<Request>(`/requests/${id}`, data);
       return response.data;
     } catch (error: any) {
       console.error("Error en peticioService.update:", error);
@@ -82,10 +82,10 @@ const peticioService = {
   /**
    * Actualiza el estado de una petición.
    */
-  updateStatus: async (id: number, estat: string): Promise<Peticio> => {
+  updateStatus: async (id: number, estat: string): Promise<Request> => {
     const api = getApi();
     try {
-      const response = await api.patch<Peticio>(`/requests/${id}/status`, { estat });
+      const response = await api.patch<Request>(`/requests/${id}/status`, { estat });
       return response.data;
     } catch (error) {
       console.error("Error en peticioService.updateStatus:", error);

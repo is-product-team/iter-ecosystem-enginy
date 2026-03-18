@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma.js';
-import { createNotificacioInterna } from '../controllers/notificacio.controller.js';
+import { createNotificationInterna } from '../controllers/notificacio.controller.js';
 
 export interface RiskResult {
     studentId: number;
@@ -20,9 +20,9 @@ export class RiskAnalysisService {
         // 1. Fetch Attendance (Last 5 sessions)
         // We assume we look at all active enrollments or specific one? 
         // Let's look at all recent attendance for simplicity.
-        const recentAttendance = await prisma.assistencia.findMany({
+        const recentAttendance = await prisma.attendance.findMany({
             where: {
-                inscripcio: { id_alumne: studentId }
+                inscripcio: { id_student: studentId }
             },
             orderBy: { data_sessio: 'desc' },
             take: 5
@@ -57,8 +57,8 @@ export class RiskAnalysisService {
         // 3. Fetch Competence Evaluations (Low engagement?)
         const lowEvaluations = await prisma.avaluacioCompetencial.count({
             where: {
-                avaluacio_docent: {
-                    inscripcio: { id_alumne: studentId }
+                evaluation: {
+                    inscripcio: { id_student: studentId }
                 },
                 puntuacio: { lt: 3 }
             }
@@ -88,8 +88,8 @@ export class RiskAnalysisService {
 
     private async triggerAlert(studentId: number, score: number, factors: string[]) {
         // Find Student Info
-        const student = await prisma.alumne.findUnique({
-            where: { id_alumne: studentId },
+        const student = await prisma.student.findUnique({
+            where: { id_student: studentId },
             include: { centre_procedencia: true }
         });
 
@@ -97,10 +97,10 @@ export class RiskAnalysisService {
 
         // Create Notification for the Center
         // We don't have a direct User-Center map easily accessible maybe, 
-        // but the notification controller handles id_centre linkage.
+        // but the notification controller handles id_center linkage.
 
-        await createNotificacioInterna({
-            id_centre: student.centre_procedencia.id_centre,
+        await createNotificationInterna({
+            id_center: student.centre_procedencia.id_center,
             titol: `⚠️ Alerta de Riesgo: ${student.nom} ${student.cognoms}`,
             missatge: `El alumno presenta un riesgo de abandono del ${score}%. Factores: ${factors.join(', ')}. Se recomienda intervención.`,
             tipus: 'SISTEMA',

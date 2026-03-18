@@ -62,32 +62,32 @@ export class SessionService {
      * Note: It is better to initialize as 'Present' or wait for input. Let's use 'Present' as default placeholder logic, 
      * or we can check if we want a specific "Pending" state. Use 'Present' for now as per likely requirement.
      */
-    static async ensureAttendanceRecords(idAssignacio: number, sessionNum: number, date: Date) {
+    static async ensureAttendanceRecords(idAssignment: number, sessionNum: number, date: Date) {
         // 1. Get all enrollments for this assignment
-        const enrollments = await prisma.inscripcio.findMany({
-            where: { id_assignacio: idAssignacio }
+        const enrollments = await prisma.enrollment.findMany({
+            where: { id_assignment: idAssignment }
         });
 
         if (enrollments.length === 0) return;
 
         // 2. Check which students already have attendance for this session
-        const existingAttendance = await prisma.assistencia.findMany({
+        const existingAttendance = await prisma.attendance.findMany({
             where: {
-                inscripcio: { id_assignacio: idAssignacio },
+                inscripcio: { id_assignment: idAssignment },
                 numero_sessio: sessionNum
             },
-            select: { id_inscripcio: true }
+            select: { id_enrollment: true }
         });
 
-        const existingIds = new Set(existingAttendance.map((a: any) => a.id_inscripcio));
+        const existingIds = new Set(existingAttendance.map((a: any) => a.id_enrollment));
 
         // 3. Create missing records
-        const missingEnrollments = enrollments.filter((e: any) => !existingIds.has(e.id_inscripcio));
+        const missingEnrollments = enrollments.filter((e: any) => !existingIds.has(e.id_enrollment));
 
         if (missingEnrollments.length > 0) {
-            await prisma.assistencia.createMany({
+            await prisma.attendance.createMany({
                 data: missingEnrollments.map((e: any) => ({
-                    id_inscripcio: e.id_inscripcio,
+                    id_enrollment: e.id_enrollment,
                     numero_sessio: sessionNum,
                     data_sessio: date,
                     estat: 'Present' // Default state
@@ -100,10 +100,10 @@ export class SessionService {
      * Retrieves the status of a session: 'Pending', 'Recorded', or 'Future'.
      * Simple heuristic based on existance of records.
      */
-    static async getSessionStatus(idAssignacio: number, sessionNum: number): Promise<string> {
-        const count = await prisma.assistencia.count({
+    static async getSessionStatus(idAssignment: number, sessionNum: number): Promise<string> {
+        const count = await prisma.attendance.count({
             where: {
-                inscripcio: { id_assignacio: idAssignacio },
+                inscripcio: { id_assignment: idAssignment },
                 numero_sessio: sessionNum
             }
         });
@@ -113,36 +113,36 @@ export class SessionService {
     /**
      * Synchronizes sessions for an assignment based on its workshop schedule.
      */
-    static async syncSessionsForAssignment(idAssignacio: number) {
-        const assignacio = await prisma.assignacio.findUnique({
-            where: { id_assignacio: idAssignacio },
+    static async syncSessionsForAssignment(idAssignment: number) {
+        const assignacio = await prisma.assignment.findUnique({
+            where: { id_assignment: idAssignment },
             include: { taller: true }
         });
 
         if (!assignacio || !assignacio.data_inici) return;
 
-        const schedule = assignacio.taller.dies_execucio;
+        const schedule = assignacio.workshop.dies_execucio;
         const sessionDates = this.generateDatesFromSchedule(assignacio.data_inici, schedule as any);
 
         // Delete future sessions that might be outdated
         // Actually, better to just create if they don't exist or update dates
         // For simplicity in Phase 3, we'll re-generate if no attendance exists
         
-        const hasAttendance = await prisma.assistencia.count({
-            where: { inscripcio: { id_assignacio: idAssignacio } }
+        const hasAttendance = await prisma.attendance.count({
+            where: { inscripcio: { id_assignment: idAssignment } }
         });
 
         if (hasAttendance > 0) return; // Don't mess with sessions if attendance is already recorded
 
         // Delete existing sessions
-        await prisma.sessio.deleteMany({
-            where: { id_assignacio: idAssignacio }
+        await prisma.session.deleteMany({
+            where: { id_assignment: idAssignment }
         });
 
         // Create new ones
-        await prisma.sessio.createMany({
+        await prisma.session.createMany({
             data: sessionDates.map(date => ({
-                id_assignacio: idAssignacio,
+                id_assignment: idAssignment,
                 data_sessio: date
             }))
         });

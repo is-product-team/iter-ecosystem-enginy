@@ -7,7 +7,7 @@ import { RiskAnalysisService } from '../services/risk-analysis.service.js';
  */
 export const getStatsByStatus = async (req: Request, res: Response) => {
   try {
-    const counts = await prisma.peticio.groupBy({
+    const counts = await prisma.request.groupBy({
       by: ['estat'],
       _count: {
         _all: true
@@ -31,17 +31,17 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
  */
 export const getPopularWorkshops = async (req: Request, res: Response) => {
   try {
-    const tallers = await prisma.taller.findMany({
+    const tallers = await prisma.workshop.findMany({
       include: {
-        peticions: true
+        requests: true
       },
       take: 10
     });
 
     const stats = tallers.map((t: any) => ({
       _id: t.titol,
-      total_solicitudes: t.peticions.length,
-      alumnes_totals: t.peticions.reduce((acc: number, p: any) => acc + (p.alumnes_aprox || 0), 0)
+      total_solicitudes: t.requests.length,
+      alumnes_totals: t.requests.reduce((acc: number, p: any) => acc + (p.alumnes_aprox || 0), 0)
     })).sort((a: any, b: any) => b.total_solicitudes - a.total_solicitudes);
 
     res.json(stats);
@@ -92,12 +92,12 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
       const result = await service.analyzeStudentRisk(parseInt(studentId));
       return res.json({ processed: 1, results: [result] });
     } else {
-      const studentsWithAttendance = await prisma.assistencia.findMany({
-        select: { inscripcio: { select: { id_alumne: true } } },
-        distinct: ['id_inscripcio']
+      const studentsWithAttendance = await prisma.attendance.findMany({
+        select: { inscripcio: { select: { id_student: true } } },
+        distinct: ['id_enrollment']
       });
 
-      const uniqueIds = [...new Set(studentsWithAttendance.map((a: any) => a.inscripcio.id_alumne))];
+      const uniqueIds = [...new Set(studentsWithAttendance.map((a: any) => a.enrollment.id_student))];
 
       const results = [];
       for (const id of uniqueIds) {
@@ -113,37 +113,37 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
   }
 };
 
-// GET: Estadístiques de monitorització de la Fase 2
+// GET: Estadístiques de monitorització de la Phase 2
 export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
   try {
-    const assignacions = await prisma.assignacio.findMany({
+    const assignacions = await prisma.assignment.findMany({
       where: {
         estat: { in: ['PUBLISHED', 'DATA_ENTRY', 'DATA_SUBMITTED', 'VALIDATED'] }
       },
       include: {
         centre: true,
         checklist: true,
-        inscripcions: true,
+        enrollments: true,
         prof1: true,
         prof2: true
       }
     });
 
     const monitoring = assignacions.map((a: any) => {
-      const hasProfessors = !!(a.prof1_id && a.prof2_id);
-      const hasStudents = a.inscripcions.length > 0;
-      const allDocsOk = a.inscripcions.every((i: any) => i.acord_pedagogic && i.autoritzacio_mobilitat && i.registre_ceb_confirmat);
-      const isComplete = hasProfessors && hasStudents && allDocsOk;
+      const hasTeachers = !!(a.prof1_id && a.prof2_id);
+      const hasStudents = a.enrollments.length > 0;
+      const allDocsOk = a.enrollments.every((i: any) => i.acord_pedagogic && i.autoritzacio_mobilitat && i.registre_ceb_confirmat);
+      const isComplete = hasTeachers && hasStudents && allDocsOk;
 
       return {
-        id_assignacio: a.id_assignacio,
-        centre: a.centre.nom,
-        taller_id: a.id_taller,
+        id_assignment: a.id_assignment,
+        centre: a.center.nom,
+        taller_id: a.id_workshop,
         estat: a.estat,
         completat: isComplete,
         detalls: {
-          professors: hasProfessors,
-          alumnes: hasStudents,
+          teachers: hasTeachers,
+          students: hasStudents,
           documentacio: allDocsOk
         }
       };

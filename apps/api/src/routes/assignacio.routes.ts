@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import * as assignacioController from '../controllers/assignacio.controller.js';
+import * as assignmentController from '../controllers/assignacio.controller.js';
 import * as tetrisController from '../controllers/tetris.controller.js';
 import * as enrollmentController from '../controllers/enrollment.controller.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
@@ -9,45 +9,45 @@ import multer from 'multer';
 const upload = multer({ storage: multer.memoryStorage() });
 
 // /api/assignacions
-router.get('/', authenticateToken, assignacioController.getAssignacions);
-router.get('/:id', authenticateToken, assignacioController.getAssignacioById);
-router.get('/centre/:idCentre', authenticateToken, assignacioController.getAssignacionsByCentre);
-router.get('/:idAssignacio/checklist', authenticateToken, assignacioController.getChecklist);
-router.get('/:idAssignacio/students', authenticateToken, assignacioController.getStudents);
-router.patch('/checklist/:idItem', authenticateToken, assignacioController.updateChecklistItem);
-router.get('/incidencies/centre/:idCentre', authenticateToken, assignacioController.getIncidenciesByCentre);
-router.post('/incidencies', authenticateToken, assignacioController.createIncidencia);
-router.post('/', authenticateToken, assignacioController.createAssignacioFromPeticio);
-router.post('/:idAssignacio/inscripcions', authenticateToken, assignacioController.createInscripcions);
-router.post('/auto-generate', authenticateToken, assignacioController.generateAutomaticAssignments);
-router.post('/publish', authenticateToken, assignacioController.publishAssignments);
-router.post('/:idAssignacio/validate', authenticateToken, assignacioController.validateCenterData);
-router.patch('/inscripcions/:idInscripcio/validate', authenticateToken, assignacioController.validateInscripcioDocument);
-router.post('/:idAssignacio/document-notification', authenticateToken, assignacioController.sendDocumentNotification);
+router.get('/', authenticateToken, assignmentController.getAssignments);
+router.get('/:id', authenticateToken, assignmentController.getAssignmentById);
+router.get('/center/:idCenter', authenticateToken, assignmentController.getAssignmentsByCenter);
+router.get('/:idAssignment/checklist', authenticateToken, assignmentController.getChecklist);
+router.get('/:idAssignment/students', authenticateToken, assignmentController.getStudents);
+router.patch('/checklist/:idItem', authenticateToken, assignmentController.updateChecklistItem);
+router.get('/issues/center/:idCenter', authenticateToken, assignmentController.getIssuesByCenter);
+router.post('/issues', authenticateToken, assignmentController.createIssue);
+router.post('/', authenticateToken, assignmentController.createAssignmentFromRequest);
+router.post('/:idAssignment/enrollments', authenticateToken, assignmentController.createEnrollments);
+router.post('/auto-generate', authenticateToken, assignmentController.generateAutomaticAssignments);
+router.post('/publish', authenticateToken, assignmentController.publishAssignments);
+router.post('/:idAssignment/validate', authenticateToken, assignmentController.validateCenterData);
+router.patch('/enrollments/:idEnrollment/validate', authenticateToken, assignmentController.validateEnrollmentDocument);
+router.post('/:idAssignment/document-notification', authenticateToken, assignmentController.sendDocumentNotification);
 
 // Phase 2 Specifics
 router.post('/tetris', authenticateToken, tetrisController.triggerTetris);
-router.post('/:idAssignacio/enrollment/excel', authenticateToken, upload.single('file'), enrollmentController.enrollStudentsViaExcel);
-router.patch('/checklist/designate-profs/:idAssignacio', authenticateToken, assignacioController.designateProfessors);
-router.post('/upload/validate', authenticateToken, upload.single('file'), assignacioController.validateDocumentUpload);
-router.post('/:idAssignacio/compliance', authenticateToken, assignacioController.updateComplianceDocuments);
-router.post('/:idAssignacio/student-document', authenticateToken, upload.single('file'), assignacioController.uploadStudentDocument);
-router.post('/:idAssignacio/confirm-registration', authenticateToken, assignacioController.confirmLegalRegistration);
+router.post('/:idAssignment/enrollment/excel', authenticateToken, upload.single('file'), enrollmentController.enrollStudentsViaExcel);
+router.patch('/checklist/designate-teachers/:idAssignment', authenticateToken, assignmentController.designateTeachers);
+router.post('/upload/validate', authenticateToken, upload.single('file'), assignmentController.validateDocumentUpload);
+router.post('/:idAssignment/compliance', authenticateToken, assignmentController.updateComplianceDocuments);
+router.post('/:idAssignment/student-document', authenticateToken, upload.single('file'), assignmentController.uploadStudentDocument);
+router.post('/:idAssignment/confirm-registration', authenticateToken, assignmentController.confirmLegalRegistration);
 
 // Phase 2: Teaching Staff
-router.post('/:idAssignacio/staff', authenticateToken, assignacioController.addTeachingStaff);
-router.delete('/:idAssignacio/staff/:idUsuari', authenticateToken, assignacioController.removeTeachingStaff);
+router.post('/:idAssignment/staff', authenticateToken, assignmentController.addTeachingStaff);
+router.delete('/:idAssignment/staff/:idUser', authenticateToken, assignmentController.removeTeachingStaff);
 
 // Phase 3: Sessions & Attendance
-router.get('/:idAssignacio/sessions', authenticateToken, assignacioController.getSessions);
-router.get('/:idAssignacio/sessions/:sessionNum', authenticateToken, assignacioController.getSessionAttendance);
-router.post('/:idAssignacio/sessions/:sessionNum', authenticateToken, assignacioController.registerAttendance);
+router.get('/:idAssignment/sessions', authenticateToken, assignmentController.getSessions);
+router.get('/:idAssignment/sessions/:sessionNum', authenticateToken, assignmentController.getSessionAttendance);
+router.post('/:idAssignment/sessions/:sessionNum', authenticateToken, assignmentController.registerAttendance);
 
 // Phase 3: Dynamic Session Teaching Staff
-router.post('/sessions/:idSessio/staff', authenticateToken, assignacioController.addSessionProfessor);
-router.delete('/sessions/:idSessio/staff/:idUsuari', authenticateToken, assignacioController.removeSessionProfessor);
+router.post('/sessions/:idSession/staff', authenticateToken, assignmentController.addSessionTeacher);
+router.delete('/sessions/:idSession/staff/:idUser', authenticateToken, assignmentController.removeSessionTeacher);
 
 // Phase 4: Closing
-router.post('/:idAssignacio/close', authenticateToken, assignacioController.closeAssignacio);
+router.post('/:idAssignment/close', authenticateToken, assignmentController.closeAssignment);
 
 export default router;

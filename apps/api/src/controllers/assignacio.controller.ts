@@ -2,10 +2,10 @@ import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 import { AssignmentChecklistSchema, ROLES } from '@iter/shared';
 import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
-import { createNotificacioInterna } from './notificacio.controller.js';
+import { createNotificationInterna } from './notificacio.controller.js';
 
 // GET: Todas las asignaciones (Admin solo)
-export const getAssignacions = async (req: Request, res: Response) => {
+export const getAssignments = async (req: Request, res: Response) => {
   const { role } = req.user!;
 
   if (role !== 'ADMIN') {
@@ -13,122 +13,122 @@ export const getAssignacions = async (req: Request, res: Response) => {
   }
 
   try {
-    const assignacions = await prisma.assignacio.findMany({
+    const assignments = await prisma.assignment.findMany({
       include: {
-        taller: true,
-        centre: true,
+        workshop: true,
+        center: true,
         checklist: true,
-        prof1: true,
-        prof2: true,
-        inscripcions: {
+        teacher1: true,
+        teacher2: true,
+        enrollments: {
           include: {
-            alumne: true
+            student: true
           }
         }
       },
       orderBy: {
-        id_assignacio: 'desc'
+        id_assignment: 'desc'
       }
     });
-    res.json(assignacions);
+    res.json(assignments);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtenir les assignacions' });
   }
 };
 
 // GET: Una asignación por ID (Detalle completo)
-export const getAssignacioById = async (req: Request, res: Response) => {
+export const getAssignmentById = async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const { centreId, role } = req.user!;
 
   try {
-    const assignacio = await prisma.assignacio.findUnique({
-      where: { id_assignacio: parseInt(id) },
+    const assignment = await prisma.assignment.findUnique({
+      where: { id_assignment: parseInt(id) },
       include: {
-        taller: true,
-        centre: true,
+        workshop: true,
+        center: true,
         checklist: true,
-        prof1: true,
-        prof2: true,
+        teacher1: true,
+        teacher2: true,
         sessions: {
           include: {
             staff: {
               include: {
-                usuari: true
+                user: true
               }
             }
           }
         },
-        professors: {
+        teachers: {
           include: {
-            usuari: true
+            user: true
           }
         },
-        inscripcions: {
+        enrollments: {
           include: {
-            alumne: true
+            student: true
           }
         }
       }
     });
 
-    if (!assignacio) {
+    if (!assignment) {
       return res.status(404).json({ error: 'Assignació no trobada' });
     }
 
     // Security Scoping
-    if (role !== 'ADMIN' && assignacio.id_centre !== centreId) {
+    if (role !== 'ADMIN' && assignment.id_center !== centreId) {
       return res.status(403).json({ error: 'Accés denegat' });
     }
 
-    res.json(assignacio);
+    res.json(assignment);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtenir el detall de l\'assignació' });
   }
 };
 
 // GET: Listar asignaciones de un centro
-export const getAssignacionsByCentre = async (req: Request, res: Response) => {
-  const { idCentre } = req.params;
+export const getAssignmentsByCenter = async (req: Request, res: Response) => {
+  const { idCenter } = req.params;
   const { centreId, role } = req.user!;
 
   // Security Scoping
-  if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
+  if (role !== 'ADMIN' && parseInt(idCenter as string) !== centreId) {
     return res.status(403).json({ error: 'Accés denegat: No pots veure les assignacions d\'altre centre' });
   }
 
   try {
-    const assignacions = await prisma.assignacio.findMany({
-      where: { id_centre: parseInt(idCentre as string) },
+    const assignments = await prisma.assignment.findMany({
+      where: { id_center: parseInt(idCenter as string) },
       include: {
-        taller: true,
-        centre: true,
+        workshop: true,
+        center: true,
         checklist: true,
-        prof1: {
-          include: { usuari: { select: { nom_complet: true } } }
+        teacher1: {
+          include: { user: { select: { nom_complet: true } } }
         },
-        prof2: {
-          include: { usuari: { select: { nom_complet: true } } }
+        teacher2: {
+          include: { user: { select: { nom_complet: true } } }
         },
         sessions: {
-          orderBy: { data_sessio: 'asc' },
+          orderBy: { data_session: 'asc' },
           include: {
             staff: {
               include: {
-                usuari: true
+                user: true
               }
             }
           }
         },
-        inscripcions: {
+        enrollments: {
           include: {
-            alumne: true,
-            avaluacio_docent: true
+            student: true,
+            evaluation: true
           }
         }
       }
     });
-    res.json(assignacions);
+    res.json(assignments);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtenir assignacions' });
   }
@@ -136,22 +136,22 @@ export const getAssignacionsByCentre = async (req: Request, res: Response) => {
 
 // GET: Obtener alumnos inscritos en una asignación
 export const getStudents = async (req: Request, res: Response) => {
-  const { idAssignacio } = req.params;
+  const { idAssignment } = req.params;
   const { userId, role } = req.user!;
 
   try {
-    const inscripcions = await prisma.inscripcio.findMany({
-      where: { id_assignacio: parseInt(idAssignacio as string) },
+    const enrollments = await prisma.enrollment.findMany({
+      where: { id_assignment: parseInt(idAssignment as string) },
       include: {
-        alumne: true,
-        avaluacio_docent: { select: { id_avaluacio_docent: true } } // include evaluation check
+        student: true,
+        evaluation: { select: { id_evaluation_teacher: true } } // include evaluation check
       }
     });
 
     // Flatten structure to return just students with relevant info + evaluated status
-    const students = inscripcions.map((i: any) => ({
-      ...i.alumne,
-      evaluated: !!i.avaluacio_docent // true if exists, false otherwise
+    const students = enrollments.map((i: any) => ({
+      ...i.student,
+      evaluated: !!i.evaluation // true if exists, false otherwise
     }));
     res.json(students);
   } catch (error) {
@@ -161,10 +161,10 @@ export const getStudents = async (req: Request, res: Response) => {
 
 // GET: Checklist de una asignación
 export const getChecklist = async (req: Request, res: Response) => {
-  const { idAssignacio } = req.params;
+  const { idAssignment } = req.params;
   try {
-    const checklist = await prisma.checklistAssignacio.findMany({
-      where: { id_assignacio: parseInt(idAssignacio as string) }
+    const checklist = await prisma.assignmentChecklist.findMany({
+      where: { id_assignment: parseInt(idAssignment as string) }
     });
     res.json(checklist);
   } catch (error) {
@@ -184,7 +184,7 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
   const { completat, url_evidencia } = result.data;
 
   try {
-    const updated = await prisma.checklistAssignacio.update({
+    const updated = await prisma.assignmentChecklist.update({
       where: { id_checklist: parseInt(idItem as string) },
       data: {
         completat,
@@ -198,38 +198,38 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
   }
 };
 
-// GET: Incidencias de un centro
-export const getIncidenciesByCentre = async (req: Request, res: Response) => {
-  const { idCentre } = req.params;
+// GET: Issues de un centro
+export const getIssuesByCenter = async (req: Request, res: Response) => {
+  const { idCenter } = req.params;
   const { centreId, role } = req.user!;
 
   // Security Scoping
-  if (role !== 'ADMIN' && parseInt(idCentre as string) !== centreId) {
+  if (role !== 'ADMIN' && parseInt(idCenter as string) !== centreId) {
     return res.status(403).json({ error: 'Accés denegat: No pots veure les incidències d\'altre centre' });
   }
 
   try {
-    const incidencies = await prisma.incidencia.findMany({
-      where: { id_centre: parseInt(idCentre as string) },
+    const issues = await prisma.issue.findMany({
+      where: { id_center: parseInt(idCenter as string) },
       orderBy: { data_creacio: 'desc' }
     });
-    res.json(incidencies);
+    res.json(issues);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtenir les incidències' });
   }
 };
 
 // POST: Crear incidencia
-export const createIncidencia = async (req: Request, res: Response) => {
-  const { id_centre, descripcio } = req.body;
+export const createIssue = async (req: Request, res: Response) => {
+  const { id_center, descripcio } = req.body;
   try {
-    const nuevaIncidencia = await prisma.incidencia.create({
+    const newIssue = await prisma.issue.create({
       data: {
-        id_centre: parseInt(id_centre),
+        id_center: parseInt(id_center),
         descripcio
       }
     });
-    res.status(201).json(nuevaIncidencia);
+    res.status(201).json(newIssue);
   } catch (error) {
     console.error("Error al crear incidencia:", error);
     res.status(500).json({ error: 'Error al crear la incidència i executar l\'anàlisi de risc' });
@@ -274,8 +274,8 @@ export const validateDocumentUpload = async (req: Request, res: Response) => {
 };
 
 // POST: Crear Asignación desde Petición (Admin Only)
-export const createAssignacioFromPeticio = async (req: Request, res: Response) => {
-  const { idPeticio } = req.body;
+export const createAssignmentFromRequest = async (req: Request, res: Response) => {
+  const { idRequest } = req.body;
   const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) {
@@ -283,49 +283,49 @@ export const createAssignacioFromPeticio = async (req: Request, res: Response) =
   }
 
   try {
-    const peticio = await prisma.peticio.findUnique({
-      where: { id_peticio: parseInt(idPeticio) },
-      include: { centre: true, taller: true }
+    const request = await prisma.request.findUnique({
+      where: { id_request: parseInt(idRequest) },
+      include: { center: true, workshop: true }
     });
 
-    if (!peticio) {
+    if (!request) {
       return res.status(404).json({ error: 'Petició no trobada.' });
     }
 
-    if (peticio.estat !== 'Aprovada') {
+    if (request.estat !== 'Aprovada') {
       return res.status(400).json({ error: 'La petició ha d\'estar aprovada per crear una assignació.' });
     }
 
     // Comprobar si ya existe una asignación para esta petición
-    const existing = await prisma.assignacio.findFirst({
-      where: { id_peticio: peticio.id_peticio }
+    const existing = await prisma.assignment.findFirst({
+      where: { id_request: request.id_request }
     });
 
     if (existing) {
       return res.status(400).json({ error: 'Ja existeix una assignació per a aquesta petició.' });
     }
 
-    const nuevaAssignacio = await prisma.assignacio.create({
+    const newAssignment = await prisma.assignment.create({
       data: {
-        id_peticio: peticio.id_peticio,
-        id_centre: peticio.id_centre,
-        id_taller: peticio.id_taller,
+        id_request: request.id_request,
+        id_center: request.id_center,
+        id_workshop: request.id_workshop,
         estat: 'PUBLISHED',
-        prof1_id: peticio.prof1_id ?? undefined,
-        prof2_id: peticio.prof2_id ?? undefined,
-        // Inicializar checklist por defecto para Fase 2
+        teacher1_id: request.teacher1_id ?? undefined,
+        teacher2_id: request.teacher2_id ?? undefined,
+        // Inicializar checklist por defecto para Phase 2
         // SIEMPRE 3 pasos para consistencia visual, pero Marcando como completado el que no aplique
         checklist: {
           create: [
             { pas_nom: 'Designar Profesores Referentes', completat: false },
             { pas_nom: 'Subir Registro Nominal (Excel)', completat: false },
-            { pas_nom: 'Acuerdo Pedagógico (Modalidad C)', completat: peticio.modalitat !== 'C' }
+            { pas_nom: 'Acuerdo Pedagógico (Modalidad C)', completat: request.modalitat !== 'C' }
           ]
         }
       }
     });
 
-    res.status(201).json(nuevaAssignacio);
+    res.status(201).json(newAssignment);
   } catch (error) {
     console.error("Error al crear asignación:", error);
     res.status(500).json({ error: 'Error al crear l\'assignació.' });
@@ -338,18 +338,18 @@ export const publishAssignments = async (req: Request, res: Response) => {
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autoritzat' });
 
   try {
-    const result = await prisma.assignacio.updateMany({
+    const result = await prisma.assignment.updateMany({
       where: { estat: 'PROVISIONAL' },
       data: { estat: 'PUBLISHED' }
     });
 
     // Notify centers (simplified logic)
-    await prisma.notificacio.create({
+    await prisma.notification.create({
       data: {
-        titol: 'Assignacions Publicades',
+        titol: 'Assignmentns Publicades',
         missatge: 'Ja podeu consultar les assignacions i començar a introduir les dades.',
-        tipus: 'FASE',
-        importancia: 'URGENT'
+        type: 'PHASE',
+        importance: 'URGENT'
       }
     });
 
@@ -360,49 +360,49 @@ export const publishAssignments = async (req: Request, res: Response) => {
 };
 
 // POST: Realizar Registro Nominal (Inscribir alumnos en una asignación)
-export const createInscripcions = async (req: Request, res: Response) => {
-  const idAssignacio = parseInt(req.params.idAssignacio as string);
-  const { ids_alumnes } = req.body; // Array de IDs de alumnos
+export const createEnrollments = async (req: Request, res: Response) => {
+  const idAssignment = parseInt(req.params.idAssignment as string);
+  const { ids_students } = req.body; // Array de IDs de alumnos
 
   try {
     const result = await prisma.$transaction(async (tx: any) => {
       // 1. Verificar existencia de la asignación
-      const assignacio = await tx.assignacio.findUnique({
-        where: { id_assignacio: idAssignacio },
-        include: { inscripcions: true }
+      const assignment = await tx.assignment.findUnique({
+        where: { id_assignment: idAssignment },
+        include: { enrollments: true }
       });
 
-      if (!assignacio) {
+      if (!assignment) {
         throw new Error('Assignació no trobada.');
       }
 
       // 2. Validación de Cupo (Máx 4 alumnos en Mod C)
-      const taller = await tx.taller.findUnique({ where: { id_taller: assignacio.id_taller } });
-      if (taller?.modalitat === 'C' && ids_alumnes.length > 4) {
+      const workshop = await tx.workshop.findUnique({ where: { id_workshop: assignment.id_workshop } });
+      if (workshop?.modalitat === 'C' && ids_students.length > 4) {
         throw new Error('Límit superat: En Modalitat C només es permeten un màxim de 4 alumnes per centre.');
       }
 
       // 3. Sincronizar inscripciones
-      const currentIds = assignacio.inscripcions.map((i: any) => i.id_alumne);
-      const newIds = ids_alumnes.map((id: any) => parseInt(id));
+      const currentIds = assignment.enrollments.map((i: any) => i.id_student);
+      const newIds = ids_students.map((id: any) => parseInt(id));
 
       const toAdd = newIds.filter((id: number) => !currentIds.includes(id));
       const toRemove = currentIds.filter((id: number) => !newIds.includes(id));
 
       if (toRemove.length > 0) {
-        await tx.inscripcio.deleteMany({
+        await tx.enrollment.deleteMany({
           where: {
-            id_assignacio: idAssignacio,
-            id_alumne: { in: toRemove }
+            id_assignment: idAssignment,
+            id_student: { in: toRemove }
           }
         });
       }
 
-      for (const idAlumne of toAdd) {
-        await tx.inscripcio.create({
+      for (const idStudent of toAdd) {
+        await tx.enrollment.create({
           data: {
-            id_assignacio: idAssignacio,
-            id_alumne: idAlumne
+            id_assignment: idAssignment,
+            id_student: idStudent
           }
         });
       }
@@ -410,9 +410,9 @@ export const createInscripcions = async (req: Request, res: Response) => {
       // 4. Actualizar estado si ya tiene profes y alumnos
       // Logic: If documented and teachers ok, state => DATA_SUBMITTED?
       // For now, update checklist
-      await tx.checklistAssignacio.updateMany({
+      await tx.assignmentChecklist.updateMany({
         where: {
-          id_assignacio: idAssignacio,
+          id_assignment: idAssignment,
           pas_nom: { contains: 'Registro Nominal' }
         },
         data: {
@@ -432,40 +432,40 @@ export const createInscripcions = async (req: Request, res: Response) => {
 };
 
 // PATCH: Designar profesores para una asignación
-export const designateProfessors = async (req: Request, res: Response) => {
-  const { idAssignacio } = req.params;
-  const { prof1_id, prof2_id } = req.body;
+export const designateTeachers = async (req: Request, res: Response) => {
+  const { idAssignment } = req.params;
+  const { teacher1_id, teacher2_id } = req.body;
 
   try {
     // 1. Validar que los profesores sean diferentes
-    if (prof1_id === prof2_id) {
+    if (teacher1_id === teacher2_id) {
       return res.status(400).json({ error: 'Has de designar dos professors diferents.' });
     }
 
-    const oldAssignacio = await prisma.assignacio.findUnique({ where: { id_assignacio: parseInt(idAssignacio as string) } });
+    const oldAssignment = await prisma.assignment.findUnique({ where: { id_assignment: parseInt(idAssignment as string) } });
     
-    const updated = await prisma.assignacio.update({
-      where: { id_assignacio: parseInt(idAssignacio as string) },
+    const updated = await prisma.assignment.update({
+      where: { id_assignment: parseInt(idAssignment as string) },
       data: {
-        prof1_id,
-        prof2_id,
+        teacher1_id,
+        teacher2_id,
         estat: 'DATA_ENTRY' // Transition state once they start filling data
       }
     });
 
-    if (oldAssignacio) {
-        await logStatusChange(parseInt(idAssignacio as string), oldAssignacio.estat, 'DATA_ENTRY');
+    if (oldAssignment) {
+        await logStatusChange(parseInt(idAssignment as string), oldAssignment.estat, 'DATA_ENTRY');
     }
 
     // Actualizar checklist
-    await prisma.checklistAssignacio.updateMany({
+    await prisma.assignmentChecklist.updateMany({
       where: {
-        id_assignacio: parseInt(idAssignacio as string),
+        id_assignment: parseInt(idAssignment as string),
         pas_nom: { contains: 'Profesores Referentes' }
       },
       data: {
-        completat: !!(prof1_id && prof2_id),
-        data_completat: (prof1_id && prof2_id) ? new Date() : null
+        completat: !!(teacher1_id && teacher2_id),
+        data_completat: (teacher1_id && teacher2_id) ? new Date() : null
       }
     });
 
@@ -478,25 +478,25 @@ export const designateProfessors = async (req: Request, res: Response) => {
 
 // POST: Validar Datos del Centro (Admin)
 export const validateCenterData = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
+  const idAssignment = req.params.idAssignment as string;
   const { aprobado, feedback } = req.body;
   const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
 
   try {
-    const oldAssignacio = await prisma.assignacio.findUnique({ where: { id_assignacio: parseInt(idAssignacio) } });
+    const oldAssignment = await prisma.assignment.findUnique({ where: { id_assignment: parseInt(idAssignment) } });
     const newState = aprobado ? 'VALIDATED' : 'DATA_ENTRY';
     
-    await prisma.assignacio.update({
-      where: { id_assignacio: parseInt(idAssignacio) },
+    await prisma.assignment.update({
+      where: { id_assignment: parseInt(idAssignment) },
       data: { 
         estat: newState,
       }
     });
 
-    if (oldAssignacio) {
-        await logStatusChange(parseInt(idAssignacio), oldAssignacio.estat, newState);
+    if (oldAssignment) {
+        await logStatusChange(parseInt(idAssignment), oldAssignment.estat, newState);
     }
 
     res.json({ message: `Assignació ${aprobado ? 'validada' : 'rebutjada'} correctament.` });
@@ -507,29 +507,29 @@ export const validateCenterData = async (req: Request, res: Response) => {
 
 // POST: Enviar Notificación de Documento Incorrecto
 export const sendDocumentNotification = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
+  const idAssignment = req.params.idAssignment as string;
   const { documentName, comment, greeting } = req.body;
   const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'No autorizado' });
 
   try {
-    const assignacio = await prisma.assignacio.findUnique({
-      where: { id_assignacio: parseInt(idAssignacio) },
+    const assignment = await prisma.assignment.findUnique({
+      where: { id_assignment: parseInt(idAssignment) },
       include: { 
-        centre: true,
-        taller: true
+        center: true,
+        workshop: true
       }
     });
 
-    if (!assignacio) {
+    if (!assignment) {
       return res.status(404).json({ error: 'Assignació no trobada' });
     }
 
-    const missatge = `${greeting}, el document ${documentName} del taller ${assignacio.taller.titol} està malament. ${comment}`;
+    const missatge = `${greeting}, el document ${documentName} del taller ${assignment.workshop.titol} està malament. ${comment}`;
 
-    await createNotificacioInterna({
-      id_centre: assignacio.id_centre,
+    await createNotificationInterna({
+      id_center: assignment.id_center,
       titol: 'Documentació Incorrecta',
       missatge,
       tipus: 'SISTEMA',
@@ -563,34 +563,34 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
 // POST: Confirmar Registre CEB (Centro)
 // POST: Confirmar Registre CEB (Centro) y Generar Sesiones
 export const confirmLegalRegistration = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
+  const idAssignment = req.params.idAssignment as string;
   try {
     // 1. Marcar inscripciones como confirmadas
-    await prisma.inscripcio.updateMany({
-      where: { id_assignacio: parseInt(idAssignacio) },
+    await prisma.enrollment.updateMany({
+      where: { id_assignment: parseInt(idAssignment) },
       data: { registre_ceb_confirmat: true }
     });
 
     // 2. Obtener datos del taller para generar sesiones
-    const assignacio = await prisma.assignacio.findUnique({
-      where: { id_assignacio: parseInt(idAssignacio) },
-      include: { taller: true }
+    const assignment = await prisma.assignment.findUnique({
+      where: { id_assignment: parseInt(idAssignment) },
+      include: { workshop: true }
     });
 
-    if (!assignacio || !assignacio.taller) {
+    if (!assignment || !assignment.workshop) {
         return res.status(404).json({ error: 'Assignació no trobada' });
     }
 
     // 3. Generar sesiones si no existen
     // Comprobamos si ya hay sesiones para no duplicar si le dan dos veces
-    const existingSessions = await prisma.sessio.count({
-        where: { id_assignacio: parseInt(idAssignacio) }
+    const existingSessions = await prisma.session.count({
+        where: { id_assignment: parseInt(idAssignment) }
     });
 
     if (existingSessions === 0) {
-        const schedule = assignacio.taller.dies_execucio as any[]; 
+        const schedule = assignment.workshop.dies_execucio as any[]; 
         
-        // 3.1 Obtener fechas de la Fase 3
+        // 3.1 Obtener fechas de la Phase 3
         const { phase: phase3 } = await isPhaseActive(PHASES.EJECUCION);
         
         if (phase3 && Array.isArray(schedule) && schedule.length > 0) {
@@ -598,11 +598,11 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
             const endDate = phase3.data_fi;
             
             // Buscar los usuarios asociados a los profesores referentes para auto-asignarlos
-            const referentProfessors = await prisma.professor.findMany({
-                where: { id_professor: { in: [assignacio.prof1_id, assignacio.prof2_id].filter(Boolean) as number[] } },
-                select: { id_usuari: true }
+            const referentTeachers = await prisma.teacher.findMany({
+                where: { id_teacher: { in: [assignment.teacher1_id, assignment.teacher2_id].filter(Boolean) as number[] } },
+                select: { id_user: true }
             });
-            const referentUserIds = referentProfessors.map((p: any) => p.id_usuari).filter(Boolean) as number[];
+            const referentUserIds = referentTeachers.map((p: any) => p.id_user).filter(Boolean) as number[];
 
             // Iterar por semanas desde startDate hasta endDate
             let currentPointer = new Date(startDate);
@@ -618,10 +618,10 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
                     // Verificar que seguimos dentro del rango de la fase
                     if (sessionDate >= startDate && sessionDate <= endDate) {
                         // Crear la sesión
-                        const createdSession = await prisma.sessio.create({
+                        await prisma.session.create({
                             data: {
-                                id_assignacio: assignacio.id_assignacio,
-                                data_sessio: sessionDate,
+                                id_assignment: assignment.id_assignment,
+                                data_session: sessionDate,
                                 hora_inici: slot.startTime,
                                 hora_fi: slot.endTime
                             }
@@ -630,31 +630,27 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
                 }
                 // Avanzar a la siguiente semana
                 currentPointer.setDate(currentPointer.getDate() + 7);
-                // Asegurarse de que el puntero no se quede atascado si el incremento cruza meses de forma extraña (raro en JS Date pero preventivo)
-                if (currentPointer > endDate && currentPointer.getTime() - endDate.getTime() < 86400000 * 7) {
-                    // Ya nos pasamos, el bucle terminará
-                }
             }
         }
     }
 
-    const oldAssignacio = await prisma.assignacio.findUnique({ where: { id_assignacio: parseInt(idAssignacio) } });
+    const oldAssignment = await prisma.assignment.findUnique({ where: { id_assignment: parseInt(idAssignment) } });
 
     // 4. Actualizar estado de la asignación a 'IN_PROGRESS'
-    await prisma.assignacio.update({
-        where: { id_assignacio: parseInt(idAssignacio) },
+    await prisma.assignment.update({
+        where: { id_assignment: parseInt(idAssignment) },
         data: { estat: 'IN_PROGRESS' }
     });
 
-    if (oldAssignacio) {
-        await logStatusChange(parseInt(idAssignacio), oldAssignacio.estat, 'IN_PROGRESS');
+    if (oldAssignment) {
+        await logStatusChange(parseInt(idAssignment), oldAssignment.estat, 'IN_PROGRESS');
     }
 
     // 5. Enviar notificació al centre confirmant l'inici del taller
-    await createNotificacioInterna({
-        id_centre: assignacio.id_centre,
-        titol: 'Registre Confirmat: Taller en Marxa',
-        missatge: `El registre per al taller "${assignacio.taller.titol}" s'ha completat correctament. El taller ja està actiu i les sessions s'han generat al vostre calendari.`,
+    await createNotificationInterna({
+        id_center: assignment.id_center,
+        titol: 'Registre Confirmat: Workshop en Marxa',
+        missatge: `El registre per al taller "${assignment.workshop.titol}" s'ha completat correctament. El taller ja està actiu i les sessions s'han generat al vostre calendari.`,
         tipus: 'FASE',
         importancia: 'INFO'
     });
@@ -669,8 +665,8 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
 /**
  * PATCH: Validar un documento específico de una inscripción
  */
-export const validateInscripcioDocument = async (req: Request, res: Response) => {
-    const { idInscripcio } = req.params;
+export const validateEnrollmentDocument = async (req: Request, res: Response) => {
+    const { idEnrollment } = req.params;
     const { field, valid } = req.body; // field: 'validat_acord_pedagogic', etc.
     const { role } = req.user!;
 
@@ -684,8 +680,8 @@ export const validateInscripcioDocument = async (req: Request, res: Response) =>
     }
 
     try {
-        const updated = await prisma.inscripcio.update({
-            where: { id_inscripcio: parseInt(idInscripcio as string) },
+        const updated = await prisma.enrollment.update({
+            where: { id_enrollment: parseInt(idEnrollment as string) },
             data: { [field]: !!valid }
         });
         res.json(updated);
@@ -698,15 +694,15 @@ export const validateInscripcioDocument = async (req: Request, res: Response) =>
 /**
  * HELPER: Log status changes as requested by user
  */
-async function logStatusChange(idAssignacio: number, oldState: string, newState: string) {
+async function logStatusChange(idAssignment: number, oldState: string, newState: string) {
     if (oldState === newState) return;
     try {
-        const a = await prisma.assignacio.findUnique({
-            where: { id_assignacio: idAssignacio },
-            include: { centre: true, taller: true }
+        const a = await prisma.assignment.findUnique({
+            where: { id_assignment: idAssignment },
+            include: { center: true, workshop: true }
         });
         if (a) {
-            console.log(`[STATUS CHANGE] Center: ${a.centre.nom} - Workshop: ${a.taller.titol} - From: ${oldState} - To: ${newState}`);
+            console.log(`[STATUS CHANGE] Center: ${a.center.nom} - Workshop: ${a.workshop.titol} - From: ${oldState} - To: ${newState}`);
         }
     } catch (e) {
         console.error("Error logging status change:", e);
@@ -714,13 +710,13 @@ async function logStatusChange(idAssignacio: number, oldState: string, newState:
 }
 // POST: Actualitzar Documents de Conformitat (Centro)
 export const updateComplianceDocuments = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
-  const { idAlumne, acord_pedagogic, autoritzacio_mobilitat, drets_imatge } = req.body;
+  const idAssignment = req.params.idAssignment as string;
+  const { idStudent, acord_pedagogic, autoritzacio_mobilitat, drets_imatge } = req.body;
 
   try {
-    const updated = await prisma.inscripcio.update({
+    const updated = await prisma.enrollment.update({
       where: {
-        id_inscripcio: parseInt(idAlumne) // Assuming we update per student or per assignment
+        id_enrollment: parseInt(idStudent) // Assuming we update per student or per assignment
       },
       data: {
         acord_pedagogic,
@@ -750,41 +746,41 @@ const sanitizeFileName = (str: string) => {
 };
 
 export const uploadStudentDocument = async (req: Request, res: Response) => {
-  const { idAssignacio } = req.params;
-  const { idInscripcio, documentType } = req.body;
+  const { idAssignment } = req.params;
+  const { idEnrollment, documentType } = req.body;
   
   if (!req.file) {
     return res.status(400).json({ error: 'No s\'ha pujat cap fitxer.' });
   }
 
   try {
-    const inscripcio = await prisma.inscripcio.findUnique({
-      where: { id_inscripcio: parseInt(idInscripcio) },
+    const enrollment = await prisma.enrollment.findUnique({
+      where: { id_enrollment: parseInt(idEnrollment) },
       include: {
-        alumne: true,
-        assignacio: {
+        student: true,
+        assignment: {
           include: {
-            taller: true
+            workshop: true
           }
         }
       }
     });
 
-    if (!inscripcio || !inscripcio.alumne || !inscripcio.assignacio?.taller) {
+    if (!enrollment || !enrollment.student || !enrollment.assignment?.workshop) {
       return res.status(404).json({ error: 'Inscripció o dades associades no trobades.' });
     }
 
-    const { alumne, assignacio } = inscripcio;
-    const taller = assignacio.taller;
+    const { student, assignment } = enrollment;
+    const workshop = assignment.workshop;
 
     const fileExt = path.extname(req.file.originalname);
     
     // Generar nom descriptiu
-    const nomAlumne = sanitizeFileName(`${alumne.nom}_${alumne.cognoms}`);
-    const cursAlumne = sanitizeFileName(alumne.curs || 'sense_curs');
-    const titolTaller = sanitizeFileName(taller.titol);
+    const studentName = sanitizeFileName(`${student.nom}_${student.cognoms}`);
+    const studentCourse = sanitizeFileName(student.curs || 'sense_curs');
+    const workshopTitle = sanitizeFileName(workshop.titol);
     
-    const fileName = `${nomAlumne}_${cursAlumne}_${titolTaller}_${documentType}_${Date.now()}${fileExt}`;
+    const fileName = `${studentName}_${studentCourse}_${workshopTitle}_${documentType}_${Date.now()}${fileExt}`;
     const docDir = path.join('uploads', 'documents');
     const filePath = path.join(docDir, fileName);
 
@@ -814,8 +810,8 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Tipus de document no vàlid.' });
     }
 
-    const updated = await prisma.inscripcio.update({
-      where: { id_inscripcio: parseInt(idInscripcio) },
+    const updated = await prisma.enrollment.update({
+      where: { id_enrollment: parseInt(idEnrollment) },
       data: {
         [updateField]: url,
         [boolField]: true // També marquem el boolean com a completat
@@ -830,11 +826,11 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
 };
 
 export const getSessions = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
+  const idAssignment = req.params.idAssignment as string;
   try {
-    const sessions = await prisma.sessio.findMany({
-      where: { id_assignacio: parseInt(idAssignacio) },
-      orderBy: { data_sessio: 'asc' }
+    const sessions = await prisma.session.findMany({
+      where: { id_assignment: parseInt(idAssignment) },
+      orderBy: { data_session: 'asc' }
     });
     res.json(sessions);
   } catch (error) {
@@ -852,23 +848,23 @@ export const registerAttendance = async (req: Request, res: Response) => {
 
 // Phase 2: Teaching Staff Management
 export const addTeachingStaff = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
-  const { idUsuari, esPrincipal } = req.body;
+  const idAssignment = req.params.idAssignment as string;
+  const { idUser, esPrincipal } = req.body;
 
   try {
-    const relation = await prisma.assignacioProfessor.upsert({
+    const relation = await prisma.assignmentTeacher.upsert({
       where: {
-        id_assignacio_id_usuari: {
-          id_assignacio: parseInt(idAssignacio),
-          id_usuari: parseInt(idUsuari)
+        id_assignment_id_user: {
+          id_assignment: parseInt(idAssignment),
+          id_user: parseInt(idUser)
         }
       },
       update: {
         es_principal: esPrincipal || false
       },
       create: {
-        id_assignacio: parseInt(idAssignacio),
-        id_usuari: parseInt(idUsuari),
+        id_assignment: parseInt(idAssignment),
+        id_user: parseInt(idUser),
         es_principal: esPrincipal || false
       }
     });
@@ -879,15 +875,15 @@ export const addTeachingStaff = async (req: Request, res: Response) => {
 };
 
 export const removeTeachingStaff = async (req: Request, res: Response) => {
-  const idAssignacio = req.params.idAssignacio as string;
-  const idUsuari = req.params.idUsuari as string;
+  const idAssignment = req.params.idAssignment as string;
+  const idUser = req.params.idUser as string;
 
   try {
-    await prisma.assignacioProfessor.delete({
+    await prisma.assignmentTeacher.delete({
       where: {
-        id_assignacio_id_usuari: {
-          id_assignacio: parseInt(idAssignacio),
-          id_usuari: parseInt(idUsuari)
+        id_assignment_id_user: {
+          id_assignment: parseInt(idAssignment),
+          id_user: parseInt(idUser)
         }
       }
     });
@@ -898,22 +894,22 @@ export const removeTeachingStaff = async (req: Request, res: Response) => {
 };
 
 // Phase 3: Dynamic Session Teaching Staff
-export const addSessionProfessor = async (req: Request, res: Response) => {
-  const { idSessio } = req.params;
-  const { idUsuari } = req.body;
+export const addSessionTeacher = async (req: Request, res: Response) => {
+  const { idSession } = req.params;
+  const { idUser } = req.body;
 
   try {
-    const relation = await prisma.sessioProfessor.upsert({
+    const relation = await prisma.sessionTeacher.upsert({
       where: {
-        id_sessio_id_usuari: {
-          id_sessio: parseInt(idSessio as string),
-          id_usuari: parseInt(idUsuari)
+        id_session_id_user: {
+          id_session: parseInt(idSession as string),
+          id_user: parseInt(idUser)
         }
       },
       update: {}, // No update needed if exists
       create: {
-        id_sessio: parseInt(idSessio as string),
-        id_usuari: parseInt(idUsuari)
+        id_session: parseInt(idSession as string),
+        id_user: parseInt(idUser)
       }
     });
     res.status(201).json(relation);
@@ -923,15 +919,15 @@ export const addSessionProfessor = async (req: Request, res: Response) => {
   }
 };
 
-export const removeSessionProfessor = async (req: Request, res: Response) => {
-  const { idSessio, idUsuari } = req.params;
+export const removeSessionTeacher = async (req: Request, res: Response) => {
+  const { idSession, idUser } = req.params;
 
   try {
-    await prisma.sessioProfessor.delete({
+    await prisma.sessionTeacher.delete({
       where: {
-        id_sessio_id_usuari: {
-          id_sessio: parseInt(idSessio as string),
-          id_usuari: parseInt(idUsuari as string)
+        id_session_id_user: {
+          id_session: parseInt(idSession as string),
+          id_user: parseInt(idUser as string)
         }
       }
     });
@@ -943,6 +939,6 @@ export const removeSessionProfessor = async (req: Request, res: Response) => {
 };
 
 // Phase 4: Closing
-export const closeAssignacio = async (req: Request, res: Response) => {
-  res.status(501).json({ error: 'Funcionalitat no implementada: closeAssignacio' });
+export const closeAssignment = async (req: Request, res: Response) => {
+  res.status(501).json({ error: 'Funcionalitat no implementada: closeAssignment' });
 };

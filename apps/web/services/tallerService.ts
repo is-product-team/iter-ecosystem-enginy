@@ -29,7 +29,7 @@ const tallerService = {
       const tallersData = response.data.data;
 
       return tallersData.map((t: any) => ({
-        _id: t.id_taller.toString(),
+        _id: t.id_workshop.toString(),
         titol: t.titol,
         sector: t.sector?.nom || "General",
         id_sector: t.id_sector,
@@ -69,7 +69,7 @@ const tallerService = {
       const t = response.data;
 
       return {
-        _id: t.id_taller.toString(),
+        _id: t.id_workshop.toString(),
         titol: t.titol,
         sector: t.sector?.nom || "General",
         id_sector: t.id_sector,
@@ -111,7 +111,7 @@ const tallerService = {
       const t = response.data;
 
       return {
-        _id: t.id_taller.toString(),
+        _id: t.id_workshop.toString(),
         titol: t.titol,
         sector: t.sector?.nom || "General",
         id_sector: t.id_sector,

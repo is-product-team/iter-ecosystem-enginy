@@ -27,12 +27,12 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
     let targetName = 'perfil';
 
     if (type === 'alumne') {
-      const alumne = await prisma.alumne.findUnique({ where: { id_alumne: targetId } });
-      if (!alumne) return res.status(404).json({ error: 'Alumne no trobat.' });
+      const alumne = await prisma.student.findUnique({ where: { id_student: targetId } });
+      if (!alumne) return res.status(404).json({ error: 'Student no trobat.' });
       targetName = sanitizeFileName(`${alumne.nom}_${alumne.cognoms}`);
     } else if (type === 'usuari') {
-      const usuari = await prisma.usuari.findUnique({ where: { id_usuari: targetId } });
-      if (!usuari) return res.status(404).json({ error: 'Usuari no trobat.' });
+      const usuari = await prisma.user.findUnique({ where: { id_user: targetId } });
+      if (!usuari) return res.status(404).json({ error: 'User no trobat.' });
       targetName = sanitizeFileName(usuari.nom_complet);
     } else {
       return res.status(400).json({ error: 'Tipus de perfil no vàlid.' });
@@ -52,13 +52,13 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
     const url = `/uploads/perfil/${fileName}`;
 
     if (type === 'alumne') {
-      await prisma.alumne.update({
-        where: { id_alumne: targetId },
+      await prisma.student.update({
+        where: { id_student: targetId },
         data: { url_foto: url }
       });
     } else {
-      await prisma.usuari.update({
-        where: { id_usuari: targetId },
+      await prisma.user.update({
+        where: { id_user: targetId },
         data: { url_foto: url }
       });
     }

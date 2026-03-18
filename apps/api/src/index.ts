@@ -9,10 +9,11 @@ import logger from './lib/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import prisma from './lib/prisma.js';
 
+import { env } from './config/env.js';
+
 const app = express();
 app.set('trust proxy', 1);
 
-// ... (allowedOrigins logic remains same)
 const defaultAllowedOrigins = [
   'https://projects.kore29.com',
   'https://projects.kore29.com/iter',
@@ -22,8 +23,8 @@ const defaultAllowedOrigins = [
   'http://localhost:3001',
 ];
 
-const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS 
-  ? process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim())
+const allowedOrigins = env.CORS_ALLOWED_ORIGINS.length > 0 
+  ? env.CORS_ALLOWED_ORIGINS 
   : defaultAllowedOrigins;
 
 app.use(cors({
@@ -42,21 +43,18 @@ app.use(cors({
 
 app.use(express.json());
 
-// Prefix logic for production paths
-const API_PREFIX = process.env.API_PREFIX || '';
+const API_PREFIX = env.API_PREFIX;
 app.use(`${API_PREFIX}/uploads`, express.static('uploads'));
 
-// Rutas API servidas con prefijo si existe (ej: /iter/api)
 app.use(`${API_PREFIX}/`, routes);
 
-// Error Handler (Debe ir después de las rutas)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 
 const server = app.listen(PORT, async () => {
-  logger.info(`🚀 Servidor listo en puerto: ${PORT}`);
-  logger.info(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  logger.info(`🚀 Server ready on port: ${PORT}`);
+  logger.info(`🌍 Environment: ${env.NODE_ENV}`);
   
   // Conexión PostgreSQL (Opcional en el arranque)
   try {

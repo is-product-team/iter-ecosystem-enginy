@@ -2,24 +2,24 @@ import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 
 // GET: Ver notificaciones (Filtradas por centro o usuario)
-export const getNotificacions = async (req: Request, res: Response) => {
+export const getNotificationns = async (req: Request, res: Response) => {
   const { centreId, userId, role } = req.user! || {};
 
   try {
     const where: any = {
       OR: [
-        // 1. Notificaciones globales (sin usuario ni centro específico)
-        { id_usuari: null, id_centre: null },
+        // 1. Notificationnes globales (sin usuario ni centro específico)
+        { id_user: null, id_center: null },
         
-        // 2. Notificaciones para mi usuario específico
-        ...(userId ? [{ id_usuari: userId }] : []),
+        // 2. Notificationnes para mi usuario específico
+        ...(userId ? [{ id_user: userId }] : []),
         
-        // 3. Notificaciones para mi centro
-        ...(centreId ? [{ id_centre: centreId }] : [])
+        // 3. Notificationnes para mi centro
+        ...(centreId ? [{ id_center: centreId }] : [])
       ]
     };
 
-    const notificacions = await prisma.notificacio.findMany({
+    const notificacions = await prisma.notification.findMany({
       where,
       orderBy: {
         data_creacio: 'desc'
@@ -29,7 +29,7 @@ export const getNotificacions = async (req: Request, res: Response) => {
 
     res.json(notificacions);
   } catch (error) {
-    console.error("Error en notificacioController.getNotificacions:", error);
+    console.error("Error en notificacioController.getNotificationns:", error);
     res.status(500).json({ error: 'Error al obtener notificaciones' });
   }
 };
@@ -39,7 +39,7 @@ export const markAsRead = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const updated = await prisma.notificacio.update({
+    const updated = await prisma.notification.update({
       where: { id_notificacio: parseInt(id as string) },
       data: { llegida: true }
     });
@@ -52,35 +52,35 @@ export const markAsRead = async (req: Request, res: Response) => {
 };
 
 // DELETE: Eliminar notificación
-export const deleteNotificacio = async (req: Request, res: Response) => {
+export const deleteNotification = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    await prisma.notificacio.delete({
+    await prisma.notification.delete({
       where: { id_notificacio: parseInt(id as string) }
     });
 
     res.json({ success: true });
   } catch (error) {
-    console.error("Error en notificacioController.deleteNotificacio:", error);
+    console.error("Error en notificacioController.deleteNotification:", error);
     res.status(500).json({ error: 'Error al eliminar la notificación' });
   }
 };
 
 // Helper: Crear notificación interna (Se usará desde otros controladores)
-export const createNotificacioInterna = async (data: {
-  id_usuari?: number;
-  id_centre?: number;
+export const createNotificationInterna = async (data: {
+  id_user?: number;
+  id_center?: number;
   titol: string;
   missatge: string;
   tipus: 'PETICIO' | 'FASE' | 'SISTEMA';
   importancia?: 'INFO' | 'WARNING' | 'URGENT';
 }) => {
   try {
-    const notif = await prisma.notificacio.create({
+    const notif = await prisma.notification.create({
       data: {
-        id_usuari: data.id_usuari,
-        id_centre: data.id_centre,
+        id_user: data.id_user,
+        id_center: data.id_center,
         titol: data.titol,
         missatge: data.missatge,
         tipus: data.tipus,

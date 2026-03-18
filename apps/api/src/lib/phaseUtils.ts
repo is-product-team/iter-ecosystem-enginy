@@ -8,12 +8,12 @@ import prisma from './prisma.js';
  */
 export async function isPhaseActive(phaseName: string) {
   const now = new Date();
-  const phase = await prisma.fase.findUnique({
+  const phase = await prisma.phase.findUnique({
     where: { nom: phaseName }
   });
 
   if (!phase) {
-    return { isActive: false, error: `Fase '${phaseName}' no encontrada.` };
+    return { isActive: false, error: `Phase '${phaseName}' no encontrada.` };
   }
 
   const isWithinDates = now >= phase.data_inici && now <= phase.data_fi;

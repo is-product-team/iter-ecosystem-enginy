@@ -15,7 +15,7 @@ export interface PopularStat {
 export interface ActivityLog {
   id_log: number;
   tipus_accio: string;
-  id_usuari?: number;
+  id_user?: number;
   data_hora: string;
   descripcio: string;
   usuari?: {

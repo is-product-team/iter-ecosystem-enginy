@@ -11,7 +11,7 @@ export const login = async (req: Request, res: Response) => {
 
   try {
     logger.info('1. Consultando base de datos...');
-    const usuari = await prisma.usuari.findUnique({
+    const usuari = await prisma.user.findUnique({
       where: { email },
       include: {
         rol: true,
@@ -20,7 +20,7 @@ export const login = async (req: Request, res: Response) => {
     });
 
     if (!usuari) {
-      logger.info('Usuario no encontrado');
+      logger.info('Usero no encontrado');
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
@@ -35,9 +35,9 @@ export const login = async (req: Request, res: Response) => {
     const secret = process.env.JWT_SECRET || 'secreto_super_seguro_dev';
     const token = jwt.sign(
       {
-        userId: usuari.id_usuari,
-        role: usuari.rol.nom_rol,
-        centreId: usuari.id_centre
+        userId: usuari.id_user,
+        role: usuari.role.nom_rol,
+        centreId: usuari.id_center
       },
       secret,
       { expiresIn: '8h' }
@@ -65,6 +65,6 @@ export const login = async (req: Request, res: Response) => {
 
 export const register = async (req: Request, res: Response) => {
   // Lógica de registro para Admins o script inicial
-  // ... similar al createTaller pero con bcrypt.hash(password, 10)
+  // ... similar al createWorkshop pero con bcrypt.hash(password, 10)
   res.status(501).json({ error: 'Not implemented' });
 };

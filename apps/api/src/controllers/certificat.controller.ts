@@ -3,17 +3,17 @@ import { Request, Response } from 'express';
 
 // POST: Generar certificados para una asignación (Automático al cerrar)
 export const generateCertificates = async (req: Request, res: Response) => {
-    const { idAssignacio } = req.body;
-    const id = parseInt(idAssignacio);
+    const { idAssignment } = req.body;
+    const id = parseInt(idAssignment);
 
     try {
-        const assignacio = await prisma.assignacio.findUnique({
-            where: { id_assignacio: id },
+        const assignacio = await prisma.assignment.findUnique({
+            where: { id_assignment: id },
             include: {
-                inscripcions: {
+                enrollments: {
                     include: {
                         alumne: true,
-                        assistencia: true
+                        attendance: true
                     }
                 }
             }
@@ -32,17 +32,17 @@ export const generateCertificates = async (req: Request, res: Response) => {
             const percentage = (attendedCount / totalSessions) * 100;
 
             if (percentage >= 80) {
-                await prisma.certificat.upsert({
+                await prisma.certificate.upsert({
                     where: {
-                        id_alumne_id_assignacio: {
-                            id_alumne: inscripcio.id_alumne,
-                            id_assignacio: id
+                        id_student_id_assignment: {
+                            id_student: inscripcio.id_student,
+                            id_assignment: id
                         }
                     },
                     update: {},
                     create: {
-                        id_alumne: inscripcio.id_alumne,
-                        id_assignacio: id,
+                        id_student: inscripcio.id_student,
+                        id_assignment: id,
                         data_emissio: new Date()
                     }
                 });
@@ -53,7 +53,7 @@ export const generateCertificates = async (req: Request, res: Response) => {
         res.json({
             success: true,
             message: `${certificatesIssued} certificados generados.`,
-            totalStudents: assignacio.inscripcions.length
+            totalStudents: assignacio.enrollments.length
         });
 
     } catch (error) {
@@ -67,9 +67,9 @@ export const getMyCertificates = async (req: Request, res: Response) => {
 
     try {
         const where: any = {};
-        if (alumneId) where.id_alumne = parseInt(alumneId as string);
+        if (alumneId) where.id_student = parseInt(alumneId as string);
 
-        const certificats = await prisma.certificat.findMany({
+        const certificats = await prisma.certificate.findMany({
             where,
             include: {
                 assignacio: {

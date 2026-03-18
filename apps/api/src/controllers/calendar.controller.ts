@@ -10,11 +10,11 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
     // 1. Obtener el profesor asociado al usuario (si es rol profesor) de forma directa por ID
     let professorId: number | null = null;
     if (user.role === ROLES.PROFESOR) {
-      const professor = await prisma.professor.findUnique({
-        where: { id_usuari: user.userId }
+      const professor = await prisma.teacher.findUnique({
+        where: { id_user: user.userId }
       });
       if (professor) {
-        professorId = professor.id_professor;
+        professorId = professor.id_teacher;
       }
     }
 
@@ -43,13 +43,13 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
       
       // 2. Assignments (basado en rol) + Sessions
       user.role === ROLES.ADMIN 
-        ? prisma.assignacio.findMany({ 
+        ? prisma.assignment.findMany({ 
             where: assignmentDateFilter, 
             include: { taller: true, centre: true, sessions: { include: { staff: { include: { usuari: true } } } } } 
           })
         : user.role === ROLES.COORDINADOR
-        ? prisma.assignacio.findMany({ 
-            where: { ...assignmentDateFilter, id_centre: user.centreId }, 
+        ? prisma.assignment.findMany({ 
+            where: { ...assignmentDateFilter, id_center: user.centreId }, 
             include: { 
               taller: true, 
               sessions: {
@@ -64,14 +64,14 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
             } 
           })
         : user.role === ROLES.PROFESOR
-        ? prisma.assignacio.findMany({ 
+        ? prisma.assignment.findMany({ 
             where: { 
               ...assignmentDateFilter, 
               OR: [
                 // Check if the user is the primary referent
-                { professors: { some: { id_usuari: user.userId } } },
+                { teachers: { some: { id_user: user.userId } } },
                 // Check if the user is assigned as staff to any session within this assignment
-                { sessions: { some: { staff: { some: { id_usuari: user.userId } } } } },
+                { sessions: { some: { staff: { some: { id_user: user.userId } } } } },
                 // Check if the user is assigned as prof1 or prof2 (legacy support)
                 ...(professorId ? [
                   { prof1_id: professorId },
@@ -122,13 +122,13 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
         
         if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
           events.push({
-            id: `assign-${a.id_assignacio}`,
-            title: user.role === ROLES.COORDINADOR ? `Taller: ${a.taller?.titol}` : `${a.taller?.titol}`,
+            id: `assign-${a.id_assignment}`,
+            title: user.role === ROLES.COORDINADOR ? `Workshop: ${a.taller?.titol}` : `${a.taller?.titol}`,
             date: startDate.toISOString(),
             endDate: endDate.toISOString(),
             type: 'assignment',
             metadata: { 
-              id_assignacio: a.id_assignacio,
+              id_assignment: a.id_assignment,
               centre: a.centre?.nom,
               adreca: a.centre?.adreca
             }
@@ -141,7 +141,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
         a.sessions.forEach((s: any) => {
           // Si es profesor, solo mostramos las sesiones donde está asignado (o si es el referent general)
           const isReferentGeneral = a.prof1_id === professorId || a.prof2_id === professorId;
-          const isSessionStaff = s.staff?.some((sp: any) => sp.id_usuari === user.userId);
+          const isSessionStaff = s.staff?.some((sp: any) => sp.id_user === user.userId);
           
           if (user.role === ROLES.PROFESOR && !isReferentGeneral && !isSessionStaff) {
             return;
@@ -151,13 +151,13 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
           if (sessionDate && !isNaN(sessionDate.getTime())) {
             events.push({
               id: `session-${s.id_sessio}`,
-              title: `SESSIÓ: ${a.taller?.titol || 'Taller'}`,
+              title: `SESSIÓ: ${a.taller?.titol || 'Workshop'}`,
               date: sessionDate.toISOString(),
               type: 'session',
               metadata: {
-                id_assignacio: a.id_assignacio,
+                id_assignment: a.id_assignment,
                 hora: `${s.hora_inici || '09:00'} - ${s.hora_fi || '13:00'}`,
-                centre: a.centre?.nom || 'Centre del Professor'
+                centre: a.centre?.nom || 'Center del Teacher'
               }
             });
           }

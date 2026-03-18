@@ -1,19 +1,19 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { Prisma, Destinatari } from '@prisma/client';
+import { Prisma, QuestionnaireTarget } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 // POST: Generar encuestas para una asignación finalizada
 // Se llama automáticamente al cerrar asignación, pero también se puede forzar
 export const generateEnquestes = async (req: Request, res: Response) => {
-    const { idAssignacio } = req.body;
+    const { idAssignment } = req.body;
 
     try {
-        const assignacio = await prisma.assignacio.findUnique({
-            where: { id_assignacio: parseInt(idAssignacio) },
+        const assignacio = await prisma.assignment.findUnique({
+            where: { id_assignment: parseInt(idAssignment) },
             include: {
-                inscripcions: { include: { alumne: true } },
-                professors: { include: { usuari: true } },
+                enrollments: { include: { alumne: true } },
+                teachers: { include: { usuari: true } },
                 centre: true
             }
         });
@@ -26,8 +26,8 @@ export const generateEnquestes = async (req: Request, res: Response) => {
         // Alumnos
         for (const inscripcio of assignacio.inscripcions) {
             enquestesData.push({
-                id_assignacio: assignacio.id_assignacio,
-                destinatari: Destinatari.ALUMNE,
+                id_assignment: assignacio.id_assignment,
+                destinatari: QuestionnaireTarget.ALUMNE,
                 token: uuidv4(),
                 completa: false
             });
@@ -36,8 +36,8 @@ export const generateEnquestes = async (req: Request, res: Response) => {
         // Profesores
         for (const prof of assignacio.professors) {
             enquestesData.push({
-                id_assignacio: assignacio.id_assignacio,
-                destinatari: Destinatari.PROFESSOR,
+                id_assignment: assignacio.id_assignment,
+                destinatari: QuestionnaireTarget.PROFESSOR,
                 token: uuidv4(),
                 completa: false
             });
@@ -45,15 +45,15 @@ export const generateEnquestes = async (req: Request, res: Response) => {
 
         // Centro (1 por asignación)
         enquestesData.push({
-            id_assignacio: assignacio.id_assignacio,
-            destinatari: Destinatari.CENTRE,
+            id_assignment: assignacio.id_assignment,
+            destinatari: QuestionnaireTarget.CENTRE,
             token: uuidv4(),
             completa: false
         });
 
         // Guardar en Prisma (Postgres)
         // Usamos createMany
-        const created = await prisma.enquesta.createMany({
+        const created = await prisma.survey.createMany({
             data: enquestesData,
             skipDuplicates: true
         });
@@ -70,7 +70,7 @@ export const getEnquestaByToken = async (req: Request, res: Response) => {
     const token = req.params.token as string;
 
     try {
-        const enquesta = await prisma.enquesta.findUnique({
+        const enquesta = await prisma.survey.findUnique({
             where: { token },
             include: { assignacio: { include: { taller: true } } }
         });
@@ -86,12 +86,12 @@ export const getEnquestaByToken = async (req: Request, res: Response) => {
         // Obtener preguntas del modelo (según destinatario)
         const model = await prisma.modelQuestionari.findFirst({
             where: { destinatari: enquesta.destinatari },
-            include: { preguntes: true }
+            include: { questions: true }
         });
 
         res.json({
             enquesta,
-            preguntes: model?.preguntes || []
+            questions: model?.preguntes || []
         });
     } catch (error) {
         res.status(500).json({ error: 'Error al cargar encuesta' });
@@ -104,13 +104,13 @@ export const submitEnquesta = async (req: Request, res: Response) => {
     // const { respostes } = req.body; 
 
     try {
-        const enquesta = await prisma.enquesta.findUnique({ where: { token } });
+        const enquesta = await prisma.survey.findUnique({ where: { token } });
 
         if (!enquesta) return res.status(404).json({ error: 'Encuesta no encontrada' });
         if (enquesta.completa) return res.status(400).json({ error: 'Encuesta ya completada' });
 
         // 1. Marcar como completada en Postgres
-        await prisma.enquesta.update({
+        await prisma.survey.update({
             where: { token },
             data: {
                 completa: true,

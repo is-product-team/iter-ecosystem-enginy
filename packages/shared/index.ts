@@ -16,14 +16,14 @@ export const ROLES = {
 
 export type Rol = typeof ROLES[keyof typeof ROLES];
 
-// Definimos los estados de las peticiones - Alineados con Prisma Enum 'EstatPeticio'
-export const ESTADOS_PETICION = {
-  PENDIENTE: 'Pendent',
-  ACEPTADA: 'Aprovada',
-  RECHAZADA: 'Rebutjada'
+// Definimos los estados de las peticiones - Alineados con Prisma Enum 'EstatRequest'
+export const REQUEST_STATUSES = {
+  PENDIENTE: 'Pending',
+  ACEPTADA: 'Approved',
+  RECHAZADA: 'Rejected'
 } as const;
 
-export type EstadoPeticion = typeof ESTADOS_PETICION[keyof typeof ESTADOS_PETICION];
+export type EstadoRequestn = typeof REQUEST_STATUSES[keyof typeof REQUEST_STATUSES];
 
 // Calendario Programa Iter (Curso 25-26 aprox)
 export const CALENDARI = {
@@ -56,24 +56,34 @@ export const esEmailValido = (email: string): boolean => {
 };
 
 // Zod Schemas for Validation
-export const PeticioSchema = z.object({
-  id_centre: z.number().int(),
-  id_taller: z.number().int(),
+export const WorkshopSchema = z.object({
+  titol: z.string().min(3).max(100),
+  descripcio: z.string().optional(),
+  durada_h: z.number().int().min(1).max(100),
+  places_maximes: z.number().int().min(1).max(50),
+  modalitat: z.enum(['A', 'B', 'C']),
+  icona: z.string().optional(),
+  id_sector: z.number().int(),
+  dies_execucio: z.array(z.any()).optional()
+});
+
+export const StudentSchema = z.object({
+  idalu: z.string().min(3),
+  nom: z.string().min(1),
+  cognoms: z.string().min(1),
+  curs: z.string().optional(),
+  id_center_origin: z.number().int().optional().nullable()
+});
+
+export const RequestSchema = z.object({
+  id_center: z.number().int(),
+  id_workshop: z.number().int(),
   alumnes_aprox: z.number().int().min(1).max(100),
   comentaris: z.string().optional()
 });
 
-export const AssignmentChecklistSchema = z.object({
-  id_checklist: z.number().int(),
-  completat: z.boolean(),
-  url_evidencia: z.string().url().optional().or(z.literal(''))
-});
-
-export const CentreAttendanceSchema = z.object({
-  id_centre: z.number().int(),
-  asistencia_reunion: z.boolean()
-});
-
-export type PeticioInput = z.infer<typeof PeticioSchema>;
+export type WorkshopInput = z.infer<typeof WorkshopSchema>;
+export type StudentInput = z.infer<typeof StudentSchema>;
+export type RequestInput = z.infer<typeof RequestSchema>;
 export type AssignmentChecklistInput = z.infer<typeof AssignmentChecklistSchema>;
-export type CentreAttendanceInput = z.infer<typeof CentreAttendanceSchema>;
+export type CenterAttendanceInput = z.infer<typeof CenterAttendanceSchema>;

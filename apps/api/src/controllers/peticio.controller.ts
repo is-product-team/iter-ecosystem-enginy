@@ -1,11 +1,11 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { EstadoPeticion } from '@iter/shared';
+import { EstadoRequestn } from '@iter/shared';
 import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
-import { createNotificacioInterna } from './notificacio.controller.js';
+import { createNotificationInterna } from './notificacio.controller.js';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
-export const getPeticions = async (req: Request, res: Response) => {
+export const getRequestns = async (req: Request, res: Response) => {
   const { centreId, role } = req.user || {};
   const { page = 1, limit = 10 } = req.query;
   const isAll = Number(limit) === 0;
@@ -20,11 +20,11 @@ export const getPeticions = async (req: Request, res: Response) => {
       if (!centreId) {
         return res.json({ data: [], meta: { total: 0, page: Number(page), limit: Number(limit), totalPages: 0 } });
       }
-      where.id_centre = parseInt(centreId.toString());
+      where.id_center = parseInt(centreId.toString());
     }
 
     const [peticions, total] = await Promise.all([
-      prisma.peticio.findMany({
+      prisma.request.findMany({
         where,
         skip,
         take,
@@ -33,13 +33,13 @@ export const getPeticions = async (req: Request, res: Response) => {
           taller: true,
           prof1: true,
           prof2: true,
-          alumnes: true
+          students: true
         },
         orderBy: {
           data_peticio: 'desc'
         }
       }),
-      prisma.peticio.count({ where }),
+      prisma.request.count({ where }),
     ]);
 
     res.json({
@@ -52,15 +52,15 @@ export const getPeticions = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Error en peticioController.getPeticions:", error);
+    console.error("Error en peticioController.getRequestns:", error);
     return res.status(500).json({ error: 'Error al obtenir peticions' });
   }
 };
 
 // POST: Crear solicitud
-export const createPeticio = async (req: Request, res: Response) => {
+export const createRequest = async (req: Request, res: Response) => {
   const {
-    id_taller,
+    id_workshop,
     alumnes_aprox,
     comentaris,
     prof1_id,
@@ -69,8 +69,8 @@ export const createPeticio = async (req: Request, res: Response) => {
   } = req.body;
   const { centreId } = req.user!;
 
-  if (!id_taller || !centreId || !prof1_id || !prof2_id) {
-    return res.status(400).json({ error: 'Falten camps obligatoris (id_taller, centreId, prof1_id, prof2_id)' });
+  if (!id_workshop || !centreId || !prof1_id || !prof2_id) {
+    return res.status(400).json({ error: 'Falten camps obligatoris (id_workshop, centreId, prof1_id, prof2_id)' });
   }
 
   // --- VERIFICACIÓN DE FASE ---
@@ -92,37 +92,37 @@ export const createPeticio = async (req: Request, res: Response) => {
     }
 
     // Comprobar límite total de 12 alumnos para el centro en Modalidad C
-    const peticionsC = await prisma.peticio.findMany({
+    const peticionsC = await prisma.request.findMany({
       where: {
-        id_centre: centreId,
+        id_center: centreId,
         modalitat: 'C'
       }
     });
 
-    const totalAlumnesC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
-    if (totalAlumnesC + alumnes_aprox > 12) {
+    const totalStudentsC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
+    if (totalStudentsC + alumnes_aprox > 12) {
       return res.status(400).json({
-        error: `Límit superat. L'institut ya té ${totalAlumnesC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
+        error: `Límit superat. L'institut ya té ${totalStudentsC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
       });
     }
   }
 
   try {
-    const existingPeticio = await prisma.peticio.findFirst({
+    const existingRequest = await prisma.request.findFirst({
       where: {
-        id_centre: centreId,
-        id_taller: parseInt(id_taller)
+        id_center: centreId,
+        id_workshop: parseInt(id_workshop)
       }
     });
 
-    if (existingPeticio) {
+    if (existingRequest) {
       return res.status(400).json({ error: 'Aquest centre ya ha realitzat una sol·licitud per a aquest taller.' });
     }
 
-    const nuevaPeticio = await prisma.peticio.create({
+    const nuevaRequest = await prisma.request.create({
       data: {
-        id_centre: centreId,
-        id_taller: parseInt(id_taller),
+        id_center: centreId,
+        id_workshop: parseInt(id_workshop),
         alumnes_aprox: parseInt(alumnes_aprox),
         comentaris,
         estat: 'Pendent',
@@ -135,15 +135,15 @@ export const createPeticio = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(nuevaPeticio);
+    res.json(nuevaRequest);
   } catch (error) {
-    console.error("Error en peticioController.createPeticio:", error);
+    console.error("Error en peticioController.createRequest:", error);
     res.status(500).json({ error: 'Error al crear la petició' });
   }
 };
 
 // PUT: Actualizar solicitud existente (solo campos permitidos y si está Pendent)
-export const updatePeticio = async (req: Request, res: Response) => {
+export const updateRequest = async (req: Request, res: Response) => {
   const { id } = req.params;
   const {
     alumnes_aprox,
@@ -155,21 +155,21 @@ export const updatePeticio = async (req: Request, res: Response) => {
 
   try {
     const peticioId = parseInt(id as string);
-    const existingPeticio = await prisma.peticio.findUnique({
-      where: { id_peticio: peticioId }
+    const existingRequest = await prisma.request.findUnique({
+      where: { id_request: peticioId }
     });
 
-    if (!existingPeticio) {
+    if (!existingRequest) {
       return res.status(404).json({ error: 'Petició no trobada.' });
     }
 
     // Verificar permisos: Coordinador solo edita las suyas
-    if (role !== 'ADMIN' && existingPeticio.id_centre !== (centreId ? (typeof centreId === 'string' ? centreId : centreId) : 0)) {
+    if (role !== 'ADMIN' && existingRequest.id_center !== (centreId ? (typeof centreId === 'string' ? centreId : centreId) : 0)) {
       return res.status(403).json({ error: 'No tens permís per editar aquesta petició.' });
     }
 
     // Verificar estado: Solo se pueden editar las pendientes
-    if (existingPeticio.estat !== 'Pendent') {
+    if (existingRequest.estat !== 'Pendent') {
       return res.status(400).json({ error: 'Només es poden editar peticions pendents.' });
     }
 
@@ -189,31 +189,31 @@ export const updatePeticio = async (req: Request, res: Response) => {
     }
 
     // --- VALIDACIONES DE MODALIDAD C (REGLAS DEL PROGRAMA) ---
-    if (existingPeticio.modalitat === 'C' && alumnes_aprox !== undefined) {
-      const nuevosAlumnes = parseInt(alumnes_aprox);
-      if (nuevosAlumnes > 4) {
+    if (existingRequest.modalitat === 'C' && alumnes_aprox !== undefined) {
+      const nuevosStudents = parseInt(alumnes_aprox);
+      if (nuevosStudents > 4) {
         return res.status(400).json({ error: 'En la Modalitat C, el màxim és de 4 alumnes d\'un mateix institut per projecte.' });
       }
 
       // Comprobar límite total de 12 alumnos (excluyendo la cantidad actual de esta petición)
-      const peticionsC = await prisma.peticio.findMany({
+      const peticionsC = await prisma.request.findMany({
         where: {
-          id_centre: existingPeticio.id_centre,
+          id_center: existingRequest.id_center,
           modalitat: 'C',
-          id_peticio: { not: peticioId } // Excluir la actual
+          id_request: { not: peticioId } // Excluir la actual
         }
       });
 
-      const totalAlumnesC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
-      if (totalAlumnesC + nuevosAlumnes > 12) {
+      const totalStudentsC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
+      if (totalStudentsC + nuevosStudents > 12) {
         return res.status(400).json({
-          error: `Límit superat. L'institut ya té ${totalAlumnesC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosAlumnes}) superaria el màxim de 12.`
+          error: `Límit superat. L'institut ya té ${totalStudentsC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosStudents}) superaria el màxim de 12.`
         });
       }
     }
 
-    const updatedPeticio = await prisma.peticio.update({
-      where: { id_peticio: peticioId },
+    const updatedRequest = await prisma.request.update({
+      where: { id_request: peticioId },
       data: {
         alumnes_aprox: alumnes_aprox ? parseInt(alumnes_aprox) : undefined,
         comentaris,
@@ -225,36 +225,36 @@ export const updatePeticio = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(updatedPeticio);
+    res.json(updatedRequest);
   } catch (error) {
-    console.error("Error en peticioController.updatePeticio:", error);
+    console.error("Error en peticioController.updateRequest:", error);
     res.status(500).json({ error: 'Error al actualitzar la petició' });
   }
 };
 
 // PATCH: Cambiar estado (Aprobar/Rechazar)
-export const updatePeticioStatus = async (req: Request, res: Response) => {
+export const updateRequestStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { estat } = req.body;
 
   try {
-    const updated = await prisma.peticio.update({
-      where: { id_peticio: parseInt(id as string) },
-      data: { estat: estat as EstadoPeticion },
+    const updated = await prisma.request.update({
+      where: { id_request: parseInt(id as string) },
+      data: { estat: estat as EstadoRequestn },
       include: { taller: true }
     });
 
-    await createNotificacioInterna({
-      id_centre: updated.id_centre,
+    await createNotificationInterna({
+      id_center: updated.id_center,
       titol: `Sol·licitud ${updated.estat === 'Aprovada' ? 'Aprovada' : 'Rebutjada'}`,
-      missatge: `La teva sol·licitud per al taller "${updated.taller.titol}" ha estat ${updated.estat.toLowerCase()}.`,
+      missatge: `La teva sol·licitud per al taller "${updated.workshop.titol}" ha estat ${updated.estat.toLowerCase()}.`,
       tipus: 'PETICIO',
       importancia: updated.estat === 'Aprovada' ? 'INFO' : 'WARNING'
     });
 
     res.json(updated);
   } catch (error) {
-    console.error("Error en updatePeticioStatus:", error);
+    console.error("Error en updateRequestStatus:", error);
     res.status(500).json({ error: 'Error al actualitzar l\'estat' });
   }
 };

@@ -1,14 +1,14 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 import prisma from '../lib/prisma.js';
-import { createNotificacioInterna } from '../controllers/notificacio.controller.js';
+import { createNotificationInterna } from '../controllers/notificacio.controller.js';
 import { PHASES } from '@iter/shared';
 
 const router = Router();
 
 // Get all phases with their status
 router.get('/', authenticateToken, async (_req: Request, res: Response) => {
-  const phases = await prisma.fase.findMany({
+  const phases = await prisma.phase.findMany({
     orderBy: { ordre: 'asc' },
     include: {
       _count: {
@@ -39,8 +39,8 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
     return res.status(403).json({ error: 'Accés denegat: Només els administradors poden modificar les fases.' });
   }
 
-  const updatedFase = await prisma.fase.update({
-    where: { id_fase: parseInt(id as string) },
+  const updatedPhase = await prisma.phase.update({
+    where: { id_phase: parseInt(id as string) },
     data: {
       nom,
       descripcio,
@@ -51,21 +51,21 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
   });
 
   if (activa === true) {
-    await prisma.fase.updateMany({
-      where: { id_fase: { not: parseInt(id as string) } },
+    await prisma.phase.updateMany({
+      where: { id_phase: { not: parseInt(id as string) } },
       data: { activa: false }
     });
 
     // Notificar a todos los centros del inicio de la nueva fase
-    await createNotificacioInterna({
-      titol: `Nova Fase: ${updatedFase.nom}`,
-      missatge: `S'ha iniciat la fase de "${updatedFase.nom}". Consulta el calendari per a més detalls.`,
+    await createNotificationInterna({
+      titol: `Nova Phase: ${updatedPhase.nom}`,
+      missatge: `S'ha iniciat la fase de "${updatedPhase.nom}". Consulta el calendari per a més detalls.`,
       tipus: 'FASE',
       importancia: 'URGENT'
     });
   }
 
-  res.json(updatedFase);
+  res.json(updatedPhase);
 });
 
 export default router;

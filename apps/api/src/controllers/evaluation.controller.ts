@@ -6,10 +6,10 @@ import prisma from '../lib/prisma.js';
 const evaluationService = new EvaluationService();
 const nlpService = new NLPService();
 
-export const getInscripcioEvaluation = async (req: Request, res: Response) => {
+export const getEnrollmentEvaluation = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        const evaluation = await evaluationService.getEvaluationByInscripcio(parseInt(id as string));
+        const evaluation = await evaluationService.getEvaluationByEnrollment(parseInt(id as string));
         if (!evaluation) {
             return res.status(404).json({ error: 'Evaluation not found' });
         }
@@ -21,29 +21,29 @@ export const getInscripcioEvaluation = async (req: Request, res: Response) => {
 
 export const upsertEvaluation = async (req: Request, res: Response) => {
     try {
-        let { id_inscripcio, id_alumne, id_assignacio, observacions, competencies, percentatge_asistencia, numero_retards } = req.body;
+        let { id_enrollment, id_student, id_assignment, observacions, competencies, percentatge_asistencia, numero_retards } = req.body;
 
-        if (!id_inscripcio) {
-            if (id_alumne && id_assignacio) {
-                const inscripcio = await prisma.inscripcio.findFirst({
+        if (!id_enrollment) {
+            if (id_student && id_assignment) {
+                const inscripcio = await prisma.enrollment.findFirst({
                     where: {
-                        id_alumne: parseInt(id_alumne),
-                        id_assignacio: parseInt(id_assignacio)
+                        id_student: parseInt(id_student),
+                        id_assignment: parseInt(id_assignment)
                     }
                 });
 
                 if (inscripcio) {
-                    id_inscripcio = inscripcio.id_inscripcio;
+                    id_enrollment = inscripcio.id_enrollment;
                 } else {
                     return res.status(404).json({ error: 'Enrollment not found for this student and assignment.' });
                 }
             } else {
-                return res.status(400).json({ error: 'Required id_inscripcio OR (id_alumne + id_assignacio).' });
+                return res.status(400).json({ error: 'Required id_enrollment OR (id_student + id_assignment).' });
             }
         }
 
         const dataToUpsert = {
-            id_inscripcio: parseInt(id_inscripcio),
+            id_enrollment: parseInt(id_enrollment),
             observacions: observacions || '',
             competencies: competencies || [],
             percentatge_asistencia: percentatge_asistencia || 100, 
@@ -90,34 +90,34 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
     try {
         const result = nlpService.processText(text);
 
-        const inscripcio = await prisma.inscripcio.findFirst({
+        const inscripcio = await prisma.enrollment.findFirst({
             where: {
-                id_alumne: parseInt(studentId),
-                id_assignacio: parseInt(assignacioId)
+                id_student: parseInt(studentId),
+                id_assignment: parseInt(assignacioId)
             }
         });
 
         let assistencia = null;
 
         if (inscripcio) {
-            const existingAssistencia = await prisma.assistencia.findFirst({
+            const existingAttendance = await prisma.attendance.findFirst({
                 where: {
-                    id_inscripcio: inscripcio.id_inscripcio,
+                    id_enrollment: inscripcio.id_enrollment,
                     numero_sessio: parseInt(sessionId)
                 }
             });
 
             const dataToSave = {
-                id_inscripcio: inscripcio.id_inscripcio,
+                id_enrollment: inscripcio.id_enrollment,
                 numero_sessio: parseInt(sessionId),
                 data_sessio: new Date(),
-                estat: result.attendanceStatus || (existingAssistencia ? existingAssistencia.estat : 'Present'),
+                estat: result.attendanceStatus || (existingAttendance ? existingAttendance.estat : 'Present'),
                 observacions: text
             };
 
-            if (existingAssistencia) {
-                assistencia = await prisma.assistencia.update({
-                    where: { id_assistencia: existingAssistencia.id_assistencia },
+            if (existingAttendance) {
+                assistencia = await prisma.attendance.update({
+                    where: { id_attendance: existingAttendance.id_attendance },
                     data: {
                         estat: dataToSave.estat,
                         observacions: dataToSave.observacions,
@@ -125,7 +125,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
                     }
                 });
             } else {
-                assistencia = await prisma.assistencia.create({
+                assistencia = await prisma.attendance.create({
                     data: dataToSave
                 });
             }
@@ -133,19 +133,19 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
         let competenceEvaluation = null;
         if (result.competenceUpdate && inscripcio) {
-            const competencia = await prisma.competencia.findFirst({
+            const competencia = await prisma.competence.findFirst({
                 where: { tipus: 'Transversal' }
             });
 
             if (competencia) {
-                let docentEval = await prisma.avaluacioDocent.findUnique({
-                    where: { id_inscripcio: inscripcio.id_inscripcio }
+                let docentEval = await prisma.evaluation.findUnique({
+                    where: { id_enrollment: inscripcio.id_enrollment }
                 });
 
                 if (!docentEval) {
-                    docentEval = await prisma.avaluacioDocent.create({
+                    docentEval = await prisma.evaluation.create({
                         data: {
-                            id_inscripcio: inscripcio.id_inscripcio,
+                            id_enrollment: inscripcio.id_enrollment,
                             percentatge_asistencia: 100,
                             numero_retards: 0,
                             observacions: 'Initialized by Voice Assistant'
@@ -155,7 +155,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
                 competenceEvaluation = await prisma.avaluacioCompetencial.create({
                     data: {
-                        id_avaluacio_docent: docentEval.id_avaluacio_docent,
+                        id_evaluation_teacher: docentEval.id_evaluation_teacher,
                         id_competencia: competencia.id_competencia,
                         puntuacio: result.competenceUpdate.score
                     }

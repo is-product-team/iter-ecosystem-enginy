@@ -3,8 +3,8 @@ import getApi from './api';
 const api = getApi();
 
 export const avaluacioService = {
-    getAvaluacioInscripcio: (id_inscripcio: number) =>
-        api.get(`/evaluation/inscripcio/${id_inscripcio}`),
+    getAvaluacioEnrollment: (id_enrollment: number) =>
+        api.get(`/evaluation/inscripcio/${id_enrollment}`),
 
     upsertAvaluacio: (data: any) =>
         api.post('/evaluation/upsert', data),

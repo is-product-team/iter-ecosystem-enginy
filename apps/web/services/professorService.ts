@@ -1,12 +1,12 @@
 import getApi from "./api";
 
-export interface Professor {
+export interface Teacher {
   id_professor: number;
   nom: string;
   contacte: string;
-  id_centre?: number;
+  id_center?: number;
   usuari?: {
-    id_usuari: number;
+    id_user: number;
     email: string;
     nom_complet?: string;
     url_foto?: string | null;
@@ -14,19 +14,19 @@ export interface Professor {
 }
 
 const professorService = {
-  getAll: async (): Promise<Professor[]> => {
+  getAll: async (): Promise<Teacher[]> => {
     const api = getApi();
-    const response = await api.get<Professor[]>("/teachers");
+    const response = await api.get<Teacher[]>("/teachers");
     return response.data;
   },
-  create: async (data: Omit<Professor, 'id_professor'>): Promise<Professor> => {
+  create: async (data: Omit<Teacher, 'id_professor'>): Promise<Teacher> => {
     const api = getApi();
-    const response = await api.post<Professor>("/teachers", data);
+    const response = await api.post<Teacher>("/teachers", data);
     return response.data;
   },
-  update: async (id: number, data: Partial<Professor>): Promise<Professor> => {
+  update: async (id: number, data: Partial<Teacher>): Promise<Teacher> => {
     const api = getApi();
-    const response = await api.put<Professor>(`/teachers/${id}`, data);
+    const response = await api.put<Teacher>(`/teachers/${id}`, data);
     return response.data;
   },
   delete: async (id: number): Promise<void> => {

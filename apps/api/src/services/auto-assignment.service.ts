@@ -18,17 +18,17 @@ export class AutoAssignmentService {
      */
     async generateAssignments() {
         // 1. Fetch Approved/Pending Petitions for Modalitat C that are not yet fully assigned
-        const petitions = await prisma.peticio.findMany({
+        const petitions = await prisma.request.findMany({
             where: {
                 estat: { in: ['Aprovada', 'Pendent'] },
                 modalitat: 'C',
-                assignacions: {
+                assignments: {
                     none: {}
                 }
             },
             include: {
                 centre: true,
-                alumnes: true
+                students: true
             },
             orderBy: {
                 data_peticio: 'asc'
@@ -42,32 +42,32 @@ export class AutoAssignmentService {
 
         console.log(`🚀 AutoAssignmentService: Processing ${petitions.length} petitions of Modalitat C...`);
 
-        // 2. Group Petitions by Taller
+        // 2. Group Petitions by Workshop
         const workshopMap = new Map<number, typeof petitions>();
         petitions.forEach((p: any) => {
-            if (!workshopMap.has(p.id_taller)) {
-                workshopMap.set(p.id_taller, []);
+            if (!workshopMap.has(p.id_workshop)) {
+                workshopMap.set(p.id_workshop, []);
             }
-            workshopMap.get(p.id_taller)?.push(p);
+            workshopMap.get(p.id_workshop)?.push(p);
         });
 
         const results = [];
 
         // 3. Process each Workshop
         for (const [tallerId, workshopPetitions] of workshopMap.entries()) {
-            const taller = await prisma.taller.findUnique({ where: { id_taller: tallerId } });
+            const taller = await prisma.workshop.findUnique({ where: { id_workshop: tallerId } });
             if (!taller) continue;
 
             // Calculate Capacity
-            const existingAssignments = await prisma.assignacio.findMany({
-                where: { id_taller: tallerId },
-                include: { inscripcions: true }
+            const existingAssignments = await prisma.assignment.findMany({
+                where: { id_workshop: tallerId },
+                include: { enrollments: true }
             });
 
-            const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => sum + a.inscripcions.length, 0);
+            const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => sum + a.enrollments.length, 0);
             const remainingCapacity = taller.places_maximes - occupiedPlazas;
 
-            console.log(`📊 AutoAssignment: Taller ID ${tallerId} (${taller.titol}): Capacity: ${taller.places_maximes}, Occupied: ${occupiedPlazas}, Remaining: ${remainingCapacity}`);
+            console.log(`📊 AutoAssignment: Workshop ID ${tallerId} (${taller.titol}): Capacity: ${taller.places_maximes}, Occupied: ${occupiedPlazas}, Remaining: ${remainingCapacity}`);
 
             if (remainingCapacity <= 0) {
                 console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Skipping.`);
@@ -83,20 +83,20 @@ export class AutoAssignmentService {
             const centerMap = new Map<number, PendingCenter>();
 
             workshopPetitions.forEach((p: any) => {
-                if (!p.alumnes || p.alumnes.length === 0) return;
+                if (!p.alumnes || p.students.length === 0) return;
 
-                if (!centerMap.has(p.id_centre)) {
-                    centerMap.set(p.id_centre, {
-                        centerId: p.id_centre,
+                if (!centerMap.has(p.id_center)) {
+                    centerMap.set(p.id_center, {
+                        centerId: p.id_center,
                         students: [],
-                        peticioId: p.id_peticio, // Track the main petition ID (or latest)
+                        peticioId: p.id_request, // Track the main petition ID (or latest)
                         timestamp: p.data_peticio,
                         assignedCount: 0
                     });
                 }
-                const entry = centerMap.get(p.id_centre)!;
+                const entry = centerMap.get(p.id_center)!;
                 // Add students
-                p.alumnes.forEach((a: any) => entry.students.push(a.id_alumne));
+                p.students.forEach((a: any) => entry.students.push(a.id_student));
                 // Keep the earliest timestamp for priority
                 if (p.data_peticio < entry.timestamp) {
                     entry.timestamp = p.data_peticio;
@@ -171,17 +171,17 @@ export class AutoAssignmentService {
         const studentsToAssign = center.students.slice(0, center.assignedCount);
 
         // Update Petition Status
-        await prisma.peticio.update({
-            where: { id_peticio: center.peticioId },
+        await prisma.request.update({
+            where: { id_request: center.peticioId },
             data: { estat: 'Aprovada' }
         });
 
-        // Create Assignacio
-        const assignacio = await prisma.assignacio.create({
+        // Create Assignment
+        const assignacio = await prisma.assignment.create({
             data: {
-                id_peticio: center.peticioId,
-                id_centre: center.centerId,
-                id_taller: tallerId,
+                id_request: center.peticioId,
+                id_center: center.centerId,
+                id_workshop: tallerId,
                 estat: 'PUBLISHED',
                 checklist: {
                     create: [
@@ -193,16 +193,16 @@ export class AutoAssignmentService {
             }
         });
 
-        // Create Inscripcions
-        await prisma.inscripcio.createMany({
+        // Create Enrollmentns
+        await prisma.enrollment.createMany({
             data: studentsToAssign.map(sid => ({
-                id_assignacio: assignacio.id_assignacio,
-                id_alumne: sid
+                id_assignment: assignacio.id_assignment,
+                id_student: sid
             }))
         });
 
         // Generate Sessions (Copy from original)
-        const taller = await prisma.taller.findUnique({ where: { id_taller: tallerId } });
+        const taller = await prisma.workshop.findUnique({ where: { id_workshop: tallerId } });
         if (taller && taller.dies_execucio) {
             const schedule = taller.dies_execucio as any[];
             if (Array.isArray(schedule) && schedule.length > 0) {
@@ -213,13 +213,13 @@ export class AutoAssignmentService {
                         d.setDate(d.getDate() + 1);
                     }
                     return {
-                        id_assignacio: assignacio.id_assignacio,
+                        id_assignment: assignacio.id_assignment,
                         data_sessio: d,
                         hora_inici: slot.startTime,
                         hora_fi: slot.endTime
                     };
                 });
-                await prisma.sessio.createMany({ data: sessionsData });
+                await prisma.session.createMany({ data: sessionsData });
             }
         }
 

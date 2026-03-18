@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-    getInscripcioEvaluation,
+    getEnrollmentEvaluation,
     upsertEvaluation,
     getCompetencies,
     analyzeObservations,
@@ -10,7 +10,7 @@ import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
-router.get('/enrollment/:id', authenticateToken, getInscripcioEvaluation);
+router.get('/enrollment/:id', authenticateToken, getEnrollmentEvaluation);
 router.post('/upsert', authenticateToken, upsertEvaluation);
 router.get('/competencies', authenticateToken, getCompetencies);
 router.post('/analyze', authenticateToken, analyzeObservations);

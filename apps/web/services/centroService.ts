@@ -1,8 +1,8 @@
 import getApi from "./api";
 
-export interface Centre {
-  id_centre: number;
-  codi_centre: string;
+export interface Center {
+  id_center: number;
+  codi_center: string;
   nom: string;
   adreca?: string;
   telefon_contacte?: string;
@@ -13,10 +13,10 @@ const centroService = {
   /**
    * Obtiene todos los centros desde el backend.
    */
-  getAll: async (): Promise<Centre[]> => {
+  getAll: async (): Promise<Center[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: Centre[], meta: any }>("/centers");
+      const response = await api.get<{ data: Center[], meta: any }>("/centers");
       return response.data.data;
     } catch (error) {
       console.error("Error en centroService.getAll:", error);
@@ -27,7 +27,7 @@ const centroService = {
   /**
    * Crea un nuevo centro en el backend.
    */
-  create: async (centroData: Omit<Centre, 'id_centre'>): Promise<Centre> => {
+  create: async (centroData: Omit<Center, 'id_center'>): Promise<Center> => {
     const api = getApi();
     try {
       const response = await api.post("/centers", centroData);
@@ -42,12 +42,12 @@ const centroService = {
   /**
    * Actualiza un centro existente.
    */
-  update: async (id: number, centroData: Partial<Centre>): Promise<Centre> => {
+  update: async (id: number, centroData: Partial<Center>): Promise<Center> => {
     const api = getApi();
     try {
-      // The backend controller only has updateCentreAttendance for PATCH.
+      // The backend controller only has updateCenterAttendance for PATCH.
       // But usually we need more. Let's look at the controller again.
-      // It only has getCentres, getCentreById, createCentre, updateCentreAttendance.
+      // It only has getCenters, getCenterById, createCenter, updateCenterAttendance.
       // I'll implement what's available and assume more might be needed or added.
       const response = await api.patch(`/centers/${id}`, centroData);
       return response.data;

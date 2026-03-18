@@ -4,12 +4,12 @@ import { Platform } from 'react-native';
 import { router } from 'expo-router';
 import type { 
   Rol, 
-  Fase, 
+  Phase, 
   Notificacio, 
   Assistencia,
-  Inscripcio,
-  Alumne,
-  Assignacio
+  Enrollment,
+  Student,
+  Assignment
 } from '@iter/shared';
 
 const getBaseURL = () => {
@@ -83,22 +83,22 @@ export const logout = async () => {
 export const login = (data: { email: string; password?: string }) => 
   api.post<{ token: string; user: { userId: number; role: Rol; centreId?: number } }>('auth/login', data);
 
-// --- Assignments & Professors ---
+// --- Assignments & Teachers ---
 export const getMyAssignments = () => 
-  api.get<Assignacio[]>('teachers/me/assignments');
+  api.get<Assignment[]>('teachers/me/assignments');
 
 export const getChecklist = (id: string | number) => 
   api.get(`assignments/${id}/checklist`);
 
 export const getStudents = (id: string | number) => 
-  api.get<(Inscripcio & { alumne: Alumne })[]>(`assignments/${id}/students`);
+  api.get<(Enrollment & { alumne: Student })[]>(`assignments/${id}/students`);
 
 // --- Attendance ---
 export const getAttendance = (idAssignment: string | number) => 
   api.get<Assistencia[]>(`attendance/assignments/${idAssignment}`);
 
 export const postAttendance = (data: { 
-  id_inscripcio: number; 
+  id_enrollment: number; 
   numero_sessio: number; 
   estat: string; 
   observacions?: string;
@@ -106,11 +106,11 @@ export const postAttendance = (data: {
 }) => api.post<Assistencia>('attendance', data);
 
 // --- Other Services ---
-export const postIncidencia = (data: { id_assignacio: number; titol: string; descripcio: string }) => 
+export const postIncidencia = (data: { id_assignment: number; titol: string; descripcio: string }) => 
   api.post('assignments/incidencies', data);
 
 export const getPhases = () => 
-  api.get<Fase[]>('phases');
+  api.get<Phase[]>('phases');
 
 export const getCalendar = () => 
   api.get('calendar');

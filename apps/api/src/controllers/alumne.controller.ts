@@ -1,7 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 
-export const getAlumnes = async (req: Request, res: Response) => {
+export const getStudents = async (req: Request, res: Response) => {
   const { centreId, role } = req.user! || {};
 
   try {
@@ -12,57 +12,56 @@ export const getAlumnes = async (req: Request, res: Response) => {
       if (!centreId) {
         return res.json([]); // No center assigned, no access
       }
-      where.id_centre_procedencia = parseInt(centreId.toString());
+      where.id_center_origin = parseInt(centreId.toString());
     }
 
-    const alumnes = await prisma.alumne.findMany({
+    const students = await prisma.student.findMany({
       where,
-      include: { centre_procedencia: true }
+      include: { center_origin: true }
     });
-    res.json(alumnes);
+    res.json(students);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener alumnos' });
+    res.status(500).json({ error: 'Error al obtenir els alumnes' });
   }
 };
 
-export const createAlumne = async (req: Request, res: Response) => {
+export const createStudent = async (req: Request, res: Response) => {
   const { centreId } = req.user!;
   try {
-    const alumne = await prisma.alumne.create({
+    const student = await prisma.student.create({
       data: {
         ...req.body,
-        id_centre_procedencia: centreId ? centreId : req.body.id_centre_procedencia
+        id_center_origin: centreId ? centreId : req.body.id_center_origin
       }
     });
-    res.json(alumne);
+    res.json(student);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al crear alumno' });
+    res.status(500).json({ error: 'Error al crear l\'alumne' });
   }
 };
 
-export const updateAlumne = async (req: Request, res: Response) => {
+export const updateStudent = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { nom, cognoms, curs, id_centre_procedencia, idalu } = req.body;
   try {
-    const alumne = await prisma.alumne.update({
-      where: { id_alumne: parseInt(id as string) },
+    const student = await prisma.student.update({
+      where: { id_student: parseInt(id as string) },
       data: req.body
     });
-    res.json(alumne);
+    res.json(student);
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar alumno' });
+    res.status(500).json({ error: 'Error al actualitzar l\'alumne' });
   }
 };
 
-export const deleteAlumne = async (req: Request, res: Response) => {
+export const deleteStudent = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await prisma.alumne.delete({
-      where: { id_alumne: parseInt(id as string) }
+    await prisma.student.delete({
+      where: { id_student: parseInt(id as string) }
     });
-    res.json({ message: 'Alumno eliminado' });
+    res.json({ message: 'Student eliminat' });
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar alumno' });
+    res.status(500).json({ error: 'Error al eliminar l\'alumne' });
   }
 };

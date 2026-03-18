@@ -1,23 +1,23 @@
 import express from 'express';
 const router = express.Router();
-import * as tallerController from '../controllers/taller.controller.js';
+import * as workshopController from '../controllers/taller.controller.js';
 import { authenticateToken, isAdmin } from '../middlewares/authMiddleware.js';
-import { validateData } from '../middlewares/validateMiddleware.js';
-import { createTallerSchema, updateTallerSchema } from '../schemas/taller.schema.js';
+import { validate } from '../middlewares/validate.middleware.js';
+import { WorkshopSchema } from '@iter/shared';
 
-// GET /api/tallers - Listar todos los talleres
-router.get('/', tallerController.getTallers);
+// GET /api/workshops - Listar todos los talleres
+router.get('/', workshopController.getWorkshops);
 
-// GET /api/tallers/:id - Detalle de un taller
-router.get('/:id', tallerController.getTallerById);
+// GET /api/workshops/:id - Detalle de un taller
+router.get('/:id', workshopController.getWorkshopById);
 
-// POST /api/tallers - Crear taller (Solo Admin)
-router.post('/', authenticateToken, isAdmin, validateData(createTallerSchema), tallerController.createTaller);
+// POST /api/workshops - Crear taller (Solo Admin)
+router.post('/', authenticateToken, isAdmin, validate(WorkshopSchema), workshopController.createWorkshop);
 
-// PUT /api/tallers/:id - Editar taller
-router.put('/:id', authenticateToken, isAdmin, validateData(updateTallerSchema), tallerController.updateTaller);
+// PUT /api/workshops/:id - Editar taller
+router.put('/:id', authenticateToken, isAdmin, validate(WorkshopSchema), workshopController.updateWorkshop);
 
-// DELETE /api/tallers/:id - Borrar taller
-router.delete('/:id', authenticateToken, isAdmin, tallerController.deleteTaller);
+// DELETE /api/workshops/:id - Borrar taller
+router.delete('/:id', authenticateToken, isAdmin, workshopController.deleteWorkshop);
 
 export default router;

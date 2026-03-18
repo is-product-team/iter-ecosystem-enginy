@@ -1,10 +1,10 @@
 import getApi from "./api";
 
-export interface Assignacio {
-  id_assignacio: number;
-  id_peticio: number | null;
-  id_centre: number;
-  id_taller: number;
+export interface Assignment {
+  id_assignment: number;
+  id_request: number | null;
+  id_center: number;
+  id_workshop: number;
   data_inici: string | null;
   data_fi: string | null;
   estat: string;
@@ -17,13 +17,13 @@ const assignacioService = {
   /**
    * Obtiene las asignaciones de un centro.
    */
-  getByCentre: async (idCentre: number): Promise<Assignacio[]> => {
+  getByCenter: async (idCenter: number): Promise<Assignment[]> => {
     const api = getApi();
     try {
-      const response = await api.get<Assignacio[]>(`/assignments/centre/${idCentre}`);
+      const response = await api.get<Assignment[]>(`/assignments/centre/${idCenter}`);
       return response.data;
     } catch (error) {
-      console.error("Error en assignacioService.getByCentre:", error);
+      console.error("Error en assignacioService.getByCenter:", error);
       throw error;
     }
   },
@@ -31,13 +31,13 @@ const assignacioService = {
   /**
    * Crea una asignación a partir de una petición.
    */
-  createFromPeticio: async (idPeticio: number): Promise<Assignacio> => {
+  createFromRequest: async (idRequest: number): Promise<Assignment> => {
     const api = getApi();
     try {
-      const response = await api.post<Assignacio>("/assignments", { idPeticio });
+      const response = await api.post<Assignment>("/assignments", { idRequest });
       return response.data;
     } catch (error) {
-      console.error("Error en assignacioService.createFromPeticio:", error);
+      console.error("Error en assignacioService.createFromRequest:", error);
       throw error;
     }
   },
@@ -73,10 +73,10 @@ const assignacioService = {
   /**
    * Obtiene todas las asignaciones (Admin solo).
    */
-  getAll: async (): Promise<Assignacio[]> => {
+  getAll: async (): Promise<Assignment[]> => {
     const api = getApi();
     try {
-      const response = await api.get<Assignacio[]>("/assignments");
+      const response = await api.get<Assignment[]>("/assignments");
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.getAll:", error);
@@ -87,10 +87,10 @@ const assignacioService = {
   /**
    * Envía una notificación de error en un documento.
    */
-  sendDocumentNotification: async (idAssignacio: number, documentName: string, comment: string, greeting: string): Promise<any> => {
+  sendDocumentNotification: async (idAssignment: number, documentName: string, comment: string, greeting: string): Promise<any> => {
     const api = getApi();
     try {
-      const response = await api.post(`/assignments/${idAssignacio}/document-notification`, { documentName, comment, greeting });
+      const response = await api.post(`/assignments/${idAssignment}/document-notification`, { documentName, comment, greeting });
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.sendDocumentNotification:", error);
@@ -101,10 +101,10 @@ const assignacioService = {
   /**
    * Valida un documento específico de una inscripción.
    */
-  validateDocument: async (idInscripcio: number, field: string, valid: boolean): Promise<any> => {
+  validateDocument: async (idEnrollment: number, field: string, valid: boolean): Promise<any> => {
     const api = getApi();
     try {
-      const response = await api.patch(`/assignments/inscripcions/${idInscripcio}/validate`, { field, valid });
+      const response = await api.patch(`/assignments/inscripcions/${idEnrollment}/validate`, { field, valid });
       return response.data;
     } catch (error) {
       console.error("Error en assignacioService.validateDocument:", error);
