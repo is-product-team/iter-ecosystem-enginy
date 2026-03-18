@@ -1,41 +1,41 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env"],
+  "globalEnv": ["DATABASE_URL", "JWT_SECRET", "NODE_ENV"],
   "tasks": {
+    "db:generate": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "db:push": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "db:seed": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "studio": {
+      "cache": false,
+      "persistent": true
+    },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**",
-        ".next/**"
-      ]
+      "dependsOn": ["^build", "db:generate"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
+      "dependsOn": ["db:generate"],
       "cache": false,
       "persistent": true
     },
     "lint": {
-      "outputs": []
+      "dependsOn": ["^lint"]
     },
-    "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": []
-    },
-    "db:generate": {
+    "type-check": {
+      "dependsOn": ["db:generate"],
       "cache": false
     },
-    "db:push": {
-      "dependsOn": [
-        "db:generate"
-      ],
-      "cache": false
-    },
-    "db:seed": {
-      "dependsOn": [
-        "db:push"
-      ],
+    "clean": {
       "cache": false
     }
   }

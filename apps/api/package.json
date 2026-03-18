@@ -2,23 +2,21 @@
   "name": "api",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
-  "main": "src/index.ts",
+  "main": "src/index.js",
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
     "start": "node dist/index.js",
-    "db:push": "npx prisma db push",
-    "db:seed": "npx tsx prisma/seed.ts",
-    "db:generate": "npx prisma generate",
-    "studio": "npx prisma studio"
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "studio": "prisma studio",
+    "lint": "eslint \"src/**/*.ts\"",
+    "type-check": "tsc --noEmit"
   },
   "prisma": {
-    "seed": "npx tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@iter/shared": "^0.0.0",
     "@prisma/client": "5.22.0",
@@ -41,9 +39,10 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
     "@types/node": "^20.19.37",
-    "@types/uuid": "^10.0.0",
     "prisma": "5.22.0",
     "ts-node": "^10.9.1",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.3.3",
+    "nodemon": "^3.1.0"
   }
 }

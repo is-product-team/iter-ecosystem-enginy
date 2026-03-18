@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { PHASES, ROLES } from '@iter/shared';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const prisma = new PrismaClient();
 

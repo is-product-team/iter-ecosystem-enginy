@@ -37,6 +37,16 @@ model Workshop {
   @@map("tallers")
 }
 
+enum Modalitat {
+  A
+  B
+  C
+}
+
+// ==========================================
+// 2. USUARIS I CENTRES
+// ==========================================
+
 model Center {
   id_center        Int     @id @default(autoincrement())
   codi_center      String  @unique
@@ -59,7 +69,7 @@ model Center {
 model Issue {
   id_issue     Int      @id @default(autoincrement())
   id_center    Int
-  center       Center   @relation(fields: [id_center], references: [id_center])
+  center       Center   @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
   descripcio   String   @db.Text
   estat        String   @default("Pendent")
   data_creacio DateTime @default(now())
@@ -99,10 +109,10 @@ model Teacher {
   id_teacher Int     @id @default(autoincrement())
   nom        String
   contacte   String?
-  id_center  Int
-  center     Center  @relation(fields: [id_center], references: [id_center])
-  id_user    Int?    @unique
-  user       User?   @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  id_center    Int
+  center       Center  @relation(fields: [id_center], references: [id_center])
+  id_user      Int?    @unique
+  user         User?   @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
 
   requests1 Request[]    @relation("Teacher1")
   requests2 Request[]    @relation("Teacher2")
@@ -112,12 +122,16 @@ model Teacher {
   @@map("professors")
 }
 
+// ==========================================
+// 3. PETICIONS I ASSIGNACIONS
+// ==========================================
+
 model Request {
   id_request    Int           @id @default(autoincrement())
   id_center     Int
-  center        Center        @relation(fields: [id_center], references: [id_center])
+  center        Center        @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
   id_workshop   Int
-  workshop      Workshop      @relation(fields: [id_workshop], references: [id_workshop])
+  workshop      Workshop      @relation(fields: [id_workshop], references: [id_workshop], onDelete: Cascade)
   alumnes_aprox Int?
   comentaris    String?       @db.Text
   data_request  DateTime      @default(now())
@@ -146,11 +160,11 @@ enum RequestStatus {
 model Assignment {
   id_assignment Int              @id @default(autoincrement())
   id_request    Int?
-  request       Request?         @relation(fields: [id_request], references: [id_request])
+  request       Request?         @relation(fields: [id_request], references: [id_request], onDelete: SetNull)
   id_center     Int
-  center        Center           @relation(fields: [id_center], references: [id_center])
+  center        Center           @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
   id_workshop   Int
-  workshop      Workshop         @relation(fields: [id_workshop], references: [id_workshop])
+  workshop      Workshop         @relation(fields: [id_workshop], references: [id_workshop], onDelete: Cascade)
   data_inici    DateTime?        @db.Date
   data_fi       DateTime?        @db.Date
   estat         AssignmentStatus @default(PUBLISHED)
@@ -211,9 +225,9 @@ enum AssignmentStatus {
 
 model AssignmentTeacher {
   id_assignment Int
-  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment])
+  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
   id_user       Int
-  user          User       @relation(fields: [id_user], references: [id_user])
+  user          User       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
   es_principal  Boolean    @default(false)
 
   @@id([id_assignment, id_user])
@@ -223,7 +237,7 @@ model AssignmentTeacher {
 model AssignmentChecklist {
   id_checklist   Int        @id @default(autoincrement())
   id_assignment  Int
-  assignment     Assignment @relation(fields: [id_assignment], references: [id_assignment])
+  assignment     Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
   pas_nom        String
   completat      Boolean    @default(false)
   url_evidencia  String?
@@ -232,13 +246,17 @@ model AssignmentChecklist {
   @@map("checklist_assignacio")
 }
 
+// ==========================================
+// 4. ALUMNAT I SEGUIMENT
+// ==========================================
+
 model Student {
   id_student        Int     @id @default(autoincrement())
   idalu             String  @unique
   nom               String
   cognoms           String
   curs              String?
-  url_foto          String?
+  url_foto              String?
   id_center_origin  Int?
   center_origin     Center? @relation("CenterOrigin", fields: [id_center_origin], references: [id_center])
 
@@ -252,9 +270,9 @@ model Student {
 model Enrollment {
   id_enrollment Int        @id @default(autoincrement())
   id_assignment Int
-  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment])
+  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
   id_student    Int
-  student       Student    @relation(fields: [id_student], references: [id_student])
+  student       Student    @relation(fields: [id_student], references: [id_student], onDelete: Cascade)
 
   // Compliance (Solo Mod C)
   acord_pedagogic        Boolean @default(false)
@@ -282,7 +300,7 @@ model Enrollment {
 model Attendance {
   id_attendance Int              @id @default(autoincrement())
   id_enrollment Int
-  enrollment    Enrollment       @relation(fields: [id_enrollment], references: [id_enrollment])
+  enrollment    Enrollment       @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
   numero_sessio Int
   data_sessio   DateTime         @db.Date
   estat         AttendanceStatus
@@ -297,6 +315,10 @@ enum AttendanceStatus {
   Absencia             @map("Absència")
   Retard
 }
+
+// ==========================================
+// 5. AVALUACIÓ I QUALITAT
+// ==========================================
 
 model Competence {
   id_competence Int              @id @default(autoincrement())
@@ -316,7 +338,7 @@ enum CompetenceType {
 model CompetenceEvaluation {
   id_evaluation Int              @id @default(autoincrement())
   id_evaluation_teacher Int
-  evaluation_teacher    Evaluation @relation(fields: [id_evaluation_teacher], references: [id_evaluation_teacher])
+  evaluation_teacher    Evaluation @relation(fields: [id_evaluation_teacher], references: [id_evaluation_teacher], onDelete: Cascade)
   id_competence      Int
   competence         Competence     @relation(fields: [id_competence], references: [id_competence])
   puntuacio           Int // Escala 1-5 (1=Sense valoració, 2=Passiva, 3=Suficient, 4=Bona, 5=Molt bona)
@@ -328,7 +350,7 @@ model CompetenceEvaluation {
 model Evaluation {
   id_evaluation_teacher Int        @id @default(autoincrement())
   id_enrollment         Int        @unique
-  enrollment            Enrollment @relation(fields: [id_enrollment], references: [id_enrollment])
+  enrollment            Enrollment @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
   percentatge_asistencia Float
   numero_retards         Int
   observacions           String?    @db.Text
@@ -342,10 +364,10 @@ model Evaluation {
 model SelfConsultStudent {
   id_self_consult Int        @id @default(autoincrement())
   id_enrollment   Int        @unique
-  enrollment      Enrollment @relation(fields: [id_enrollment], references: [id_enrollment])
+  enrollment      Enrollment @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
 
   // Comportament (Frequència)
-  puntualitat_tasques  String // Escala: Sí sempre / A vegades / Quasi mai / Mai
+  puntualitat_tasques  String // Escala: Sí siempre / A vegades / Quasi mai / Mai
   respecte_material    String
   interes_aprenentatge String
   autonomia_resolucio  String
@@ -391,7 +413,7 @@ enum QuestionnaireTarget {
 model Question {
   id_question    Int                    @id @default(autoincrement())
   id_model       Int
-  model          QuestionnaireModel     @relation(fields: [id_model], references: [id_model])
+  model          QuestionnaireModel     @relation(fields: [id_model], references: [id_model], onDelete: Cascade)
   enunciat       String                 @db.Text
   response_type  ResponseType
   options        Json? // Per a respostes múltiples
@@ -411,9 +433,9 @@ enum ResponseType {
 model QuestionnaireSubmission {
   id_submission  Int              @id @default(autoincrement())
   id_model       Int
-  model          QuestionnaireModel @relation(fields: [id_model], references: [id_model])
+  model          QuestionnaireModel @relation(fields: [id_model], references: [id_model], onDelete: Cascade)
   id_assignment  Int
-  assignment     Assignment       @relation(fields: [id_assignment], references: [id_assignment])
+  assignment     Assignment       @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
   status         SubmissionStatus   @default(Pendent)
   submission_date DateTime?
   response_date  DateTime?
@@ -432,25 +454,29 @@ enum SubmissionStatus {
 model QuestionnaireResponse {
   id_response             Int                  @id @default(autoincrement())
   id_submission           Int
-  submission              QuestionnaireSubmission @relation(fields: [id_submission], references: [id_submission])
+  submission              QuestionnaireSubmission @relation(fields: [id_submission], references: [id_submission], onDelete: Cascade)
   id_question             Int
-  question                Question             @relation(fields: [id_question], references: [id_question])
+  question                Question             @relation(fields: [id_question], references: [id_question], onDelete: Cascade)
   value                   String               @db.Text
   is_anonymous            Boolean              @default(false)
-  assignment              Assignment?          @relation(fields: [assignmentId_assignment], references: [id_assignment])
+  assignment              Assignment?          @relation(fields: [assignmentId_assignment], references: [id_assignment], onDelete: Cascade)
   assignmentId_assignment Int?
 
   @@map("respostes_questionari")
 }
 
+// ==========================================
+// 6. NOTIFICACIONS I AVISOS
+// ==========================================
+
 model Notification {
   id_notification Int      @id @default(autoincrement())
   id_user         Int?
-  user            User?    @relation(fields: [id_user], references: [id_user])
+  user            User?    @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
   id_center       Int?
-  center          Center?  @relation(fields: [id_center], references: [id_center])
+  center          Center?  @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
   titol           String
-  missatge        String   @db.Text
+  missatge       String   @db.Text
   read            Boolean  @default(false)
   created_at      DateTime @default(now())
   type            String // REQUEST, PHASE, SYSTEM
@@ -460,10 +486,14 @@ model Notification {
   @@map("notificacions")
 }
 
+// ==========================================
+// 7. LOGS
+// ==========================================
+
 model LogAuditor {
   id_log     Int      @id @default(autoincrement())
   id_user    Int?
-  user       User?    @relation(fields: [id_user], references: [id_user])
+  user       User?    @relation(fields: [id_user], references: [id_user], onDelete: SetNull)
   action     String
   details    Json?
   created_at DateTime @default(now())
@@ -471,6 +501,10 @@ model LogAuditor {
   @@index([created_at])
   @@map("logs_auditoria")
 }
+
+// ==========================================
+// 8. CONFIGURACIÓ DINÀMICA
+// ==========================================
 
 model Phase {
   id_phase    Int              @id @default(autoincrement())
@@ -488,7 +522,7 @@ model Phase {
 model CalendarEvent {
   id_event   Int      @id @default(autoincrement())
   id_phase   Int
-  phase      Phase     @relation(fields: [id_phase], references: [id_phase])
+  phase      Phase     @relation(fields: [id_phase], references: [id_phase], onDelete: Cascade)
   titol      String
   descripcio String?
   data       DateTime
@@ -500,7 +534,7 @@ model CalendarEvent {
 model Survey {
   id_survey      String      @id @default(uuid())
   id_assignment  Int
-  assignment     Assignment  @relation(fields: [id_assignment], references: [id_assignment])
+  assignment     Assignment  @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
   target         QuestionnaireTarget
   token          String      @unique
   complete       Boolean     @default(false)
@@ -513,13 +547,12 @@ model Survey {
 model Certificate {
   id_certificate String     @id @default(uuid())
   id_student     Int
-  student        Student     @relation(fields: [id_student], references: [id_student])
+  student        Student     @relation(fields: [id_student], references: [id_student], onDelete: Cascade)
   id_assignment  Int
-  assignment     Assignment @relation(fields: [id_assignment], references: [id_assignment])
+  assignment     Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
   issued_at      DateTime   @default(now())
   url_pdf        String?
 
   @@unique([id_student, id_assignment])
   @@map("certificats")
 }
-

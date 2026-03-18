@@ -2,11 +2,11 @@
   "name": "@iter/shared",
   "version": "0.0.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./theme": "./dist/theme.js"
+    ".": "./index.ts",
+    "./theme": "./theme.ts"
   },
   "scripts": {
     "build": "tsc",

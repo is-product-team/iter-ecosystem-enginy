@@ -37,7 +37,7 @@ services:
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
-    command: sh -c "npm install && npx turbo db:generate --filter=api && npx prisma db push --accept-data-loss --schema=apps/api/prisma/schema.prisma && npx turbo db:seed --filter=api"
+    command: sh -c "npm install && npx turbo db:generate --filter=api && npx prisma db push --force-reset --schema=apps/api/prisma/schema.prisma && npx turbo db:seed --filter=api"
     env_file:
       - apps/api/.env
     depends_on:

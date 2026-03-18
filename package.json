@@ -1,86 +1,31 @@
 {
-  "name": "tr2-reptes-tr2-g2",
-  "version": "2.0.0",
-  "description": "**Central Hub for the Iter Ecosystem | Unified Modern Stack**",
+  "name": "iter-ecosystem",
   "private": true,
-  "packageManager": "npm@10.9.4",
+  "version": "1.0.0",
+  "description": "Iter Ecosystem Monorepo - Professional Architecture",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-  "engines": {
-    "node": ">=20.0.0"
-  },
   "scripts": {
-    "// --- GLOBAL COMMANDS ---": "",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --parallel",
     "build": "turbo run build",
-    "start": "turbo run start",
     "lint": "turbo run lint",
-    "test": "turbo run test",
+    "type-check": "turbo run type-check",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "// --- SCOPED DEV (Run individual apps) ---": "",
-    "dev:web": "turbo run dev --filter=web",
-    "dev:api": "turbo run dev --filter=api",
-    "dev:mobile": "turbo run dev --filter=mobile",
-    "dev:electron": "turbo run dev --filter=web --filter=electron",
-    "// --- DATABASE (Managed via API) ---": "",
-    "db:push": "turbo run db:push --filter=api",
-    "db:seed": "turbo run db:seed --filter=api",
-    "db:studio": "turbo run studio --filter=api",
-    "db:generate": "turbo run db:generate --filter=api",
-    "// --- MOBILE SPECIFIC (Expo wrappers) ---": "",
-    "mobile": "npm run start --workspace=mobile",
-    "mobile:android": "npm run android --workspace=mobile",
-    "mobile:ios": "npm run ios --workspace=mobile",
-    "mobile:web": "npm run web --workspace=mobile",
-    "mobile:clear": "npm run start --workspace=mobile -- --clear",
-    "mobile:tunnel": "npm run dev:tunnel --workspace=mobile",
-    "build:electron": "cross-env IS_ELECTRON_BUILD=true npm run build --workspace=web && npm run build --workspace=electron",
-    "// --- MAINTENANCE ---": "",
-    "clean": "rm -rf node_modules package-lock.json apps/*/node_modules apps/*/package-lock.json packages/*/node_modules packages/*/package-lock.json .turbo"
+    "clean": "turbo run clean && rm -rf node_modules **/.next **/dist **/.turbo",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push",
+    "db:seed": "turbo run db:seed",
+    "db:studio": "turbo run studio"
   },
-  "directories": {
-    "doc": "doc"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/inspedralbes/tr2-reptes-tr2-g2.git"
-  },
-  "keywords": [
-    "monorepo",
-    "turborepo",
-    "nextjs",
-    "express",
-    "prisma",
-    "postgres",
-    "docker"
-  ],
-  "author": "Iter Team",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/inspedralbes/tr2-reptes-tr2-g2/issues"
-  },
-  "homepage": "https://github.com/inspedralbes/tr2-reptes-tr2-g2#readme",
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "autoprefixer": "^10.4.20",
-    "concurrently": "^9.2.1",
-    "cross-env": "^10.1.0",
-    "expo": "~54.0.29",
-    "nodemon": "3.1.0",
-    "postcss": "^8.4.49",
-    "prettier": "latest",
-    "prisma": "5.22.0",
-    "tailwindcss": "^3.4.19",
-    "ts-node": "10.9.2",
-    "tsx": "4.19.2",
-    "turbo": "2.7.4",
-    "typescript": "5.3.3",
-    "wait-on": "^9.0.3"
+    "prettier": "^3.2.5",
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.3"
   },
-  "dependencies": {
-    "lucide-react": "^0.562.0",
-    "recharts": "^3.7.0"
+  "packageManager": "npm@10.2.4",
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -14,7 +14,10 @@
     "declaration": true,
     "sourceMap": true,
     "ignoreDeprecations": "5.0",
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "paths": {
+      "@iter/shared": ["../../packages/shared/index.ts"]
+    }
   },
   "include": ["src/**/*", "src/types/**/*.d.ts", "prisma/**/*", "scripts/**/*"],
   "exclude": ["node_modules", "dist"]
