@@ -38,7 +38,7 @@ async function main() {
                         id_taller: taller.id_taller,
                         data_inici: new Date('2026-02-01'),
                         data_fi: new Date('2026-04-10'),
-                        estat: 'En_curs'
+                        estat: 'IN_PROGRESS'
                     }
                 });
                 createdDummy = true;
