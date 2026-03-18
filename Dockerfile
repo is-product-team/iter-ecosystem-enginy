@@ -59,4 +59,4 @@ COPY --from=builder-api /app/node_modules/@prisma ./node_modules/@prisma
 RUN mkdir -p /app/uploads/perfil /app/uploads/documents
 
 EXPOSE 3000
-CMD ["node", "apps/api/dist/apps/api/src/index.js"]
+CMD ["node", "apps/api/dist/src/index.js"]

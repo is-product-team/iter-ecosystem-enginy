@@ -15,6 +15,8 @@ app.set('trust proxy', 1);
 // ... (allowedOrigins logic remains same)
 const allowedOrigins = [
   'https://projects.kore29.com',
+  'https://projects.kore29.com/iter',
+  'https://iter.kore29.com',
   'http://localhost:8002',
   'http://localhost:3000',
   'http://localhost:3001',
