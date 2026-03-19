@@ -13,7 +13,7 @@ datasource db {
 
 model Sector {
   id_sector  Int        @id @default(autoincrement())
-  nom        String
+  nom        String     @unique
   descripcio String?    @db.Text
   workshops  Workshop[]
 
@@ -79,7 +79,7 @@ model Issue {
 
 model Role {
   id_role  Int    @id @default(autoincrement())
-  nom_role String
+  nom_role String @unique
   users    User[]
 
   @@map("rols")

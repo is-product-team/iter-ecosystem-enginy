@@ -82,6 +82,17 @@ export const RequestSchema = z.object({
   comentaris: z.string().optional()
 });
 
+export const AssignmentChecklistSchema = z.object({
+  completat: z.boolean(),
+  url_evidencia: z.string().optional().nullable()
+});
+
+export const CenterAttendanceSchema = z.object({
+  id_enrollment: z.number().int(),
+  estat: z.enum(['Present', 'Absència Justificada', 'Absència', 'Retard']),
+  observacions: z.string().optional().nullable()
+});
+
 export type WorkshopInput = z.infer<typeof WorkshopSchema>;
 export type StudentInput = z.infer<typeof StudentSchema>;
 export type RequestInput = z.infer<typeof RequestSchema>;
