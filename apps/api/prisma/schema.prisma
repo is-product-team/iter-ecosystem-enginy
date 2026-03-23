@@ -8,7 +8,7 @@ datasource db {
 }
 
 // ==========================================
-// 1. GESTIÓ DE TALLERS I CATÀLEG
+// 1. CATÀLEG Y ESTRUCTURA
 // ==========================================
 
 model Sector {
@@ -44,7 +44,7 @@ enum Modalitat {
 }
 
 // ==========================================
-// 2. USUARIS I CENTRES
+// 2. IDENTITAT (USUARIS I CENTRES)
 // ==========================================
 
 model Center {
@@ -55,26 +55,12 @@ model Center {
   telefon_contacte String?
   email_contacte   String?
 
-  users         User[]
-  requests      Request[]
-  assignments   Assignment[]
-  students      Student[]      @relation("CenterOrigin")
-  teachers      Teacher[]
-  issues        Issue[]
-  notifications Notification[]
+  users       User[]
+  requests    Request[]
+  assignments Assignment[]
+  students    Student[]    @relation("CenterOrigin")
 
   @@map("centres")
-}
-
-model Issue {
-  id_issue     Int      @id @default(autoincrement())
-  id_center    Int
-  center       Center   @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
-  descripcio   String   @db.Text
-  estat        String   @default("Pendent")
-  data_creacio DateTime @default(now())
-
-  @@map("incidencies")
 }
 
 model Role {
@@ -91,39 +77,20 @@ model User {
   email         String  @unique
   password_hash String
   url_foto      String?
+  telefon       String?
   id_role       Int
   role          Role    @relation(fields: [id_role], references: [id_role])
   id_center     Int?
   center        Center? @relation(fields: [id_center], references: [id_center])
 
-  assignment_teachers AssignmentTeacher[]
-  logs                LogAuditor[]
-  notifications       Notification[]
-  teacher             Teacher?
-  session_teachers    SessionTeacher[]
+  assignments      AssignmentTeacher[]
+  session_teachers SessionTeacher[]
 
   @@map("usuaris")
 }
 
-model Teacher {
-  id_teacher Int     @id @default(autoincrement())
-  nom        String
-  contacte   String?
-  id_center    Int
-  center       Center  @relation(fields: [id_center], references: [id_center])
-  id_user      Int?    @unique
-  user         User?   @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
-
-  requests1 Request[]    @relation("Teacher1")
-  requests2 Request[]    @relation("Teacher2")
-  assig1    Assignment[] @relation("AssigTeacher1")
-  assig2    Assignment[] @relation("AssigTeacher2")
-
-  @@map("professors")
-}
-
 // ==========================================
-// 3. PETICIONS I ASSIGNACIONS
+// 3. OPERATIVA (PETICIONS I ASSIGNACIONS)
 // ==========================================
 
 model Request {
@@ -138,14 +105,9 @@ model Request {
   estat         RequestStatus @default(Pendent)
   modalitat     Modalitat?
 
-  teacher1_id Int
-  teacher1    Teacher @relation("Teacher1", fields: [teacher1_id], references: [id_teacher])
-  teacher2_id Int
-  teacher2    Teacher @relation("Teacher2", fields: [teacher2_id], references: [id_teacher])
-
-  students Student[] @relation("StudentsRequest")
-
-  assignments Assignment[]
+  // Profesores solicitados (opcional)
+  prof1_id Int?
+  prof2_id Int?
 
   @@index([estat])
   @@map("peticions")
@@ -159,7 +121,7 @@ enum RequestStatus {
 
 model Assignment {
   id_assignment Int              @id @default(autoincrement())
-  id_request    Int?
+  id_request    Int?             @unique
   request       Request?         @relation(fields: [id_request], references: [id_request], onDelete: SetNull)
   id_center     Int
   center        Center           @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
@@ -170,22 +132,37 @@ model Assignment {
   estat         AssignmentStatus @default(PUBLISHED)
   grup          Int              @default(1)
 
-  teacher1_id Int?
-  teacher1    Teacher? @relation("AssigTeacher1", fields: [teacher1_id], references: [id_teacher])
-  teacher2_id Int?
-  teacher2    Teacher? @relation("AssigTeacher2", fields: [teacher2_id], references: [id_teacher])
-
   teachers    AssignmentTeacher[]
   checklist   AssignmentChecklist[]
   enrollments Enrollment[]
-  responses   QuestionnaireResponse[]
-  submissions QuestionnaireSubmission[]
-  surveys     Survey[]
-  certificates Certificate[]
   sessions    Session[]
+  evaluations Evaluation[]
 
   @@index([data_inici, data_fi])
   @@map("assignacions")
+}
+
+model AssignmentTeacher {
+  id_assignment Int
+  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
+  id_user       Int
+  user          User       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  es_principal  Boolean    @default(false)
+
+  @@id([id_assignment, id_user])
+  @@map("assignacio_professors")
+}
+
+model AssignmentChecklist {
+  id_checklist   Int        @id @default(autoincrement())
+  id_assignment  Int
+  assignment     Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
+  pas_nom        String
+  completat      Boolean    @default(false)
+  url_evidencia  String?
+  data_completat DateTime?
+
+  @@map("checklist_assignacio")
 }
 
 model Session {
@@ -223,29 +200,6 @@ enum AssignmentStatus {
   CANCELLED
 }
 
-model AssignmentTeacher {
-  id_assignment Int
-  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  id_user       Int
-  user          User       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
-  es_principal  Boolean    @default(false)
-
-  @@id([id_assignment, id_user])
-  @@map("assignacio_professors")
-}
-
-model AssignmentChecklist {
-  id_checklist   Int        @id @default(autoincrement())
-  id_assignment  Int
-  assignment     Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  pas_nom        String
-  completat      Boolean    @default(false)
-  url_evidencia  String?
-  data_completat DateTime?
-
-  @@map("checklist_assignacio")
-}
-
 // ==========================================
 // 4. ALUMNAT I SEGUIMENT
 // ==========================================
@@ -256,13 +210,11 @@ model Student {
   nom               String
   cognoms           String
   curs              String?
-  url_foto              String?
+  url_foto          String?
   id_center_origin  Int?
   center_origin     Center? @relation("CenterOrigin", fields: [id_center_origin], references: [id_center])
 
-  enrollments  Enrollment[]
-  requests     Request[]    @relation("StudentsRequest")
-  certificates Certificate[]
+  enrollments Enrollment[]
 
   @@map("alumnes")
 }
@@ -274,25 +226,11 @@ model Enrollment {
   id_student    Int
   student       Student    @relation(fields: [id_student], references: [id_student], onDelete: Cascade)
 
-  // Compliance (Solo Mod C)
-  acord_pedagogic        Boolean @default(false)
-  autoritzacio_mobilitat Boolean @default(false)
-  drets_imatge           Boolean @default(false)
-  registre_ceb_confirmat Boolean @default(false)
+  // Documentació i validació (JSON per flexibilitat)
+  docs_status Json? // { acord_pedagogic: true, url: '...', validat: true }
 
-  // Validation Flags (Admin)
-  validat_acord_pedagogic        Boolean @default(false)
-  validat_autoritzacio_mobilitat Boolean @default(false)
-  validat_drets_imatge           Boolean @default(false)
-
-  // Document URLs
-  url_acord_pedagogic        String?
-  url_autoritzacio_mobilitat String?
-  url_drets_imatge           String?
-
-  attendance   Attendance[]
-  evaluation   Evaluation?
-  self_consult SelfConsultStudent?
+  attendance  Attendance[]
+  evaluations Evaluation[]
 
   @@map("inscripcions")
 }
@@ -317,193 +255,32 @@ enum AttendanceStatus {
 }
 
 // ==========================================
-// 5. AVALUACIÓ I QUALITAT
+// 5. EVALUACIÓ I QUALITAT (UNIFICADA)
 // ==========================================
-
-model Competence {
-  id_competence Int              @id @default(autoincrement())
-  nom           String
-  tipus         CompetenceType
-
-  evaluations CompetenceEvaluation[]
-
-  @@map("competencies")
-}
-
-enum CompetenceType {
-  Tecnica     @map("Tècnica")
-  Transversal
-}
-
-model CompetenceEvaluation {
-  id_evaluation Int              @id @default(autoincrement())
-  id_evaluation_teacher Int
-  evaluation_teacher    Evaluation @relation(fields: [id_evaluation_teacher], references: [id_evaluation_teacher], onDelete: Cascade)
-  id_competence      Int
-  competence         Competence     @relation(fields: [id_competence], references: [id_competence])
-  puntuacio           Int // Escala 1-5 (1=Sense valoració, 2=Passiva, 3=Suficient, 4=Bona, 5=Molt bona)
-
-  @@unique([id_evaluation_teacher, id_competence])
-  @@map("avaluacio_competencial")
-}
 
 model Evaluation {
-  id_evaluation_teacher Int        @id @default(autoincrement())
-  id_enrollment         Int        @unique
-  enrollment            Enrollment @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
-  percentatge_asistencia Float
-  numero_retards         Int
-  observacions           String?    @db.Text
-  data_evaluation        DateTime   @default(now())
+  id_evaluation Int              @id @default(autoincrement())
+  tipus         EvaluationType
+  id_assignment Int
+  assignment    Assignment       @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
+  id_enrollment Int?
+  enrollment    Enrollment?      @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
+  
+  respostes     Json // Respostes dinàmiques { competència: nota, comentari: "...", etc }
+  data_enviament DateTime        @default(now())
 
-  competences CompetenceEvaluation[]
-
-  @@map("avaluacions_docents")
+  @@map("avaluacions")
 }
 
-model SelfConsultStudent {
-  id_self_consult Int        @id @default(autoincrement())
-  id_enrollment   Int        @unique
-  enrollment      Enrollment @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
-
-  // Comportament (Frequència)
-  puntualitat_tasques  String // Escala: Sí siempre / A vegades / Quasi mai / Mai
-  respecte_material    String
-  interes_aprenentatge String
-  autonomia_resolucio  String
-
-  // Satisfacció
-  valoracio_experiencia Int // 1-10
-  valoracio_docent      Int // 1-10
-
-  // Impacte Vocacional
-  impacte_vocacional VocationalImpact
-
-  // Preguntes obertes
-  millores_personals String? @db.Text
-  aprenentatges_clau String? @db.Text
-
-  data_enviament DateTime @default(now())
-
-  @@map("autoconsultes_alumnes")
-}
-
-enum VocationalImpact {
-  SI          @map("Sí, m’ha aclarit les idees")
-  NO          @map("No, ja ho tenia clar o no és per a mi")
-  CONSIDERANT @map("Ho estic considerant ara mateix")
-}
-
-model QuestionnaireModel {
-  id_model    Int                    @id @default(autoincrement())
-  titol       String
-  target      QuestionnaireTarget
-  questions   Question[]
-  submissions QuestionnaireSubmission[]
-
-  @@map("model_questionaris")
-}
-
-enum QuestionnaireTarget {
-  CENTER
-  TEACHER
-  STUDENT
-}
-
-model Question {
-  id_question    Int                    @id @default(autoincrement())
-  id_model       Int
-  model          QuestionnaireModel     @relation(fields: [id_model], references: [id_model], onDelete: Cascade)
-  enunciat       String                 @db.Text
-  response_type  ResponseType
-  options        Json? // Per a respostes múltiples
-  responses      QuestionnaireResponse[]
-
-  @@map("preguntes")
-}
-
-enum ResponseType {
-  Likert_1_5  @map("Likert 1-5")
-  Likert_1_10 @map("Likert 1-10")
-  Oberta
-  Si_No       @map("Si/No")
-  Multiple
-}
-
-model QuestionnaireSubmission {
-  id_submission  Int              @id @default(autoincrement())
-  id_model       Int
-  model          QuestionnaireModel @relation(fields: [id_model], references: [id_model], onDelete: Cascade)
-  id_assignment  Int
-  assignment     Assignment       @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  status         SubmissionStatus   @default(Pendent)
-  submission_date DateTime?
-  response_date  DateTime?
-
-  responses QuestionnaireResponse[]
-
-  @@map("enviaments_questionaris")
-}
-
-enum SubmissionStatus {
-  Pendent
-  Enviat
-  Respost
-}
-
-model QuestionnaireResponse {
-  id_response             Int                  @id @default(autoincrement())
-  id_submission           Int
-  submission              QuestionnaireSubmission @relation(fields: [id_submission], references: [id_submission], onDelete: Cascade)
-  id_question             Int
-  question                Question             @relation(fields: [id_question], references: [id_question], onDelete: Cascade)
-  value                   String               @db.Text
-  is_anonymous            Boolean              @default(false)
-  assignment              Assignment?          @relation(fields: [assignmentId_assignment], references: [id_assignment], onDelete: Cascade)
-  assignmentId_assignment Int?
-
-  @@map("respostes_questionari")
+enum EvaluationType {
+  SATISFACCIO_ALUMNE
+  SATISFACCIO_CENTRE
+  COMPETENCIES_DOCENT
+  AUTOCONSULTA
 }
 
 // ==========================================
-// 6. NOTIFICACIONS I AVISOS
-// ==========================================
-
-model Notification {
-  id_notification Int      @id @default(autoincrement())
-  id_user         Int?
-  user            User?    @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
-  id_center       Int?
-  center          Center?  @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
-  titol           String
-  missatge       String   @db.Text
-  read            Boolean  @default(false)
-  created_at      DateTime @default(now())
-  type            String // REQUEST, PHASE, SYSTEM
-  importance      String   @default("NORMAL") // INFO, WARNING, URGENT
-
-  @@index([id_user, id_center])
-  @@map("notificacions")
-}
-
-// ==========================================
-// 7. LOGS
-// ==========================================
-
-model LogAuditor {
-  id_log     Int      @id @default(autoincrement())
-  id_user    Int?
-  user       User?    @relation(fields: [id_user], references: [id_user], onDelete: SetNull)
-  action     String
-  details    Json?
-  created_at DateTime @default(now())
-
-  @@index([created_at])
-  @@map("logs_auditoria")
-}
-
-// ==========================================
-// 8. CONFIGURACIÓ DINÀMICA
+// 6. CONFIGURACIÓ SISTEMA
 // ==========================================
 
 model Phase {
@@ -526,33 +303,7 @@ model CalendarEvent {
   titol      String
   descripcio String?
   data       DateTime
-  type       String // milestone, deadline, assignment
+  type       String
 
   @@map("calendari_events")
-}
-
-model Survey {
-  id_survey      String      @id @default(uuid())
-  id_assignment  Int
-  assignment     Assignment  @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  target         QuestionnaireTarget
-  token          String      @unique
-  complete       Boolean     @default(false)
-  created_at     DateTime    @default(now())
-  completed_at   DateTime?
-
-  @@map("enquestes")
-}
-
-model Certificate {
-  id_certificate String     @id @default(uuid())
-  id_student     Int
-  student        Student     @relation(fields: [id_student], references: [id_student], onDelete: Cascade)
-  id_assignment  Int
-  assignment     Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  issued_at      DateTime   @default(now())
-  url_pdf        String?
-
-  @@unique([id_student, id_assignment])
-  @@map("certificats")
 }
