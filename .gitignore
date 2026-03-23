@@ -32,10 +32,6 @@ apps/mobile/ios/
 *.pyc
 *.keystore
 
-# --- Electron ---
-apps/electron/dist/
-apps/electron/release/
-
 # --- Assets y Subidas (No subir archivos dinámicos) ---
 **/uploads/
 **/storage/
