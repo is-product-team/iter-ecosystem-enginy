@@ -1,0 +1,44 @@
+import { Request as Peticio, Prisma } from '@prisma/client';
+import { BaseRepository } from './base.repository.js';
+
+export class RequestRepository extends BaseRepository<Peticio, Prisma.RequestCreateInput, Prisma.RequestUpdateInput> {
+  constructor() {
+    super('request');
+  }
+
+  override async findById(id: number): Promise<Peticio | null> {
+    return this.prisma.request.findUnique({
+      where: { id_request: id },
+      include: {
+        center: true,
+        workshop: true
+      }
+    });
+  }
+
+  async findByCenter(centerId: number): Promise<Peticio[]> {
+    return this.model.findMany({
+      where: { id_center: centerId },
+      include: { workshop: true },
+      orderBy: { data_request: 'desc' }
+    });
+  }
+
+  async findAllDetailed(role: string, centerId?: number): Promise<Peticio[]> {
+    const where: Prisma.RequestWhereInput = {};
+    if (role !== 'ADMIN' && centerId) {
+      where.id_center = centerId;
+    }
+
+    return this.model.findMany({
+      where,
+      include: {
+        center: true,
+        workshop: true
+      },
+      orderBy: { data_request: 'desc' }
+    });
+  }
+}
+
+export const requestRepository = new RequestRepository();

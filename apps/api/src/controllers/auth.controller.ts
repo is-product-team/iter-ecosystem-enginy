@@ -1,70 +1,89 @@
-// apps/api/src/controllers/auth.controller.ts
-import prisma from '../lib/prisma.js';
+import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Request, Response } from 'express';
-import logger from '../lib/logger.js';
+import { userRepository } from '../repositories/user.repository.js';
+import { env } from '../config/env.js';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  logger.info(`Intento de login para: ${email}`);
 
   try {
-    logger.info('1. Consultando base de datos...');
-    const usuari = await prisma.user.findUnique({
-      where: { email },
-      include: {
-        rol: true,
-        centre: true
-      }
-    });
+    // 1. Usamos el repositorio para buscar al usuario
+    const user = await userRepository.findByEmail(email);
 
-    if (!usuari) {
-      logger.info('Usero no encontrado');
-      return res.status(401).json({ error: 'Credenciales inválidas' });
+    if (!user) {
+      return res.status(401).json({ error: 'Credencials invàlides' });
     }
 
-    logger.info('2. Comparando contraseña...');
-    const validPassword = await bcrypt.compare(password, usuari.password_hash);
+    // 2. Verificar password
+    const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) {
-      logger.info('Contraseña inválida');
-      return res.status(401).json({ error: 'Credenciales inválidas' });
+      return res.status(401).json({ error: 'Credencials invàlides' });
     }
 
-    logger.info('3. Firmando token...');
-    const secret = process.env.JWT_SECRET || 'secreto_super_seguro_dev';
+    // 3. Generar JWT
     const token = jwt.sign(
-      {
-        userId: usuari.id_user,
-        role: usuari.role.nom_rol,
-        centreId: usuari.id_center
+      { 
+        userId: user.id_user, 
+        email: user.email, 
+        role: user.role.nom_role,
+        centreId: user.id_center 
       },
-      secret,
-      { expiresIn: '8h' }
+      env.JWT_SECRET,
+      { expiresIn: '24h' }
     );
 
-    logger.info('4. Preparando respuesta...');
-    const { password_hash, ...userWithoutPass } = usuari;
-
-    logger.info('5. Enviando JSON...');
+    // 4. Respuesta limpia (Omitimos el hash del password por seguridad)
+    const { password_hash, ...userSafe } = user;
     res.json({
       token,
-      user: userWithoutPass
+      user: userSafe
     });
-    logger.info('Login exitoso');
-
   } catch (error) {
-    logger.error('Login error CRITICAL:', error);
-    res.status(500).json({
-      error: 'Error en el servidor',
-      details: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
-    });
+    console.error('Error en login:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
   }
 };
 
 export const register = async (req: Request, res: Response) => {
-  // Lógica de registro para Admins o script inicial
-  // ... similar al createWorkshop pero con bcrypt.hash(password, 10)
-  res.status(501).json({ error: 'Not implemented' });
+  const { email, password, nom_complet, id_role, id_center } = req.body;
+
+  try {
+    // 1. Verificar si el usuario ya existe
+    const existingUser = await userRepository.findByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'L\'usuari ja existeix' });
+    }
+
+    // 2. Hash del password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    // 3. Crear usuario
+    const user = await userRepository.create({
+      email,
+      password_hash,
+      nom_complet,
+      role: { connect: { id_role: parseInt(id_role) } },
+      center: id_center ? { connect: { id_center: parseInt(id_center) } } : undefined,
+    });
+
+    res.status(201).json({ message: 'Usuari registrat correctament', userId: user.id_user });
+  } catch (error) {
+    console.error('Error en register:', error);
+    res.status(500).json({ error: 'Error al registrar l\'usuari' });
+  }
+};
+
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const user = await userRepository.findWithDetails((req as any).user.userId);
+    if (!user) return res.status(404).json({ error: 'Usuari no trobat' });
+
+    const { password_hash, ...userSafe } = user;
+    res.json(userSafe);
+  } catch (error) {
+    console.error('Error en getMe:', error);
+    res.status(500).json({ error: 'Error al obtenir dades' });
+  }
 };
