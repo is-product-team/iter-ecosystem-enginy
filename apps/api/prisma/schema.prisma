@@ -59,6 +59,8 @@ model Center {
   requests    Request[]
   assignments Assignment[]
   students    Student[]    @relation("CenterOrigin")
+  teachers    Teacher[]
+  issues      Issue[]
 
   @@map("centres")
 }
@@ -85,8 +87,21 @@ model User {
 
   assignments      AssignmentTeacher[]
   session_teachers SessionTeacher[]
+  teachers         Teacher[]
 
   @@map("usuaris")
+}
+
+model Teacher {
+  id_teacher Int    @id @default(autoincrement())
+  nom        String
+  contacte   String
+  id_center  Int
+  center     Center @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
+  id_user    Int    @unique
+  user       User   @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+
+  @@map("professors")
 }
 
 // ==========================================
@@ -108,6 +123,8 @@ model Request {
   // Profesores solicitados (opcional)
   prof1_id Int?
   prof2_id Int?
+
+  assignment Assignment?
 
   @@index([estat])
   @@map("peticions")
@@ -259,17 +276,43 @@ enum AttendanceStatus {
 // ==========================================
 
 model Evaluation {
-  id_evaluation Int              @id @default(autoincrement())
-  tipus         EvaluationType
-  id_assignment Int
-  assignment    Assignment       @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  id_enrollment Int?
-  enrollment    Enrollment?      @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
+  id_evaluation_teacher Int              @id @default(autoincrement())
+  id_assignment         Int
+  assignment            Assignment       @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
+  id_enrollment         Int?             @unique
+  enrollment            Enrollment?      @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
   
-  respostes     Json // Respostes dinàmiques { competència: nota, comentari: "...", etc }
-  data_enviament DateTime        @default(now())
+  percentatge_asistencia Float?
+  numero_retards         Int?
+  observacions           String?         @db.Text
+  
+  respostes              Json?           // Respostes dinàmiques
+  data_enviament         DateTime        @default(now())
+
+  tipus                  EvaluationType?
+  competencies           AvaluacioCompetencial[]
 
   @@map("avaluacions")
+}
+
+model Competence {
+  id_competencia Int                     @id @default(autoincrement())
+  nom            String
+  tipus          String
+  evaluations    AvaluacioCompetencial[]
+
+  @@map("competencies")
+}
+
+model AvaluacioCompetencial {
+  id_evaluation_teacher Int
+  evaluation           Evaluation @relation(fields: [id_evaluation_teacher], references: [id_evaluation_teacher], onDelete: Cascade)
+  id_competencia        Int
+  competencia          Competence @relation(fields: [id_competencia], references: [id_competencia], onDelete: Cascade)
+  puntuacio             Int
+
+  @@id([id_evaluation_teacher, id_competencia])
+  @@map("avaluacio_competencial")
 }
 
 enum EvaluationType {
@@ -306,4 +349,48 @@ model CalendarEvent {
   type       String
 
   @@map("calendari_events")
+}
+
+model Notification {
+  id_notificacio Int      @id @default(autoincrement())
+  id_user        Int?
+  id_center      Int?
+  titol          String
+  missatge       String   @db.Text
+  data_creacio   DateTime @default(now())
+  llegida        Boolean  @default(false)
+  tipus          String?  // PETICIO, FASE, SISTEMA
+  importancia    String?  // INFO, WARNING, URGENT
+
+  @@map("notificacions")
+}
+
+model Issue {
+  id_issue     Int      @id @default(autoincrement())
+  id_center    Int
+  center       Center   @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
+  descripcio   String   @db.Text
+  data_creacio DateTime @default(now())
+
+  @@map("incidencies")
+}
+
+enum QuestionnaireTarget {
+  ALUMNE
+  CENTRE
+  DOCENT
+  PROFESSOR
+}
+
+enum ResponseType {
+  TEXT
+  RATING
+  SINGLE_CHOICE
+  MULTI_CHOICE
+}
+
+enum SubmissionStatus {
+  Enviat
+  Respost
+  Pendent
 }

@@ -24,7 +24,7 @@ export const login = async (req: Request, res: Response) => {
     // 3. Generar JWT
     const token = jwt.sign(
       { 
-        id: user.id_user, 
+        userId: user.id_user, 
         email: user.email, 
         role: user.role.nom_role,
         centreId: user.id_center 
@@ -45,14 +45,45 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+export const register = async (req: Request, res: Response) => {
+  const { email, password, nom_complet, id_role, id_center } = req.body;
+
+  try {
+    // 1. Verificar si el usuario ya existe
+    const existingUser = await userRepository.findByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'L\'usuari ja existeix' });
+    }
+
+    // 2. Hash del password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    // 3. Crear usuario
+    const user = await userRepository.create({
+      email,
+      password_hash,
+      nom_complet,
+      role: { connect: { id_role: parseInt(id_role) } },
+      center: id_center ? { connect: { id_center: parseInt(id_center) } } : undefined,
+    });
+
+    res.status(201).json({ message: 'Usuari registrat correctament', userId: user.id_user });
+  } catch (error) {
+    console.error('Error en register:', error);
+    res.status(500).json({ error: 'Error al registrar l\'usuari' });
+  }
+};
+
 export const getMe = async (req: Request, res: Response) => {
   try {
-    const user = await userRepository.findWithDetails(req.user.id);
+    const user = await userRepository.findWithDetails((req as any).user.userId);
     if (!user) return res.status(404).json({ error: 'Usuari no trobat' });
 
     const { password_hash, ...userSafe } = user;
     res.json(userSafe);
   } catch (error) {
+    console.error('Error en getMe:', error);
     res.status(500).json({ error: 'Error al obtenir dades' });
   }
 };
