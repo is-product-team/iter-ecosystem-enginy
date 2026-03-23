@@ -5,8 +5,7 @@ node_modules/
 
 # --- Archivos de Entorno (MÁXIMA SEGURIDAD) ---
 **/.env*
-!.env.example
-**/.env.example
+!**/.env.example
 !.env # Permitimos el de la raíz porque ahora solo tiene puertos de Docker
 
 # --- Compilación y Salida (Builds) ---
