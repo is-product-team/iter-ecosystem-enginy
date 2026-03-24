@@ -23,11 +23,30 @@ Ensure you have the following installed on your host machine:
     cp apps/web/.env.example apps/web/.env
     ```
 3.  **Boot the System**:
-    We use Docker Compose to orchestrate the entire stack.
+    You can run the ecosystem either via Docker (recommended for full stack) or natively using Turborepo.
+
+    **Option A: Docker Compose (Full Stack)**
     ```bash
     docker compose up
     ```
     *Note: The first run will take some time as the `setup` service installs dependencies and initializes the database.*
+
+    **Option B: Local Native (Turborepo)**
+    If you prefer to run the Node servers natively on your machine:
+    1. Install all monorepo dependencies:
+       ```bash
+       npm install
+       ```
+    2. Initialize the Postgres database (ensure you have a local standard DB running as specified in `.env`):
+       ```bash
+       npm run db:push
+       npm run db:generate
+       npm run db:seed
+       ```
+    3. Start the Web and API servers concurrently:
+       ```bash
+       npm run dev
+       ```
 
 ## 3. Development Workflow
 
