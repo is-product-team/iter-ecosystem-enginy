@@ -5,9 +5,130 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { THEME } from '@iter/shared';
 import Avatar from '@/components/Avatar';
 import { useTheme } from 'next-themes';
-import { Sun, Moon, Monitor } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Sun, Moon, Monitor, Copy, RefreshCw, Calendar as CalendarIcon, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import getApi from '@/services/api';
 
+function CalendarSyncSection() {
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+
+  const fetchToken = useCallback(async () => {
+    try {
+      const api = getApi();
+      const res = await api.get('/profile/sync-token');
+      setToken(res.data.sync_token);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const generateToken = async () => {
+    setRegenerating(true);
+    try {
+      const api = getApi();
+      const res = await api.post('/profile/sync-token');
+      setToken(res.data.sync_token);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchToken();
+  }, [fetchToken]);
+
+  const syncUrl = token ? `${process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.location.origin + '/api' : '')}/calendar/sync/${token}.ics` : '';
+
+  const copyToClipboard = () => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(syncUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <label className="block text-[10px] font-black text-consorci-darkBlue uppercase tracking-widest">
+        Sincronització de Calendari (iCal)
+      </label>
+      <div className="p-6 bg-consorci-darkBlue/5 border-2 border-consorci-darkBlue/10 rounded-sm">
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 bg-consorci-darkBlue text-white flex items-center justify-center shrink-0 shadow-lg">
+            <CalendarIcon size={24} />
+          </div>
+          <div>
+            <h4 className="text-sm font-black text-text-primary uppercase tracking-tight">Sincronitza amb Google/Apple</h4>
+            <p className="text-[10px] text-text-muted font-bold leading-relaxed mt-1">
+              Subscriu-te des del teu sistema favorit per veure totes les fites i sessions automàticament.
+            </p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="h-10 bg-background-subtle animate-pulse rounded-sm w-full"></div>
+        ) : !token ? (
+          <button 
+            onClick={generateToken}
+            disabled={regenerating}
+            className="w-full py-3 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-all flex items-center justify-center gap-2"
+          >
+            {regenerating ? <RefreshCw className="animate-spin w-4 h-4" /> : <RefreshCw size={16} />}
+            Activar Sincronització
+          </button>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <div className="flex-1 bg-background-surface border border-border-subtle p-3 text-[10px] font-mono text-text-muted truncate">
+                {syncUrl}
+              </div>
+              <button 
+                onClick={copyToClipboard}
+                className={`px-4 flex items-center justify-center transition-all ${copied ? 'bg-green-600 text-white' : 'bg-consorci-darkBlue text-white hover:bg-consorci-actionBlue'}`}
+              >
+                {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
+              </button>
+            </div>
+            <div className="flex justify-between items-center">
+               <span className="text-[9px] font-bold text-text-muted italic">Sincronització activa ✓</span>
+               <button 
+                 onClick={generateToken}
+                 disabled={regenerating}
+                 className="text-[9px] font-black text-consorci-pinkRed uppercase tracking-widest hover:underline flex items-center gap-1"
+               >
+                 {regenerating && <RefreshCw className="animate-spin w-3 h-3" />}
+                 Regenerar Link
+               </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 border border-border-subtle bg-background-subtle/50 space-y-3">
+        <p className="text-[9px] font-black text-text-muted uppercase tracking-widest">Preferències de Notificació</p>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold text-text-primary">Avisos de Sessió (24h abans)</span>
+          <div className="w-10 h-5 bg-consorci-darkBlue rounded-full relative px-1 flex items-center">
+            <div className="w-3.5 h-3.5 bg-white rounded-full absolute right-1"></div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold text-text-primary">Canvis en Dates de Fases</span>
+          <div className="w-10 h-5 bg-consorci-darkBlue rounded-full relative px-1 flex items-center">
+            <div className="w-3.5 h-3.5 bg-white rounded-full absolute right-1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
@@ -110,7 +231,7 @@ export default function ProfilePage() {
 
                   <div>
                     <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-3">Apariència de la interfície</label>
-                    <div className="flex border border-border-subtle p-0.5 max-w-sm">
+                    <div className="flex border border-border-subtle p-0.5 max-w-sm mb-8">
                       {[
                         { id: 'light', label: 'Clar', icon: Sun },
                         { id: 'dark', label: 'Fosc', icon: Moon },
@@ -135,6 +256,9 @@ export default function ProfilePage() {
                       })}
                     </div>
                   </div>
+
+                  {/* Sincronització de Calendari */}
+                  <CalendarSyncSection />
 
 
 

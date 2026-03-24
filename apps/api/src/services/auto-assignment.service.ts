@@ -22,16 +22,14 @@ export class AutoAssignmentService {
             where: {
                 estat: { in: ['Aprovada', 'Pendent'] },
                 modalitat: 'C',
-                assignments: {
-                    none: {}
-                }
+                assignment: null
             },
             include: {
-                centre: true,
-                students: true
+                center: true,
+                workshop: true
             },
             orderBy: {
-                data_peticio: 'asc'
+                data_request: 'asc'
             }
         });
 
@@ -83,28 +81,35 @@ export class AutoAssignmentService {
             const centerMap = new Map<number, PendingCenter>();
 
             workshopPetitions.forEach((p: any) => {
-                if (!p.alumnes || p.students.length === 0) return;
+                const demand = p.alumnes_aprox || 0;
+                if (demand === 0) return;
 
                 if (!centerMap.has(p.id_center)) {
                     centerMap.set(p.id_center, {
                         centerId: p.id_center,
-                        students: [],
-                        peticioId: p.id_request, // Track the main petition ID (or latest)
-                        timestamp: p.data_peticio,
+                        students: [], // No actual students yet
+                        peticioId: p.id_request, 
+                        timestamp: p.data_request,
                         assignedCount: 0
                     });
                 }
                 const entry = centerMap.get(p.id_center)!;
-                // Add students
-                p.students.forEach((a: any) => entry.students.push(a.id_student));
-                // Keep the earliest timestamp for priority
-                if (p.data_peticio < entry.timestamp) {
-                    entry.timestamp = p.data_peticio;
+                entry.assignedCount += demand; // Store initial demand here for calc
+                
+                if (p.data_request < entry.timestamp) {
+                    entry.timestamp = p.data_request;
                 }
             });
 
-            const centers = Array.from(centerMap.values());
-            const totalDemand = centers.reduce((sum: number, c: any) => sum + c.students.length, 0);
+            // Adjust assignedCount back for calculation
+            centersData.push(...Array.from(centerMap.values()).map(c => {
+                const demand = c.assignedCount;
+                c.assignedCount = 0; // reset for distribution
+                return { ...c, demand }; 
+            }));
+
+            const centers = centersData as any[];
+            const totalDemand = centers.reduce((sum: number, c: any) => sum + c.demand, 0);
 
             // DISTRIBUTION LOGIC
             let allocated = 0;
@@ -122,35 +127,23 @@ export class AutoAssignmentService {
                 let leftoverSpots = remainingCapacity;
                 
                 centers.forEach((c: any) => {
-                    const allocation = Math.min(c.students.length, baseShare);
+                    const allocation = Math.min(c.demand, baseShare);
                     c.assignedCount = allocation;
                     leftoverSpots -= allocation;
                 });
 
                 // 2. Distribute Leftovers by Priority (Earliest Timestamp)
-                // Sort centers by timestamp
                 centers.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
                 let i = 0;
                 while (leftoverSpots > 0) {
-                    const center = centers[i % numCenters]; // Round robin if we loop? 
-                    // Actually, requirement says "por orden de llegada". 
-                    // So we iterate prioritized list. If a center still needs spots, give 1.
-                    // But usually "order de llegada" implies the first one gets as much as possible?
-                    // "si son impares, por orden de llegada" implies the REMAINDER is distributed by order.
-                    
-                    if (center.assignedCount < center.students.length) {
+                    const center = centers[i % numCenters];
+                    if (center.assignedCount < center.demand) {
                         center.assignedCount++;
                         leftoverSpots--;
                     }
-                    
-                    // Move to next center? Or fill this one? 
-                    // "Assign the remainder by order of arrival" usually means distributing the odd lots.
-                    // Example: 5 spots, 2 centers. Share = 2. Remainder = 1.
-                    // Center A (Early) gets +1 -> Total 3. Center B gets 2.
-                    // So we iterate once through the sorted list.
                     i++;
-                    if (i >= numCenters * 2 && leftoverSpots > 0) break; // Breaker preventing infinite loop if logic fails
+                    if (i >= numCenters * 2 && leftoverSpots > 0) break;
                 }
             }
 
@@ -193,13 +186,8 @@ export class AutoAssignmentService {
             }
         });
 
-        // Create Enrollmentns
-        await prisma.enrollment.createMany({
-            data: studentsToAssign.map(sid => ({
-                id_assignment: assignacio.id_assignment,
-                id_student: sid
-            }))
-        });
+        // Note: Specific enrollments are created later by the center.
+        // For now we just create the Assignment framework.
 
         // Generate Sessions (Copy from original)
         const taller = await prisma.workshop.findUnique({ where: { id_workshop: tallerId } });
@@ -214,7 +202,7 @@ export class AutoAssignmentService {
                     }
                     return {
                         id_assignment: assignacio.id_assignment,
-                        data_sessio: d,
+                        data_session: d,
                         hora_inici: slot.startTime,
                         hora_fi: slot.endTime
                     };

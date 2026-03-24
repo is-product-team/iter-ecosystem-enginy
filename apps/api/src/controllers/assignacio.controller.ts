@@ -605,14 +605,14 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
             const referentUserIds = referentTeachers.map((p: any) => p.id_user).filter(Boolean) as number[];
 
             // Iterar por semanas desde startDate hasta endDate
-            let currentPointer = new Date(startDate);
+            const currentPointer = new Date(startDate);
             while (currentPointer <= endDate) {
                 for (const slot of schedule) {
                     const sessionDate = new Date(currentPointer);
                     
                     // Calcular el día de la semana deseado para esta sesión
                     const currentDay = sessionDate.getDay(); 
-                    let daysUntil = (slot.dayOfWeek + 7 - currentDay) % 7;
+                    const daysUntil = (slot.dayOfWeek + 7 - currentDay) % 7;
                     sessionDate.setDate(sessionDate.getDate() + daysUntil);
 
                     // Verificar que seguimos dentro del rango de la fase

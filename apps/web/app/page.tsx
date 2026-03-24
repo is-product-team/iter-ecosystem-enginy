@@ -13,10 +13,14 @@ export default function Home() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        if (user.rol.nom_rol === 'ADMIN') {
+        const role = user.rol?.nom_rol;
+        if (role === 'ADMIN') {
           router.push('/admin');
-        } else if (user.rol.nom_rol === 'COORDINADOR') {
+        } else if (role === 'COORDINADOR') {
           router.push('/centro');
+        } else {
+          // If role is missing or invalid, redirect to login
+          router.push('/login');
         }
       } else {
         router.push('/login');

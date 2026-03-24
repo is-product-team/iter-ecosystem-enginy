@@ -8,6 +8,7 @@ import routes from './routes/index.js';
 import logger from './lib/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import prisma from './lib/prisma.js';
+import { ReminderService } from './services/reminder.service.js';
 
 import { env } from './config/env.js';
 
@@ -63,10 +64,14 @@ const server = app.listen(PORT, async () => {
   } catch (e) {
     logger.error(`🗄️  DATABASE STATUS: PostgreSQL Connection failed`);
   }
+
+  // Start Background Services
+  ReminderService.start();
 });
 
 process.on('SIGINT', async () => {
   logger.info('Shutting down server...');
+  ReminderService.stop();
   await prisma.$disconnect();
   server.close(() => {
     logger.info('Server closed');
