@@ -12,17 +12,17 @@ export interface Notificacio {
 
 const notificacioService = {
   getAll: async (): Promise<Notificacio[]> => {
-    const response = await api().get('/notificacions');
+    const response = await api().get('/notifications');
     return response.data;
   },
 
   markAsRead: async (id: number): Promise<Notificacio> => {
-    const response = await api().patch(`/notificacions/${id}/read`);
+    const response = await api().patch(`/notifications/${id}/read`);
     return response.data;
   },
 
   delete: async (id: number): Promise<void> => {
-    await api().delete(`/notificacions/${id}`);
+    await api().delete(`/notifications/${id}`);
   }
 };
 

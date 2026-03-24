@@ -79,6 +79,9 @@ services:
       - node_modules_cache:/app/node_modules
     ports:
       - "${WEB_PORT:-8002}:${PORT:-3001}"
+    environment:
+      - COREPACK_ENABLE=0
+      - npm_config_user_agent=npm
     env_file:
       - apps/web/.env
     depends_on:
