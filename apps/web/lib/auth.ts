@@ -39,9 +39,8 @@ export async function login(email: string, password: string): Promise<LoginRespo
 
   const data = await res.json();
   
-  // Store token in localStorage for simplicity in this MVP
+  // Store user in localStorage, but cookie handles the token
   if (typeof window !== 'undefined') {
-    localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
   }
 
@@ -50,8 +49,8 @@ export async function login(email: string, password: string): Promise<LoginRespo
 
 export function logout() {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Session is handled by cookie, API logout clears it
     window.location.href = '/login';
   }
 }
@@ -59,8 +58,8 @@ export function logout() {
 export function getUser(): User | null {
   if (typeof window !== 'undefined') {
     const userStr = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    if (userStr && token) {
+    // Note: We no longer check for 'token' in localStorage as it's in a cookie
+    if (userStr) {
       try {
         return JSON.parse(userStr);
       } catch (e) {

@@ -4,6 +4,7 @@ dotenv.config();
 import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import routes from './routes/index.js';
 import logger from './lib/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
@@ -42,6 +43,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(cookieParser());
 
 const API_PREFIX = env.API_PREFIX;
 app.use(`${API_PREFIX}/uploads`, express.static('uploads'));
