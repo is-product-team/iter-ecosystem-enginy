@@ -1,4 +1,4 @@
-import { ROLES, RoleTag } from '@iter/shared';
+import { RoleTag } from '@iter/shared';
 
 export interface User {
   id_user: number;

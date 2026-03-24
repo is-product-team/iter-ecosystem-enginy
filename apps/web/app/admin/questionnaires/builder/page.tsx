@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 import { toast } from 'sonner';
@@ -32,9 +31,9 @@ export default function QuestionnaireBuilderPage() {
         });
     };
 
-    const updateQuestion = (index: number, field: string, value: any) => {
+    const updateQuestion = (index: number, field: string, value: string | string[]) => {
         const newPreguntes = [...form.preguntes];
-        (newPreguntes[index] as any)[field] = value;
+        (newPreguntes[index] as Record<string, string | string[]>)[field] = value;
         setForm({ ...form, preguntes: newPreguntes });
     };
 

@@ -24,6 +24,30 @@ export interface Request {
   teacher2?: { name: string };
 }
 
+interface BackendRequest {
+  id_request: number;
+  id_center: number;
+  id_workshop: number;
+  alumnes_aprox: number | null;
+  comentaris: string | null;
+  data_request: string;
+  estat: string;
+  modalitat: string;
+  prof1_id?: number;
+  prof2_id?: number;
+  ids_alumnes?: number[];
+  workshop?: {
+    titol: string;
+    sector?: { nom: string };
+    modalitat: string;
+  };
+  center?: {
+    nom: string;
+  };
+  prof1?: { nom: string };
+  prof2?: { nom: string };
+}
+
 const requestService = {
   /**
    * Gets all requests.
@@ -31,8 +55,8 @@ const requestService = {
   getAll: async (): Promise<Request[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: any[], meta: any }>("/requests?limit=0");
-      return response.data.data.map((r: any) => ({
+      const response = await api.get<{ data: BackendRequest[], meta: unknown }>("/requests?limit=0");
+      return response.data.data.map((r: BackendRequest) => ({
         id_request: r.id_request,
         id_center: r.id_center,
         id_workshop: r.id_workshop,
@@ -82,7 +106,7 @@ const requestService = {
         prof2_id: data.teacher2Id,
         modalitat: data.modality,
       };
-      const response = await api.post<any>("/requests", payload);
+      const response = await api.post<BackendRequest>("/requests", payload);
       const r = response.data;
       return {
         id_request: r.id_request,
@@ -97,9 +121,9 @@ const requestService = {
         teacher2Id: r.prof2_id,
         studentIds: r.ids_alumnes,
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error in requestService.create:", error);
-      const errorMessage = error.response?.data?.error || "Failed to create request";
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Failed to create request";
       throw new Error(errorMessage);
     }
   },
@@ -121,7 +145,7 @@ const requestService = {
         prof1_id: data.teacher1Id,
         prof2_id: data.teacher2Id,
       };
-      const response = await api.put<any>(`/requests/${id}`, payload);
+      const response = await api.put<BackendRequest>(`/requests/${id}`, payload);
       const r = response.data;
       return {
         id_request: r.id_request,
@@ -136,9 +160,9 @@ const requestService = {
         teacher2Id: r.prof2_id,
         studentIds: r.ids_alumnes,
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error in requestService.update:", error);
-      const errorMessage = error.response?.data?.error || "Could not update the request";
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Could not update the request";
       throw new Error(errorMessage);
     }
   },
@@ -149,7 +173,7 @@ const requestService = {
   updateStatus: async (id: number, status: string): Promise<Request> => {
     const api = getApi();
     try {
-      const response = await api.patch<any>(`/requests/${id}/status`, { estat: status });
+      const response = await api.patch<BackendRequest>(`/requests/${id}/status`, { estat: status });
       const r = response.data;
       return {
         id_request: r.id_request,

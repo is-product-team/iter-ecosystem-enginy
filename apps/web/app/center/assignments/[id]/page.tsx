@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService, { Assignment, Enrollment } from '@/services/assignmentService';
 import studentService, { Student } from '@/services/studentService';
@@ -61,7 +61,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
   const handleAddStudent = async (idStudent: number) => {
     try {
       if (!assignment) return;
-      const currentIds = assignment.enrollments?.map((i: any) => i.id_student) || [];
+      const currentIds = assignment.enrollments?.map((i: Enrollment) => i.id_student) || [];
       if (currentIds.includes(idStudent)) {
         toast.warning("This student is already enrolled.");
         return;
@@ -84,7 +84,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
   const handleRemoveStudent = async (idStudent: number) => {
     try {
       if (!assignment) return;
-      const currentIds = assignment.enrollments?.map((i: any) => i.id_student) || [];
+      const currentIds = assignment.enrollments?.map((i: Enrollment) => i.id_student) || [];
       const updated = await assignmentService.updateEnrollments(parseInt(id), currentIds.filter((id: number) => id !== idStudent));
       setAssignment(updated);
       toast.success('Student removed successfully.');

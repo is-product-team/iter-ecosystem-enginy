@@ -5,7 +5,7 @@ export const getWorkshops = async (req: Request, res: Response) => {
   try {
     const workshops = await workshopRepository.findAllWithSectors();
     res.json(workshops);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtenir els tallers' });
   }
 };
@@ -18,7 +18,7 @@ export const getWorkshopById = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Taller no trobat' });
     }
     res.json(workshop);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtenir el taller' });
   }
 };
@@ -27,7 +27,7 @@ export const createWorkshop = async (req: Request, res: Response) => {
   try {
     const newWorkshop = await workshopRepository.create(req.body);
     res.status(201).json(newWorkshop);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al crear el taller' });
   }
 };
@@ -37,7 +37,7 @@ export const updateWorkshop = async (req: Request, res: Response) => {
   try {
     const updated = await workshopRepository.update(parseInt(String(id)), req.body);
     res.json(updated);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al actualitzar el taller' });
   }
 };
@@ -47,7 +47,7 @@ export const deleteWorkshop = async (req: Request, res: Response) => {
   try {
     await workshopRepository.delete(parseInt(String(id)));
     res.status(204).send();
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al eliminar el taller' });
   }
 };

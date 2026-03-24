@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import { evaluationService } from '@/services/evaluationService';
 
 export default function AdminReportsPage() {
-    const [metrics, setMetrics] = useState<any>(null);
+    const [metrics, setMetrics] = useState<unknown>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -31,7 +30,10 @@ export default function AdminReportsPage() {
         );
     }
 
-    const { general_avg, impact_distribution } = metrics || { general_avg: {}, impact_distribution: [] };
+    const { general_avg, impact_distribution } = (metrics as { 
+        general_avg: { valoracio_experiencia: number, valoracio_docent: number }, 
+        impact_distribution: { impacte_vocacional: string, _count: { _all: number } }[] 
+    }) || { general_avg: { valoracio_experiencia: 0, valoracio_docent: 0 }, impact_distribution: [] };
 
     return (
         <DashboardLayout
@@ -72,12 +74,12 @@ export default function AdminReportsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Impacte Vocacional */}
                     <div className="lg:col-span-2 bg-white p-10 border shadow-sm">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-10">Distribució de l'Impacte Vocacional</h3>
+                        <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-10">Distribució de l&apos;Impacte Vocacional</h3>
                         <div className="space-y-6">
-                            {impact_distribution.map((item: any) => {
-                                const total = impact_distribution.reduce((acc: number, curr: any) => acc + curr._count._all, 0);
+                            {impact_distribution.map((item: { impacte_vocacional: string, _count: { _all: number } }) => {
+                                const total = impact_distribution.reduce((acc: number, curr: { _count: { _all: number } }) => acc + curr._count._all, 0);
                                 const percent = (item._count._all / total) * 100;
-                                const labels: any = {
+                                const labels: Record<string, string> = {
                                     'SI': 'Ha triat una branca professional',
                                     'NO': 'No ha canviat la seva opinió',
                                     'CONSIDERANT': 'Ho està considerant ara mateix'

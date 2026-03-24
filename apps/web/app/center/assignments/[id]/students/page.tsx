@@ -3,11 +3,11 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME, PHASES, ROLES } from '@iter/shared';
+import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
-import assignmentService from '@/services/assignmentService';
+import assignmentService, { Assignment, Enrollment } from '@/services/assignmentService';
 import studentService, { Student } from '@/services/studentService';
-import phaseService from '@/services/phaseService';
+import phaseService, { Phase } from '@/services/phaseService';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
@@ -16,7 +16,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 export default function NominalRegisterPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [user, setUser] = useState<User | null>(null);
-  const [assignment, setAssignment] = useState<any>(null);
+  const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +46,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   useEffect(() => {
     const currentUser = getUser();
-    const roleName = currentUser?.rol?.nom_rol || (currentUser as any)?.role?.name;
+    const roleName = currentUser?.rol.nom_rol;
     
     if (!currentUser || roleName !== ROLES.COORDINATOR) {
       router.push('/login');
@@ -60,7 +60,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
         // Fetch phases first for gating
         const phasesData = await phaseService.getAll();
-        const isPlanning = phasesData.find((f: any) => f.name === PHASES.PLANNING)?.active;
+        const isPlanning = phasesData.find((f: Phase) => f.name === PHASES.PLANNING)?.active;
 
         if (!isPlanning) {
           toast.error('The nominal registration period is not active.');
@@ -74,7 +74,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
         // Pre-populate selectedIds from existing enrollments
         if (found.enrollments) {
-          setSelectedIds(found.enrollments.map((i: any) => i.id_student));
+          setSelectedIds(found.enrollments.map((i: Enrollment) => i.id_student));
         }
 
         // Fetch all students from center (controller handles scoping)
@@ -190,7 +190,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   return (
     <DashboardLayout
-      title={`Nominal Register: ${assignment.workshop?.title}`}
+      title={`Nominal Register: ${assignment?.workshop?.title}`}
       subtitle={`In this phase you must designate the ${maxSeats} students who will participate.`}
       actions={headerActions}
     >
@@ -374,7 +374,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
           <div>
             <p className="uppercase tracking-[0.2em] mb-2 font-black">Note on Nominal Register</p>
             <p className="font-normal text-gray-600 leading-relaxed max-w-3xl">
-              According to the Consortium's regulations, the nominal register must match the number of requested spots. Once confirmed, these students will be the ones listed on the final report and will receive the corresponding certification.
+              According to the Consortium&apos;s regulations, the nominal register must match the number of requested spots. Once confirmed, these students will be the ones listed on the final report and will receive the corresponding certification.
             </p>
           </div>
         </div>

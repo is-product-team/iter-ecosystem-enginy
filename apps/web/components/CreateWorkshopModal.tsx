@@ -73,8 +73,8 @@ const CreateWorkshopModal = ({
       setMaxPlaces(initialData.technicalDetails?.maxPlaces?.toString() || "");
       setDefaultLocation(initialData.technicalDetails?.defaultLocation || "");
 
-      if (Array.isArray(initialData.executionDays) && initialData.executionDays.length > 0 && typeof initialData.executionDays[0] === 'object') {
-        setSchedule(initialData.executionDays as any);
+      if (Array.isArray(initialData.executionDays) && initialData.executionDays.length > 0) {
+        setSchedule(initialData.executionDays);
       } else {
         setSchedule([]);
       }
@@ -137,9 +137,9 @@ const CreateWorkshopModal = ({
       }
       onWorkshopCreated(result);
       onClose();
-    } catch (err: any) {
+    } catch (err) {
       setError(
-        "Error saving workshop. Check the data."
+        (err as { response?: { data?: { error?: string } } }).response?.data?.error || "Error saving workshop. Check the data."
       );
     } finally {
       setLoading(false);

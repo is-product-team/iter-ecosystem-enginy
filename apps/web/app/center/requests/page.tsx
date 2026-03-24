@@ -177,8 +177,8 @@ export default function RequestsPage() {
       cancelEdit(); // Close form
       router.refresh();
 
-    } catch (err: any) {
-      setError(err.message || 'Error sending request.');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Error sending request.');
     } finally {
       setSubmitting(false);
     }

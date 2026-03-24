@@ -21,7 +21,7 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
     }));
 
     res.json(stats);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtener estadísticas de estados' });
   }
 };
@@ -45,7 +45,7 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
     })).sort((a: any, b: any) => b.total_solicitudes - a.total_solicitudes);
 
     res.json(stats);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtener talleres populares' });
   }
 };
@@ -61,7 +61,7 @@ export const getRecentActivity = async (req: Request, res: Response) => {
       include: { user: true }
     });
     res.json(logs);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtener actividad reciente' });
   }
 };
@@ -77,7 +77,7 @@ export const cleanupLogs = async (req: Request, res: Response) => {
       }
     });
     res.json({ success: true, deletedCount: result.count });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al limpiar logs' });
   }
 };
@@ -107,8 +107,8 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
       res.json({ processed: results.length, active_risks: results.filter(r => r.riskLevel === 'CRITICAL' || r.riskLevel === 'HIGH') });
     }
 
-  } catch (error) {
-    console.error("Error in risk analysis:", error);
+  } catch (_error) {
+    console.error("Error in risk analysis:", _error);
     res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
   }
 };
@@ -152,8 +152,8 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
     });
 
     res.json(monitoring);
-  } catch (error) {
-    console.error("Error monitoring Phase 2:", error);
+  } catch (_error) {
+    console.error("Error monitoring Phase 2:", _error);
     res.status(500).json({ error: 'Error al obtenir estadístiques de monitorització.' });
   }
 };

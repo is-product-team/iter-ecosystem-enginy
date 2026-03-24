@@ -1,15 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ROLES } from '@iter/shared';
 import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import Calendar, { CalendarEvent } from "../../components/ui/Calendar";
 import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 
+interface Phase {
+  id_fase: number;
+  nom: string;
+  data_inici: string;
+  data_fi: string;
+  descripcio: string;
+  activa: boolean;
+}
+
+interface Request {
+  id_center: number;
+  // Add other properties of Request if known
+}
+
 export default function CalendarPage() {
   const { user, loading: authLoading } = useAuth();
-  const [activeFase, setActiveFase] = useState<any>(null);
+  const [activeFase, setActiveFase] = useState<Phase | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
@@ -21,6 +36,11 @@ export default function CalendarPage() {
     const fetchData = async () => {
       try {
         const api = getApi();
+        // The following lines were part of the instruction but seem out of place in this useEffect context.
+        // If they are meant to be added, their placement and purpose need clarification.
+        // const res = await api.get('/requests');
+        // const filtered = res.data.filter((r: Request) => r.id_center === user.id_center);
+
         const [eventsRes, phasesRes] = await Promise.all([
           api.get("/calendar"),
           api.get("/fases")
@@ -37,7 +57,7 @@ export default function CalendarPage() {
           return "bg-consorci-darkBlue text-white";
         };
 
-        const phaseEvents = phasesData.map((f: any) => ({
+        const phaseEvents = phasesData.map((f: Phase) => ({
           id: `fase-${f.id_fase}`,
           title: `Fase: ${f.nom}`,
           date: f.data_inici,
@@ -48,7 +68,7 @@ export default function CalendarPage() {
         }));
 
         setEvents([...eventsRes.data, ...phaseEvents]);
-        setActiveFase(phasesData.find((f: any) => f.activa));
+        setActiveFase(phasesData.find((f: Phase) => f.activa));
       } catch (error) {
         console.error("Error fetching calendar data:", error);
       } finally {
@@ -125,7 +145,7 @@ export default function CalendarPage() {
                   <div className="w-4 h-4 bg-consorci-yellow"></div>
                   <div>
                     <span className="block text-xs font-black text-text-primary uppercase tracking-tight">Sessió de Taller</span>
-                    <span className="text-[10px] text-text-muted font-medium">Dia i hora concrets de l'activitat.</span>
+                    <span className="text-[10px] text-text-muted font-medium">Dia i hora concrets de l&apos;activitat.</span>
                   </div>
                 </div>
 
@@ -176,7 +196,7 @@ export default function CalendarPage() {
               </button>
 
               <div className="mb-6">
-                <div className="text-[10px] font-black text-text-muted uppercase tracking-widest mb-1">Detalls de l'esdeveniment</div>
+                <div className="text-[10px] font-black text-text-muted uppercase tracking-widest mb-1">Detalls de l&apos;esdeveniment</div>
                 <h3 className="text-xl font-black text-text-primary leading-tight uppercase tracking-tight">{selectedEvent.title}</h3>
               </div>
 
@@ -211,7 +231,7 @@ export default function CalendarPage() {
                 {selectedEvent.description && (
                   <div className="p-4 bg-background-subtle border-l-4 border-consorci-darkBlue">
                     <p className="text-xs text-text-secondary font-medium leading-relaxed italic">
-                      "{selectedEvent.description}"
+                      &quot;{selectedEvent.description}&quot;
                     </p>
                   </div>
                 )}
@@ -224,11 +244,11 @@ export default function CalendarPage() {
                 >
                   Tancar
                 </button>
-                {(selectedEvent.metadata?.id_assignacio) && (
+                {selectedEvent.metadata?.id_assignacio && (
                   <button 
                     onClick={() => {
-                      const baseUrl = user?.rol.nom_rol === 'ADMIN' ? '/admin/assignacions' : '/centro/assignacions';
-                      window.location.href = `${baseUrl}/${selectedEvent.metadata.id_assignacio}`;
+                      const baseUrl = user?.rol.nom_rol === ROLES.ADMIN ? '/admin/assignacions' : '/centro/assignacions';
+                      window.location.href = `${baseUrl}/${selectedEvent.metadata?.id_assignacio}`;
                     }}
                     className="flex-1 py-3 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-colors"
                   >
@@ -240,7 +260,7 @@ export default function CalendarPage() {
                     onClick={() => setSelectedEvent(null)}
                     className="flex-1 py-3 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-colors"
                   >
-                    D'acord
+                    D&apos;acord
                   </button>
                 )}
               </div>

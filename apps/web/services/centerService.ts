@@ -16,7 +16,7 @@ const centerService = {
   getAll: async (): Promise<Center[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: Center[], meta: any }>("/centers");
+      const response = await api.get<{ data: Center[], meta: unknown }>("/centers");
       return response.data.data;
     } catch (error) {
       console.error("Error en centerService.getAll:", error);
@@ -32,9 +32,9 @@ const centerService = {
     try {
       const response = await api.post("/centers", centroData);
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error en centerService.create:", error);
-      const errorMessage = error.response?.data?.message || "No se pudo crear el centro";
+      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "No se pudo crear el centro";
       throw new Error(errorMessage);
     }
   },
@@ -51,9 +51,9 @@ const centerService = {
       // I'll implement what's available and assume more might be needed or added.
       const response = await api.patch(`/centers/${id}`, centroData);
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error en centerService.update:", error);
-      const errorMessage = error.response?.data?.message || "No se pudo actualizar el centro";
+      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "No se pudo actualizar el centro";
       throw new Error(errorMessage);
     }
   },
@@ -65,9 +65,9 @@ const centerService = {
     const api = getApi();
     try {
       await api.delete(`/centers/${id}`);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error en centerService.delete:", error);
-      const errorMessage = error.response?.data?.message || "No se pudo eliminar el centro";
+      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "No se pudo eliminar el centro";
       throw new Error(errorMessage);
     }
   },

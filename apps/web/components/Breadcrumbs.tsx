@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { THEME } from '@iter/shared';
 
 const Breadcrumbs: React.FC = () => {
   const pathname = usePathname();

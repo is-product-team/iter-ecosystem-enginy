@@ -13,11 +13,24 @@ export interface Teacher {
   };
 }
 
+interface BackendTeacher {
+  id_professor: number;
+  nom: string;
+  contacte: string;
+  id_center: number;
+  user?: {
+    id_user: number;
+    email: string;
+    nom_complet: string;
+    url_foto: string | null;
+  };
+}
+
 const teacherService = {
   getAll: async (): Promise<Teacher[]> => {
     const api = getApi();
-    const response = await api.get<any[]>("/teachers");
-    return response.data.map(t => ({
+    const response = await api.get<BackendTeacher[]>("/teachers");
+    return response.data.map((t: BackendTeacher) => ({
       id_teacher: t.id_professor,
       name: t.nom,
       contact: t.contacte,
@@ -32,8 +45,8 @@ const teacherService = {
   },
   getByCenter: async (idCenter: number): Promise<Teacher[]> => {
     const api = getApi();
-    const response = await api.get<any[]>(`/teachers/centre/${idCenter}`);
-    return response.data.map(t => ({
+    const response = await api.get<BackendTeacher[]>(`/teachers/centre/${idCenter}`);
+    return response.data.map((t: BackendTeacher) => ({
       id_teacher: t.id_professor,
       name: t.nom,
       contact: t.contacte,
@@ -58,7 +71,12 @@ const teacherService = {
   },
   delete: async (id: number): Promise<void> => {
     const api = getApi();
-    await api.delete(`/teachers/${id}`);
+    try {
+      await api.delete(`/teachers/${id}`);
+    } catch (error) {
+      console.error("Error in teacherService.delete:", error);
+      throw error;
+    }
   }
 };
 

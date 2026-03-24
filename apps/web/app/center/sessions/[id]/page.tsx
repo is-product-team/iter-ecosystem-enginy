@@ -9,12 +9,25 @@ import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 
+interface AssignacioDetall {
+  taller?: { titol: string };
+  prof1?: { nom: string };
+  prof2?: { nom: string };
+  sessions?: {
+    id_sessio: number;
+    data_sessio: string;
+    hora_inici?: string;
+    hora_fi?: string;
+    staff?: { id_usuari: number; usuari?: { nom_complet: string } }[];
+  }[];
+}
+
 export default function SessionManagementPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [user, setUser] = useState<User | null>(null);
-  const [assignacio, setAssignacio] = useState<any>(null);
+  const [assignacio, setAssignacio] = useState<AssignacioDetall | null>(null);
   const [loading, setLoading] = useState(true);
-  const [allProfessors, setAllProfessors] = useState<any[]>([]);
+  const [allProfessors, setAllProfessors] = useState<{ id_usuari: number; nom: string }[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -97,7 +110,13 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
-            {assignacio.sessions?.map((sessio: any, idx: number) => (
+            {assignacio.sessions?.map((sessio: { 
+              id_sessio: number; 
+              data_sessio: string; 
+              hora_inici?: string; 
+              hora_fi?: string; 
+              staff?: { id_usuari: number; usuari?: { nom_complet: string } }[] 
+            }, idx: number) => (
             <div key={sessio.id_sessio} className="bg-white border border-gray-200 p-6 flex flex-col gap-4 group hover:border-[#4197CB] transition-all shadow-sm">
                 <div className="flex justify-between items-start">
                     <div className="flex flex-col">
@@ -114,7 +133,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                 <div className="border-t border-gray-50 pt-4 flex flex-col gap-3">
                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">SPECIFIC TEACHING TEAM</span>
                     <div className="flex flex-wrap gap-2 min-h-[32px]">
-                        {sessio.staff?.map((sp: any) => (
+                        {sessio.staff?.map((sp: { id_usuari: number; usuari?: { nom_complet: string } }) => (
                         <div key={sp.id_usuari} className="flex items-center gap-2 bg-[#F8FAFC] border border-gray-100 pl-2 pr-1 py-1 group/chip">
                             <span className="text-[10px] font-bold text-[#00426B] uppercase">{sp.usuari?.nom_complet}</span>
                             <button 
@@ -143,7 +162,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                     defaultValue=""
                     >
                     <option value="" disabled>+ Modify teacher for day</option>
-                    {allProfessors?.map((p: any) => (
+                    {allProfessors?.map((p: { id_usuari: number; nom: string }) => (
                         <option key={p.id_usuari} value={p.id_usuari}>{p.nom} (TEACHER)</option>
                     ))}
                     </select>

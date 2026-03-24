@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService from '@/services/assignmentService';
 import getApi from '@/services/api';
@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 export default function AssignmentEvaluationsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [user, setUser] = useState<User | null>(null);
-    const [assignment, setAssignment] = useState<any>(null);
+    const [assignment, setAssignment] = useState<Record<string, unknown> | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
@@ -70,7 +70,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                                 <p className="text-sm text-gray-400 italic">No enrollments found for this assignment.</p>
                             </div>
                         ) : (
-                            assignment.enrollments.map((ins: any) => (
+                            assignment.enrollments.map((ins: Record<string, unknown>) => (
                                 <div
                                     key={ins.id_enrollment}
                                     className="px-8 py-6 flex justify-between items-center hover:bg-gray-50 transition-colors"
@@ -113,7 +113,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                 <div className="mt-8 p-6 bg-gray-100 border-l-4 border-black text-gray-600 text-xs font-bold">
                     <p className="uppercase tracking-widest mb-1">Evaluation Instructions</p>
                     <p className="font-normal leading-relaxed">
-                        Remember that the competence evaluation is an indispensable requirement for the certification of the student's educational attention. You must value both technical and transversal competences.
+                        Remember that the competence evaluation is an indispensable requirement for the certification of the student&apos;s educational attention. You must value both technical and transversal competences.
                     </p>
                 </div>
             </div>

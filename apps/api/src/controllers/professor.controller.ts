@@ -30,7 +30,7 @@ export const getTeachers = async (req: Request, res: Response) => {
       }
     });
     res.json(teachers);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtener profesores' });
   }
 };
@@ -94,14 +94,13 @@ export const createTeacher = async (req: Request, res: Response) => {
 
 export const updateTeacher = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { nom, contacte, id_center } = req.body;
   try {
     const professor = await prisma.teacher.update({
       where: { id_teacher: parseInt(id as string) },
       data: req.body
     });
     res.json(professor);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al actualizar profesor' });
   }
 };
@@ -113,7 +112,7 @@ export const deleteTeacher = async (req: Request, res: Response) => {
       where: { id_teacher: parseInt(id as string) }
     });
     res.json({ message: 'Profesor eliminado' });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al eliminar profesor' });
   }
 };

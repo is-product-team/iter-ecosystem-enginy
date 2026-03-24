@@ -87,7 +87,7 @@ export default function PhaseManagementPage() {
               <h3 className="font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase text-[10px] tracking-widest mb-1">Panell de Control Temporal</h3>
               <p className="text-sm text-text-secondary font-medium leading-relaxed">
                 Cada fase habilita funcionalitats específiques per als coordinadors de centre.
-                Pots activar una fase per forçar la transició de l'aplicació i provar els fluxos de treball.
+                Pots activar una fase per forçar l&apos;aplicació i provar els fluxos de treball.
               </p>
             </div>
           </div>
@@ -176,11 +176,11 @@ export default function PhaseManagementPage() {
                         : (fase.activa ? 'Fase Activada' : 'Activar aquesta Fase')
                       }
                     </button>
-                    {!fase.activa && (
-                      <p className="mt-3 text-[9px] text-text-muted font-bold uppercase text-center tracking-tighter">
-                        L'activació és immediata
-                      </p>
-                    )}
+                      {!fase.activa && (
+                        <p className="mt-3 text-[9px] text-text-muted font-bold uppercase text-center tracking-tighter">
+                          L&apos;activació és immediata
+                        </p>
+                      )}
                   </div>
                 </div>
               </div>

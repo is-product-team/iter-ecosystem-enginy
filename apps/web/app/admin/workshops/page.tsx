@@ -39,6 +39,21 @@ export default function WorkshopAdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSector, setSelectedSector] = useState("All sectors");
   const [selectedModality, setSelectedModality] = useState("All modalities");
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    setCurrentPage(1);
+  };
+
+  const handleSectorChange = (val: string) => {
+    setSelectedSector(val);
+    setCurrentPage(1);
+  };
+
+  const handleModalityChange = (val: string) => {
+    setSelectedModality(val);
+    setCurrentPage(1);
+  };
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -69,10 +84,15 @@ export default function WorkshopAdminPage() {
   }, []);
 
   useEffect(() => {
-    if (user && user.rol.nom_rol === 'ADMIN') {
-      setLoading(true);
-      fetchWorkshops().finally(() => setLoading(false));
-    }
+    let isMounted = true;
+    const init = async () => {
+      if (user && user.rol.nom_rol === ROLES.ADMIN) {
+        await fetchWorkshops();
+      }
+      if (isMounted) setLoading(false);
+    };
+    init();
+    return () => { isMounted = false; };
   }, [fetchWorkshops, user]);
 
   const filteredWorkshops = useMemo(() => {
@@ -84,9 +104,9 @@ export default function WorkshopAdminPage() {
     });
   }, [workshops, searchQuery, selectedSector, selectedModality]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedSector, selectedModality]);
+  // useEffect(() => {
+  //   setCurrentPage(1);
+  // }, [searchQuery, selectedSector, selectedModality]);
 
   const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
   const paginatedWorkshops = filteredWorkshops.slice(
@@ -176,7 +196,7 @@ export default function WorkshopAdminPage() {
               type="text"
               placeholder="Ex: Woodwork, Robotics..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary placeholder:text-text-muted transition-all"
             />
             <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,7 +210,7 @@ export default function WorkshopAdminPage() {
           <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Filter by sector</label>
           <select 
             value={selectedSector}
-            onChange={(e) => setSelectedSector(e.target.value)}
+            onChange={(e) => handleSectorChange(e.target.value)}
             className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary appearance-none"
           >
             {uniqueSectors.map(s => (
@@ -204,7 +224,7 @@ export default function WorkshopAdminPage() {
           <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Filter by modality</label>
           <select 
             value={selectedModality}
-            onChange={(e) => setSelectedModality(e.target.value)}
+            onChange={(e) => handleModalityChange(e.target.value)}
             className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary appearance-none"
           >
             {uniqueModalities.map(m => (

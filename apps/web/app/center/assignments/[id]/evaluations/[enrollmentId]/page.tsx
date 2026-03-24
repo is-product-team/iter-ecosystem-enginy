@@ -3,20 +3,28 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService from '@/services/assignmentService';
 import { evaluationService } from '@/services/evaluationService';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
+import { Enrollment } from '@/services/assignmentService';
 import ConfirmDialog from '@/components/ConfirmDialog';
+
+interface Competence {
+    id_competence: number;
+    name: string;
+    description: string;
+    type: 'TECNICA' | 'TRANSVERSAL';
+}
 
 export default function StudentEvaluationFormPage({ params }: { params: Promise<{ id: string, enrollmentId: string }> }) {
     const { id, enrollmentId } = use(params);
     const [user, setUser] = useState<User | null>(null);
-    const [enrollment, setEnrollment] = useState<any>(null);
-    const [competencies, setCompetencies] = useState<any[]>([]);
+    const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
+    const [competencies, setCompetencies] = useState<Competence[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [analyzing, setAnalyzing] = useState(false);
@@ -71,7 +79,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                     return;
                 }
 
-                const ins = assignment.enrollments?.find((i: any) => i.id_enrollment === parseInt(enrollmentId));
+                const ins = assignment.enrollments?.find((i: Enrollment) => i.id_enrollment === parseInt(enrollmentId));
                 if (!ins) {
                     toast.error('Enrollment not found.');
                     router.push(`/center/assignments/${id}/evaluations`);
@@ -87,7 +95,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                         attendancePercentage: evalData.attendance_percentage || 100,
                         delayCount: evalData.delay_count || 0,
                         observations: evalData.observations || '',
-                        competencies: evalData.competencies?.map((c: any) => ({
+                        competencies: evalData.competencies?.map((c: { id_competence: number; score: number }) => ({
                             id_competence: c.id_competence,
                             score: c.score
                         })) || []
@@ -96,7 +104,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                     // Initialize competencies with 3 (sufficient)
                     setForm(prev => ({
                         ...prev,
-                        competencies: resComp.data.map((c: any) => ({ 
+                        competencies: resComp.data.map((c: Competence) => ({ 
                             id_competence: c.id_competence, 
                             score: 3 
                         }))
@@ -128,15 +136,16 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
             return;
         }
 
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
-        recognition.lang = 'ca-ES'; // O es-ES según prefiera
+        recognition.lang = 'ca-ES';
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
         recognition.onstart = () => setIsListening(true);
         recognition.onend = () => setIsListening(false);
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event: { results: { [key: number]: { [key: number]: { transcript: string } } } }) => {
             const transcript = event.results[0][0].transcript;
             setForm(prev => ({ ...prev, observations: prev.observations + " " + transcript }));
         };

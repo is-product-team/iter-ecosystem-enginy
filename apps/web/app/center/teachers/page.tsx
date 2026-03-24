@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import teacherService, { Teacher } from '@/services/teacherService';
 import Loading from '@/components/Loading';
@@ -90,8 +90,8 @@ export default function TeachersCRUD() {
       setEditingTeacher(null);
       setFormData({ name: '', contact: '', password: '' });
       loadTeachers();
-    } catch (err: any) {
-      toast.error(err.message || "Error saving teacher.");
+    } catch (err: unknown) {
+      toast.error((err as Error).message || "Error saving teacher.");
     }
   };
 
@@ -183,12 +183,12 @@ export default function TeachersCRUD() {
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
                           <Avatar 
-                            url={p.usuari?.url_foto} 
+                            url={p.user?.url_foto} 
                             name={p.name} 
-                            id={p.usuari?.id_user || p.id_teacher} 
+                            id={p.user?.id_user || p.id_teacher} 
                             type="usuari" 
                             size="md"
-                            email={p.usuari?.email}
+                            email={p.user?.email}
                           />
                           <div>
                             <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{p.name}</div>
@@ -256,9 +256,9 @@ export default function TeachersCRUD() {
               {editingTeacher && (
                 <div className="p-8 bg-gray-50/50 border-b border-gray-50 flex flex-col items-center gap-4">
                   <Avatar 
-                    url={editingTeacher.usuari?.url_foto} 
+                    url={editingTeacher.user?.url_foto} 
                     name={editingTeacher.name} 
-                    id={editingTeacher.usuari?.id_user || editingTeacher.id_teacher} 
+                    id={editingTeacher.user?.id_user || editingTeacher.id_teacher} 
                     type="usuari" 
                     size="xl"
                     className="shadow-xl ring-4 ring-white"
@@ -270,13 +270,13 @@ export default function TeachersCRUD() {
                       className="hidden" 
                       accept="image/*"
                       onChange={async (e) => {
-                        if (e.target.files?.[0] && editingTeacher.usuari?.id_user) {
+                        if (e.target.files?.[0] && editingTeacher.user?.id_user) {
                           const file = e.target.files[0];
                           const formData = new FormData();
                           formData.append('foto', file);
                           try {
                             const api = getApi();
-                            const res = await api.post(`/upload/perfil/usuari/${editingTeacher.usuari.id_user}`, formData, {
+                            const res = await api.post(`/upload/perfil/usuari/${editingTeacher.user.id_user}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
                             toast.success("Photo updated.");
@@ -284,12 +284,12 @@ export default function TeachersCRUD() {
                             // Update local state for immediate feedback
                             setEditingTeacher({ 
                               ...editingTeacher, 
-                              usuari: { ...editingTeacher.usuari, url_foto: res.data.url_foto } 
-                            });
+                              user: { ...editingTeacher.user, url_foto: res.data.url_foto } 
+                            } as Teacher);
                           } catch (err) {
                             toast.error("Error uploading photo.");
                           }
-                        } else if (!editingTeacher.usuari?.id_user) {
+                        } else if (!editingTeacher.user?.id_user) {
                           toast.error("Cannot upload photo to a teacher without a linked user.");
                         }
                       }}
