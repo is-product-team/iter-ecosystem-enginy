@@ -85,7 +85,7 @@ export const createRequest = async (req: Request, res: Response) => {
   }
 
   // --- VERIFICACIÓN DE FASE ---
-  const phaseStatus = await isPhaseActive(PHASES.SOLICITUD);
+  const phaseStatus = await isPhaseActive(PHASES.APPLICATION);
   if (!phaseStatus.isActive) {
     let errorMessage = 'El període de sol·licitud de tallers no està actiu.';
     if (!phaseStatus.phaseActiveFlag) {
@@ -187,7 +187,7 @@ export const updateRequest = async (req: Request, res: Response) => {
     // --- VERIFICACIÓN DE FASE ---
     // Si NO es admin, verificamos la fase. Los admins pueden editar siempre.
     if (role !== 'ADMIN') {
-      const phaseStatus = await isPhaseActive(PHASES.SOLICITUD);
+      const phaseStatus = await isPhaseActive(PHASES.APPLICATION);
       if (!phaseStatus.isActive) {
         let errorMessage = 'El període de sol·licitud de tallers no està actiu.';
         if (!phaseStatus.phaseActiveFlag) {

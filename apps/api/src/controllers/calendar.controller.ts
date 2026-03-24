@@ -9,7 +9,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
 
     // 1. Obtener el profesor asociado al usuario (si es rol profesor) de forma directa por ID
     let professorId: number | null = null;
-    if (user.role === ROLES.PROFESSOR) {
+    if (user.role === ROLES.TEACHER) {
       const professor = await prisma.teacher.findUnique({
         where: { id_user: user.userId }
       });
@@ -47,7 +47,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
             where: assignmentDateFilter, 
             include: { workshop: true, center: true, sessions: { include: { staff: { include: { user: true } } } } } 
           })
-        : user.role === ROLES.COORDINADOR
+        : user.role === ROLES.COORDINATOR
         ? prisma.assignment.findMany({ 
             where: { ...assignmentDateFilter, id_center: user.centreId }, 
             include: { 
@@ -63,7 +63,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
               }
             } 
           })
-        : user.role === ROLES.PROFESSOR
+        : user.role === ROLES.TEACHER
         ? prisma.assignment.findMany({ 
             where: { 
               ...assignmentDateFilter, 
@@ -111,14 +111,14 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
     // Mapeo de Assignments y sus Sessions
     assignments.forEach((a: any) => {
       // La barra de rango del workshop (Azul claro) - Ocultar para profesores para reducir ruido
-      if (a.data_inici && a.data_fi && user.role !== ROLES.PROFESSOR) {
+      if (a.data_inici && a.data_fi && user.role !== ROLES.TEACHER) {
         const startDate = new Date(a.data_inici);
         const endDate = new Date(a.data_fi);
         
         if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
           events.push({
             id: `assign-${a.id_assignment}`,
-            title: user.role === ROLES.COORDINADOR ? `Workshop: ${a.workshop?.titol}` : `${a.workshop?.titol}`,
+            title: user.role === ROLES.COORDINATOR ? `Workshop: ${a.workshop?.titol}` : `${a.workshop?.titol}`,
             date: startDate.toISOString(),
             endDate: endDate.toISOString(),
             type: 'assignment',
@@ -138,7 +138,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
           const isReferentGeneral = a.teachers?.some((t: any) => t.id_user === user.userId);
           const isSessionStaff = s.staff?.some((sp: any) => sp.id_user === user.userId);
           
-          if (user.role === ROLES.PROFESSOR && !isReferentGeneral && !isSessionStaff) {
+          if (user.role === ROLES.TEACHER && !isReferentGeneral && !isSessionStaff) {
             return;
           }
 
