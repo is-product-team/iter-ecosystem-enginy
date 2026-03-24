@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME, PHASES, ROLES } from '@iter/shared';
+import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService, { Assignment } from '@/services/assignmentService';
 import phaseService, { Phase } from '@/services/phaseService';
@@ -38,27 +38,42 @@ export default function AssignmentsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const currentUser = getUser();
-    // Support both English and legacy Catalan role property names
-    const roleName = currentUser?.rol?.nom_rol || (currentUser as any)?.role?.name;
-    
-    if (!currentUser || roleName !== ROLES.COORDINATOR) {
-      router.push('/login');
-      return;
-    }
-    setUser(currentUser);
+    let isMounted = true;
+    const init = async () => {
+      const currentUser = getUser();
+      if (!isMounted) return;
 
-    // Fetch assignments
-    if (currentUser.id_center) {
-      Promise.all([
-        assignmentService.getByCenter(currentUser.id_center),
-        phaseService.getAll()
-      ]).then(([resAssig, resPhases]) => {
-        setAssignments(resAssig);
-        setPhases(resPhases);
-      }).finally(() => setLoading(false));
-    }
-  }, []);
+      if (!currentUser || currentUser.rol.nom_rol !== ROLES.COORDINATOR) {
+        router.push('/login');
+        return;
+      }
+      
+      setUser(currentUser);
+
+      // Fetch assignments
+      if (currentUser.id_center) {
+        try {
+          const [resAssig, resPhases] = await Promise.all([
+            assignmentService.getByCenter(currentUser.id_center),
+            phaseService.getAll()
+          ]);
+          if (isMounted) {
+            setAssignments(resAssig);
+            setPhases(resPhases);
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          if (isMounted) setLoading(false);
+        }
+      } else {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    init();
+    return () => { isMounted = false; };
+  }, [router]);
 
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find(f => f.name === phaseName);
@@ -130,7 +145,7 @@ export default function AssignmentsPage() {
             </div>
             <button 
               onClick={() => { setSearchQuery(""); setStatusFilter("All statuses"); }}
-              className="px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#00426B] hover:bg-[#EAEFF2] transition-all border-2 border-[#00426B]"
+              className="px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#00426B] hover:bg-[#EAEFF2] transition-all border-2 border-transparent hover:border-[#00426B]"
             >
               Clear
             </button>

@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME, REQUEST_STATUSES } from '@iter/shared';
+import { REQUEST_STATUSES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import workshopService, { Workshop } from '@/services/workshopService';
 import requestService, { Request } from '@/services/requestService';
@@ -20,7 +20,7 @@ export default function AdminRequestsPage() {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
   const [centers, setCenters] = useState<Center[]>([]);
-  const [phases, setPhases] = useState<any[]>([]);
+  const [phases, setPhases] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -128,11 +128,14 @@ export default function AdminRequestsPage() {
       onConfirm: async () => {
         setLoading(true);
         try {
-          const result = await assignmentService.runTetris();
+          const result = await assignmentService.runTetris() as { assignmentsCreated: number };
           toast.success(`Assignment completed: ${result.assignmentsCreated} new assignments.`);
           await fetchData();
-        } catch (err: any) {
-          toast.error('Error running Tetris: ' + (err.response?.data?.error || err.message));
+        } catch (err: unknown) {
+          const errorMessage = (err as { response?: { data?: { error?: string } }, message?: string })?.response?.data?.error 
+            || (err as Error).message 
+            || 'Unknown error';
+          toast.error('Error running Tetris: ' + errorMessage);
         } finally {
           setLoading(false);
         }
@@ -359,8 +362,8 @@ export default function AdminRequestsPage() {
                           <td className="px-6 py-4 text-right">
                             {r.status === REQUEST_STATUSES.REJECTED ? (
                               <span className="text-[9px] font-bold text-gray-300 uppercase italic">Rejected</span>
-                            ) : (r as any).assignments && (r as any).assignments.length > 0 ? (
-                              <span className="text-[9px] font-bold text-gray-300 uppercase italic">Assigned</span>
+                            ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
+                                <span className="text-[9px] font-bold text-gray-300 uppercase italic">Assigned</span>
                             ) : (
                               <div className="flex justify-end gap-2">
                                 <button

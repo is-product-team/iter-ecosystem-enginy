@@ -11,9 +11,9 @@ import Pagination from "@/components/Pagination";
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
-  const [assignacions, setAssignacions] = useState<any[]>([]);
+  const [assignacions, setAssignacions] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAssignacio, setSelectedAssignacio] = useState<any | null>(null);
+  const [selectedAssignacio, setSelectedAssignacio] = useState<Assignment | null>(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [notificationData, setNotificationData] = useState({
     documentName: '',
@@ -50,7 +50,7 @@ export default function DocumentVerificationPage() {
     }
   };
 
-  const handleOpenNotification = (assignacio: any, docName: string) => {
+  const handleOpenNotification = (assignacio: Assignment, docName: string) => {
     setSelectedAssignacio(assignacio);
     setNotificationData({
       ...notificationData,
@@ -159,7 +159,7 @@ export default function DocumentVerificationPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="space-y-2">
-                        {assig.enrollments?.map((ins: any) => (
+                        {assig.enrollments?.map((ins) => (
                           <div key={ins.id_enrollment} className="flex items-center justify-between gap-4 p-3 border border-gray-100 bg-gray-50/50 group">
                             <div className="flex flex-col gap-1 min-w-0">
                               <div className="text-xs font-bold text-gray-700 truncate">
@@ -279,7 +279,7 @@ export default function DocumentVerificationPage() {
               <div className="bg-blue-50 border-l-4 border-[#4197CB] p-4 text-blue-700">
                 <p className="text-[10px] font-black uppercase tracking-wider mb-1">Previsualització del missatge</p>
                 <div className="text-xs italic leading-relaxed">
-                  "{notificationData.greeting}, el document <span className="font-bold underline">{notificationData.documentName === 'Selecciona document' ? '[Document]' : notificationData.documentName}</span> del taller <span className="font-bold">{selectedAssignacio?.taller?.titol}</span> està malament {notificationData.comment}"
+                  &quot;{notificationData.greeting}, el document <span className="font-bold underline">{notificationData.documentName === 'Selecciona document' ? '[Document]' : notificationData.documentName}</span> del taller <span className="font-bold">{selectedAssignacio?.workshop?.title}</span> està malament {notificationData.comment}&quot;
                 </div>
               </div>
 
@@ -307,14 +307,14 @@ export default function DocumentVerificationPage() {
                       <option value="Selecciona document" disabled>Selecciona document...</option>
                       <option value="Acord Pedagògic">Acord Pedagògic</option>
                       <option value="Autorització de Mobilitat">Autorització de Mobilitat</option>
-                      <option value="Drets d'Imatge">Drets d'Imatge</option>
+                      <option value="Drets d'Imatge">Drets d&apos;Imatge</option>
                       <option value="Tota la documentació">Tota la documentació</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Comentari (Motiu de l'error)</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Comentari (Motiu de l&apos;error)</label>
                   <textarea
                     value={notificationData.comment}
                     onChange={(e) => setNotificationData({ ...notificationData, comment: e.target.value })}

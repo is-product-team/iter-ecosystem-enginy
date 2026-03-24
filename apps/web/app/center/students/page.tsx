@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 import studentService, { Student } from '@/services/studentService';
@@ -97,8 +97,8 @@ export default function StudentsCRUD() {
       setEditingStudent(null);
       setFormData({ name: '', surnames: '', idalu: '', course: '' });
       loadStudents();
-    } catch (err: any) {
-      toast.error(err.message || "Error saving student.");
+    } catch (err: unknown) {
+      toast.error((err as Error).message || "Error saving student.");
     }
   };
 
@@ -307,7 +307,7 @@ export default function StudentsCRUD() {
                             toast.success("Photo updated.");
                             loadStudents();
                             setEditingStudent({ ...editingStudent, url_foto: res.data.url_foto });
-                          } catch (err) {
+                          } catch (err: unknown) {
                             toast.error("Error uploading photo.");
                           }
                         }

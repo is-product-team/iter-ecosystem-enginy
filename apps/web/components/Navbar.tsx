@@ -1,38 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME, ROLES } from '@iter/shared';
-import notificationService, { Notificacio } from '@/services/notificationService';
-import { useEffect, useState, useRef } from 'react';
-import Avatar from './Avatar';
+import { ROLES } from '@iter/shared';
+import notificationService from '@/services/notificationService';
+import { useEffect, useState } from 'react';
 
-interface NavbarProps {
-  title?: string;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
+const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(false);
-
-  const checkScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 5);
-    }
-  };
-
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-    return () => window.removeEventListener('resize', checkScroll);
-  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -46,7 +25,6 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
       };
       fetchUnread();
 
-      // Refresh every 2 minutes
       const interval = setInterval(fetchUnread, 120000);
       return () => clearInterval(interval);
     }
@@ -63,17 +41,6 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
     return '/';
   };
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 200;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
-      setTimeout(checkScroll, 300);
-    }
-  };
-
   const navLinks = [
     { label: 'Home', path: getInicioPath(), show: true },
     { label: 'Notifications', path: '/center/notifications', show: true, isNotifications: true },
@@ -85,25 +52,26 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
     <div className="sticky top-0 z-50 bg-background-surface border-t-4 border-t-consorci-darkBlue border-b border-b-border-subtle">
       <div className="max-w-[1440px] mx-auto container-responsive">
         <div className="flex justify-between h-16">
-          {/* Logo & Brand Section */}
           <div className="flex items-center">
             <Link href={getInicioPath()} className="flex items-center">
-              <img 
+              <Image 
                 src="/logo.png" 
                 alt="Iter Logo" 
+                width={40}
+                height={40}
                 className="w-10 h-10 object-contain block dark:hidden" 
               />
-              <img 
+              <Image 
                 src="/logo-invers.png" 
                 alt="Iter Logo" 
+                width={40}
+                height={40}
                 className="w-10 h-10 object-contain hidden dark:block" 
               />
             </Link>
           </div>
 
-          {/* Navigation & User Section */}
           <div className="flex items-center">
-            {/* Nav Links */}
             <nav className="hidden md:flex items-center h-full mr-8">
               {navLinks.filter(link => link.show).map((link) => (
                 <Link
@@ -129,7 +97,6 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
               ))}
             </nav>
 
-            {/* User Info & Logout */}
             <div className="flex items-center border-l border-border-subtle pl-8 h-8 my-auto gap-6">
               <div className="flex flex-col items-end">
                 <span className="text-text-primary text-[10px] font-bold uppercase tracking-widest">
@@ -151,7 +118,6 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
       </div>
     </div>
   );
-
 };
 
 export default Navbar;

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import Loading from '@/components/Loading';
 
 export default function Home() {

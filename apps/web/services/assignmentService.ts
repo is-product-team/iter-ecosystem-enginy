@@ -35,7 +35,49 @@ export interface Assignment {
   teacher1?: { id_user: number; name: string };
   teacher2?: { id_user: number; name: string };
   enrollments?: Enrollment[];
-  checklist?: any[];
+  checklist?: unknown[];
+}
+
+interface BackendStudent {
+  id_student: number;
+  nom: string;
+  cognoms: string;
+  curs: string;
+  idalu: string;
+  url_foto?: string | null;
+}
+
+interface BackendEnrollment {
+  id_enrollment: number;
+  id_assignment: number;
+  id_student: number;
+  student: BackendStudent;
+  docs_status?: {
+    acord_pedagogic?: string;
+    validat_acord_pedagogic?: boolean;
+    autoritzacio_mobilitat?: string;
+    validat_autoritzacio_mobilitat?: boolean;
+    drets_imatge?: string;
+    validat_drets_imatge?: boolean;
+  };
+  evaluations?: unknown[];
+}
+
+interface BackendAssignment {
+  id_assignment: number;
+  id_request: number | null;
+  id_center: number;
+  id_workshop: number;
+  data_inici: string | null;
+  data_fi: string | null;
+  estat: string;
+  taller?: { titol: string; modalitat: string; places_maximes: number };
+  centre?: { nom: string };
+  peticio?: { alumnes_aprox: number };
+  prof1?: { id_user: number; nom: string };
+  prof2?: { id_user: number; nom: string };
+  enrollments?: BackendEnrollment[];
+  checklist?: unknown[];
 }
 
 const assignmentService = {
@@ -45,8 +87,8 @@ const assignmentService = {
   getByCenter: async (idCenter: number): Promise<Assignment[]> => {
     const api = getApi();
     try {
-      const response = await api.get<any[]>(`/assignments/centre/${idCenter}`);
-      return response.data.map((a: any) => ({
+      const response = await api.get<BackendAssignment[]>(`/assignments/centre/${idCenter}`);
+      return response.data.map((a: BackendAssignment) => ({
         id_assignment: a.id_assignment,
         id_request: a.id_request,
         id_center: a.id_center,
@@ -63,7 +105,7 @@ const assignmentService = {
         request: a.peticio ? { approxStudents: a.peticio.alumnes_aprox } : undefined,
         teacher1: a.prof1 ? { id_user: a.prof1.id_user, name: a.prof1.nom } : undefined,
         teacher2: a.prof2 ? { id_user: a.prof2.id_user, name: a.prof2.nom } : undefined,
-        enrollments: a.enrollments?.map((i: any) => ({
+        enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
           id_enrollment: i.id_enrollment,
           id_assignment: i.id_assignment,
           id_student: i.id_student,
@@ -76,18 +118,19 @@ const assignmentService = {
             url_foto: i.student.url_foto,
           },
           url_pedagogical_agreement: i.docs_status?.acord_pedagogic,
-          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic,
+          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
           url_mobility_authorization: i.docs_status?.autoritzacio_mobilitat,
-          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat,
+          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
           url_image_rights: i.docs_status?.drets_imatge,
-          validated_image_rights: i.docs_status?.validat_drets_imatge,
-          teacher_evaluation: i.evaluations?.length > 0,
+          validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
+          teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
         })),
         checklist: a.checklist,
       }));
     } catch (error) {
-      console.error("Error in assignmentService.getByCenter:", error);
-      throw error;
+      console.error(error);
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Error al carregar l'assignació";
+      throw new Error(errorMessage);
     }
   },
 
@@ -97,7 +140,7 @@ const assignmentService = {
   createFromRequest: async (idRequest: number): Promise<Assignment> => {
     const api = getApi();
     try {
-      const response = await api.post<any>("/assignments", { idRequest });
+      const response = await api.post<BackendAssignment>("/assignments", { idRequest });
       const a = response.data;
       return {
         id_assignment: a.id_assignment,
@@ -124,10 +167,10 @@ const assignmentService = {
   /**
    * Updates a checklist item.
    */
-  updateChecklistItem: async (idItem: number, completed: boolean, evidenceUrl?: string): Promise<any> => {
+  updateChecklistItem: async (idItem: number, completed: boolean, evidenceUrl?: string): Promise<unknown> => {
     const api = getApi();
     try {
-      const response = await api.patch(`/assignments/checklist/${idItem}`, { completat: completed, url_evidencia: evidenceUrl });
+      const response = await api.patch<{ data: unknown }>(`/assignments/checklist/${idItem}`, { completat: completed, url_evidencia: evidenceUrl });
       return response.data;
     } catch (error) {
       console.error("Error in assignmentService.updateChecklistItem:", error);
@@ -138,10 +181,10 @@ const assignmentService = {
   /**
    * Runs the Tetris algorithm for bulk assignment.
    */
-  runTetris: async (): Promise<any> => {
+  runTetris: async (): Promise<{ assignmentsCreated: number }> => {
     const api = getApi();
     try {
-      const response = await api.post("/assignments/tetris");
+      const response = await api.post<{ assignmentsCreated: number }>("/assignments/tetris");
       return response.data;
     } catch (error) {
       console.error("Error in assignmentService.runTetris:", error);
@@ -155,8 +198,8 @@ const assignmentService = {
   getAll: async (): Promise<Assignment[]> => {
     const api = getApi();
     try {
-      const response = await api.get<any[]>("/assignments");
-      return response.data.map((a: any) => ({
+      const response = await api.get<BackendAssignment[]>("/assignments");
+      return response.data.map((a: BackendAssignment) => ({
         id_assignment: a.id_assignment,
         id_request: a.id_request,
         id_center: a.id_center,
@@ -173,7 +216,7 @@ const assignmentService = {
         request: a.peticio ? { approxStudents: a.peticio.alumnes_aprox } : undefined,
         teacher1: a.prof1 ? { id_user: a.prof1.id_user, name: a.prof1.nom } : undefined,
         teacher2: a.prof2 ? { id_user: a.prof2.id_user, name: a.prof2.nom } : undefined,
-        enrollments: a.enrollments?.map((i: any) => ({
+        enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
           id_enrollment: i.id_enrollment,
           id_assignment: i.id_assignment,
           id_student: i.id_student,
@@ -186,12 +229,12 @@ const assignmentService = {
             url_foto: i.student.url_foto,
           },
           url_pedagogical_agreement: i.docs_status?.acord_pedagogic,
-          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic,
+          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
           url_mobility_authorization: i.docs_status?.autoritzacio_mobilitat,
-          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat,
+          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
           url_image_rights: i.docs_status?.drets_imatge,
-          validated_image_rights: i.docs_status?.validat_drets_imatge,
-          teacher_evaluation: i.evaluations?.length > 0,
+          validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
+          teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
         })),
         checklist: a.checklist,
       }));
@@ -207,7 +250,7 @@ const assignmentService = {
   getById: async (id: number): Promise<Assignment> => {
     const api = getApi();
     try {
-      const response = await api.get<any>(`/assignments/${id}`);
+      const response = await api.get<BackendAssignment>(`/assignments/${id}`);
       const a = response.data;
       return {
         id_assignment: a.id_assignment,
@@ -226,7 +269,7 @@ const assignmentService = {
         request: a.peticio ? { approxStudents: a.peticio.alumnes_aprox } : undefined,
         teacher1: a.prof1 ? { id_user: a.prof1.id_user, name: a.prof1.nom } : undefined,
         teacher2: a.prof2 ? { id_user: a.prof2.id_user, name: a.prof2.nom } : undefined,
-        enrollments: a.enrollments?.map((i: any) => ({
+        enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
           id_enrollment: i.id_enrollment,
           id_assignment: i.id_assignment,
           id_student: i.id_student,
@@ -239,12 +282,12 @@ const assignmentService = {
             url_foto: i.student.url_foto,
           },
           url_pedagogical_agreement: i.docs_status?.acord_pedagogic,
-          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic,
+          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
           url_mobility_authorization: i.docs_status?.autoritzacio_mobilitat,
-          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat,
+          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
           url_image_rights: i.docs_status?.drets_imatge,
-          validated_image_rights: i.validat_drets_imatge,
-          teacher_evaluation: i.evaluations?.length > 0,
+          validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
+          teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
         })),
         checklist: a.checklist,
       };
@@ -263,8 +306,9 @@ const assignmentService = {
       await api.post(`/assignments/${id}/inscripcions`, { ids_alumnes: studentIds });
       return assignmentService.getById(id);
     } catch (error) {
-      console.error("Error in assignmentService.updateEnrollments:", error);
-      throw error;
+      console.error(error);
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Error al carregar les assignacions";
+      throw new Error(errorMessage);
     }
   },
 
@@ -284,10 +328,10 @@ const assignmentService = {
   /**
    * Sends an error notification for a document.
    */
-  sendDocumentNotification: async (idAssignment: number, documentName: string, comment: string, greeting: string): Promise<any> => {
+  sendDocumentNotification: async (idAssignment: number, documentName: string, comment: string, greeting: string): Promise<unknown> => {
     const api = getApi();
     try {
-      const response = await api.post(`/assignments/${idAssignment}/document-notification`, { documentName, comment, greeting });
+      const response = await api.post<{ data: unknown }>(`/assignments/${idAssignment}/document-notification`, { documentName, comment, greeting });
       return response.data;
     } catch (error) {
       console.error("Error in assignmentService.sendDocumentNotification:", error);
@@ -298,10 +342,10 @@ const assignmentService = {
   /**
    * Validates a specific document within an enrollment.
    */
-  validateDocument: async (idEnrollment: number, field: string, valid: boolean): Promise<any> => {
+  validateDocument: async (idEnrollment: number, field: string, valid: boolean): Promise<unknown> => {
     const api = getApi();
     try {
-      const response = await api.patch(`/assignments/inscripcions/${idEnrollment}/validate`, { field, valid });
+      const response = await api.patch<{ data: unknown }>(`/assignments/inscripcions/${idEnrollment}/validate`, { field, valid });
       return response.data;
     } catch (error) {
       console.error("Error in assignmentService.validateDocument:", error);

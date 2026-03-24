@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import { evaluationService } from '@/services/evaluationService';
 import Pagination from "@/components/Pagination";
 import Loading from '@/components/Loading';
 
 export default function AdminQuestionnairesPage() {
-    const [models, setModels] = useState<any[]>([]);
+    const [models, setModels] = useState<{ id_model: string, titol: string, destinatari: string, _count?: { preguntes: number } }[]>([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
@@ -61,11 +60,11 @@ export default function AdminQuestionnairesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {models.length === 0 ? (
                         <div className="col-span-full bg-white p-20 border-2 border-dashed border-gray-100 text-center">
-                            <p className="text-gray-400 italic mb-6">No s'han creat models de qüestionari encara.</p>
+                            <p className="text-gray-400 italic mb-6">No s&apos;han creat models de qüestionari encara.</p>
                             <button onClick={() => router.push('/admin/questionaris/builder')} className="text-blue-900 font-black uppercase text-xs tracking-widest hover:underline">Començar ara</button>
                         </div>
                     ) : (
-                        paginatedModels.map((m: any) => (
+                        paginatedModels.map((m) => (
                             <div key={m.id_model} className="bg-white p-8 border shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between">
                                 <div>
                                     <div className="flex justify-between items-start mb-4">
@@ -107,7 +106,7 @@ export default function AdminQuestionnairesPage() {
                         <div>
                             <h4 className="text-sm font-black text-blue-900 uppercase tracking-tighter mb-2">Com funcionen els qüestionaris?</h4>
                             <p className="text-xs text-blue-800/80 leading-relaxed font-bold italic uppercase tracking-tighter">
-                                Els qüestionaris dinàmics es poden enviar als participants un cop finalitzada la fase d'execució. Les dades obtingues alimenten automàticament el Dashboard d'Avaluació per als administradors del Consorcí.
+                                Els qüestionaris dinàmics es poden enviar als participants un cop finalitzada la fase d&apos;execució. Les dades obtingues alimenten automàticament el Dashboard d&apos;Avaluació per als administradors del Consorcí.
                             </p>
                         </div>
                     </div>

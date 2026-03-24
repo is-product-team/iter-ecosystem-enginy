@@ -11,7 +11,7 @@ interface AvatarProps {
   email?: string | null;
 }
 
-export default function Avatar({ url, name, id, type, size = 'md', className = '', isCoordinator, email }: AvatarProps) {
+export default function Avatar({ url, name, size = 'md', className = '', isCoordinator, email }: AvatarProps) {
   const sizeClasses = {
     xs: 'w-6 h-6 text-[8px]',
     sm: 'w-8 h-8 text-[10px]',
@@ -31,6 +31,7 @@ export default function Avatar({ url, name, id, type, size = 'md', className = '
   return (
     <div className={`relative shrink-0 overflow-hidden bg-background-subtle text-text-primary flex items-center justify-center font-bold shadow-inner ${currentSize} ${className}`}>
       {showPhoto ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
         <img 
           src={fullUrl!} 
           alt={name} 

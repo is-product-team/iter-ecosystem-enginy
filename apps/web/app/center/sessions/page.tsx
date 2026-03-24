@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
@@ -12,11 +12,40 @@ import Pagination from '@/components/Pagination';
 
 type AssignmentMode = 'single' | 'whole';
 
+interface Sessio {
+  id_sessio: number | string;
+  data_sessio: string;
+  hora_inici?: string;
+  hora_fi?: string;
+  isPending?: boolean;
+  assignmentTitle?: string;
+  assignacioId?: number;
+  modality?: string;
+  referent1?: string;
+  referent2?: string;
+  staff?: { id_usuari?: number; id?: number; nom?: string; usuari?: { nom_complet: string } }[];
+  status?: string;
+}
+
+interface BackendAssignment {
+  id_assignacio: number;
+  taller?: { titol: string; modalitat: string };
+  prof1?: { usuari: { nom_complet: string } };
+  prof2?: { usuari: { nom_complet: string } };
+  sessions?: Sessio[];
+  estat: string;
+}
+
+interface Professor {
+  id_usuari: number;
+  nom: string;
+}
+
 export default function SessionsListPage() {
   const { user, loading: authLoading } = useAuth();
-  const [sessions, setSessions] = useState<any[]>([]);
-  const [assignacions, setAssignacions] = useState<any[]>([]); // For the dropdown
-  const [allProfessors, setAllProfessors] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<Sessio[]>([]);
+  const [assignacions, setAssignacions] = useState<BackendAssignment[]>([]); // For the dropdown
+  const [allProfessors, setAllProfessors] = useState<Professor[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Search & Filter State
@@ -54,10 +83,10 @@ export default function SessionsListPage() {
         setAllProfessors(resProfs.data || []);
 
         // Flatten sessions
-        const flatSessions: any[] = [];
-        rawAssignacions.forEach((a: any) => {
+        const flatSessions: Sessio[] = [];
+        rawAssignacions.forEach((a: BackendAssignment) => {
           if (a.sessions && a.sessions.length > 0) {
-            a.sessions.forEach((s: any) => {
+            a.sessions.forEach((s: Sessio) => {
               flatSessions.push({
                 ...s,
                 assignmentTitle: a.taller?.titol,
@@ -145,7 +174,7 @@ export default function SessionsListPage() {
         // Let's loop to be safe and ensure they appear on the calendar for all days.
         const targetAssignacio = assignacions.find(a => a.id_assignacio === parseInt(selectedAssignacioId));
         if (targetAssignacio?.sessions) {
-           await Promise.all(targetAssignacio.sessions.map((s: any) => 
+           await Promise.all(targetAssignacio.sessions.map((s: { id_sessio: number }) => 
                api.post(`/assignacions/sessions/${s.id_sessio}/staff`, { idUsuari: parseInt(selectedProfessorId) })
                  .catch(() => {}) // Ignore duplicates
            ));
@@ -253,7 +282,7 @@ export default function SessionsListPage() {
               const dateObj = new Date(sessio.data_sessio);
               const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
               const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
-              const staffNames = sessio.staff?.map((s: any) => s.usuari?.nom_complet).join(', ');
+              const staffNames = sessio.staff?.map((s) => s.usuari?.nom_complet || s.nom).join(', ');
 
               return (
                 <div key={sessio.id_sessio} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${sessio.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
@@ -311,15 +340,17 @@ export default function SessionsListPage() {
                           </span>
                         ) : sessio.staff && sessio.staff.length > 0 ? (
                           <div className="flex flex-wrap justify-end gap-2 max-w-[300px]">
-                            {sessio.staff.map((staffMember: any) => (
-                              <div key={staffMember.id_usuari || staffMember.id} className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-2 py-1 rounded group/chip hover:border-red-200 transition-colors">
+                            {sessio.staff.map((staffMember) => (
+                              <div key={staffMember.id_usuari} className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-2 py-1 rounded group/chip hover:border-red-200 transition-colors">
                                 <span className="text-[10px] font-black text-[#4197CB] uppercase group-hover/chip:text-red-400 transition-colors">
                                   {staffMember.usuari?.nom_complet || staffMember.nom}
                                 </span>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleRemoveStaff(sessio.id_sessio, staffMember.id_usuari || staffMember.id);
+                                    if (staffMember.id_usuari || staffMember.id) {
+                                      handleRemoveStaff(Number(sessio.id_sessio), (staffMember.id_usuari || staffMember.id) as number);
+                                    }
                                   }}
                                   className="text-blue-300 hover:text-red-500 focus:outline-none transition-colors"
                                   title="Remove teacher"
@@ -431,7 +462,7 @@ export default function SessionsListPage() {
                       className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
                     >
                       <option value="">-- Choose a session --</option>
-                      {selectedAssignacio?.sessions?.map((s: any, idx: number) => (
+                      {selectedAssignacio?.sessions?.map((s: { id_sessio: number, data_sessio: string, hora_inici: string, hora_fi: string }, idx: number) => (
                         <option key={s.id_sessio} value={s.id_sessio}>
                           Session {idx + 1} - {new Date(s.data_sessio).toLocaleDateString()} ({s.hora_inici}-{s.hora_fi})
                         </option>

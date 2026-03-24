@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { THEME } from '@iter/shared';
+
 
 export interface CalendarEvent {
   id: string;
@@ -10,7 +10,7 @@ export interface CalendarEvent {
   endDate?: string;
   type: 'milestone' | 'deadline' | 'assignment' | 'session';
   description?: string;
-  metadata?: any;
+  metadata?: Record<string, string>;
 }
 
 interface CalendarProps {
@@ -54,7 +54,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
     }
 
     return days;
-  }, [currentDate]);
+  }, [currentDate, year]);
 
   const getEventsForDay = (dateStr: string) => {
     return events.filter(event => {
@@ -64,7 +64,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
     });
   };
 
-  const selectedDayEvents = useMemo(() => getEventsForDay(selectedDate), [selectedDate, events]);
+  const selectedDayEvents = getEventsForDay(selectedDate);
 
   const getEventColor = (type: string) => {
     switch (type) {

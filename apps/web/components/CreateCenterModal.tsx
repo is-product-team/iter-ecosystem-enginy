@@ -71,11 +71,10 @@ const CreateCenterModal = ({
       }
       onCenterSaved(result);
       onClose();
-    } catch (err: any) {
-      setError(
-        err.message ||
-        (initialData ? "Could not update the center." : "Could not create the center.")
-      );
+    } catch (err) {
+      const errorMessage = (err as Error).message ||
+        (initialData ? "Could not update the center." : "Could not create the center.");
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);

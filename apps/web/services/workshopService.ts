@@ -16,6 +16,20 @@ export interface Workshop {
   };
   assignedReferents?: string[];
   executionDays: { dayOfWeek: number; startTime: string; endTime: string }[];
+  image?: string;
+}
+
+interface BackendWorkshop {
+  id_workshop: number;
+  titol: string;
+  modalitat: string;
+  icona?: string;
+  descripcio?: string;
+  durada_h?: number;
+  places_maximes?: number;
+  dies_execucio?: { dayOfWeek: number; startTime: string; endTime: string }[];
+  sector?: { nom: string };
+  id_sector?: number;
 }
 
 const workshopService = {
@@ -25,10 +39,10 @@ const workshopService = {
   getAll: async (): Promise<Workshop[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: any[], meta: any }>("/workshops?limit=0");
+      const response = await api.get<{ data: BackendWorkshop[], meta: unknown }>("/workshops?limit=0");
       const workshopsData = response.data.data;
 
-      return workshopsData.map((t: any) => ({
+      return workshopsData.map((t: BackendWorkshop) => ({
         _id: t.id_workshop.toString(),
         title: t.titol,
         sector: t.sector?.nom || "General",
@@ -44,6 +58,7 @@ const workshopService = {
         },
         assignedReferents: [],
         executionDays: t.dies_execucio || [],
+        image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop",
       }));
     } catch (error) {
       console.error("Error in workshopService.getAll:", error);
@@ -85,9 +100,9 @@ const workshopService = {
         assignedReferents: [],
         executionDays: t.dies_execucio || [],
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error in workshopService.create:", error);
-      const errorMessage = error.response?.data?.message || "Could not create the workshop";
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Could not create workshop";
       throw new Error(errorMessage);
     }
   },
@@ -95,7 +110,7 @@ const workshopService = {
   update: async (id: string, workshopData: Partial<Workshop>): Promise<Workshop> => {
     const api = getApi();
     try {
-      const payload: any = {};
+      const payload: Record<string, unknown> = {};
       if (workshopData.title) payload.titol = workshopData.title;
       if (workshopData.modality) payload.modalitat = workshopData.modality;
       if (workshopData.id_sector) payload.id_sector = workshopData.id_sector;
@@ -127,9 +142,9 @@ const workshopService = {
         assignedReferents: [],
         executionDays: t.dies_execucio || [],
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error in workshopService.update:", error);
-      const errorMessage = error.response?.data?.message || "Could not update the workshop";
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Could not update workshop";
       throw new Error(errorMessage);
     }
   },
@@ -141,9 +156,9 @@ const workshopService = {
     const api = getApi();
     try {
       await api.delete(`/workshops/${id}`);
-    } catch (error: any) {
-      console.error("Error in workshopService.delete:", error);
-      const errorMessage = error.response?.data?.message || "Could not delete the workshop";
+    } catch (error) {
+      console.error("Error in workshopService.getAll:", error);
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Could not fetch workshops";
       throw new Error(errorMessage);
     }
   },

@@ -7,7 +7,7 @@ export const getModels = async (req: Request, res: Response) => {
     try {
         const models = await questionariService.getModels();
         res.json(models);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error al obtener los modelos' });
     }
 };
@@ -16,7 +16,7 @@ export const createModel = async (req: Request, res: Response) => {
     try {
         const model = await questionariService.createModel(req.body);
         res.json(model);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error al crear el modelo de cuestionario' });
     }
 };
@@ -29,7 +29,7 @@ export const getModel = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Modelo no encontrado' });
         }
         res.json(model);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error al obtener el modelo' });
     }
 };
@@ -39,7 +39,7 @@ export const trackEnviament = async (req: Request, res: Response) => {
     try {
         const enviament = await questionariService.trackEnviament(modelId, assignacioId);
         res.json(enviament);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error al registrar el envío' });
     }
 };
@@ -49,7 +49,7 @@ export const submitRespostes = async (req: Request, res: Response) => {
     try {
         const result = await questionariService.submitResponses(token, respostes);
         res.json(result);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error al enviar las respuestas' });
     }
 };
@@ -58,7 +58,7 @@ export const submitAutoconsulta = async (req: Request, res: Response) => {
     try {
         const result = await questionariService.submitAutoconsultaStudent(req.body);
         res.json(result);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error al enviar la autoevaluación' });
     }
 };
@@ -67,7 +67,7 @@ export const getReports = async (req: Request, res: Response) => {
     try {
         const metrics = await questionariService.getSatisfactionMetrics();
         res.json(metrics);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error al obtener reportes' });
     }
 };

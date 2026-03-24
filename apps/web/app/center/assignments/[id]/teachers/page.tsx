@@ -3,9 +3,9 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME, PHASES, ROLES } from '@iter/shared';
+import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
-import assignmentService from '@/services/assignmentService';
+import assignmentService, { Assignment } from '@/services/assignmentService';
 import teacherService, { Teacher } from '@/services/teacherService';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 export default function DesignateProfessorsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [user, setUser] = useState<User | null>(null);
-  const [assignment, setAssignment] = useState<any>(null);
+  const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [prof1Id, setProf1Id] = useState<string>('');
   const [prof2Id, setProf2Id] = useState<string>('');
@@ -36,7 +36,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
         // Fetch phases first for gating
         const resFases = await api.get("/phases");
         const phasesData = resFases.data.data;
-        const isPlanning = phasesData.find((f: any) => f.nom === PHASES.PLANNING)?.activa;
+        const isPlanning = phasesData.find((f: { nom: string, activa: boolean }) => f.nom === PHASES.PLANNING)?.activa;
         
         if (!isPlanning) {
           toast.error('The teacher designation period is not active.');
@@ -102,7 +102,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
 
   return (
     <DashboardLayout 
-      title={`Designate Teachers: ${assignment.workshop?.title}`} 
+      title={`Designate Teachers: ${assignment?.workshop?.title}`} 
       subtitle="Designate the two referring teachers who will be responsible for monitoring."
     >
       <div className="max-w-2xl mx-auto pb-20">

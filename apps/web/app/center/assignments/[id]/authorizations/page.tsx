@@ -3,9 +3,9 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
-import assignmentService from '@/services/assignmentService';
+import assignmentService, { Assignment, Enrollment } from '@/services/assignmentService';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 export default function AuthorizationsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [user, setUser] = useState<User | null>(null);
-  const [assignment, setAssignment] = useState<any>(null);
+  const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const router = useRouter();
@@ -50,12 +50,15 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
       });
       
       // Update local state for immediate feedback
-      setAssignment((prev: any) => ({
-        ...prev,
-        enrollments: prev.enrollments.map((ins: any) => 
-          ins.id_enrollment === idInscripcio ? { ...ins, [field]: value } : ins
-        )
-      }));
+      setAssignment((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          enrollments: prev.enrollments?.map((ins) => 
+            ins.id_enrollment === idInscripcio ? { ...ins, [field]: value } : ins
+          )
+        };
+      });
     } catch (error) {
       toast.error('Error updating the document.');
     }
@@ -97,7 +100,7 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {assignment.enrollments?.map((ins: any) => (
+                {assignment.enrollments?.map((ins: Enrollment) => (
                   <tr key={ins.id_enrollment} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="text-sm font-bold text-consorci-darkBlue uppercase tracking-tight">

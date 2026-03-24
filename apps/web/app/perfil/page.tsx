@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import Avatar from '@/components/Avatar';
 import { useTheme } from 'next-themes';
 import { Sun, Moon, Monitor } from 'lucide-react';
@@ -15,7 +15,8 @@ export default function ProfilePage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading || !user) {

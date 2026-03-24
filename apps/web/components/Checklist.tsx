@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { THEME } from '@iter/shared';
 
 interface ChecklistItem {
   id_checklist: number;

@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
-import { THEME, ROLES } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 
@@ -45,21 +46,22 @@ export default function LoginPage() {
       if (user.rol.nom_rol === ROLES.TEACHER) {
         setShowProfessorLink(true);
       } else {
-        login(user, token);
+        login(user);
         if (user.rol.nom_rol === ROLES.ADMIN) {
           router.push('/admin');
         } else if (user.rol.nom_rol === ROLES.COORDINATOR) {
           router.push('/center');
         }
       }
-    } catch (err: any) {
+    } catch (err) {
+      const errorObj = err as { message: string };
       // Improved error messaging based on backend response or common errors
-      if (err.message.includes('401') || err.message.toLowerCase().includes('invalid')) {
+      if (errorObj.message.includes('401') || errorObj.message.toLowerCase().includes('invalid')) {
         setError('Incorrect email or password. Please try again.');
-      } else if (err.message.includes('fetch') || err.message.includes('network')) {
+      } else if (errorObj.message.includes('fetch') || errorObj.message.includes('network')) {
         setError('Connection error. Please check if the server is active.');
       } else {
-        setError(err.message || 'An unexpected error occurred.');
+        setError(errorObj.message || 'An unexpected error occurred.');
       }
     } finally {
       setLoading(false);
@@ -71,9 +73,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-background-surface p-12 border border-border-subtle shadow-xl">
         <div className="text-center mb-12">
           <div className="w-32 h-32 bg-background-surface flex items-center justify-center mx-auto mb-6">
-            <img
+            <Image
               src="/logo.png"
               alt="Iter Logo"
+              width={128}
+              height={128}
               className="w-full h-full object-contain dark:invert"
             />
           </div>

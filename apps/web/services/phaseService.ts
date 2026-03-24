@@ -17,7 +17,7 @@ const phaseService = {
       const response = await api.get("/fases");
       // The API returns data in the 'data' field of the response body
       const rawData = response.data.data || [];
-      return rawData.map((f: any) => ({
+      return rawData.map((f: { id_fase: number, nom: string, descripcio: string, data_inici: string, data_fi: string, activa: boolean, ordre: number }) => ({
         id_phase: f.id_fase,
         name: f.nom,
         description: f.descripcio,

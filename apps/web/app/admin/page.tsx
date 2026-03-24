@@ -2,7 +2,6 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect } from 'react';
 import Loading from '@/components/Loading';

@@ -62,7 +62,7 @@ const server = app.listen(PORT, async () => {
   try {
     await prisma.$queryRaw`SELECT 1`;
     logger.info(`🗄️  DATABASE STATUS: Connected to PostgreSQL`);
-  } catch (e) {
+  } catch (_e) {
     logger.error(`🗄️  DATABASE STATUS: PostgreSQL Connection failed`);
   }
 });
