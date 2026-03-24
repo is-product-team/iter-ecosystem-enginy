@@ -10,7 +10,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "dev:tunnel": "npx expo start --tunnel",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "echo 'No tests yet'"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",

@@ -83,7 +83,7 @@ export class AutoAssignmentService {
             const centerMap = new Map<number, PendingCenter>();
 
             workshopPetitions.forEach((p: any) => {
-                if (!p.alumnes || p.students.length === 0) return;
+                if (!p.students || p.students.length === 0) return;
 
                 if (!centerMap.has(p.id_center)) {
                     centerMap.set(p.id_center, {
@@ -214,7 +214,7 @@ export class AutoAssignmentService {
                     }
                     return {
                         id_assignment: assignacio.id_assignment,
-                        data_sessio: d,
+                        data_session: d,
                         hora_inici: slot.startTime,
                         hora_fi: slot.endTime
                     };

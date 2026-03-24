@@ -1,10 +1,21 @@
-name: 🚀 Manual Deploy (Self-Hosted)
+name: Deploy (Self-Hosted)
 
 on:
   workflow_dispatch:
 
 jobs:
+  verify:
+    runs-on: [self-hosted, Linux, X64]
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      - name: 📦 Install dependencies
+        run: npm install
+      - name: ✅ Run Quality Gates (Lint, Type-check, Test)
+        run: npm run verify
+
   deploy:
+    needs: verify
     runs-on: [self-hosted, Linux, X64]
     steps:
       - name: 📥 Checkout code
@@ -14,10 +25,10 @@ jobs:
         run: |
           # Crear el .env de la API
           echo "${{ secrets.PROD_API_ENV }}" > apps/api/.env.production
-          
+
           # Crear el .env de la Web
           echo "${{ secrets.PROD_WEB_ENV }}" > apps/web/.env.production
-          
+
           # Opcional: Crear el .env del Mobile (si lo necesitas en el servidor)
           echo "${{ secrets.PROD_MOBILE_ENV }}" > apps/mobile/.env.production
 
@@ -25,6 +36,6 @@ jobs:
         run: |
           # Usamos el archivo de producción que configuramos
           docker compose -f docker-compose.prod.yml up -d --build
-          
+
           # Limpieza de imágenes huérfanas para ahorrar espacio en el LXC
           docker image prune -f

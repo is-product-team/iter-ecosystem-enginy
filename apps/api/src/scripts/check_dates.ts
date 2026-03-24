@@ -1,5 +1,5 @@
 
-// @ts-nocheck
+// check_dates.ts
 import prisma from '../lib/prisma.js';
 
 async function main() {

@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma.js';
 
 export class EvaluationService {
     /**
@@ -29,18 +27,23 @@ export class EvaluationService {
         observacions?: string;
         competencies: { id_competencia: number; puntuacio: number }[];
     }) {
+        const {
+            id_enrollment,
+            percentatge_asistencia,
+            numero_retards,
+            observacions,
+            competencies
+        } = data;
+
         // 1. Crear o actualizar la evaluación docente principal
         const avaluacioDocent = await prisma.evaluation.upsert({
-            where: { id_enrollment: data.id_enrollment },
+            where: { id_enrollment },
             update: {
-                percentatge_asistencia: data.percentatge_asistencia,
-                numero_retards: data.numero_retards,
-                observacions: data.observacions,
+                percentatge_asistencia,
+                numero_retards,
+                observacions,
             },
             create: {
-                id_enrollment: data.id_enrollment,
-                percentatge_asistencia: data.percentatge_asistencia,
-                numero_retards: data.numero_retards,
                 observacions: data.observacions,
             },
         });
@@ -52,7 +55,7 @@ export class EvaluationService {
 
         // 3. Crear las nuevas puntuaciones de competencias
         const competenciesCreated = await prisma.avaluacioCompetencial.createMany({
-            data: data.competences.map((c) => ({
+            data: competencies.map((c) => ({
                 id_evaluation_teacher: avaluacioDocent.id_evaluation_teacher,
                 id_competencia: c.id_competencia,
                 puntuacio: c.puntuacio,
