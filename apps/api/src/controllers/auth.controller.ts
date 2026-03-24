@@ -26,7 +26,7 @@ export const login = async (req: Request, res: Response) => {
       { 
         userId: user.id_user, 
         email: user.email, 
-        role: user.role.nom_role,
+        role: (user as any).role.nom_roleee,
         centreId: user.id_center 
       },
       env.JWT_SECRET,
@@ -35,14 +35,28 @@ export const login = async (req: Request, res: Response) => {
 
     // 4. Respuesta limpia (Omitimos el hash del password por seguridad)
     const { password_hash, ...userSafe } = user;
+
+    // 5. Set Cookie (Web Security)
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24h
+    });
+
     res.json({
-      token,
+      token, // Mantener para compatibilidad móvil (Bearer)
       user: userSafe
     });
   } catch (error) {
     console.error('Error en login:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie('token');
+  res.json({ message: 'Sessió tancada correctament' });
 };
 
 export const register = async (req: Request, res: Response) => {

@@ -12,7 +12,7 @@ The system uses **JWT (JSON Web Tokens)** for stateless authentication across th
    - User is looked up by email in the PostgreSQL database.
    - Password hash is verified using `bcrypt.compare()`.
 3. **Token Generation**: A JWT is signed using a `JWT_SECRET` with a **24-hour expiration**.
-4. **Response**: Returns the JWT and a safe user object (excluding the password hash).
+4. **Response**: Returns the JWT and a safe user object. For web clients, it also sets an **HTTP-Only, Secure, and SameSite: Strict cookie** containing the JWT to mitigate XSS and CSRF.
 
 ### Registration Flow
 - **Encryption**: Passwords are hashed using `bcrypt` with a salt of **10 rounds** before storage.
@@ -49,4 +49,5 @@ Access control is enforced via Express middlewares:
 
 - **Password Hashing**: Always done server-side using `bcrypt`.
 - **Sensitive Data**: Password hashes are stripped from API responses using object destructuring.
-- **Environment Variables**: Secrets like `JWT_SECRET` and `DATABASE_URL` are managed via `.env` files and never committed to version control.
+- **Environment Variables**: Secrets like `JWT_SECRET` and `DATABASE_URL` are managed via `.env` files.
+- **Rate Limiting**: Critical endpoints (login/register) are protected against brute-force (max 5 attempts per 15 min).

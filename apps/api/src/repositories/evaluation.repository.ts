@@ -3,12 +3,12 @@ import { BaseRepository } from './base.repository.js';
 
 export class EvaluationRepository extends BaseRepository<Evaluation, Prisma.EvaluationCreateInput, Prisma.EvaluationUpdateInput> {
   constructor() {
-    super('evaluation');
+    super('evaluation', 'id_evaluation_teacher');
   }
 
   override async findById(id: number): Promise<Evaluation | null> {
     return this.prisma.evaluation.findUnique({
-      where: { id_evaluation: id },
+      where: { id_evaluation_teacher: id },
       include: {
         assignment: { include: { workshop: true, center: true } },
         enrollment: { include: { student: true } }

@@ -10,21 +10,17 @@ if (!API_URL) {
 const apiInstance: AxiosInstance = axios.create({
   baseURL: API_URL,
   timeout: 15000, // Slightly longer timeout
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
   },
 });
 
-// Request Interceptor: Inject Token
+// Request Interceptor: Inject Token (Only if still using Bearer, but now we prefer cookies)
 apiInstance.interceptors.request.use(
   (config) => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
+    // Note: withCredentials: true handles cookies automatically
     return config;
   },
   (error) => Promise.reject(error)

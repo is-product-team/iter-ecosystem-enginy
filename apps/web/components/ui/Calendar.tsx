@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { THEME } from '@iter/shared';
 
 export interface CalendarEvent {
   id: string;
@@ -10,7 +9,12 @@ export interface CalendarEvent {
   endDate?: string;
   type: 'milestone' | 'deadline' | 'assignment' | 'session';
   description?: string;
-  metadata?: any;
+  metadata?: {
+    hora?: string;
+    centre?: string;
+    id_assignacio?: number;
+    [key: string]: unknown;
+  };
   colorClass?: string;
 }
 
@@ -59,9 +63,9 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
       weeks.push(days.slice(i, i + 7));
     }
     return weeks;
-  }, [currentDate]);
+  }, [currentDate, year]);
 
-  const getEventStyles = (type: string, title: string = '') => {
+  const getEventStyles = (type: string) => {
     switch (type) {
       case 'milestone': 
         return 'bg-consorci-darkBlue text-white';
@@ -130,7 +134,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
           const firstDayOfWeek = week[0].date;
           const lastDayOfWeek = week[6].date;
           
-          const weekEvents: any[] = [];
+          const weekEvents: (CalendarEvent & { start: number; span: number; continuesBefore: boolean; continuesAfter: boolean; isPhase: boolean })[] = [];
           if (firstDayOfWeek && lastDayOfWeek) {
             events.forEach(event => {
               const eStart = event.date.split('T')[0];
@@ -156,7 +160,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
           }
 
           // Track assignment
-          const tracks: any[][] = [];
+          const tracks: (CalendarEvent & { start: number; span: number; continuesBefore: boolean; continuesAfter: boolean; isPhase: boolean })[][] = [];
           weekEvents.sort((a, b) => b.span - a.span).forEach(event => {
             let trackIdx = 0;
             while (tracks[trackIdx] && tracks[trackIdx].some(e => 
@@ -199,7 +203,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
                       <button
                         key={event.id}
                         onClick={() => onEventClick?.(event)}
-                        className={`absolute h-full pointer-events-auto flex items-center px-4 transition-colors hover:bg-opacity-90 active:opacity-80 group/event ${event.colorClass || getEventStyles(event.type, event.title)}`}
+                        className={`absolute h-full pointer-events-auto flex items-center px-4 transition-colors hover:bg-opacity-90 active:opacity-80 group/event ${event.colorClass || getEventStyles(event.type)}`}
                         style={{
                           left: `${(event.start * 100) / 7}%`,
                           width: `${(event.span * 100) / 7}%`,

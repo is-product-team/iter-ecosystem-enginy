@@ -42,15 +42,20 @@ export const upsertEvaluation = async (req: Request, res: Response) => {
             }
         }
 
+        if (!id_assignment) {
+            return res.status(400).json({ error: 'id_assignment is required.' });
+        }
+
         const dataToUpsert = {
             id_enrollment: parseInt(id_enrollment),
+            id_assignment: parseInt(id_assignment),
             observacions: observacions || '',
-            competencies: competencies || [],
+            competences: competencies || [], // Mapped to competences
             percentatge_asistencia: percentatge_asistencia || 100, 
             numero_retards: numero_retards || 0
         };
 
-        const result = await evaluationService.upsertEvaluation(dataToUpsert);
+        const result = await evaluationService.upsertEvaluation(dataToUpsert as any);
         res.json(result);
     } catch (error) {
         console.error("Error in upsertEvaluation:", error);
@@ -81,71 +86,72 @@ export const analyzeObservations = async (req: Request, res: Response) => {
 };
 
 export const processVoiceEvaluation = async (req: Request, res: Response) => {
-    const { text, studentId, sessionId, assignacioId } = req.body;
+    const { text, studentId, sessionId, assignmentId } = req.body;
 
-    if (!text || !studentId || !sessionId) {
-        return res.status(400).json({ error: 'Missing required parameters (text, studentId, sessionId).' });
+    if (!text || !studentId || !sessionId || !assignmentId) {
+        return res.status(400).json({ error: 'Missing required parameters (text, studentId, sessionId, assignmentId).' });
     }
 
     try {
-        const result = nlpService.processText(text);
+        const nlpResult = nlpService.processText(text);
 
-        const inscripcio = await prisma.enrollment.findFirst({
+        const enrollmentRecord = await prisma.enrollment.findFirst({
             where: {
                 id_student: parseInt(studentId),
-                id_assignment: parseInt(assignacioId)
+                id_assignment: parseInt(assignmentId)
             }
         });
 
-        let assistencia = null;
+        let attendanceRecord = null;
 
-        if (inscripcio) {
+        if (enrollmentRecord) {
             const existingAttendance = await prisma.attendance.findFirst({
                 where: {
-                    id_enrollment: inscripcio.id_enrollment,
+                    id_enrollment: enrollmentRecord.id_enrollment,
                     numero_sessio: parseInt(sessionId)
                 }
             });
 
             const dataToSave = {
-                id_enrollment: inscripcio.id_enrollment,
+                id_enrollment: enrollmentRecord.id_enrollment,
                 numero_sessio: parseInt(sessionId),
-                data_sessio: new Date(),
-                estat: result.attendanceStatus || (existingAttendance ? existingAttendance.estat : 'Present'),
+                data_session: new Date(),
+                estat: nlpResult.attendanceStatus || (existingAttendance ? existingAttendance.estat : 'Present'),
                 observacions: text
             };
 
             if (existingAttendance) {
-                assistencia = await prisma.attendance.update({
+                attendanceRecord = await prisma.attendance.update({
                     where: { id_attendance: existingAttendance.id_attendance },
                     data: {
                         estat: dataToSave.estat,
                         observacions: dataToSave.observacions,
-                        data_sessio: new Date()
+                        data_session: new Date()
                     }
                 });
             } else {
-                assistencia = await prisma.attendance.create({
+                attendanceRecord = await prisma.attendance.create({
                     data: dataToSave
                 });
             }
         }
 
-        let competenceEvaluation = null;
-        if (result.competenceUpdate && inscripcio) {
-            const competencia = await prisma.competence.findFirst({
+        let competenceEval = null;
+        if (nlpResult.competenceUpdate && enrollmentRecord) {
+            const competence = await prisma.competence.findFirst({
                 where: { tipus: 'Transversal' }
             });
 
-            if (competencia) {
+            if (competence) {
                 let docentEval = await prisma.evaluation.findUnique({
-                    where: { id_enrollment: inscripcio.id_enrollment }
+                    where: { id_enrollment: enrollmentRecord.id_enrollment }
                 });
 
                 if (!docentEval) {
                     docentEval = await prisma.evaluation.create({
                         data: {
-                            id_enrollment: inscripcio.id_enrollment,
+                            id_enrollment: enrollmentRecord.id_enrollment,
+                            id_assignment: enrollmentRecord.id_assignment,
                             percentatge_asistencia: 100,
                             numero_retards: 0,
                             observacions: 'Initialized by Voice Assistant'
@@ -153,11 +159,11 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
                     });
                 }
 
-                competenceEvaluation = await prisma.avaluacioCompetencial.create({
+                competenceEval = await prisma.competenceEvaluation.create({
                     data: {
                         id_evaluation_teacher: docentEval.id_evaluation_teacher,
-                        id_competencia: competencia.id_competencia,
-                        puntuacio: result.competenceUpdate.score
+                        id_competence: competence.id_competence,
+                        puntuacio: nlpResult.competenceUpdate.score
                     }
                 });
             }
@@ -165,10 +171,10 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
         res.json({
             originalText: text,
-            analysis: result,
+            analysis: nlpResult,
             updates: {
-                assistencia,
-                competenceEvaluation
+                attendance: attendanceRecord,
+                competenceEvaluation: competenceEval
             }
         });
 

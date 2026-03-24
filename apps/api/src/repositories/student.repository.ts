@@ -3,7 +3,7 @@ import { BaseRepository } from './base.repository.js';
 
 export class StudentRepository extends BaseRepository<Student, Prisma.StudentCreateInput, Prisma.StudentUpdateInput> {
   constructor() {
-    super('student');
+    super('student', 'id_student');
   }
 
   // Sobrescribimos findById para usar id_student

@@ -1,13 +1,12 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { User, getUser as getAuthUser, logout as authLogout } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (userData: User, token: string) => void;
+  login: (userData: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -15,21 +14,22 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    const storedUser = getAuthUser();
-    if (storedUser) {
-      setUser(storedUser);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      return getAuthUser();
     }
-    setLoading(false);
+    return null;
+  });
+  const [loading] = useState(false);
+
+  // No longer need immediate check in useEffect if initialized synchronously
+  useEffect(() => {
+    // This could still be used for watching changes if needed, 
+    // but the sync initialization handles the hydration error/standard case.
   }, []);
 
-  const login = (userData: User, token: string) => {
+  const login = (userData: User) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
     }
     setUser(userData);

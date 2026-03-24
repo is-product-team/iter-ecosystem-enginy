@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { THEME } from '@iter/shared';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 

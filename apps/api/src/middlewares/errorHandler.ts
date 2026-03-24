@@ -6,7 +6,7 @@ export const errorHandler = (
   err: any,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   logger.error(`[API Error] ${err.message} - ${req.method} ${req.url} - IP: ${req.ip}`);
 

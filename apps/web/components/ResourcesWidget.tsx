@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { THEME } from '@iter/shared';
 
 interface Resource {
   id: string;

@@ -9,7 +9,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
 
     // 1. Obtener el profesor asociado al usuario (si es rol profesor) de forma directa por ID
     let professorId: number | null = null;
-    if (user.role === ROLES.PROFESOR) {
+    if (user.role === ROLES.TEACHER) {
       const professor = await prisma.teacher.findUnique({
         where: { id_user: user.userId }
       });
@@ -36,34 +36,34 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
     // Ejecutamos consultas en paralelo para mejorar rendimiento
     const [dbEvents, assignments] = await Promise.all([
       // 1. Milestones
-      prisma.calendariEvent.findMany({
+      prisma.calendarEvent.findMany({
         where: dateFilter,
-        include: { fase: true }
+        include: { phase: true }
       }),
       
       // 2. Assignments (basado en rol) + Sessions
       user.role === ROLES.ADMIN 
         ? prisma.assignment.findMany({ 
             where: assignmentDateFilter, 
-            include: { taller: true, centre: true, sessions: { include: { staff: { include: { usuari: true } } } } } 
+            include: { workshop: true, center: true, sessions: { include: { staff: { include: { user: true } } } } } 
           })
-        : user.role === ROLES.COORDINADOR
+        : user.role === ROLES.COORDINATOR
         ? prisma.assignment.findMany({ 
             where: { ...assignmentDateFilter, id_center: user.centreId }, 
             include: { 
-              taller: true, 
+              workshop: true, 
               sessions: {
                 include: {
                   staff: {
                     include: {
-                      usuari: true
+                      user: true
                     }
                   }
                 }
               }
             } 
           })
-        : user.role === ROLES.PROFESOR
+        : user.role === ROLES.TEACHER
         ? prisma.assignment.findMany({ 
             where: { 
               ...assignmentDateFilter, 
@@ -71,22 +71,17 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
                 // Check if the user is the primary referent
                 { teachers: { some: { id_user: user.userId } } },
                 // Check if the user is assigned as staff to any session within this assignment
-                { sessions: { some: { staff: { some: { id_user: user.userId } } } } },
-                // Check if the user is assigned as prof1 or prof2 (legacy support)
-                ...(professorId ? [
-                  { prof1_id: professorId },
-                  { prof2_id: professorId }
-                ] : [])
+                { sessions: { some: { staff: { some: { id_user: user.userId } } } } }
               ]
             }, 
             include: { 
-              taller: true, 
-              centre: true, 
+              workshop: true, 
+              center: true, 
               sessions: {
                 include: {
                   staff: {
                     include: {
-                      usuari: true
+                      user: true
                     }
                   }
                 }
@@ -108,29 +103,29 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
           date: date.toISOString(),
           type: e.tipus,
           description: e.descripcio || '',
-          metadata: { fase: e.fase?.nom || 'General' }
+          metadata: { phase: e.phase?.nom || 'General' }
         });
       }
     });
 
     // Mapeo de Assignments y sus Sessions
     assignments.forEach((a: any) => {
-      // La barra de rango del taller (Azul claro) - Ocultar para profesores para reducir ruido
-      if (a.data_inici && a.data_fi && user.role !== ROLES.PROFESOR) {
+      // La barra de rango del workshop (Azul claro) - Ocultar para profesores para reducir ruido
+      if (a.data_inici && a.data_fi && user.role !== ROLES.TEACHER) {
         const startDate = new Date(a.data_inici);
         const endDate = new Date(a.data_fi);
         
         if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
           events.push({
             id: `assign-${a.id_assignment}`,
-            title: user.role === ROLES.COORDINADOR ? `Workshop: ${a.taller?.titol}` : `${a.taller?.titol}`,
+            title: user.role === ROLES.COORDINATOR ? `Workshop: ${a.workshop?.titol}` : `${a.workshop?.titol}`,
             date: startDate.toISOString(),
             endDate: endDate.toISOString(),
             type: 'assignment',
             metadata: { 
               id_assignment: a.id_assignment,
-              centre: a.centre?.nom,
-              adreca: a.centre?.adreca
+              center: a.center?.nom,
+              adreca: a.center?.adreca
             }
           });
         }
@@ -140,24 +135,24 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
       if (a.sessions) {
         a.sessions.forEach((s: any) => {
           // Si es profesor, solo mostramos las sesiones donde está asignado (o si es el referent general)
-          const isReferentGeneral = a.prof1_id === professorId || a.prof2_id === professorId;
+          const isReferentGeneral = a.teachers?.some((t: any) => t.id_user === user.userId);
           const isSessionStaff = s.staff?.some((sp: any) => sp.id_user === user.userId);
           
-          if (user.role === ROLES.PROFESOR && !isReferentGeneral && !isSessionStaff) {
+          if (user.role === ROLES.TEACHER && !isReferentGeneral && !isSessionStaff) {
             return;
           }
 
-          const sessionDate = s.data_sessio ? new Date(s.data_sessio) : null;
+          const sessionDate = s.data_session ? new Date(s.data_session) : null;
           if (sessionDate && !isNaN(sessionDate.getTime())) {
             events.push({
-              id: `session-${s.id_sessio}`,
-              title: `SESSIÓ: ${a.taller?.titol || 'Workshop'}`,
+              id: `session-${s.id_session}`,
+              title: `SESSIÓ: ${a.workshop?.titol || 'Workshop'}`,
               date: sessionDate.toISOString(),
               type: 'session',
               metadata: {
                 id_assignment: a.id_assignment,
                 hora: `${s.hora_inici || '09:00'} - ${s.hora_fi || '13:00'}`,
-                centre: a.centre?.nom || 'Center del Teacher'
+                center: a.center?.nom || 'Center del Teacher'
               }
             });
           }

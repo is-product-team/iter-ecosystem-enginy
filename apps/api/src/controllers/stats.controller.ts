@@ -3,7 +3,7 @@ import prisma from '../lib/prisma.js';
 import { RiskAnalysisService } from '../services/risk-analysis.service.js';
 
 /**
- * GET /stats/peticions-by-status
+ * GET /stats/requests-by-status
  */
 export const getStatsByStatus = async (req: Request, res: Response) => {
   try {
@@ -21,7 +21,7 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
     }));
 
     res.json(stats);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtener estadísticas de estados' });
   }
 };
@@ -45,7 +45,7 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
     })).sort((a: any, b: any) => b.total_solicitudes - a.total_solicitudes);
 
     res.json(stats);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtener talleres populares' });
   }
 };
@@ -55,13 +55,13 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
  */
 export const getRecentActivity = async (req: Request, res: Response) => {
   try {
-    const logs = await prisma.logAuditoria.findMany({
+    const logs = await prisma.auditLog.findMany({
       orderBy: { data_hora: 'desc' },
       take: 10,
-      include: { usuari: true }
+      include: { user: true }
     });
     res.json(logs);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtener actividad reciente' });
   }
 };
@@ -71,13 +71,13 @@ export const getRecentActivity = async (req: Request, res: Response) => {
  */
 export const cleanupLogs = async (req: Request, res: Response) => {
   try {
-    const result = await prisma.logAuditoria.deleteMany({
+    const result = await prisma.auditLog.deleteMany({
       where: {
         data_hora: { lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
       }
     });
     res.json({ success: true, deletedCount: result.count });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al limpiar logs' });
   }
 };
@@ -93,7 +93,7 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
       return res.json({ processed: 1, results: [result] });
     } else {
       const studentsWithAttendance = await prisma.attendance.findMany({
-        select: { inscripcio: { select: { id_student: true } } },
+        select: { enrollment: { select: { id_student: true } } },
         distinct: ['id_enrollment']
       });
 
@@ -107,8 +107,8 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
       res.json({ processed: results.length, active_risks: results.filter(r => r.riskLevel === 'CRITICAL' || r.riskLevel === 'HIGH') });
     }
 
-  } catch (error) {
-    console.error("Error in risk analysis:", error);
+  } catch (_error) {
+    console.error("Error in risk analysis:", _error);
     res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
   }
 };
@@ -121,24 +121,26 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
         estat: { in: ['PUBLISHED', 'DATA_ENTRY', 'DATA_SUBMITTED', 'VALIDATED'] }
       },
       include: {
-        centre: true,
+        center: true,
         checklist: true,
         enrollments: true,
-        prof1: true,
-        prof2: true
+        teachers: true
       }
     });
 
     const monitoring = assignacions.map((a: any) => {
-      const hasTeachers = !!(a.prof1_id && a.prof2_id);
+      const hasTeachers = a.teachers.length >= 2;
       const hasStudents = a.enrollments.length > 0;
-      const allDocsOk = a.enrollments.every((i: any) => i.acord_pedagogic && i.autoritzacio_mobilitat && i.registre_ceb_confirmat);
+      const allDocsOk = a.enrollments.every((i: any) => {
+        const docs = (i.docs_status as any) || {};
+        return docs.acord_pedagogic && docs.autoritzacio_mobilitat && docs.registre_ceb_confirmat;
+      });
       const isComplete = hasTeachers && hasStudents && allDocsOk;
 
       return {
         id_assignment: a.id_assignment,
-        centre: a.center.nom,
-        taller_id: a.id_workshop,
+        center: a.center.nom,
+        workshop_id: a.id_workshop,
         estat: a.estat,
         completat: isComplete,
         detalls: {
@@ -150,8 +152,8 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
     });
 
     res.json(monitoring);
-  } catch (error) {
-    console.error("Error monitoring Phase 2:", error);
+  } catch (_error) {
+    console.error("Error monitoring Phase 2:", _error);
     res.status(500).json({ error: 'Error al obtenir estadístiques de monitorització.' });
   }
 };
