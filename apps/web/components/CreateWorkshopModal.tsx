@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import tallerService, { Taller } from "../services/tallerService";
+import workshopService, { Workshop } from "../services/workshopService";
 import sectorService, { Sector } from "../services/sectorService";
 import WorkshopIcon, { SVG_ICONS } from "./WorkshopIcon";
 import Loading from "./Loading";
@@ -9,8 +9,8 @@ import Loading from "./Loading";
 type CreateWorkshopModalProps = {
   visible: boolean;
   onClose: () => void;
-  onWorkshopCreated: (newWorkshop: Taller) => void;
-  initialData?: Taller | null;
+  onWorkshopCreated: (newWorkshop: Workshop) => void;
+  initialData?: Workshop | null;
 };
 
 type ScheduleSlot = {
@@ -25,16 +25,16 @@ const CreateWorkshopModal = ({
   onWorkshopCreated,
   initialData,
 }: CreateWorkshopModalProps) => {
-  const [titol, setTitol] = useState("");
+  const [title, setTitle] = useState("");
   const [idSector, setIdSector] = useState<number | "">("");
   const [sectors, setSectors] = useState<Sector[]>([]);
-  const [modalitat, setModalitat] = useState("A");
-  const [trimestre, setTrimestre] = useState("1r");
-  const [descripcio, setDescripcio] = useState("");
-  const [duradaHores, setDuradaHores] = useState("");
-  const [placesMaximes, setPlacesMaximes] = useState("");
-  const [ubicacioDefecte, setUbicacioDefecte] = useState("");
-  const [icona, setIcona] = useState("PUZZLE");
+  const [modality, setModality] = useState("A");
+  const [trimestre, setTrimestre] = useState("1st");
+  const [description, setDescription] = useState("");
+  const [durationHours, setDurationHours] = useState("");
+  const [maxPlaces, setMaxPlaces] = useState("");
+  const [defaultLocation, setDefaultLocation] = useState("");
+  const [icon, setIcon] = useState("PUZZLE");
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
 
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ const CreateWorkshopModal = ({
   const [tempEnd, setTempEnd] = useState("11:00");
 
   const daysMap: Record<number, string> = {
-    1: 'Dilluns', 2: 'Dimarts', 3: 'Dimecres', 4: 'Dijous', 5: 'Divendres'
+    1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday'
   };
 
   useEffect(() => {
@@ -63,31 +63,31 @@ const CreateWorkshopModal = ({
 
   React.useEffect(() => {
     if (visible && initialData) {
-      setTitol(initialData.titol);
+      setTitle(initialData.title);
       setIdSector(initialData.id_sector || "");
-      setModalitat(initialData.modalitat);
-      setTrimestre(initialData.trimestre);
-      setIcona(initialData.icona || "PUZZLE");
-      setDescripcio(initialData.detalls_tecnics?.descripcio || "");
-      setDuradaHores(initialData.detalls_tecnics?.durada_hores?.toString() || "");
-      setPlacesMaximes(initialData.detalls_tecnics?.places_maximes?.toString() || "");
-      setUbicacioDefecte(initialData.detalls_tecnics?.ubicacio_defecte || "");
+      setModality(initialData.modality);
+      setTrimestre(initialData.term);
+      setIcon(initialData.icon || "PUZZLE");
+      setDescription(initialData.technicalDetails?.description || "");
+      setDurationHours(initialData.technicalDetails?.durationHours?.toString() || "");
+      setMaxPlaces(initialData.technicalDetails?.maxPlaces?.toString() || "");
+      setDefaultLocation(initialData.technicalDetails?.defaultLocation || "");
 
-      if (Array.isArray(initialData.dies_execucio) && initialData.dies_execucio.length > 0 && typeof initialData.dies_execucio[0] === 'object') {
-        setSchedule(initialData.dies_execucio as any);
+      if (Array.isArray(initialData.executionDays) && initialData.executionDays.length > 0 && typeof initialData.executionDays[0] === 'object') {
+        setSchedule(initialData.executionDays as any);
       } else {
         setSchedule([]);
       }
     } else if (visible) {
-      setTitol("");
+      setTitle("");
       setIdSector("");
-      setModalitat("A");
-      setTrimestre("1r");
-      setIcona("PUZZLE");
-      setDescripcio("");
-      setDuradaHores("");
-      setPlacesMaximes("");
-      setUbicacioDefecte("");
+      setModality("A");
+      setTrimestre("1st");
+      setIcon("PUZZLE");
+      setDescription("");
+      setDurationHours("");
+      setMaxPlaces("");
+      setDefaultLocation("");
       setSchedule([]);
     }
     setError(null);
@@ -104,42 +104,42 @@ const CreateWorkshopModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!titol || !modalitat) {
-      setError("Els camps marcats amb * són obligatoris.");
+    if (!title || !modality) {
+      setError("Fields marked with * are required.");
       return;
     }
     setLoading(true);
     setError(null);
 
-    const tallerData: Omit<Taller, "_id"> = {
-      titol,
-      sector: sectors.find(s => s.id_sector === idSector)?.nom || "",
+    const workshopData: Omit<Workshop, "_id"> = {
+      title,
+      sector: sectors.find(s => s.id_sector === idSector)?.nom || "General",
       id_sector: idSector === "" ? undefined : idSector,
-      modalitat,
-      trimestre,
-      icona,
-      detalls_tecnics: {
-        descripcio,
-        durada_hores: parseInt(duradaHores, 10) || 0,
-        places_maximes: parseInt(placesMaximes, 10) || 0,
-        ubicacio_defecte: ubicacioDefecte,
+      modality,
+      term: trimestre,
+      icon,
+      technicalDetails: {
+        description,
+        durationHours: parseInt(durationHours, 10) || 0,
+        maxPlaces: parseInt(maxPlaces, 10) || 0,
+        defaultLocation,
       },
-      dies_execucio: schedule,
-      referents_assignats: [],
+      executionDays: schedule,
+      assignedReferents: [],
     };
 
     try {
       let result;
       if (initialData) {
-        result = await tallerService.update(initialData._id, tallerData);
+        result = await workshopService.update(initialData._id, workshopData);
       } else {
-        result = await tallerService.create(tallerData);
+        result = await workshopService.create(workshopData);
       }
       onWorkshopCreated(result);
       onClose();
     } catch (err: any) {
       setError(
-        "Error al guardar el taller. Comprova les dades."
+        "Error saving workshop. Check the data."
       );
     } finally {
       setLoading(false);
@@ -155,10 +155,10 @@ const CreateWorkshopModal = ({
         <div className="bg-gray-50 px-8 py-5 flex justify-between items-center shrink-0 border-b border-gray-100">
           <div>
             <h2 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
-              {initialData ? "Editar Taller" : "Nou Taller"}
+              {initialData ? "Edit Workshop" : "New Workshop"}
             </h2>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-              Configuració del Taller i Horaris Setmanals
+              Workshop Configuration and Weekly Schedule
             </p>
           </div>
           <button onClick={onClose} className="text-gray-300 hover:text-[#00426B] transition-colors">
@@ -169,32 +169,32 @@ const CreateWorkshopModal = ({
         {/* Content */}
         <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
 
-          {/* Esquerra: Dades */}
+          {/* Left: Data */}
           <div className="md:w-7/12 p-8 overflow-y-auto border-r border-gray-100 custom-scrollbar">
             <section className="mb-8">
-              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">Informació General</h3>
+              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">General Information</h3>
 
               <div className="space-y-6">
                 <div className="group">
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Títol del Taller <span className="text-red-400">*</span></label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Workshop Title <span className="text-red-400">*</span></label>
                   <input
                     type="text"
-                    value={titol}
-                    onChange={(e) => setTitol(e.target.value)}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all placeholder:text-gray-300 outline-none"
-                    placeholder="Introdueix el nom del taller..."
+                    placeholder="Enter the workshop name..."
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Sector Professional</label>
+                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Professional Sector</label>
                     <select
                       value={idSector}
                       onChange={(e) => setIdSector(Number(e.target.value))}
                       className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
                     >
-                      <option value="">Selecciona un sector...</option>
+                      <option value="">Select a sector...</option>
                       {sectors.map((sector) => (
                         <option key={sector.id_sector} value={sector.id_sector}>
                           {sector.nom}
@@ -203,41 +203,41 @@ const CreateWorkshopModal = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Modalitat <span className="text-red-400">*</span></label>
+                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Modality <span className="text-red-400">*</span></label>
                     <select
-                      value={modalitat}
-                      onChange={(e) => setModalitat(e.target.value)}
+                      value={modality}
+                      onChange={(e) => setModality(e.target.value)}
                       className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
                     >
-                      <option value="A">Modalitat A (3 Trim.)</option>
-                      <option value="B">Modalitat B (2 Trim.)</option>
-                      <option value="C">Modalitat C (1 Trim.)</option>
+                      <option value="A">Modality A (3 Quarters)</option>
+                      <option value="B">Modality B (2 Quarters)</option>
+                      <option value="C">Modality C (1 Quarter)</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Descripció</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Description</label>
                   <textarea
-                    value={descripcio}
-                    onChange={(e) => setDescripcio(e.target.value)}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     rows={3}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all placeholder:text-gray-300 outline-none custom-scrollbar"
-                    placeholder="Breu explicació del contingut..."
+                    placeholder="Brief explanation of the content..."
                   />
                 </div>
               </div>
             </section>
 
             <section>
-              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">Detalls Tècnics</h3>
+              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">Technical Details</h3>
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Durada (h)</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Duration (h)</label>
                   <input
                     type="number"
-                    value={duradaHores}
-                    onChange={(e) => setDuradaHores(e.target.value)}
+                    value={durationHours}
+                    onChange={(e) => setDurationHours(e.target.value)}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none md:appearance-none"
                   />
                 </div>
@@ -245,23 +245,23 @@ const CreateWorkshopModal = ({
                   <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Places</label>
                   <input
                     type="number"
-                    value={placesMaximes}
-                    onChange={(e) => setPlacesMaximes(e.target.value)}
+                    value={maxPlaces}
+                    onChange={(e) => setMaxPlaces(e.target.value)}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none md:appearance-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Icona</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Icon</label>
                   <div className="relative group/icon">
                     <button className="w-full flex items-center justify-between px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] group-hover/icon:border-[#0775AB] transition-all">
                       <span className="flex items-center gap-2">
-                        <WorkshopIcon iconName={icona} className="w-5 h-5" />
-                        <span className="text-[9px] font-black uppercase tracking-widest">{icona}</span>
+                        <WorkshopIcon iconName={icon} className="w-5 h-5" />
+                        <span className="text-[9px] font-black uppercase tracking-widest">{icon}</span>
                       </span>
                     </button>
                     <div className="absolute top-full left-0 w-full bg-white border border-gray-200 shadow-xl hidden group-hover/icon:grid grid-cols-4 gap-1 p-3 z-20 animate-in fade-in slide-in-from-top-1 duration-150">
                       {Object.keys(SVG_ICONS).map((key) => (
-                        <button key={key} onClick={() => setIcona(key)} className="p-3 hover:bg-[#EAEFF2] flex justify-center text-[#00426B] transition-colors relative group/item">
+                        <button key={key} onClick={() => setIcon(key)} className="p-3 hover:bg-[#EAEFF2] flex justify-center text-[#00426B] transition-colors relative group/item">
                           <WorkshopIcon iconName={key} className="w-5 h-5" />
                           <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[6px] font-black uppercase opacity-0 group-hover/item:opacity-100 transition-opacity bg-[#00426B] text-white px-1">{key}</span>
                         </button>
@@ -273,28 +273,28 @@ const CreateWorkshopModal = ({
             </section>
           </div>
 
-          {/* Dreta: Horaris */}
+          {/* Right: Schedule */}
           <div className="md:w-5/12 bg-[#F8FAFC] p-8 overflow-y-auto">
             <section>
               <h3 className="text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                Horari Setmanal
+                Weekly Schedule
               </h3>
 
               <div className="bg-white p-6 shadow-sm border border-gray-100 mb-8 relative">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-[#00426B]"></div>
-                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Afegir Franja</h4>
+                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Add Slot</h4>
                 <div className="space-y-4">
                   <div>
                     <select
                       value={tempDay} onChange={(e) => setTempDay(parseInt(e.target.value))}
                       className="w-full px-4 py-2.5 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
                     >
-                      <option value={1}>Dilluns</option>
-                      <option value={2}>Dimarts</option>
-                      <option value={3}>Dimecres</option>
-                      <option value={4}>Dijous</option>
-                      <option value={5}>Divendres</option>
+                      <option value={1}>Monday</option>
+                      <option value={2}>Tuesday</option>
+                      <option value={3}>Wednesday</option>
+                      <option value={4}>Thursday</option>
+                      <option value={5}>Friday</option>
                     </select>
                   </div>
                   <div className="flex gap-4">
@@ -310,12 +310,12 @@ const CreateWorkshopModal = ({
                     onClick={addScheduleSlot}
                     className="w-full py-3 bg-[#EAEFF2] text-[#00426B] text-[9px] font-black uppercase tracking-[0.2em] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95"
                   >
-                    + Afegir Dia
+                    + Add Day
                   </button>
                 </div>
               </div>
 
-              <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 px-1">Dies Configurats</h4>
+              <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 px-1">Configured Days</h4>
               <div className="space-y-3">
                 {schedule.map((slot, idx) => (
                   <div key={idx} className="flex justify-between items-center bg-white border border-gray-100 p-4 shadow-sm hover:border-[#0775AB] transition-colors group">
@@ -330,7 +330,7 @@ const CreateWorkshopModal = ({
                 ))}
                 {schedule.length === 0 && (
                   <div className="text-center py-10 border border-dashed border-gray-200 text-gray-300 text-[10px] font-bold uppercase tracking-widest bg-white">
-                    Cap dia configurat encara
+                    No days configured yet
                   </div>
                 )}
               </div>
@@ -343,12 +343,12 @@ const CreateWorkshopModal = ({
           {error ? (
             <div className="text-[#F26178] text-[10px] font-black uppercase tracking-widest">{error}</div>
           ) : (
-            <div className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Revisa les dades abans de guardar.</div>
+            <div className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Review data before saving.</div>
           )}
 
           <div className="flex gap-4">
             <button onClick={onClose} className="px-6 py-3 text-[10px] font-black text-gray-400 hover:text-gray-600 uppercase tracking-widest transition-colors">
-              Cancel·lar
+              Cancel
             </button>
             <button
               onClick={handleSubmit}
@@ -358,9 +358,9 @@ const CreateWorkshopModal = ({
               {loading ? (
                 <div className="flex items-center gap-2">
                   <Loading size="sm" white message="" />
-                  Guardant...
+                  Saving...
                 </div>
-              ) : 'Guardar Taller'}
+              ) : 'Save Workshop'}
             </button>
           </div>
         </div>

@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@iter/shared';
-import notificacioService, { Notificacio } from '@/services/notificacioService';
+import { THEME, ROLES } from '@iter/shared';
+import notificationService, { Notificacio } from '@/services/notificationService';
 import { useEffect, useState, useRef } from 'react';
 import Avatar from './Avatar';
 
@@ -38,7 +38,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
     if (user) {
       const fetchUnread = async () => {
         try {
-          const list = await notificacioService.getAll();
+          const list = await notificationService.getAll();
           setUnreadCount(list.filter(n => !n.llegida).length);
         } catch (error) {
           console.error("Error fetching notifications for navbar", error);
@@ -54,12 +54,12 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
 
   if (!user) return null;
 
-  const isAdmin = user.rol.nom_rol === 'ADMIN';
-  const isCoordinator = user.rol.nom_rol === 'COORDINADOR';
+  const isAdmin = user.rol.nom_rol === ROLES.ADMIN;
+  const isCoordinator = user.rol.nom_rol === ROLES.COORDINATOR;
 
   const getInicioPath = () => {
     if (isAdmin) return '/admin';
-    if (isCoordinator) return '/centro';
+    if (isCoordinator) return '/center';
     return '/';
   };
 
@@ -75,10 +75,10 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
   };
 
   const navLinks = [
-    { label: 'Inici', path: getInicioPath(), show: true },
-    { label: 'Avisos', path: '/centro/avisos', show: true, isAvisos: true },
-    { label: 'Calendari', path: '/calendar', show: true },
-    { label: 'Perfil', path: '/perfil', show: true },
+    { label: 'Home', path: getInicioPath(), show: true },
+    { label: 'Notifications', path: '/center/notifications', show: true, isNotifications: true },
+    { label: 'Calendar', path: '/calendar', show: true },
+    { label: 'Profile', path: '/perfil', show: true },
   ];
 
   return (
@@ -117,7 +117,7 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
                 >
                   <span className="relative">
                     {link.label}
-                    {link.isAvisos && unreadCount > 0 && (
+                    {link.isNotifications && unreadCount > 0 && (
                       <span className="absolute -top-3 -right-4 flex h-4 w-4">
                         <span className="relative inline-flex h-4 w-4 bg-consorci-pinkRed text-[8px] font-bold items-center justify-center text-white">
                           {unreadCount > 9 ? '9+' : unreadCount}
@@ -133,17 +133,17 @@ const Navbar: React.FC<NavbarProps> = ({ title = 'Iter' }) => {
             <div className="flex items-center border-l border-border-subtle pl-8 h-8 my-auto gap-6">
               <div className="flex flex-col items-end">
                 <span className="text-text-primary text-[10px] font-bold uppercase tracking-widest">
-                  {user.nom_complet}
+                  {user.center?.nom || 'Educational center'}
                 </span>
-                <span className="text-text-secondary text-[8px] font-bold uppercase tracking-widest">
-                  {user.rol.nom_rol} {user.centre?.nom ? `• ${user.centre.nom}` : ''}
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 truncate max-w-[180px]">
+                  {user.rol?.nom_rol} {user.center?.codi_center ? `• ${user.center.codi_center}` : ''}
                 </span>
               </div>
               <button
                 onClick={logout}
                 className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[10px] font-bold uppercase tracking-widest px-5 py-2 transition-all"
               >
-                Sortir
+                Logout
               </button>
             </div>
           </div>

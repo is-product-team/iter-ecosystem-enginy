@@ -1,0 +1,122 @@
+'use client';
+
+import { useEffect, useState, use } from 'react';
+import { useRouter } from 'next/navigation';
+import { getUser, User } from '@/lib/auth';
+import { THEME, ROLES } from '@iter/shared';
+import DashboardLayout from '@/components/DashboardLayout';
+import assignmentService from '@/services/assignmentService';
+import getApi from '@/services/api';
+import Loading from '@/components/Loading';
+import { toast } from 'sonner';
+
+export default function AssignmentEvaluationsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+    const [user, setUser] = useState<User | null>(null);
+    const [assignment, setAssignment] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+
+    useEffect(() => {
+        const currentUser = getUser();
+        if (!currentUser || (currentUser.rol.nom_rol !== ROLES.COORDINATOR && currentUser.rol.nom_rol !== ROLES.ADMIN)) {
+            router.push('/login');
+            return;
+        }
+        setUser(currentUser);
+
+        const fetchData = async () => {
+            try {
+                const resAssig = await assignmentService.getById(parseInt(id));
+                setAssignment(resAssig);
+            } catch (error) {
+                console.error("Error fetching assignment for evaluations:", error);
+                toast.error('Assignment not found.');
+                router.push('/center/assignments');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id, router]);
+
+    if (loading || !assignment) {
+        return <Loading fullScreen message="Loading enrollments..." />;
+    }
+
+    return (
+        <DashboardLayout
+            title={`Competence Evaluation: ${assignment.workshop?.title}`}
+            subtitle="Grade the performance of the students participating in the workshop."
+        >
+            <div className="w-full pb-20">
+                <button
+                    onClick={() => router.push('/center/assignments')}
+                    className="mb-8 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors flex items-center gap-2"
+                >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    Back to Assignments
+                </button>
+
+                <div className="bg-white border shadow-sm overflow-hidden">
+                    <div className="bg-gray-50 px-8 py-4 border-b">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">List of Enrollments</h3>
+                    </div>
+
+                    <div className="divide-y relative">
+                        {assignment.enrollments?.length === 0 ? (
+                            <div className="p-20 text-center">
+                                <p className="text-sm text-gray-400 italic">No enrollments found for this assignment.</p>
+                            </div>
+                        ) : (
+                            assignment.enrollments.map((ins: any) => (
+                                <div
+                                    key={ins.id_enrollment}
+                                    className="px-8 py-6 flex justify-between items-center hover:bg-gray-50 transition-colors"
+                                >
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-12 h-12 bg-blue-900 flex items-center justify-center font-black italic text-sm text-white shadow-lg">
+                                            {ins.student?.name?.charAt(0)}{ins.student?.surnames?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-900">
+                                                {ins.student?.name} {ins.student?.surnames}
+                                            </p>
+                                            <p className="text-[10px] font-black uppercase tracking-tighter text-gray-400">
+                                                IDALU: {ins.student?.idalu}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-6">
+                                        <div className="hidden md:block text-right">
+                                            {ins.teacher_evaluation ? (
+                                                <span className="text-[10px] font-black uppercase px-3 py-1 bg-green-100 text-green-700">Completed</span>
+                                            ) : (
+                                                <span className="text-[10px] font-black uppercase px-3 py-1 bg-orange-100 text-orange-700">Pending</span>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => router.push(`/center/assignments/${id}/evaluations/${ins.id_enrollment}`)}
+                                            className="bg-black hover:bg-blue-900 text-white px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95"
+                                        >
+                                            {ins.teacher_evaluation ? 'View / Edit' : 'Evaluate'}
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                <div className="mt-8 p-6 bg-gray-100 border-l-4 border-black text-gray-600 text-xs font-bold">
+                    <p className="uppercase tracking-widest mb-1">Evaluation Instructions</p>
+                    <p className="font-normal leading-relaxed">
+                        Remember that the competence evaluation is an indispensable requirement for the certification of the student's educational attention. You must value both technical and transversal competences.
+                    </p>
+                </div>
+            </div>
+        </DashboardLayout>
+    );
+}

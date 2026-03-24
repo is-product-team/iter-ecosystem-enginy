@@ -29,8 +29,8 @@ async function seedInfrastructure() {
 
   const rolesMap = {
     ADMIN: roles.find((r) => r.nom_role === ROLES.ADMIN)!,
-    COORDINADOR: roles.find((r) => r.nom_role === ROLES.COORDINADOR)!,
-    PROFESSOR: roles.find((r) => r.nom_role === ROLES.PROFESSOR)!,
+    COORDINATOR: roles.find((r) => r.nom_role === ROLES.COORDINATOR)!,
+    TEACHER: roles.find((r) => r.nom_role === ROLES.TEACHER)!,
   };
 
   const sectors = ['Transformació Digital', 'Creació Artística', 'Industrial i Logística'];
@@ -113,7 +113,7 @@ async function seedUsers(roles: any, passDefault: string) {
         nom_complet: c.coordNom,
         email: c.coordEmail,
         password_hash: passDefault,
-        id_role: roles.COORDINADOR.id_role,
+        id_role: roles.COORDINATOR.id_role,
         id_center: centre.id_center,
       },
     });
@@ -132,7 +132,7 @@ async function seedUsers(roles: any, passDefault: string) {
         nom_complet: name,
         email,
         password_hash: passDefault,
-        id_role: roles.PROFESSOR.id_role,
+        id_role: roles.TEACHER.id_role,
         id_center: centres[0].id_center,
       },
     });
@@ -152,7 +152,7 @@ async function seedUsers(roles: any, passDefault: string) {
         nom_complet: name,
         email,
         password_hash: passDefault,
-        id_role: roles.PROFESSOR.id_role,
+        id_role: roles.TEACHER.id_role,
         id_center: centres[1].id_center,
       },
     });
@@ -196,10 +196,10 @@ async function seedFases() {
   const currentYear = now.getFullYear();
 
   const fasesData = [
-    { nom: PHASES.SOLICITUD, ordre: 1, activa: true },
-    { nom: PHASES.PLANIFICACION, ordre: 2, activa: false },
-    { nom: PHASES.EJECUCION, ordre: 3, activa: false },
-    { nom: PHASES.CIERRE, ordre: 4, activa: false },
+    { nom: PHASES.APPLICATION, ordre: 1, activa: true },
+    { nom: PHASES.PLANNING, ordre: 2, activa: false },
+    { nom: PHASES.EXECUTION, ordre: 3, activa: false },
+    { nom: PHASES.CLOSURE, ordre: 4, activa: false },
   ];
 
   for (const fase of fasesData) {

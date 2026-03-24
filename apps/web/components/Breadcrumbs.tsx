@@ -13,19 +13,21 @@ const Breadcrumbs: React.FC = () => {
 
   const pathSegments = pathname.split('/').filter(Boolean);
   
-  // Mapeo de segmentos a nombres legibles
+  // Mapping of segments to readable names
   const segmentMap: Record<string, string> = {
-    admin: 'Inici',
-    centro: 'Inici',
-    talleres: 'Tallers',
-    centros: 'Centres',
-    solicitudes: 'Peticions',
-    fases: 'Fases',
-    calendar: 'Calendari',
-    perfil: 'El meu Perfil',
-    alumnos: 'Alumnat',
-    profesores: 'Professorat',
-    assignacions: 'Assignacions'
+    admin: 'Home',
+    center: 'Home',
+    workshops: 'Workshops',
+    centers: 'Centers',
+    requests: 'Requests',
+    phases: 'Phases',
+    calendar: 'Calendar',
+    perfil: 'Profile',
+    students: 'Students',
+    teachers: 'Teachers',
+    assignments: 'Assignments',
+    sessions: 'Sessions',
+    notifications: 'Notifications'
   };
 
   return (

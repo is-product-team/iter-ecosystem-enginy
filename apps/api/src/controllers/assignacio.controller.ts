@@ -619,7 +619,7 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
         const schedule = assignment.workshop.dies_execucio as any[]; 
         
         // 3.1 Obtener fechas de la Phase 3
-        const { phase: phase3 } = await isPhaseActive(PHASES.EJECUCION);
+        const { phase: phase3 } = await isPhaseActive(PHASES.EXECUTION);
         
         if (phase3 && Array.isArray(schedule) && schedule.length > 0) {
             const startDate = new Date(Math.max(new Date().getTime(), phase3.data_inici.getTime()));

@@ -7,23 +7,23 @@ export { THEME };
 // Nota: Requiere que la API haya ejecutado "npx prisma generate"
 export type * from '@prisma/client';
 
-// Definimos los roles exactos que espera la Base de Datos
+// Define exact roles expected by the Database
 export const ROLES = {
   ADMIN: 'ADMIN',
-  COORDINADOR: 'COORDINADOR',
-  PROFESSOR: 'PROFESSOR'
+  COORDINATOR: 'COORDINADOR',
+  TEACHER: 'PROFESSOR'
 } as const;
 
-export type Rol = typeof ROLES[keyof typeof ROLES];
+export type RoleTag = typeof ROLES[keyof typeof ROLES];
 
-// Definimos los estados de las peticiones - Alineados con Prisma Enum 'EstatRequest'
+// Define request statuses - Aligned with Prisma Enum 'RequestStatus' (or EstatRequest)
 export const REQUEST_STATUSES = {
-  PENDIENTE: 'Pending',
-  ACEPTADA: 'Approved',
-  RECHAZADA: 'Rejected'
+  PENDING: 'Pending',
+  APPROVED: 'Approved',
+  REJECTED: 'Rejected'
 } as const;
 
-export type EstadoRequestn = typeof REQUEST_STATUSES[keyof typeof REQUEST_STATUSES];
+export type RequestStatus = typeof REQUEST_STATUSES[keyof typeof REQUEST_STATUSES];
 
 // Calendario Programa Iter (Curso 25-26 aprox)
 export const CALENDARI = {
@@ -33,20 +33,20 @@ export const CALENDARI = {
   GESTION_VACANTES: '2025-11-01',
 } as const;
 
-// Nombres oficiales de las fases para consistencia en DB y UI
+// Official phase names for consistency in DB and UI
 export const PHASES = {
-  SOLICITUD: 'Sol·licitud i Inscripció',
-  PLANIFICACION: 'Planificació i Assignació',
-  EJECUCION: 'Execució i Seguiment',
-  CIERRE: 'Tancament i Avaluació'
+  APPLICATION: 'Sol·licitud i Inscripció',
+  PLANNING: 'Planificació i Assignació',
+  EXECUTION: 'Execució i Seguiment',
+  CLOSURE: 'Tancament i Avaluació'
 } as const;
 
-export const FASES_TIMELINE = [
-  { id: 'PRESENTACIO', nom: PHASES.SOLICITUD, data: CALENDARI.REUNION_PRESENTACION },
-  { id: 'DEMANDA', nom: 'Enviament de Demanda', data: CALENDARI.LIMITE_DEMANDA },
-  { id: 'ASSIGNACIO', nom: PHASES.PLANIFICACION, data: CALENDARI.COMUNICACION_ASIGNACIONES },
-  { id: 'VACANTS', nom: 'Gestió de Vacants i Incidències', data: CALENDARI.GESTION_VACANTES },
-  { id: 'VALIDACIO', nom: PHASES.CIERRE, data: null }
+export const PHASES_TIMELINE = [
+  { id: 'PRESENTATION', name: PHASES.APPLICATION, data: CALENDARI.REUNION_PRESENTACION },
+  { id: 'DEMAND', name: 'Enviament de Demanda', data: CALENDARI.LIMITE_DEMANDA },
+  { id: 'ASSIGNMENT', name: PHASES.PLANNING, data: CALENDARI.COMUNICACION_ASIGNACIONES },
+  { id: 'VACANTS', name: 'Gestió de Vacants i Incidències', data: CALENDARI.GESTION_VACANTES },
+  { id: 'VALIDATION', name: PHASES.CLOSURE, data: null }
 ] as const;
 
 // Utility functions
