@@ -13,7 +13,7 @@ import Pagination from '@/components/Pagination';
 type AssignmentMode = 'single' | 'whole';
 
 interface Sessio {
-  id_sessio: number | string;
+  id_sessio: number;
   data_sessio: string;
   hora_inici?: string;
   hora_fi?: string;
