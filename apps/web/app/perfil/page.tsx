@@ -22,8 +22,8 @@ export default function ProfilePage() {
   if (loading || !user) {
 
     return (
-      <div className="flex min-h-screen justify-center items-center" style={{ backgroundColor: THEME.colors.background }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: THEME.colors.primary }}></div>
+      <div className="flex min-h-screen justify-center items-center bg-[#F8FAFC]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00426B] mx-auto"></div>
       </div>
     );
   }

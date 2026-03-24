@@ -13,7 +13,7 @@ import Pagination from '@/components/Pagination';
 type AssignmentMode = 'single' | 'whole';
 
 interface Sessio {
-  id_sessio: number;
+  id_sessio: number | string;
   data_sessio: string;
   hora_inici?: string;
   hora_fi?: string;
@@ -174,7 +174,7 @@ export default function SessionsListPage() {
         // Let's loop to be safe and ensure they appear on the calendar for all days.
         const targetAssignacio = assignacions.find(a => a.id_assignacio === parseInt(selectedAssignacioId));
         if (targetAssignacio?.sessions) {
-           await Promise.all(targetAssignacio.sessions.map((s: { id_sessio: number }) => 
+           await Promise.all(targetAssignacio.sessions.map((s: any) => 
                api.post(`/assignacions/sessions/${s.id_sessio}/staff`, { idUsuari: parseInt(selectedProfessorId) })
                  .catch(() => {}) // Ignore duplicates
            ));
@@ -462,7 +462,7 @@ export default function SessionsListPage() {
                       className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
                     >
                       <option value="">-- Choose a session --</option>
-                      {selectedAssignacio?.sessions?.map((s: { id_sessio: number, data_sessio: string, hora_inici: string, hora_fi: string }, idx: number) => (
+                      {selectedAssignacio?.sessions?.map((s: any, idx: number) => (
                         <option key={s.id_sessio} value={s.id_sessio}>
                           Session {idx + 1} - {new Date(s.data_sessio).toLocaleDateString()} ({s.hora_inici}-{s.hora_fi})
                         </option>
