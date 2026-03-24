@@ -20,9 +20,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      if (user.rol.nom_rol === 'ADMIN') {
+      const role = user.rol?.nom_rol;
+      if (role === 'ADMIN') {
         router.push('/admin');
-      } else if (user.rol.nom_rol === 'COORDINADOR') {
+      } else if (role === 'COORDINADOR') {
         router.push('/centro');
       }
     }
@@ -42,13 +43,14 @@ export default function LoginPage() {
       const response = await apiLogin(email, password);
       const { user, token } = response;
 
-      if (user.rol.nom_rol === 'PROFESSOR') {
+      if (user.rol?.nom_rol === 'PROFESSOR') {
         setShowProfessorLink(true);
       } else {
         login(user, token);
-        if (user.rol.nom_rol === 'ADMIN') {
+        const role = user.rol?.nom_rol;
+        if (role === 'ADMIN') {
           router.push('/admin');
-        } else if (user.rol.nom_rol === 'COORDINADOR') {
+        } else if (role === 'COORDINADOR') {
           router.push('/centro');
         }
       }

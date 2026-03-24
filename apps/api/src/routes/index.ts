@@ -18,8 +18,12 @@ import notificacioRoutes from './notificacio.routes.js';
 import evaluationRoutes from './evaluation.routes.js'; 
 import questionariRoutes from './questionari.routes.js';
 import uploadRoutes from './upload.routes.js';
+import profileRoutes from './profile.routes.js';
 
 // --- Definir las rutas base ---
+
+// Rutas de Usuario/Perfil
+router.use('/profile', profileRoutes);
 
 // Rutas de Autenticación (Login, Registro)
 router.use('/auth', authRoutes);
@@ -42,7 +46,7 @@ router.use('/attendance', assistenciaRoutes);
 
 // Rutas de Calendario
 router.use('/calendar', calendarRoutes);
-router.use('/phases', faseRoutes);
+router.use('/fases', faseRoutes);
 
 // Rutas de Estadísticas
 router.use('/stats', statsRoutes);

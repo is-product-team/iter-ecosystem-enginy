@@ -62,9 +62,19 @@ export function getUser(): User | null {
     const token = localStorage.getItem('token');
     if (userStr && token) {
       try {
-        return JSON.parse(userStr);
+        const user = JSON.parse(userStr);
+        // Basic validation: ensure the user has a valid role structure
+        if (!user || !user.rol || typeof user.rol.nom_rol !== 'string') {
+          console.warn("Malformed user data in localStorage, clearing session.");
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          return null;
+        }
+        return user;
       } catch (e) {
         console.error("Error parsing user data", e);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
         return null;
       }
     }

@@ -84,6 +84,7 @@ model User {
   role          Role    @relation(fields: [id_role], references: [id_role])
   id_center     Int?
   center        Center? @relation(fields: [id_center], references: [id_center])
+  sync_token    String? @unique
 
   assignments      AssignmentTeacher[]
   session_teachers SessionTeacher[]

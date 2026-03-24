@@ -8,7 +8,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 
 interface Fase {
-  id_fase: number;
+  id_phase: number;
   nom: string;
   descripcio: string;
   data_inici: string;
@@ -81,7 +81,7 @@ export default function CentroDashboard() {
               <div className="w-full py-8 text-center uppercase text-[10px] font-bold tracking-widest text-[#00426B]">Carregant calendari...</div>
             ) : (
               fases.map((fase) => (
-                <div key={fase.id_fase} className="relative flex flex-col items-center text-center flex-1 group">
+                <div key={fase.id_phase} className="relative flex flex-col items-center text-center flex-1 group">
                   {/* Square with number */}
                   <div
                     className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border-2 transition-all ${fase.activa
