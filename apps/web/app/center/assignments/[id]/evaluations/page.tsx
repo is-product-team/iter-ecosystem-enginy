@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 export default function AssignmentEvaluationsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [user, setUser] = useState<User | null>(null);
-    const [assignment, setAssignment] = useState<Record<string, unknown> | null>(null);
+    const [assignment, setAssignment] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
@@ -70,7 +70,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                                 <p className="text-sm text-gray-400 italic">No enrollments found for this assignment.</p>
                             </div>
                         ) : (
-                            assignment.enrollments.map((ins: Record<string, unknown>) => (
+                            assignment.enrollments.map((ins: any) => (
                                 <div
                                     key={ins.id_enrollment}
                                     className="px-8 py-6 flex justify-between items-center hover:bg-gray-50 transition-colors"
