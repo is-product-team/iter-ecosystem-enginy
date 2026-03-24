@@ -1,5 +1,5 @@
 import React from 'react';
-import { Taller } from '../services/tallerService';
+import { Taller } from '../services/workshopService';
 import WorkshopIcon from './WorkshopIcon';
 
 interface WorkshopCardProps {

@@ -22,7 +22,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
-  const monthName = currentDate.toLocaleString('ca-ES', { month: 'long' });
+  const monthName = currentDate.toLocaleString('en-US', { month: 'long' });
   const year = currentDate.getFullYear();
 
   const daysInMonth = (y: number, m: number) => new Date(y, m + 1, 0).getDate();
@@ -107,7 +107,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
         </div>
 
         <div className="grid grid-cols-7 border-t border-l border-gray-100">
-          {['DL', 'DT', 'DC', 'DJ', 'DV', 'DS', 'DG'].map(d => (
+          {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map(d => (
             <div key={d} className="py-3 bg-gray-50 border-r border-b border-gray-100 text-center">
               <span className="text-[10px] font-black text-gray-400 tracking-widest">{d}</span>
             </div>
@@ -159,13 +159,13 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick }) => {
       <div className="lg:w-96 flex flex-col gap-6">
         <div className="bg-white border border-gray-200 p-8 shadow-sm h-full">
           <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-6">
-            Esdeveniments per al {new Date(selectedDate).toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+            Events for {new Date(selectedDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
           </h3>
           
           <div className="flex flex-col gap-4">
             {selectedDayEvents.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-gray-300 text-xs font-medium italic">No hi ha activitat programada</p>
+                <p className="text-gray-300 text-xs font-medium italic">No scheduled activity</p>
               </div>
             ) : (
               selectedDayEvents.map(event => (

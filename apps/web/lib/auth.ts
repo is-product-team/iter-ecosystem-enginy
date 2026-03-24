@@ -1,17 +1,18 @@
+import { ROLES, RoleTag } from '@iter/shared';
 
 export interface User {
-  id: number;
-  id_usuari: number;
-  email: string;
+  id_user: number;
   nom_complet: string;
+  email: string;
   url_foto?: string | null;
-  id_centre?: number;
-  centre?: {
-    id_centre: number;
+  id_center?: number | null;
+  center?: {
+    id_center: number;
     nom: string;
+    codi_center?: string;
   };
   rol: {
-    nom_rol: 'ADMIN' | 'COORDINADOR' | 'PROFESSOR';
+    nom_rol: RoleTag;
   };
 }
 

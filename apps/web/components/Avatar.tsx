@@ -4,7 +4,7 @@ interface AvatarProps {
   url?: string | null;
   name: string;
   id: string | number;
-  type: 'alumne' | 'usuari';
+  type: 'student' | 'user' | 'alumne' | 'usuari';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   isCoordinator?: boolean;

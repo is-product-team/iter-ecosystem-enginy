@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { THEME } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
-import { avaluacioService } from '@/services/avaluacioService';
+import { evaluationService } from '@/services/evaluationService';
 
 export default function AdminReportsPage() {
     const [metrics, setMetrics] = useState<any>(null);
@@ -12,7 +12,7 @@ export default function AdminReportsPage() {
     useEffect(() => {
         const fetchMetrics = async () => {
             try {
-                const res = await avaluacioService.getReports();
+                const res = await evaluationService.getReports();
                 setMetrics(res.data);
             } catch (err) {
                 console.error("Error fetching report metrics:", err);
@@ -35,8 +35,8 @@ export default function AdminReportsPage() {
 
     return (
         <DashboardLayout
-            title="Dashboard d'Avaluació"
-            subtitle="Analitza la qualitat i l'impacte del Programa Enginy."
+            title="Evaluation Dashboard"
+            subtitle="Analyze the quality and impact of the Enginy Program."
         >
             <div className="w-full pb-20 space-y-12">
 

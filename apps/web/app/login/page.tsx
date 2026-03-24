@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@iter/shared';
+import { THEME, ROLES } from '@iter/shared';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 
@@ -20,16 +20,16 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      if (user.rol.nom_rol === 'ADMIN') {
+      if (user.rol.nom_rol === ROLES.ADMIN) {
         router.push('/admin');
-      } else if (user.rol.nom_rol === 'COORDINADOR') {
-        router.push('/centro');
+      } else if (user.rol.nom_rol === ROLES.COORDINATOR) {
+        router.push('/center');
       }
     }
   }, [user, authLoading, router]);
 
   if (authLoading) {
-    return <Loading fullScreen message="Iniciant sessió..." />;
+    return <Loading fullScreen message="Signing in..." />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,24 +42,24 @@ export default function LoginPage() {
       const response = await apiLogin(email, password);
       const { user, token } = response;
 
-      if (user.rol.nom_rol === 'PROFESSOR') {
+      if (user.rol.nom_rol === ROLES.TEACHER) {
         setShowProfessorLink(true);
       } else {
         login(user, token);
-        if (user.rol.nom_rol === 'ADMIN') {
+        if (user.rol.nom_rol === ROLES.ADMIN) {
           router.push('/admin');
-        } else if (user.rol.nom_rol === 'COORDINADOR') {
-          router.push('/centro');
+        } else if (user.rol.nom_rol === ROLES.COORDINATOR) {
+          router.push('/center');
         }
       }
     } catch (err: any) {
       // Improved error messaging based on backend response or common errors
-      if (err.message.includes('401') || err.message.toLowerCase().includes('inválidas')) {
-        setError('Correu o contrasenya incorrectes. Torna-ho a provar.');
+      if (err.message.includes('401') || err.message.toLowerCase().includes('invalid')) {
+        setError('Incorrect email or password. Please try again.');
       } else if (err.message.includes('fetch') || err.message.includes('network')) {
-        setError('Error de conexió. Comprova que el servidor estigui actiu.');
+        setError('Connection error. Please check if the server is active.');
       } else {
-        setError(err.message || 'S\'ha produït un error inesperat.');
+        setError(err.message || 'An unexpected error occurred.');
       }
     } finally {
       setLoading(false);
@@ -79,7 +79,7 @@ export default function LoginPage() {
           </div>
           <h2 className="text-4xl font-black tracking-tighter text-text-primary uppercase leading-none">Iter</h2>
           <div className="h-1 w-12 bg-consorci-darkBlue mx-auto mt-2"></div>
-          <p className="text-text-primary text-[10px] font-black uppercase tracking-[0.3em] mt-4 opacity-70">Gestió d'Aprenentatge</p>
+          <p className="text-text-primary text-[10px] font-black uppercase tracking-[0.3em] mt-4 opacity-70">Learning Management</p>
         </div>
 
         {error && (
@@ -93,16 +93,16 @@ export default function LoginPage() {
 
         {showProfessorLink ? (
           <div className="bg-background-subtle p-10 text-center animate-in fade-in zoom-in duration-300">
-            <h3 className="text-xl font-black text-consorci-darkBlue uppercase mb-4 tracking-tight">Accés via App Mòbil</h3>
+            <h3 className="text-xl font-black text-consorci-darkBlue uppercase mb-4 tracking-tight">Access via Mobile App</h3>
             <p className="text-xs text-text-muted font-bold uppercase tracking-wider mb-8 leading-relaxed">
-              Com a professor, has d'utilitzar l'aplicació mòbil d'Iter per gestionar les teves sessions.
+              As a teacher, you must use the Iter mobile app to manage your sessions.
             </p>
             <a
               href="#"
               className="group relative flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white text-xs font-bold uppercase tracking-widest transition-all hover:bg-consorci-actionBlue active:scale-95"
-              onClick={(e) => { e.preventDefault(); toast.info('Enllaç de descàrrega pròximament (Expo Go / TestFlight)'); }}
+              onClick={(e) => { e.preventDefault(); toast.info('Download link coming soon (Expo Go / TestFlight)'); }}
             >
-              <span>Descarregar App Iter</span>
+              <span>Download Iter App</span>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -111,25 +111,25 @@ export default function LoginPage() {
               onClick={() => setShowProfessorLink(false)}
               className="mt-8 text-[10px] font-black text-consorci-lightBlue hover:text-consorci-darkBlue tracking-[0.2em] uppercase transition-colors"
             >
-              ← Tornar al login
+              ← Back to login
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-2">
-              <label className="block text-text-primary text-[10px] font-black uppercase tracking-widest px-1">Correu Electrònic</label>
+              <label className="block text-text-primary text-[10px] font-black uppercase tracking-widest px-1">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-bold text-sm text-text-primary placeholder:text-text-muted outline-none"
-                placeholder="coordinador@centre.cat"
+                placeholder="coordinator@center.com"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-text-primary text-[10px] font-black uppercase tracking-widest px-1">Contrasenya</label>
+              <label className="block text-text-primary text-[10px] font-black uppercase tracking-widest px-1">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -167,9 +167,9 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <Loading size="sm" white message="" />
-                  <span>Accedint...</span>
+                  <span>Signing in...</span>
                 </>
-              ) : 'Entrar al Programa'}
+              ) : 'Enter Program'}
             </button>
           </form>
         )}

@@ -19,15 +19,15 @@ export default function AdminDashboardPage() {
 
   if (authLoading || !user) {
     return (
-      <Loading fullScreen message="Autenticant administrador..." />
+      <Loading fullScreen message="Authenticating administrator..." />
     );
   }
 
   const sections = [
     {
-      title: 'Gestió de Tallers',
-      description: 'Crea, modifica o elimina els tallers per els centres.',
-      path: '/admin/talleres',
+      title: 'Workshop Management',
+      description: 'Create, modify or delete workshops for centers.',
+      path: '/admin/workshops',
       phase: 'General',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,9 +37,9 @@ export default function AdminDashboardPage() {
       color: 'blue'
     },
     {
-      title: 'Gestió de Centres',
-      description: 'Crea, modifica o elimina els centres.',
-      path: '/admin/centros',
+      title: 'Center Management',
+      description: 'Create, modify or delete centers.',
+      path: '/admin/centers',
       phase: 'General',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,10 +49,10 @@ export default function AdminDashboardPage() {
       color: 'red'
     },
     {
-      title: 'Fases del Curs',
-      description: 'Configura les dates i estats de les fases del curs.',
-      path: '/admin/fases',
-      phase: 'Configuració',
+      title: 'Course Phases',
+      description: 'Configure dates and status of the course phases.',
+      path: '/admin/phases',
+      phase: 'Configuration',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -61,8 +61,8 @@ export default function AdminDashboardPage() {
       color: 'purple'
     },
     {
-      title: 'Estadísticas',
-      description: "Analítica avançada de l'ús del sistema, tallers més demandats i activitat del sistema.",
+      title: 'Statistics',
+      description: 'Advanced analysis of system usage, most requested workshops and system activity.',
       path: '/admin/stats',
       phase: 'Global',
       icon: (
@@ -73,10 +73,10 @@ export default function AdminDashboardPage() {
       color: 'green'
     },
     {
-      title: 'Solicitudes de Centres',
-      description: 'Consulta les peticions de les centres i assigna tallers.',
-      path: '/admin/solicitudes',
-      phase: 'Fase 1',
+      title: 'Center Requests',
+      description: 'View center requests and assign workshops.',
+      path: '/admin/requests',
+      phase: 'Phase 1',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -85,10 +85,10 @@ export default function AdminDashboardPage() {
       color: 'orange'
     },
     {
-      title: 'Verificació de Documents',
-      description: 'Valida la documentació presentada pels centres (Acord Pedagògic, Mobilitat, etc).',
-      path: '/admin/verificacions',
-      phase: 'Fase 2',
+      title: 'Document Verification',
+      description: 'Validate documentation presented by centers (Pedagogical Agreement, Mobility, etc).',
+      path: '/admin/verifications',
+      phase: 'Phase 2',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -100,8 +100,8 @@ export default function AdminDashboardPage() {
 
   return (
     <DashboardLayout
-      title="Panell d'Administració"
-      subtitle="Benvingut al centre de control del programa Iter. Gestiona tallers, centres i sol·licituds des d'aquest panell."
+      title="Admin Dashboard"
+      subtitle="Welcome to the Iter control center. Manage workshops, centers, and requests from this panel."
     >
       <div className="flex justify-center w-full pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
