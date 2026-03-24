@@ -33,11 +33,11 @@ export default function CalendarPage() {
       const phasesData = phasesRes.data.data;
       const getPhaseColor = (nom: string) => {
         const n = nom.toLowerCase();
-        if (n.includes("sol·licitud") || n.includes("inscripció")) return "bg-consorci-darkBlue text-white";
-        if (n.includes("planificació") || n.includes("assignació")) return "bg-consorci-actionBlue text-white";
-        if (n.includes("execució") || n.includes("seguiment")) return "bg-consorci-pinkRed text-white";
-        if (n.includes("tancament") || n.includes("avaluació")) return "bg-consorci-beige text-[#00426B]";
-        return "bg-consorci-darkBlue text-white";
+        if (n.includes("sol·licitud") || n.includes("inscripció")) return "calendar-event-card event-phase-inscription";
+        if (n.includes("planificació") || n.includes("assignació")) return "calendar-event-card event-phase-planning";
+        if (n.includes("execució") || n.includes("seguiment")) return "calendar-event-card event-phase-execution";
+        if (n.includes("tancament") || n.includes("avaluació")) return "calendar-event-card event-phase-evaluation";
+        return "calendar-event-card event-milestone";
       };
 
       const phaseEvents = phasesData.map((f: any) => ({

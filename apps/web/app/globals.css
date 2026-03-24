@@ -112,3 +112,63 @@ h6 {
     @apply px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24;
   }
 }
+
+/* Calendar Event Redesign (Apple Calendar Style) */
+.calendar-event-card {
+  @apply border-l-[3px] h-full flex items-center px-2 py-0.5 overflow-hidden transition-all shadow-sm;
+  border-radius: 4px !important; /* Override global 0px */
+}
+
+.event-milestone {
+  background-color: rgba(0, 66, 107, 0.12) !important;
+  border-left-color: #00426b !important;
+  color: #00426b !important;
+}
+
+.event-deadline {
+  background-color: rgba(225, 0, 81, 0.12) !important;
+  border-left-color: #e10051 !important;
+  color: #e10051 !important;
+}
+
+.event-assignment {
+  background-color: rgba(65, 151, 203, 0.12) !important;
+  border-left-color: #4197cb !important;
+  color: #4197cb !important;
+}
+
+.event-session {
+  background-color: rgba(234, 179, 8, 0.12) !important;
+  border-left-color: #eab308 !important;
+  color: #856404 !important; /* Darker yellow for readability */
+}
+
+/* Phase Specific Styles */
+.event-phase-inscription {
+  background-color: rgba(0, 66, 107, 0.12) !important;
+  border-left-color: #00426b !important;
+  color: #00426b !important;
+}
+
+.event-phase-planning {
+  background-color: rgba(7, 117, 171, 0.12) !important;
+  border-left-color: #0775ab !important;
+  color: #0775ab !important;
+}
+
+.event-phase-execution {
+  background-color: rgba(242, 97, 120, 0.12) !important;
+  border-left-color: #f26178 !important;
+  color: #f26178 !important;
+}
+
+.event-phase-evaluation {
+  background-color: rgba(224, 197, 172, 0.12) !important;
+  border-left-color: #e0c5ac !important;
+  color: #6d4c41 !important; /* Darker brown for readability */
+}
+
+.calendar-event-title {
+  @apply text-[10px] font-semibold truncate leading-none;
+  text-transform: none !important;
+}

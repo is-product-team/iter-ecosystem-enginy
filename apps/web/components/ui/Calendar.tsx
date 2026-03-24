@@ -64,11 +64,11 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
 
   const getEventStyles = (type: string) => {
     switch (type) {
-      case 'milestone': return 'bg-consorci-darkBlue text-white';
-      case 'deadline': return 'bg-consorci-pinkRed text-white';
-      case 'assignment': return 'bg-consorci-lightBlue text-white';
-      case 'session': return 'bg-consorci-yellow text-white';
-      default: return 'bg-gray-500 text-white';
+      case 'milestone': return 'calendar-event-card event-milestone';
+      case 'deadline': return 'calendar-event-card event-deadline';
+      case 'assignment': return 'calendar-event-card event-assignment';
+      case 'session': return 'calendar-event-card event-session';
+      default: return 'calendar-event-card bg-gray-100 border-gray-400 text-gray-700';
     }
   };
 
@@ -194,15 +194,15 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
                         <button
                           key={event.id}
                           onClick={(e) => { e.stopPropagation(); onEventClick?.(event); }}
-                          className={`absolute h-full pointer-events-auto flex items-center px-2 transition-transform hover:scale-[1.02] active:scale-[0.98] ${event.colorClass || getEventStyles(event.type)} shadow-sm`}
+                          className={`absolute h-full pointer-events-auto flex items-center transition-transform hover:scale-[1.01] active:scale-[0.99] ${event.colorClass || getEventStyles(event.type)}`}
                           style={{
                             left: `${(event.start * 100) / 7}%`,
-                            width: `${(event.span * 100) / 7}%`,
+                            width: `calc(${(event.span * 100) / 7}% - 4px)`,
                             marginLeft: '2px',
                             marginRight: '2px',
                           }}
                         >
-                          <span className="text-[9px] font-black text-white truncate uppercase tracking-tighter leading-none">
+                          <span className="calendar-event-title">
                             {event.title}
                           </span>
                         </button>
