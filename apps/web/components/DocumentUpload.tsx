@@ -26,15 +26,11 @@ export default function DocumentUpload({
   const [uploading, setUploading] = useState(false);
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const [validatingAI, setValidatingAI] = useState(false);
+  const [overrideMode, setOverrideMode] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-    if (file.type !== 'application/pdf') {
-      toast.error('Només es permeten fitxers PDF.');
-      return;
-    }
-
+  const handleValidUpload = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('idInscripcio', idInscripcio.toString());
@@ -56,11 +52,63 @@ export default function DocumentUpload({
       setCurrentUrl(newUrl);
       onUploadSuccess(newUrl);
       toast.success(`${label} pujat correctament.`);
+      setOverrideMode(false);
+      setPendingFile(null);
     } catch (error) {
       console.error('Error uploading document:', error);
       toast.error('Error al pujar el document.');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Només es permeten fitxers PDF.');
+      return;
+    }
+
+    try {
+      setValidatingAI(true);
+      const { extractTextFromPdf, classifyDocumentType } = await import('@/lib/pdfUtils');
+      const text = await extractTextFromPdf(file);
+      const detectedType = classifyDocumentType(text);
+
+      if (detectedType !== 'unknown' && detectedType !== documentType) {
+        toast.error(`La IA detecta que has pujat un document tipus: ${detectedType}.`);
+        setOverrideMode(true);
+        setPendingFile(file);
+        setValidatingAI(false);
+        return;
+      }
+
+      if (documentType === 'acord_pedagogic') {
+        const { signatureDetector } = await import('@/lib/visionUtils');
+        await signatureDetector.loadModel();
+        const croppedCanvas = await signatureDetector.getBottomThirdOfLastPage(file);
+        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3);
+        
+        if (!hasSignatures) {
+          toast.error('La IA no ha detectat les 3 signatures obligatòries.');
+          setOverrideMode(true);
+          setPendingFile(file);
+          setValidatingAI(false);
+          return;
+        }
+      }
+
+      // Validado correctamente por la IA
+      await handleValidUpload(file);
+    } catch (err) {
+      console.error("AI Validation Error:", err);
+      toast.error('Error processant IA. Pots forçar pujada manualment.');
+      setOverrideMode(true);
+      setPendingFile(file);
+    } finally {
+      setValidatingAI(false);
     }
   };
 
@@ -88,18 +136,38 @@ export default function DocumentUpload({
           )}
         </div>
 
-        <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${
-          uploading ? 'bg-gray-50 border-gray-100 text-gray-300' : 'border-[#00426B] text-[#00426B] hover:bg-blue-50'
-        }`}>
-          {uploading ? 'PUJANT...' : currentUrl ? 'CANVIAR' : 'ADJUNTAR'}
-          <input 
-            type="file" 
-            className="hidden" 
-            accept=".pdf"
-            onChange={handleFileChange}
-            disabled={uploading}
-          />
-        </label>
+        {overrideMode ? (
+          <div className="flex gap-2 shrink-0">
+             <button
+               onClick={() => { setOverrideMode(false); setPendingFile(null); }}
+               className="px-3 py-2 text-[9px] font-bold uppercase tracking-widest border border-gray-300 text-gray-500 hover:bg-gray-50 transition-all"
+             >
+               CANCEL·LAR
+             </button>
+             <button
+               onClick={() => pendingFile && handleValidUpload(pendingFile)}
+               className="px-3 py-2 text-[9px] font-bold uppercase tracking-widest border border-red-500 text-red-600 bg-red-50 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+               disabled={uploading}
+             >
+               {uploading ? 'PUJANT...' : 'FORÇAR PUJADA'}
+             </button>
+          </div>
+        ) : (
+          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${
+            validatingAI ? 'bg-purple-50 border-purple-300 text-purple-600 animate-pulse' :
+            uploading ? 'bg-gray-50 border-gray-100 text-gray-300' : 
+            'border-[#00426B] text-[#00426B] hover:bg-blue-50 hover:shadow-sm'
+          }`}>
+            {validatingAI ? 'VALIDANT IA...' : uploading ? 'PUJANT...' : currentUrl ? 'CANVIAR' : 'ADJUNTAR'}
+            <input 
+              type="file" 
+              className="hidden" 
+              accept=".pdf"
+              onChange={handleFileChange}
+              disabled={uploading || validatingAI}
+            />
+          </label>
+        )}
       </div>
     </div>
   );
