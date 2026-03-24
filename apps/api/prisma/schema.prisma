@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/node_modules/@prisma/client"
+  output   = "../node_modules/@prisma/client"
 }
 
 datasource db {
