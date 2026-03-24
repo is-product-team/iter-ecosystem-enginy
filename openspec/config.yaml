@@ -1,0 +1,26 @@
+schema: spec-driven
+
+# Project context
+# This is shown to AI when creating artifacts.
+context: |
+  Iter Ecosystem is a scalable monorepo infrastructure for educational centers.
+  
+  Tech Stack:
+  - Frontend: Next.js 15 (React 19) with Tailwind CSS.
+  - Backend: Node.js 22 with Express and Prisma ORM.
+  - Mobile: React Native (Expo) with NativeWind.
+  - Database: PostgreSQL 15.
+  - Orchestration: Turborepo and Docker Compose.
+  
+  Domain:
+  - Management of vocational training workshops (tallers), educational centers, teachers, and students.
+  - Features high-frequency GPS telemetry, automated enrollment validation, and AI-driven group optimization.
+
+# Per-artifact rules
+rules:
+  proposal:
+    - Always link to related specifications in `openspec/specs/`.
+  design:
+    - Include ASCII diagrams for data flows and architecture.
+  tasks:
+    - Break tasks into logical steps (backend, frontend, mobile, infra).
