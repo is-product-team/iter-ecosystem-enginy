@@ -16,11 +16,11 @@ export const getTeachers = async (req: Request, res: Response) => {
       where.id_center = parseInt(centreId.toString());
     }
 
-    const professors = await prisma.teacher.findMany({
+    const teachers = await prisma.teacher.findMany({
       where,
       include: { 
-        centre: true,
-        usuari: {
+        center: true,
+        user: {
           select: {
             id_user: true,
             email: true,
@@ -29,7 +29,7 @@ export const getTeachers = async (req: Request, res: Response) => {
         }
       }
     });
-    res.json(professors);
+    res.json(teachers);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener profesores' });
   }
@@ -50,7 +50,7 @@ export const createTeacher = async (req: Request, res: Response) => {
     const result = await prisma.$transaction(async (tx: any) => {
       // 1. Buscar el rol de profesor
       const rolProfe = await tx.role.findFirst({
-        where: { nom_rol: 'PROFESSOR' }
+        where: { nom_rolee: 'PROFESSOR' }
       });
 
       if (!rolProfe) throw new Error('Role PROFESSOR no trobat.');
@@ -129,34 +129,24 @@ export const getTeacherAssignments = async (req: Request, res: Response) => {
 
     const assignments = await prisma.assignment.findMany({
       where: {
-        OR: [
-           { teachers: { some: { id_user: userId } } },
-           { prof1: { id_user: userId } },
-           { prof2: { id_user: userId } }
-        ]
+        teachers: { some: { id_user: userId } }
       },
       include: {
-        taller: true,
-        centre: true,
-        prof1: true,
-        prof2: true,
-        sessions: {
-            orderBy: { data_sessio: 'asc' }
-        },
+        workshop: true,
+        center: true,
         teachers: {
           include: {
-            usuari: {
+            user: {
               select: {
+                id_user: true,
                 nom_complet: true,
                 email: true
               }
             }
           }
         },
-        submissions: {
-            include: {
-                model: true
-            }
+        sessions: {
+            orderBy: { data_session: 'asc' }
         }
       }
     });
@@ -178,10 +168,10 @@ export const getTeachersByCenter = async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Accés denegat' });
     }
 
-    const professors = await prisma.teacher.findMany({
+    const teachers = await prisma.teacher.findMany({
       where: { id_center: parseInt(idCenter as string) },
       include: {
-        usuari: {
+        user: {
           select: {
             id_user: true,
             email: true,
@@ -192,9 +182,9 @@ export const getTeachersByCenter = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(professors);
+    res.json(teachers);
   } catch (error) {
-    console.error("Error fetching professors by centre:", error);
-    res.status(500).json({ error: 'Error al obtenir els professors del centre.' });
+    console.error("Error fetching teachers by center:", error);
+    res.status(500).json({ error: 'Error al obtenir els teachers del centre.' });
   }
 };

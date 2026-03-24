@@ -30,14 +30,14 @@ export async function runTetris() {
   const petitions = await prisma.request.findMany({
     where: {
       estat: { in: [RequestStatus.Aprovada, RequestStatus.Pendent] },
-      assignments: { none: {} }
+      assignment: null
     },
     include: {
-      taller: true,
-      centre: true
+      workshop: true,
+      center: true
     },
     orderBy: {
-      data_peticio: 'asc' // Strict FIFO: First come, first served
+      data_request: 'asc' // Strict FIFO: First come, first served
     }
   });
 
@@ -68,7 +68,7 @@ export async function runTetris() {
     // 1. Calculate strictly occupied capacity from existing assignments
     const existingAssignments = await prisma.assignment.findMany({
       where: { id_workshop: parseInt(tallerId) },
-      include: { peticio: true }
+      include: { request: true }
     });
 
     const occupiedPlazas = (existingAssignments as any[]).reduce((sum: number, a: any) => {
@@ -103,12 +103,10 @@ export async function runTetris() {
             id_request: petition.id_request,
             id_center: petition.id_center,
             id_workshop: petition.id_workshop,
-            prof1_id: petition.prof1_id,
-            prof2_id: petition.prof2_id,
             estat: 'PUBLISHED',
             checklist: {
               create: [
-                { pas_nom: 'Designar Profesores Referentes', completat: petition.prof1_id !== null && petition.prof2_id !== null },
+                { pas_nom: 'Designar Profesores Referentes', completat: false },
                 { pas_nom: 'Subir Registro Nominal (Excel)', completat: false },
                 { pas_nom: 'Gestionar Acuerdo Pedagògic', completat: petition.modalitat !== 'C' },
                 { pas_nom: 'Autorizaciones de Imagen y Desplazamiento', completat: false }

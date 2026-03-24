@@ -203,8 +203,8 @@ export class AutoAssignmentService {
                     return {
                         id_assignment: assignacio.id_assignment,
                         data_session: d,
-                        hora_inici: slot.startTime,
-                        hora_fi: slot.endTime
+                        hora_inici: (slot as any).startTime,
+                        hora_fi: (slot as any).endTime
                     };
                 });
                 await prisma.session.createMany({ data: sessionsData });

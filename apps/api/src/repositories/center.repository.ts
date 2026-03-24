@@ -3,7 +3,7 @@ import { BaseRepository } from './base.repository.js';
 
 export class CenterRepository extends BaseRepository<Center, Prisma.CenterCreateInput, Prisma.CenterUpdateInput> {
   constructor() {
-    super('center');
+    super('center', 'id_center');
   }
 
   // Sobrescribimos findById para usar id_center

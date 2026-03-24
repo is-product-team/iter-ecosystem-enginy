@@ -18,13 +18,11 @@ export class RiskAnalysisService {
         let riskScore = 0;
 
         // 1. Fetch Attendance (Last 5 sessions)
-        // We assume we look at all active enrollments or specific one? 
-        // Let's look at all recent attendance for simplicity.
         const recentAttendance = await prisma.attendance.findMany({
             where: {
-                inscripcio: { id_student: studentId }
+                enrollment: { id_student: studentId }
             },
-            orderBy: { data_sessio: 'desc' },
+            orderBy: { data_session: 'desc' },
             take: 5
         });
 
@@ -49,16 +47,13 @@ export class RiskAnalysisService {
                 riskScore += 10;
                 factors.push('Persistent tardiness');
             }
-        } else {
-            // No attendance data? Maybe new student or hasn't started.
-            // Low risk unless it's late in the phase.
         }
 
         // 3. Fetch Competence Evaluations (Low engagement?)
-        const lowEvaluations = await prisma.avaluacioCompetencial.count({
+        const lowEvaluations = await prisma.competenceEvaluation.count({
             where: {
                 evaluation: {
-                    inscripcio: { id_student: studentId }
+                    enrollment: { id_student: studentId }
                 },
                 puntuacio: { lt: 3 }
             }
@@ -90,17 +85,13 @@ export class RiskAnalysisService {
         // Find Student Info
         const student = await prisma.student.findUnique({
             where: { id_student: studentId },
-            include: { centre_procedencia: true }
+            include: { center_origin: true }
         });
 
-        if (!student || !student.centre_procedencia) return;
-
-        // Create Notification for the Center
-        // We don't have a direct User-Center map easily accessible maybe, 
-        // but the notification controller handles id_center linkage.
+        if (!student || !student.center_origin) return;
 
         await createNotificationInterna({
-            id_center: student.centre_procedencia.id_center,
+            id_center: student.center_origin.id_center,
             titol: `⚠️ Alerta de Riesgo: ${student.nom} ${student.cognoms}`,
             missatge: `El alumno presenta un riesgo de abandono del ${score}%. Factores: ${factors.join(', ')}. Se recomienda intervención.`,
             tipus: 'SISTEMA',

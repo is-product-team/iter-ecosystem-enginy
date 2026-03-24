@@ -1,4 +1,4 @@
-import { PrismaClient, Modalitat, QuestionnaireTarget, ResponseType, AttendanceStatus, SubmissionStatus } from '@prisma/client';
+import { PrismaClient, Modalitat } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { PHASES, ROLES } from '@iter/shared';
 import dotenv from 'dotenv';

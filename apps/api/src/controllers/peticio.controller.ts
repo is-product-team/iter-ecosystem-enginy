@@ -1,12 +1,12 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { EstadoRequestn } from '@iter/shared';
+import { RequestStatus } from '@prisma/client';
 import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
 import { createNotificationInterna } from './notificacio.controller.js';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
 export const getRequestns = async (req: Request, res: Response) => {
-  const { centreId, role } = req.user || {};
+  const { centreId, role, userId } = req.user || {};
   const { page = 1, limit = 10 } = req.query;
   const isAll = Number(limit) === 0;
   const skip = isAll ? undefined : (Number(page) - 1) * Number(limit);
@@ -20,30 +20,41 @@ export const getRequestns = async (req: Request, res: Response) => {
       if (!centreId) {
         return res.json({ data: [], meta: { total: 0, page: Number(page), limit: Number(limit), totalPages: 0 } });
       }
-      where.id_center = parseInt(centreId.toString());
+      // If the user is a teacher, they should only see requests related to their assignments
+      if (role === 'TEACHER') {
+        const assignments = await prisma.assignment.findMany({
+          where: {
+            teachers: { some: { id_user: userId } }
+          },
+          select: {
+            id_workshop: true
+          }
+        });
+        const workshopIds = assignments.map(a => a.id_workshop);
+        where.id_workshop = { in: workshopIds };
+      } else { // COORDINATOR
+        where.id_center = parseInt(centreId.toString());
+      }
     }
 
-    const [peticions, total] = await Promise.all([
+    const [requests, total] = await Promise.all([
       prisma.request.findMany({
         where,
         skip,
         take,
         include: {
-          centre: true,
-          taller: true,
-          prof1: true,
-          prof2: true,
-          students: true
+          center: true,
+          workshop: true
         },
         orderBy: {
-          data_peticio: 'desc'
+          data_request: 'desc'
         }
       }),
       prisma.request.count({ where }),
     ]);
 
     res.json({
-      data: peticions,
+      data: requests,
       meta: {
         total,
         page: Number(page),
@@ -53,7 +64,7 @@ export const getRequestns = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error en peticioController.getRequestns:", error);
-    return res.status(500).json({ error: 'Error al obtenir peticions' });
+    return res.status(500).json({ error: 'Error al obtenir requests' });
   }
 };
 
@@ -92,14 +103,14 @@ export const createRequest = async (req: Request, res: Response) => {
     }
 
     // Comprobar límite total de 12 alumnos para el centro en Modalidad C
-    const peticionsC = await prisma.request.findMany({
+    const requestsC = await prisma.request.findMany({
       where: {
         id_center: centreId,
         modalitat: 'C'
       }
     });
 
-    const totalStudentsC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
+    const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
     if (totalStudentsC + alumnes_aprox > 12) {
       return res.status(400).json({
         error: `Límit superat. L'institut ya té ${totalStudentsC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
@@ -131,7 +142,7 @@ export const createRequest = async (req: Request, res: Response) => {
         prof2_id: parseInt(prof2_id),
       },
       include: {
-        taller: true
+        workshop: true
       }
     });
 
@@ -170,7 +181,7 @@ export const updateRequest = async (req: Request, res: Response) => {
 
     // Verificar estado: Solo se pueden editar las pendientes
     if (existingRequest.estat !== 'Pendent') {
-      return res.status(400).json({ error: 'Només es poden editar peticions pendents.' });
+      return res.status(400).json({ error: 'Només es poden editar requests pendents.' });
     }
 
     // --- VERIFICACIÓN DE FASE ---
@@ -196,7 +207,7 @@ export const updateRequest = async (req: Request, res: Response) => {
       }
 
       // Comprobar límite total de 12 alumnos (excluyendo la cantidad actual de esta petición)
-      const peticionsC = await prisma.request.findMany({
+      const requestsC = await prisma.request.findMany({
         where: {
           id_center: existingRequest.id_center,
           modalitat: 'C',
@@ -204,7 +215,7 @@ export const updateRequest = async (req: Request, res: Response) => {
         }
       });
 
-      const totalStudentsC = peticionsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
+      const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
       if (totalStudentsC + nuevosStudents > 12) {
         return res.status(400).json({
           error: `Límit superat. L'institut ya té ${totalStudentsC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosStudents}) superaria el màxim de 12.`
@@ -221,7 +232,7 @@ export const updateRequest = async (req: Request, res: Response) => {
         prof2_id: parseInt(prof2_id),
       },
       include: {
-        taller: true
+        workshop: true
       }
     });
 
@@ -240,8 +251,8 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
   try {
     const updated = await prisma.request.update({
       where: { id_request: parseInt(id as string) },
-      data: { estat: estat as EstadoRequestn },
-      include: { taller: true }
+      data: { estat: estat as RequestStatus },
+      include: { workshop: true }
     });
 
     await createNotificationInterna({

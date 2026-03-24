@@ -12,7 +12,7 @@ export const generateCertificates = async (req: Request, res: Response) => {
             include: {
                 enrollments: {
                     include: {
-                        alumne: true,
+                        student: true,
                         attendance: true
                     }
                 }
@@ -24,8 +24,8 @@ export const generateCertificates = async (req: Request, res: Response) => {
         const totalSessions = 10;
         let certificatesIssued = 0;
 
-        for (const inscripcio of assignacio.inscripcions) {
-            const attendedCount = (inscripcio.assistencia as any[]).filter((a: any) =>
+        for (const inscripcio of assignacio.enrollments) {
+            const attendedCount = (inscripcio.attendance as any[]).filter((a: any) =>
                 a.estat === 'Present' || a.estat === 'Retard'
             ).length;
 
@@ -72,10 +72,10 @@ export const getMyCertificates = async (req: Request, res: Response) => {
         const certificats = await prisma.certificate.findMany({
             where,
             include: {
-                assignacio: {
-                    include: { taller: true }
+                assignment: {
+                    include: { workshop: true }
                 },
-                alumne: true
+                student: true
             }
         });
 

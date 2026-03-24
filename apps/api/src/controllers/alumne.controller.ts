@@ -36,7 +36,8 @@ export const createStudent = async (req: Request, res: Response) => {
 export const updateStudent = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const student = await studentRepository.update(parseInt(id), req.body);
+    const { id_student, ...updateData } = req.body;
+    const student = await studentRepository.update(parseInt(String(id)), updateData);
     res.json(student);
   } catch (error) {
     res.status(500).json({ error: 'Error al actualitzar l\'alumne' });
@@ -46,7 +47,7 @@ export const updateStudent = async (req: Request, res: Response) => {
 export const deleteStudent = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await studentRepository.delete(parseInt(id));
+    await studentRepository.delete(parseInt(String(id)));
     res.json({ message: 'Alumne eliminat' });
   } catch (error) {
     res.status(500).json({ error: 'Error al eliminar l\'alumne' });

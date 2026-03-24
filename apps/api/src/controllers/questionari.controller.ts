@@ -45,9 +45,9 @@ export const trackEnviament = async (req: Request, res: Response) => {
 };
 
 export const submitRespostes = async (req: Request, res: Response) => {
-    const { enviamentId, respostes } = req.body;
+    const { token, respostes } = req.body;
     try {
-        const result = await questionariService.submitRespostes(enviamentId, respostes);
+        const result = await questionariService.submitResponses(token, respostes);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: 'Error al enviar las respuestas' });

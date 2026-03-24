@@ -73,7 +73,7 @@ export class SessionService {
         // 2. Check which students already have attendance for this session
         const existingAttendance = await prisma.attendance.findMany({
             where: {
-                inscripcio: { id_assignment: idAssignment },
+                enrollment: { id_assignment: idAssignment },
                 numero_sessio: sessionNum
             },
             select: { id_enrollment: true }
@@ -89,7 +89,7 @@ export class SessionService {
                 data: missingEnrollments.map((e: any) => ({
                     id_enrollment: e.id_enrollment,
                     numero_sessio: sessionNum,
-                    data_sessio: date,
+                    data_session: date,
                     estat: 'Present' // Default state
                 }))
             });
@@ -103,7 +103,7 @@ export class SessionService {
     static async getSessionStatus(idAssignment: number, sessionNum: number): Promise<string> {
         const count = await prisma.attendance.count({
             where: {
-                inscripcio: { id_assignment: idAssignment },
+                enrollment: { id_assignment: idAssignment },
                 numero_sessio: sessionNum
             }
         });
@@ -116,7 +116,7 @@ export class SessionService {
     static async syncSessionsForAssignment(idAssignment: number) {
         const assignacio = await prisma.assignment.findUnique({
             where: { id_assignment: idAssignment },
-            include: { taller: true }
+            include: { workshop: true }
         });
 
         if (!assignacio || !assignacio.data_inici) return;
@@ -129,7 +129,7 @@ export class SessionService {
         // For simplicity in Phase 3, we'll re-generate if no attendance exists
         
         const hasAttendance = await prisma.attendance.count({
-            where: { inscripcio: { id_assignment: idAssignment } }
+            where: { enrollment: { id_assignment: idAssignment } }
         });
 
         if (hasAttendance > 0) return; // Don't mess with sessions if attendance is already recorded
@@ -143,7 +143,7 @@ export class SessionService {
         await prisma.session.createMany({
             data: sessionDates.map(date => ({
                 id_assignment: idAssignment,
-                data_sessio: date
+                data_session: date
             }))
         });
     }

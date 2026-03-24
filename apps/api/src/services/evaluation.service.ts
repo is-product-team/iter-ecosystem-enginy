@@ -8,9 +8,9 @@ export class EvaluationService {
         return await prisma.evaluation.findUnique({
             where: { id_enrollment },
             include: {
-                competencies: {
+                competences: {
                     include: {
-                        competencia: true,
+                        competence: true,
                     },
                 },
             },
@@ -22,17 +22,19 @@ export class EvaluationService {
      */
     async upsertEvaluation(data: {
         id_enrollment: number;
+        id_assignment: number;
         percentatge_asistencia: number;
         numero_retards: number;
         observacions?: string;
-        competencies: { id_competencia: number; puntuacio: number }[];
+        competences: { id_competence: number; puntuacio: number }[];
     }) {
         const {
             id_enrollment,
+            id_assignment,
             percentatge_asistencia,
             numero_retards,
             observacions,
-            competencies
+            competences
         } = data;
 
         // 1. Crear o actualizar la evaluación docente principal
@@ -44,25 +46,29 @@ export class EvaluationService {
                 observacions,
             },
             create: {
+                id_enrollment,
+                id_assignment,
+                percentatge_asistencia,
+                numero_retards,
                 observacions: data.observacions,
             },
         });
 
         // 2. Eliminar competencias previas si existen (para re-crearlas)
-        await prisma.avaluacioCompetencial.deleteMany({
+        await prisma.competenceEvaluation.deleteMany({
             where: { id_evaluation_teacher: avaluacioDocent.id_evaluation_teacher },
         });
 
         // 3. Crear las nuevas puntuaciones de competencias
-        const competenciesCreated = await prisma.avaluacioCompetencial.createMany({
-            data: competencies.map((c) => ({
+        const competencesCreated = await prisma.competenceEvaluation.createMany({
+            data: competences.map((c) => ({
                 id_evaluation_teacher: avaluacioDocent.id_evaluation_teacher,
-                id_competencia: c.id_competencia,
+                id_competence: c.id_competence,
                 puntuacio: c.puntuacio,
             })),
         });
 
-        return { ...avaluacioDocent, competenciesCount: competenciesCreated.count };
+        return { ...avaluacioDocent, competencesCount: competencesCreated.count };
     }
 
     /**

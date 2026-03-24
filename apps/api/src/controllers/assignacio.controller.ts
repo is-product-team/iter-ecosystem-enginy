@@ -18,8 +18,17 @@ export const getAssignments = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
-        teacher1: true,
-        teacher2: true,
+        teachers: {
+          include: {
+            user: {
+              select: {
+                id_user: true,
+                nom_complet: true,
+                url_foto: true
+              }
+            }
+          }
+        },
         enrollments: {
           include: {
             student: true
@@ -48,8 +57,6 @@ export const getAssignmentById = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
-        teacher1: true,
-        teacher2: true,
         sessions: {
           include: {
             staff: {
@@ -104,11 +111,8 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
-        teacher1: {
-          include: { user: { select: { nom_complet: true } } }
-        },
-        teacher2: {
-          include: { user: { select: { nom_complet: true } } }
+        teachers: {
+          include: { user: { select: { nom_complet: true, id_user: true } } }
         },
         sessions: {
           orderBy: { data_session: 'asc' },
@@ -123,7 +127,7 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
         enrollments: {
           include: {
             student: true,
-            evaluation: true
+            evaluations: true
           }
         }
       }
@@ -144,14 +148,14 @@ export const getStudents = async (req: Request, res: Response) => {
       where: { id_assignment: parseInt(idAssignment as string) },
       include: {
         student: true,
-        evaluation: { select: { id_evaluation_teacher: true } } // include evaluation check
+        evaluations: { select: { id_evaluation_teacher: true } } // include evaluation check
       }
     });
 
     // Flatten structure to return just students with relevant info + evaluated status
     const students = enrollments.map((i: any) => ({
       ...i.student,
-      evaluated: !!i.evaluation // true if exists, false otherwise
+      evaluated: i.evaluations.length > 0 // true if exists, false otherwise
     }));
     res.json(students);
   } catch (error) {
@@ -311,10 +315,13 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
         id_center: request.id_center,
         id_workshop: request.id_workshop,
         estat: 'PUBLISHED',
-        teacher1_id: request.teacher1_id ?? undefined,
-        teacher2_id: request.teacher2_id ?? undefined,
+        teachers: {
+          create: [
+            ...(request.prof1_id ? [{ id_user: request.prof1_id, es_principal: true }] : []),
+            ...(request.prof2_id ? [{ id_user: request.prof2_id, es_principal: false }] : [])
+          ]
+        },
         // Inicializar checklist por defecto para Phase 2
-        // SIEMPRE 3 pasos para consistencia visual, pero Marcando como completado el que no aplique
         checklist: {
           create: [
             { pas_nom: 'Designar Profesores Referentes', completat: false },
@@ -348,8 +355,8 @@ export const publishAssignments = async (req: Request, res: Response) => {
       data: {
         titol: 'Assignmentns Publicades',
         missatge: 'Ja podeu consultar les assignacions i començar a introduir les dades.',
-        type: 'PHASE',
-        importance: 'URGENT'
+        tipus: 'PHASE',
+        importancia: 'URGENT'
       }
     });
 
@@ -435,23 +442,29 @@ export const createEnrollments = async (req: Request, res: Response) => {
 export const designateTeachers = async (req: Request, res: Response) => {
   const { idAssignment } = req.params;
   const { teacher1_id, teacher2_id } = req.body;
-
+  
   try {
     // 1. Validar que los profesores sean diferentes
-    if (teacher1_id === teacher2_id) {
-      return res.status(400).json({ error: 'Has de designar dos professors diferents.' });
+    if (teacher1_id && teacher2_id && teacher1_id === teacher2_id) {
+      return res.status(400).json({ error: 'Has de designar dos teachers diferents.' });
     }
 
     const oldAssignment = await prisma.assignment.findUnique({ where: { id_assignment: parseInt(idAssignment as string) } });
     
-    const updated = await prisma.assignment.update({
-      where: { id_assignment: parseInt(idAssignment as string) },
-      data: {
-        teacher1_id,
-        teacher2_id,
-        estat: 'DATA_ENTRY' // Transition state once they start filling data
-      }
-    });
+    // Update teachers using deletions and creations
+    await prisma.$transaction([
+      prisma.assignmentTeacher.deleteMany({ where: { id_assignment: parseInt(idAssignment as string) } }),
+      prisma.assignmentTeacher.createMany({
+        data: [
+          ...(teacher1_id ? [{ id_assignment: parseInt(idAssignment as string), id_user: teacher1_id, es_principal: true }] : []),
+          ...(teacher2_id ? [{ id_assignment: parseInt(idAssignment as string), id_user: teacher2_id, es_principal: false }] : [])
+        ]
+      }),
+      prisma.assignment.update({
+        where: { id_assignment: parseInt(idAssignment as string) },
+        data: { estat: 'DATA_ENTRY' }
+      })
+    ]);
 
     if (oldAssignment) {
         await logStatusChange(parseInt(idAssignment as string), oldAssignment.estat, 'DATA_ENTRY');
@@ -469,10 +482,15 @@ export const designateTeachers = async (req: Request, res: Response) => {
       }
     });
 
-    res.json(updated);
+    const updatedAssignment = await prisma.assignment.findUnique({
+      where: { id_assignment: parseInt(idAssignment as string) },
+      include: { teachers: true }
+    });
+
+    res.json(updatedAssignment);
   } catch (error) {
     console.error("Error al designar profesores:", error);
-    res.status(500).json({ error: 'Error al designar professors.' });
+    res.status(500).json({ error: 'Error al designar teachers.' });
   }
 };
 
@@ -566,10 +584,20 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
   const idAssignment = req.params.idAssignment as string;
   try {
     // 1. Marcar inscripciones como confirmadas
-    await prisma.enrollment.updateMany({
-      where: { id_assignment: parseInt(idAssignment) },
-      data: { registre_ceb_confirmat: true }
-    });
+    const enrollments = await prisma.enrollment.findMany({ where: { id_assignment: parseInt(idAssignment) } });
+    
+    for (const enrollment of enrollments) {
+      const docsStatus = (enrollment.docs_status as any) || {};
+      await prisma.enrollment.update({
+        where: { id_enrollment: enrollment.id_enrollment },
+        data: {
+          docs_status: {
+            ...docsStatus,
+            registre_ceb_confirmat: true
+          }
+        }
+      });
+    }
 
     // 2. Obtener datos del taller para generar sesiones
     const assignment = await prisma.assignment.findUnique({
@@ -598,11 +626,11 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
             const endDate = phase3.data_fi;
             
             // Buscar los usuarios asociados a los profesores referentes para auto-asignarlos
-            const referentTeachers = await prisma.teacher.findMany({
-                where: { id_teacher: { in: [assignment.teacher1_id, assignment.teacher2_id].filter(Boolean) as number[] } },
+            const assignmentTeachers = await prisma.assignmentTeacher.findMany({
+                where: { id_assignment: assignment.id_assignment },
                 select: { id_user: true }
             });
-            const referentUserIds = referentTeachers.map((p: any) => p.id_user).filter(Boolean) as number[];
+            const referentUserIds = assignmentTeachers.map((p: any) => p.id_user).filter(Boolean) as number[];
 
             // Iterar por semanas desde startDate hasta endDate
             const currentPointer = new Date(startDate);
@@ -680,9 +708,17 @@ export const validateEnrollmentDocument = async (req: Request, res: Response) =>
     }
 
     try {
+        const enrollment = await prisma.enrollment.findUnique({ where: { id_enrollment: parseInt(idEnrollment as string) } });
+        const docsStatus = (enrollment?.docs_status as any) || {};
+        
         const updated = await prisma.enrollment.update({
             where: { id_enrollment: parseInt(idEnrollment as string) },
-            data: { [field]: !!valid }
+            data: { 
+              docs_status: {
+                ...docsStatus,
+                [field]: !!valid
+              }
+            }
         });
         res.json(updated);
     } catch (error) {
@@ -714,14 +750,20 @@ export const updateComplianceDocuments = async (req: Request, res: Response) => 
   const { idStudent, acord_pedagogic, autoritzacio_mobilitat, drets_imatge } = req.body;
 
   try {
+    const enrollment = await prisma.enrollment.findUnique({ where: { id_enrollment: parseInt(idStudent) } });
+    const docsStatus = (enrollment?.docs_status as any) || {};
+
     const updated = await prisma.enrollment.update({
       where: {
-        id_enrollment: parseInt(idStudent) // Assuming we update per student or per assignment
+        id_enrollment: parseInt(idStudent) 
       },
       data: {
-        acord_pedagogic,
-        autoritzacio_mobilitat,
-        drets_imatge
+        docs_status: {
+          ...docsStatus,
+          acord_pedagogic,
+          autoritzacio_mobilitat,
+          drets_imatge
+        }
       }
     });
 
@@ -810,11 +852,16 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Tipus de document no vàlid.' });
     }
 
+    const docsStatus = (enrollment?.docs_status as any) || {};
+
     const updated = await prisma.enrollment.update({
       where: { id_enrollment: parseInt(idEnrollment) },
       data: {
-        [updateField]: url,
-        [boolField]: true // També marquem el boolean com a completat
+        docs_status: {
+          ...docsStatus,
+          [updateField]: url,
+          [boolField]: true
+        }
       }
     });
 

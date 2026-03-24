@@ -7,7 +7,7 @@ export const getCenters = async (req: Request, res: Response) => {
   const skip = (Number(page) - 1) * Number(limit);
   const take = Number(limit);
 
-  const [centres, total] = await Promise.all([
+  const [centers, total] = await Promise.all([
     prisma.center.findMany({
       skip,
       take,
@@ -16,7 +16,7 @@ export const getCenters = async (req: Request, res: Response) => {
   ]);
 
   res.json({
-    data: centres,
+    data: centers,
     meta: {
       total,
       page: Number(page),

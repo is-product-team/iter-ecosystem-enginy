@@ -13,7 +13,7 @@ export const getWorkshops = async (req: Request, res: Response) => {
 export const getWorkshopById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const workshop = await workshopRepository.findById(parseInt(id));
+    const workshop = await workshopRepository.findById(parseInt(String(id)));
     if (!workshop) {
       return res.status(404).json({ error: 'Taller no trobat' });
     }
@@ -35,7 +35,7 @@ export const createWorkshop = async (req: Request, res: Response) => {
 export const updateWorkshop = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const updated = await workshopRepository.update(parseInt(id), req.body);
+    const updated = await workshopRepository.update(parseInt(String(id)), req.body);
     res.json(updated);
   } catch (error) {
     res.status(500).json({ error: 'Error al actualitzar el taller' });
@@ -45,7 +45,7 @@ export const updateWorkshop = async (req: Request, res: Response) => {
 export const deleteWorkshop = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await workshopRepository.delete(parseInt(id));
+    await workshopRepository.delete(parseInt(String(id)));
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Error al eliminar el taller' });

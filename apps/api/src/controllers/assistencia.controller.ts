@@ -20,10 +20,10 @@ export const registerAttendance = async (req: Request, res: Response) => {
     const sessionMatch = await prisma.session.findFirst({
         where: { 
             id_assignment: parseInt(id_assignment),
-            data_sessio: today
+            data_session: today
         }
     });
-    const sessionNum = sessionMatch ? sessionMatch.id_sessio : 1;
+    const sessionNum = sessionMatch ? sessionMatch.id_session : 1;
 
     // Helper to map mobile status (UPPERCASE) to Prisma Enum (PascalCase)
     const mapStatus = (status: string) => {
@@ -55,7 +55,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
         const existing = await prisma.attendance.findFirst({
             where: {
                 id_enrollment: validEnrollment.id_enrollment,
-                data_sessio: today
+                data_session: today
             }
         });
 
@@ -72,7 +72,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
                 data: {
                     id_enrollment: validEnrollment.id_enrollment,
                     numero_sessio: sessionNum,
-                    data_sessio: today,
+                    data_session: today,
                     estat: prismaStatus as any, 
                     observacions: item.observacions
                 }
@@ -96,14 +96,14 @@ export const getAttendanceByAssignment = async (req: Request, res: Response) => 
   try {
     const assistencies = await prisma.attendance.findMany({
       where: {
-        inscripcio: {
+        enrollment: {
           id_assignment: parseInt(idAssignment as string)
         }
       },
       include: {
-        inscripcio: {
+        enrollment: {
           include: {
-            alumne: true
+            student: true
           }
         }
       }

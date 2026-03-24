@@ -1,86 +1,76 @@
-import { PrismaClient, QuestionnaireTarget } from '@prisma/client';
+import { PrismaClient, QuestionnaireTarget, ResponseType } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
 export class QuestionariService {
-    /**
-     * Obtiene un modelo de cuestionario por ID.
-     */
     async getModels() {
-        return await prisma.modelQuestionari.findMany({
+        return await prisma.questionnaireModel.findMany({
             include: { _count: { select: { questions: true } } }
         });
     }
 
     async getModelById(id_model: number) {
-        return await prisma.modelQuestionari.findUnique({
+        return await prisma.questionnaireModel.findUnique({
             where: { id_model },
             include: { questions: true },
         });
     }
 
-    /**
-     * Crea un nuevo modelo de cuestionario dinámico.
-     */
     async createModel(data: {
-        titol: string;
+        nom: string;
         destinatari: QuestionnaireTarget;
-        questions: { enunciat: string; tipus_resposta: any; opcions?: any }[];
+        questions: { text: string; tipus: ResponseType; opcions?: any }[];
     }) {
-        return await prisma.modelQuestionari.create({
+        return await prisma.questionnaireModel.create({
             data: {
-                titol: data.titol,
+                nom: data.nom,
                 destinatari: data.destinatari,
                 questions: {
-                    create: data.preguntes,
+                    create: data.questions,
                 },
             },
             include: { questions: true },
         });
     }
 
-    /**
-     * Registra el envío de un cuestionario para una asignación.
-     */
-    async trackEnviament(id_model: number, id_assignment: number) {
-        return await prisma.enviamentQuestionari.create({
+    async trackEnviament(id_assignment: number, destinatari: QuestionnaireTarget) {
+        return await prisma.questionnaire.create({
             data: {
-                id_model,
                 id_assignment,
-                estat: 'Enviat',
-                data_enviament: new Date(),
+                destinatari,
+                token: uuidv4(),
+                completa: false
             },
         });
     }
 
-    /**
-     * Registra las respuestas de un cuestionario enviado.
-     */
-    async submitRespostes(id_enviament: number, responses: { id_pregunta: number; valor: string }[]) {
-        // 1. Marcar como respondido
-        await prisma.enviamentQuestionari.update({
-            where: { id_enviament },
+    async submitResponses(token: string, responses: { id_question: number; valor: string }[]) {
+        const questionnaire = await prisma.questionnaire.findUnique({
+            where: { token }
+        });
+
+        if (!questionnaire) throw new Error('Questionnaire not found');
+
+        await prisma.questionnaire.update({
+            where: { id_questionnaire: questionnaire.id_questionnaire },
             data: {
-                estat: 'Respost',
-                data_resposta: new Date(),
+                completa: true,
+                data_completat: new Date(),
             },
         });
 
-        // 2. Crear las respuestas
-        return await prisma.respostesQuestionari.createMany({
-            data: respostes.map((r) => ({
-                id_enviament,
-                id_pregunta: r.id_pregunta,
+        return await prisma.questionnaireResponse.createMany({
+            data: responses.map((r) => ({
+                id_questionnaire: questionnaire.id_questionnaire,
+                id_question: r.id_question,
                 valor: r.valor,
             })),
         });
     }
 
-    /**
-     * Guarda la autoevaluación de un alumno.
-     */
     async submitAutoconsultaStudent(data: any) {
-        return await prisma.autoconsultaStudent.create({
+        return await prisma.studentSelfConsultation.create({
             data: {
                 id_enrollment: data.id_enrollment,
                 puntualitat_tasques: data.puntualitat_tasques,
@@ -96,20 +86,15 @@ export class QuestionariService {
         });
     }
 
-    /**
-     * Genera métricas generales de satisfacción.
-     */
     async getSatisfactionMetrics() {
-        // Media de valoraciones de alumnos
-        const avgStats = await prisma.autoconsultaStudent.aggregate({
+        const avgStats = await prisma.studentSelfConsultation.aggregate({
             _avg: {
                 valoracio_experiencia: true,
                 valoracio_docent: true,
             },
         });
 
-        // Conteo por impacto vocacional
-        const impactStats = await prisma.autoconsultaStudent.groupBy({
+        const impactStats = await prisma.studentSelfConsultation.groupBy({
             by: ['impacte_vocacional'],
             _count: {
                 _all: true,
