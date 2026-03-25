@@ -9,17 +9,17 @@ async function test() {
         console.log('DB Connection: OK');
 
         console.log('--- Testing User Retrieval ---');
-        const user = await prisma.usuari.findUnique({
+        const user = await prisma.user.findUnique({
             where: { email: 'admin@admin.com' },
-            include: { rol: true, centre: true }
+            include: { role: true, center: true }
         });
 
         if (user) {
             console.log('User found:', {
-                id: user.id_usuari,
+                id: user.id_user,
                 email: user.email,
-                role: user.rol.nom_rol,
-                centre: user.centre ? user.centre.nom : 'None'
+                role: user.role?.nom_role,
+                center: user.center ? user.center.nom : 'None'
             });
 
             console.log('--- Testing Password Comparison ---');

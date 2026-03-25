@@ -24,25 +24,40 @@ export const login = async (req: Request, res: Response) => {
 
     // 3. Generar JWT
     const token = jwt.sign(
-      { 
-        userId: user.id_user, 
-        email: user.email, 
-        role: user.role.nom_role,
-        centreId: user.id_center 
+      {
+        userId: user.id_user,
+        email: user.email,
+        role: (user as any).role.nom_roleee,
+        centreId: user.id_center
       },
       env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    // 4. Respuesta limpia usando el mapper
+    // 4. Respuesta limpia (Omitimos el hash del password por seguridad)
+    const { password_hash, ...userSafe } = user;
+
+    // 5. Set Cookie (Web Security)
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24h
+    });
+
     res.json({
-      token,
-      user: mapUserResponse(user)
+      token, // Mantener para compatibilidad móvil (Bearer)
+      user: userSafe
     });
   } catch (error) {
     console.error('Error en login:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie('token');
+  res.json({ message: 'Sessió tancada correctament' });
 };
 
 export const register = async (req: Request, res: Response) => {

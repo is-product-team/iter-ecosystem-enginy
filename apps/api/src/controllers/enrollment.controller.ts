@@ -30,7 +30,7 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
 
     const assignacio = await prisma.assignment.findUnique({
       where: { id_assignment: parseInt(idAssignment as string) },
-      include: { centre: true }
+      include: { center: true }
     });
 
     if (!assignacio) {
@@ -49,7 +49,7 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
         },
         create: {
           ...s,
-          id_center_procedencia: assignacio.id_center
+          id_center_origin: assignacio.id_center
         }
       });
 
@@ -81,7 +81,7 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
     }
 
     // Update checklist
-    await prisma.checklistAssignment.updateMany({
+    await prisma.assignmentChecklist.updateMany({
       where: {
         id_assignment: assignacio.id_assignment,
         pas_nom: { contains: 'Registro Nominal' }

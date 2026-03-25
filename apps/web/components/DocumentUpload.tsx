@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 interface DocumentUploadProps {
   idAssignacio: number;
   idInscripcio: number;
-  documentType: 'acord_pedagogic' | 'autoritzacio_mobilitat' | 'drets_imatge';
+  documentType: 'pedagogical_agreement' | 'mobility_authorization' | 'image_rights';
   initialUrl?: string | null;
   isValidated?: boolean;
   label: string;
@@ -26,11 +26,15 @@ export default function DocumentUpload({
   const [uploading, setUploading] = useState(false);
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
 
-  const [validatingAI, setValidatingAI] = useState(false);
-  const [overrideMode, setOverrideMode] = useState(false);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const handleValidUpload = async (file: File) => {
+    if (file.type !== 'application/pdf') {
+      toast.error('Only PDF files are allowed.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('idInscripcio', idInscripcio.toString());
@@ -39,24 +43,22 @@ export default function DocumentUpload({
     try {
       setUploading(true);
       const api = getApi();
-      const res = await api.post(`/assignacions/${idAssignacio}/student-document`, formData, {
+      const res = await api.post(`/assignments/${idAssignacio}/student-document`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      const newUrl = res.data[documentType === 'acord_pedagogic' ? 'url_acord_pedagogic' : 
-                               documentType === 'autoritzacio_mobilitat' ? 'url_autoritzacio_mobilitat' : 
-                               'url_drets_imatge'];
-      
+      const newUrl = res.data[documentType === 'pedagogical_agreement' ? 'url_pedagogical_agreement' :
+        documentType === 'mobility_authorization' ? 'url_mobility_authorization' :
+          'url_image_rights'];
+
       setCurrentUrl(newUrl);
       onUploadSuccess(newUrl);
-      toast.success(`${label} pujat correctament.`);
-      setOverrideMode(false);
-      setPendingFile(null);
+      toast.success(`${label} uploaded successfully.`);
     } catch (error) {
       console.error('Error uploading document:', error);
-      toast.error('Error al pujar el document.');
+      toast.error('Error uploading document.');
     } finally {
       setUploading(false);
     }
@@ -90,7 +92,7 @@ export default function DocumentUpload({
         await signatureDetector.loadModel();
         const croppedCanvas = await signatureDetector.getBottomThirdOfLastPage(file);
         const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3);
-        
+
         if (!hasSignatures) {
           toast.error('La IA no ha detectat les 3 signatures obligatòries.');
           setOverrideMode(true);
@@ -120,54 +122,33 @@ export default function DocumentUpload({
             <span className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">{label}</span>
           </div>
           {currentUrl ? (
-            <a 
-              href={`${process.env.NEXT_PUBLIC_API_URL}${currentUrl}`} 
-              target="_blank" 
+            <a
+              href={`${process.env.NEXT_PUBLIC_API_URL}${currentUrl}`}
+              target="_blank"
               rel="noopener noreferrer"
               className={`text-[10px] font-bold flex items-center gap-1 mt-1 ${isValidated ? 'text-green-600' : 'text-consorci-darkBlue hover:text-consorci-lightBlue'}`}
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              {isValidated ? 'DOCUMENT VALIDAT' : 'VEURE DOCUMENT'}
+              {isValidated ? 'DOCUMENT VALIDATED' : 'VIEW DOCUMENT'}
             </a>
           ) : (
-            <span className="text-[10px] font-bold text-red-400 mt-1 uppercase">PENDENT</span>
+            <span className="text-[10px] font-bold text-red-400 mt-1 uppercase">PENDING</span>
           )}
         </div>
 
-        {overrideMode ? (
-          <div className="flex gap-2 shrink-0">
-             <button
-               onClick={() => { setOverrideMode(false); setPendingFile(null); }}
-               className="px-3 py-2 text-[9px] font-bold uppercase tracking-widest border border-gray-300 text-gray-500 hover:bg-gray-50 transition-all"
-             >
-               CANCEL·LAR
-             </button>
-             <button
-               onClick={() => pendingFile && handleValidUpload(pendingFile)}
-               className="px-3 py-2 text-[9px] font-bold uppercase tracking-widest border border-red-500 text-red-600 bg-red-50 hover:bg-red-500 hover:text-white transition-all shadow-sm"
-               disabled={uploading}
-             >
-               {uploading ? 'PUJANT...' : 'FORÇAR PUJADA'}
-             </button>
-          </div>
-        ) : (
-          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${
-            validatingAI ? 'bg-purple-50 border-purple-300 text-purple-600 animate-pulse' :
-            uploading ? 'bg-gray-50 border-gray-100 text-gray-300' : 
-            'border-[#00426B] text-[#00426B] hover:bg-blue-50 hover:shadow-sm'
+        <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${uploading ? 'bg-gray-50 border-gray-100 text-gray-300' : 'border-[#00426B] text-[#00426B] hover:bg-blue-50'
           }`}>
-            {validatingAI ? 'VALIDANT IA...' : uploading ? 'PUJANT...' : currentUrl ? 'CANVIAR' : 'ADJUNTAR'}
-            <input 
-              type="file" 
-              className="hidden" 
-              accept=".pdf"
-              onChange={handleFileChange}
-              disabled={uploading || validatingAI}
-            />
-          </label>
-        )}
+          {uploading ? 'UPLOADING...' : currentUrl ? 'CHANGE' : 'ATTACH'}
+          <input
+            type="file"
+            className="hidden"
+            accept=".pdf"
+            onChange={handleFileChange}
+            disabled={uploading}
+          />
+        </label>
       </div>
     </div>
   );

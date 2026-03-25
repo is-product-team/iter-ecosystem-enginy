@@ -19,7 +19,7 @@ async function main() {
     // 2. Integration Test (requires DB connection)
     console.log('\n2. Testing DB Integration (ReadOnly check)');
     try {
-        let assignment = await prisma.assignacio.findFirst({
+        let assignment = await prisma.assignment.findFirst({
             where: { data_inici: { not: null } }
         });
 
@@ -28,32 +28,32 @@ async function main() {
         if (!assignment) {
             console.log('⚠️ No active assignments found. Creating a DUMMY assignment for testing...');
 
-            const centre = await prisma.centre.findFirst();
-            const taller = await prisma.taller.findFirst();
+            const center = await prisma.center.findFirst();
+            const workshop = await prisma.workshop.findFirst();
 
-            if (centre && taller) {
-                assignment = await prisma.assignacio.create({
+            if (center && workshop) {
+                assignment = await prisma.assignment.create({
                     data: {
-                        id_centre: centre.id_centre,
-                        id_taller: taller.id_taller,
+                        id_center: center.id_center,
+                        id_workshop: workshop.id_workshop,
                         data_inici: new Date('2026-02-01'),
                         data_fi: new Date('2026-04-10'),
                         estat: 'IN_PROGRESS'
                     }
                 });
                 createdDummy = true;
-                console.log(`✅ Created dummy assignment ID: ${assignment.id_assignacio}`);
+                console.log(`✅ Created dummy assignment ID: ${assignment.id_assignment}`);
             } else {
-                console.error('❌ Cannot create dummy assignment: No Centre or Taller found in DB.');
+                console.error('❌ Cannot create dummy assignment: No Center or Workshop found in DB.');
             }
         }
 
         if (assignment) {
-            console.log(`Found Assignment ID: ${assignment.id_assignacio} starting ${assignment.data_inici}`);
+            console.log(`Found Assignment ID: ${assignment.id_assignment} starting ${assignment.data_inici}`);
             const sessionsStatus = await Promise.all(
                 [1, 2, 3].map(async i => ({
                     num: i,
-                    status: await SessionService.getSessionStatus(assignment!.id_assignacio, i)
+                    status: await SessionService.getSessionStatus(assignment!.id_assignment, i)
                 }))
             );
             console.log('Session Statuses:', sessionsStatus);
@@ -61,28 +61,28 @@ async function main() {
 
             // Verify Attendance Initialization (Create fake enrollment if needed)
             // Check if there are enrollments
-            const enrollments = await prisma.inscripcio.count({ where: { id_assignacio: assignment.id_assignacio } });
+            const enrollments = await prisma.enrollment.count({ where: { id_assignment: assignment.id_assignment } });
             if (enrollments === 0) {
-                const alumne = await prisma.alumne.findFirst();
-                if (alumne) {
-                    await prisma.inscripcio.create({
-                        data: { id_assignacio: assignment.id_assignacio, id_alumne: alumne.id_alumne }
+                const student = await prisma.student.findFirst();
+                if (student) {
+                    await prisma.enrollment.create({
+                        data: { id_assignment: assignment.id_assignment, id_student: student.id_student }
                     });
                     console.log('Created dummy enrollment for testing attendance init.');
                 }
             }
 
             console.log('Testing ensureAttendanceRecords...');
-            await SessionService.ensureAttendanceRecords(assignment.id_assignacio, 1, new Date());
-            const statusAfter = await SessionService.getSessionStatus(assignment.id_assignacio, 1);
+            await SessionService.ensureAttendanceRecords(assignment.id_assignment, 1, new Date());
+            const statusAfter = await SessionService.getSessionStatus(assignment.id_assignment, 1);
             console.log(`Session 1 Status After Init: ${statusAfter}`);
 
             if (createdDummy) {
                 // Cleanup
                 console.log('Cleaning up dummy data...');
-                await prisma.assistencia.deleteMany({ where: { inscripcio: { id_assignacio: assignment.id_assignacio } } });
-                await prisma.inscripcio.deleteMany({ where: { id_assignacio: assignment.id_assignacio } });
-                await prisma.assignacio.delete({ where: { id_assignacio: assignment.id_assignacio } });
+                await prisma.attendance.deleteMany({ where: { enrollment: { id_assignment: assignment.id_assignment } } });
+                await prisma.enrollment.deleteMany({ where: { id_assignment: assignment.id_assignment } });
+                await prisma.assignment.delete({ where: { id_assignment: assignment.id_assignment } });
                 console.log('Cleanup done.');
             }
 

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AutoAssignmentService } from './auto-assignment.service.js';
 import prisma from '../lib/prisma.js';
-import { mockReset } from 'vitest-mock-extended';
 
 vi.mock('../lib/prisma.js', async () => {
   const { mockDeep } = await import('vitest-mock-extended');

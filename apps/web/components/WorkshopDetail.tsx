@@ -1,8 +1,8 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { Taller } from '../services/tallerService';
+import Image from 'next/image';
+import { Workshop } from '../services/workshopService';
 
 const SVG_ICONS: Record<string, React.ReactNode> = {
   PUZZLE: <path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
@@ -18,19 +18,16 @@ const SVG_ICONS: Record<string, React.ReactNode> = {
 interface Props {
   visible: boolean;
   onClose: () => void;
-  selectedWorkshop: Taller | null;
-  onEdit: (taller: Taller) => void;
+  selectedWorkshop: Workshop | null;
+  onEdit: (workshop: Workshop) => void;
   onDelete: (id: string) => void;
 }
 
 export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onEdit, onDelete }: Props) {
-  const router = useRouter();
-
-  const imageSource = (selectedWorkshop as any)?.imatge
-    ? (selectedWorkshop as any).imatge
-    : "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop";
-
   if (!visible || !selectedWorkshop) return null;
+
+  const imageSource = selectedWorkshop.image 
+    || "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop";
 
   const handleDelete = () => {
     if (confirm("Estàs segur que vols eliminar aquest taller? Aquesta acció no es pot desfer.")) {
@@ -55,20 +52,22 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
         <div className="flex flex-col md:flex-row h-full">
           {/* Hero Image Section */}
           <div className="md:w-2/5 relative min-h-[300px]">
-            <img
+            <Image
               src={imageSource}
               className="absolute inset-0 w-full h-full object-cover"
-              alt={selectedWorkshop.titol}
+              alt={selectedWorkshop.title}
+              width={800}
+              height={400}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-white/10" />
             
             {/* Badges on Image (Mobile) or Sidebar */}
             <div className="absolute bottom-6 left-6 flex flex-wrap gap-2">
               <span className="bg-white text-consorci-darkBlue px-3 py-1 text-[10px] font-black uppercase tracking-wider">
-                {selectedWorkshop.modalitat}
+                {selectedWorkshop.modality}
               </span>
               <span className="bg-consorci-lightBlue text-white px-3 py-1 text-[10px] font-black uppercase tracking-wider">
-                {selectedWorkshop.trimestre} Trimestre
+                {selectedWorkshop.term} Quarter
               </span>
             </div>
           </div>
@@ -81,10 +80,10 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
                 <h1 className="text-consorci-darkBlue text-4xl font-black leading-none tracking-tight flex items-center gap-4">
                   <div className="w-12 h-12 flex items-center justify-center bg-gray-50 border border-gray-100 shrink-0">
                     <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                      {SVG_ICONS[selectedWorkshop.icona || "PUZZLE"] || SVG_ICONS.PUZZLE}
+                      {SVG_ICONS[selectedWorkshop.icon || "PUZZLE"] || SVG_ICONS.PUZZLE}
                     </svg>
                   </div>
-                  {selectedWorkshop.titol}
+                  {selectedWorkshop.title}
                 </h1>
               </div>
               <div className="flex shrink-0 gap-2">
@@ -119,11 +118,11 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
                   </svg>
                 </div>
                 <div>
-                  <span className="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-1 block">Ubicació</span>
-                  <p className="text-consorci-darkBlue font-bold">{selectedWorkshop.detalls_tecnics?.ubicacio_defecte ?? 'No disponible'}</p>
+                  <span className="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-1 block">Location</span>
+                  <p className="text-consorci-darkBlue font-bold">{selectedWorkshop.technicalDetails?.defaultLocation ?? 'Not available'}</p>
                 </div>
               </div>
-
+ 
               <div className="flex items-start gap-4">
                 <div className="bg-gray-50 p-3 text-consorci-darkBlue border border-gray-100">
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,26 +130,26 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
                   </svg>
                 </div>
                 <div>
-                  <span className="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-1 block">Aforament</span>
-                  <p className="text-consorci-darkBlue font-bold">{selectedWorkshop.detalls_tecnics?.places_maximes ?? 0} Places disponibles</p>
+                  <span className="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-1 block">Capacity</span>
+                  <p className="text-consorci-darkBlue font-bold">{selectedWorkshop.technicalDetails?.maxPlaces ?? 0} Places available</p>
                 </div>
               </div>
             </div>
 
             {/* Description */}
             <div className="bg-gray-50 border-l-4 border-consorci-darkBlue p-6 mb-8 flex-1">
-              <span className="text-consorci-darkBlue font-black text-[10px] uppercase tracking-widest mb-2 block">Resum del Taller</span>
+              <span className="text-consorci-darkBlue font-black text-[10px] uppercase tracking-widest mb-2 block">Workshop Summary</span>
               <p className="text-gray-600 leading-relaxed text-sm">
-                {selectedWorkshop.detalls_tecnics?.descripcio ?? 'No hi ha descripció disponible per a aquest taller.'}
+                {selectedWorkshop.technicalDetails?.description ?? 'No description available for this workshop.'}
               </p>
             </div>
 
             {/* Referents section if exists */}
-            {(selectedWorkshop.referents_assignats?.length ?? 0) > 0 && (
+            {(selectedWorkshop.assignedReferents?.length ?? 0) > 0 && (
               <div className="mb-10">
-                <span className="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-3 block">Referents Assignats</span>
+                <span className="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-3 block">Assigned Referents</span>
                 <div className="flex flex-wrap gap-2">
-                  {selectedWorkshop.referents_assignats!.map((ref, idx) => (
+                  {selectedWorkshop.assignedReferents!.map((ref, idx) => (
                     <span key={idx} className="bg-gray-100 text-gray-700 px-3 py-1 text-xs font-bold border border-gray-200">
                       {ref}
                     </span>

@@ -2,23 +2,13 @@
 
 import React from 'react';
 import {
-    PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
-    AreaChart, Area,
-    LineChart, Line
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Tooltip, ResponsiveContainer,
+    LineChart, Line, Cell
 } from 'recharts';
-
-// --- COLORS ---
-const COLORS = ['#00426B', '#0775AB', '#4197CB', '#97C9E3', '#CFD2D3'];
-const GRADIENTS = {
-    blue: ['#00426B', '#0775AB'],
-    green: ['#10B981', '#34D399'],
-    purple: ['#8B5CF6', '#A78BFA']
-};
 
 // --- COMPONENTS ---
 
-export const StatusDistribution = ({ data }: { data: any[] }) => {
+export const StatusDistribution = ({ data }: { data: { estat: string, total: number }[] }) => {
     // Ensure we have the three categories even if they are zero
     const categories = ['Pendent', 'Aprovada', 'Rebutjada'];
     const chartData = categories.map(cat => {
@@ -60,7 +50,7 @@ export const StatusDistribution = ({ data }: { data: any[] }) => {
     );
 };
 
-export const WorkshopPopularity = ({ data }: { data: any[] }) => {
+export const WorkshopPopularity = ({ data }: { data: { _id: string, alumnes_totals: number }[] }) => {
     // Transform data: Use d._id directly as the name (backend provides title or fallback)
     const chartData = data.map(d => ({
         name: d._id,

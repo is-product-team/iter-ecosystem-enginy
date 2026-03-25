@@ -1,12 +1,12 @@
 import { Request as Peticio, Prisma } from '@prisma/client';
 import { BaseRepository } from './base.repository.js';
 
-export class RequestRepository extends BaseRepository<Peticio, Prisma.RequestCreateInput, Prisma.RequestUpdateInput> {
+export class RequestRepository extends BaseRepository<Request, Prisma.RequestCreateInput, Prisma.RequestUpdateInput> {
   constructor() {
-    super('request');
+    super('request', 'id_request');
   }
 
-  override async findById(id: number): Promise<Peticio | null> {
+  override async findById(id: number): Promise<any> {
     return this.prisma.request.findUnique({
       where: { id_request: id },
       include: {

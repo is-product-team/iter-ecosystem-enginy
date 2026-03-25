@@ -5,7 +5,7 @@
     "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "../../",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -19,6 +19,6 @@
       "@iter/shared": ["../../packages/shared/index.ts"]
     }
   },
-  "include": ["src/**/*", "src/types/**/*.d.ts", "prisma/**/*", "scripts/**/*"],
+  "include": ["src/**/*", "src/types/**/*.d.ts", "prisma/**/*", "scripts/**/*", "../../packages/shared/**/*"],
   "exclude": ["node_modules", "dist"]
 }

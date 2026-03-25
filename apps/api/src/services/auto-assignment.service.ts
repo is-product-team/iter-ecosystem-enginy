@@ -112,12 +112,12 @@ export class AutoAssignmentService {
             const totalDemand = centers.reduce((sum: number, c: any) => sum + c.demand, 0);
 
             // DISTRIBUTION LOGIC
-            let allocated = 0;
+            // let allocated = 0; // Removed as unused
 
             if (totalDemand <= remainingCapacity) {
                 // Happy Path: Give everyone everything
                 centers.forEach((c: any) => c.assignedCount = c.students.length);
-                allocated = totalDemand;
+                // allocated = totalDemand; // Removed as unused
             } else {
                 // Scarcity Logic: Fair Share
                 const numCenters = centers.length;
@@ -161,7 +161,7 @@ export class AutoAssignmentService {
 
     private async persistAssignment(center: PendingCenter, tallerId: number) {
         // Take the first N students
-        const studentsToAssign = center.students.slice(0, center.assignedCount);
+        // center.students.slice(0, center.assignedCount); // Removed as unused
 
         // Update Petition Status
         await prisma.request.update({
@@ -203,8 +203,8 @@ export class AutoAssignmentService {
                     return {
                         id_assignment: assignacio.id_assignment,
                         data_session: d,
-                        hora_inici: slot.startTime,
-                        hora_fi: slot.endTime
+                        hora_inici: (slot as any).startTime,
+                        hora_fi: (slot as any).endTime
                     };
                 });
                 await prisma.session.createMany({ data: sessionsData });

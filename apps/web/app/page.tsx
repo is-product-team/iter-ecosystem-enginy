@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME } from '@iter/shared';
+import { ROLES } from '@iter/shared';
 import Loading from '@/components/Loading';
 
 export default function Home() {
@@ -13,14 +13,10 @@ export default function Home() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        const role = user.rol?.nom_rol;
-        if (role === 'ADMIN') {
+        if (user.rol.nom_rol === ROLES.ADMIN) {
           router.push('/admin');
-        } else if (role === 'COORDINADOR') {
-          router.push('/centro');
-        } else {
-          // If role is missing or invalid, redirect to login
-          router.push('/login');
+        } else if (user.rol.nom_rol === ROLES.COORDINATOR) {
+          router.push('/center');
         }
       } else {
         router.push('/login');
@@ -29,6 +25,6 @@ export default function Home() {
   }, [user, loading, router]);
 
   return (
-    <Loading fullScreen message="Carregant plataforma..." />
+    <Loading fullScreen message="Loading platform..." />
   );
 }
