@@ -23,18 +23,17 @@ export default function DocumentUpload({
   label,
   onUploadSuccess
 }: DocumentUploadProps) {
-  const [uploading, setUploading] = useState(false);
-  const [currentUrl, setCurrentUrl] = useState(initialUrl);
+  // --- Estados de carga y validación ---
+  const [uploading, setUploading] = useState(false); // Indica si la subida HTTP al backend está en curso
+  const [currentUrl, setCurrentUrl] = useState(initialUrl); // URL actual del documento subido
+  const [validatingAI, setValidatingAI] = useState(false); // Indica si el pipeline de IA (TensorFlow/PDF.js) está trabajando
+  const [overrideMode, setOverrideMode] = useState(false); // Se activa si la IA rechaza el doc, permitiendo subida manual
+  const [pendingFile, setPendingFile] = useState<File | null>(null); // Almacena el archivo que falló la validación para el "Forzado"
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== 'application/pdf') {
-      toast.error('Only PDF files are allowed.');
-      return;
-    }
-
+  /**
+   * Realiza la subida física del archivo al servidor una vez validado (o forzado).
+   */
+  const handleValidUpload = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('idInscripcio', idInscripcio.toString());
@@ -49,6 +48,7 @@ export default function DocumentUpload({
         },
       });
 
+      // Extraemos la URL según el tipo de documento para actualizar la UI local
       const newUrl = res.data[documentType === 'pedagogical_agreement' ? 'url_pedagogical_agreement' :
         documentType === 'mobility_authorization' ? 'url_mobility_authorization' :
           'url_image_rights'];
@@ -56,6 +56,10 @@ export default function DocumentUpload({
       setCurrentUrl(newUrl);
       onUploadSuccess(newUrl);
       toast.success(`${label} uploaded successfully.`);
+      
+      // Limpiamos estados de error/bloqueo tras éxito
+      setOverrideMode(false);
+      setPendingFile(null);
     } catch (error) {
       console.error('Error uploading document:', error);
       toast.error('Error uploading document.');
@@ -64,49 +68,61 @@ export default function DocumentUpload({
     }
   };
 
+  /**
+   * Orquestador de la validación por IA al seleccionar un archivo.
+   */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validación básica de formato
     if (file.type !== 'application/pdf') {
-      toast.error('Només es permeten fitxers PDF.');
+      toast.error('Only PDF files are allowed.');
       return;
     }
 
     try {
       setValidatingAI(true);
+      setOverrideMode(false);
+      
+      // Carga dinámica de utilidades para no penalizar el bundle inicial
       const { extractTextFromPdf, classifyDocumentType } = await import('@/lib/pdfUtils');
       const text = await extractTextFromPdf(file);
       const detectedType = classifyDocumentType(text);
 
-      if (detectedType !== 'unknown' && detectedType !== documentType) {
-        toast.error(`La IA detecta que has pujat un document tipus: ${detectedType}.`);
+      // Mapeo entre el tipo esperado por props y el detectado por IA (heurísticas de texto)
+      const expectedInIAPipeline = documentType === 'pedagogical_agreement' ? 'acord_pedagogic' : 
+                                   documentType === 'mobility_authorization' ? 'autoritzacio_mobilitat' : 
+                                   documentType === 'image_rights' ? 'drets_imatge' : 'unknown';
+
+      // Validación 1: El contenido del texto debe coincidir con el tipo de "slot" de subida
+      if (detectedType !== 'unknown' && detectedType !== expectedInIAPipeline) {
+        toast.error(`IA detecta un tipus diferent: ${detectedType}.`);
         setOverrideMode(true);
         setPendingFile(file);
-        setValidatingAI(false);
         return;
       }
 
-      if (documentType === 'acord_pedagogic') {
+      // Validación 2: Si es Acord Pedagògic, usamos Visión Artificial (TF.js) para buscar firmas
+      if (documentType === 'pedagogical_agreement') {
         const { signatureDetector } = await import('@/lib/visionUtils');
-        await signatureDetector.loadModel();
+        await signatureDetector.loadModel(); // Carga modelo YOLOv8 si no está en memoria
         const croppedCanvas = await signatureDetector.getBottomThirdOfLastPage(file);
-        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3);
+        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // Buscamos 3 firmas
 
         if (!hasSignatures) {
-          toast.error('La IA no ha detectat les 3 signatures obligatòries.');
+          toast.error('IA no ha detectat les signatures obligatòries.');
           setOverrideMode(true);
           setPendingFile(file);
-          setValidatingAI(false);
           return;
         }
       }
 
-      // Validado correctamente por la IA
+      // Si pasa todos los filtros, procedemos a la subida real
       await handleValidUpload(file);
     } catch (err) {
       console.error("AI Validation Error:", err);
-      toast.error('Error processant IA. Pots forçar pujada manualment.');
+      toast.error('Error processant IA. Pots forçar la pujada.');
       setOverrideMode(true);
       setPendingFile(file);
     } finally {
@@ -138,17 +154,29 @@ export default function DocumentUpload({
           )}
         </div>
 
-        <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${uploading ? 'bg-gray-50 border-gray-100 text-gray-300' : 'border-[#00426B] text-[#00426B] hover:bg-blue-50'
+        <div className="flex flex-col items-end gap-2">
+          {overrideMode && pendingFile && (
+            <button
+              onClick={() => handleValidUpload(pendingFile)}
+              className="px-3 py-1 text-[8px] font-bold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition-all uppercase"
+            >
+              Forçar Pujada Manual
+            </button>
+          )}
+          
+          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${
+            uploading || validatingAI ? 'bg-gray-50 border-gray-100 text-gray-300' : 'border-[#00426B] text-[#00426B] hover:bg-blue-50'
           }`}>
-          {uploading ? 'UPLOADING...' : currentUrl ? 'CHANGE' : 'ATTACH'}
-          <input
-            type="file"
-            className="hidden"
-            accept=".pdf"
-            onChange={handleFileChange}
-            disabled={uploading}
-          />
-        </label>
+            {uploading ? 'PUJANT...' : validatingAI ? 'VALIDANT (IA)...' : currentUrl ? 'CANVIAR' : 'ADJUNTAR'}
+            <input
+              type="file"
+              className="hidden"
+              accept=".pdf"
+              onChange={handleFileChange}
+              disabled={uploading || validatingAI}
+            />
+          </label>
+        </div>
       </div>
     </div>
   );
