@@ -108,7 +108,7 @@ async function seedUsers(roles: any, passDefault: string) {
 
     await prisma.user.upsert({
       where: { email: c.coordEmail },
-      update: {},
+      update: { password_hash: passDefault },
       create: {
         nom_complet: c.coordNom,
         email: c.coordEmail,

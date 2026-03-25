@@ -17,8 +17,11 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // 2. Verificar password
+    console.log(`[Auth] Intento de login para: ${email}`);
     const validPassword = await bcrypt.compare(password, user.password_hash);
+    
     if (!validPassword) {
+      console.warn(`[Auth] Password incorrecto para: ${email}`);
       return res.status(401).json({ error: 'Credencials invàlides' });
     }
 
@@ -27,17 +30,14 @@ export const login = async (req: Request, res: Response) => {
       { 
         userId: user.id_user, 
         email: user.email, 
-        role: (user as any).role.nom_roleee,
+        role: (user as any).role.nom_role,
         centreId: user.id_center 
       },
       env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    // 4. Respuesta limpia (Omitimos el hash del password por seguridad)
-    const { password_hash, ...userSafe } = user;
-
-    // 5. Set Cookie (Web Security)
+    // 4. Set Cookie (Web Security)
     res.cookie('token', token, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
@@ -47,7 +47,7 @@ export const login = async (req: Request, res: Response) => {
 
     res.json({
       token, // Mantener para compatibilidad móvil (Bearer)
-      user: userSafe
+      user: mapUserResponse(user)
     });
   } catch (error) {
     console.error('Error en login:', error);
