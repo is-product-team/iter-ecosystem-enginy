@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma.js';
-import { crypto } from '../lib/crypto.js'; // Assuming crypto or similar is available for random strings
 
 export const getSyncToken = async (req: Request, res: Response) => {
   try {

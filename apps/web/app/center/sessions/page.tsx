@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
@@ -69,7 +69,7 @@ export default function SessionsListPage() {
     }
   }, [user, authLoading, router]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (user && user.center?.id_center) {
       try {
         const api = getApi();
@@ -123,11 +123,11 @@ export default function SessionsListPage() {
         setLoading(false);
       }
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchData();
-  }, [user]);
+  }, [fetchData]);
 
   // Filtering Logic
   const filteredSessions = (sessions || []).filter(s => {
@@ -174,7 +174,7 @@ export default function SessionsListPage() {
         // Let's loop to be safe and ensure they appear on the calendar for all days.
         const targetAssignacio = assignacions.find(a => a.id_assignacio === parseInt(selectedAssignacioId));
         if (targetAssignacio?.sessions) {
-           await Promise.all(targetAssignacio.sessions.map((s: any) => 
+           await Promise.all(targetAssignacio.sessions.map((s: Sessio) => 
                api.post(`/assignacions/sessions/${s.id_sessio}/staff`, { idUsuari: parseInt(selectedProfessorId) })
                  .catch(() => {}) // Ignore duplicates
            ));
@@ -197,7 +197,7 @@ export default function SessionsListPage() {
       setSelectedProfessorId("");
       
       
-    } catch (error) {
+    } catch (_error) {
       toast.error('Error making assignment');
     }
   };
@@ -282,7 +282,6 @@ export default function SessionsListPage() {
               const dateObj = new Date(sessio.data_sessio);
               const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
               const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
-              const staffNames = sessio.staff?.map((s) => s.usuari?.nom_complet || s.nom).join(', ');
 
               return (
                 <div key={sessio.id_sessio} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${sessio.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
@@ -462,7 +461,7 @@ export default function SessionsListPage() {
                       className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
                     >
                       <option value="">-- Choose a session --</option>
-                      {selectedAssignacio?.sessions?.map((s: any, idx: number) => (
+                      {selectedAssignacio?.sessions?.map((s: Sessio, idx: number) => (
                         <option key={s.id_sessio} value={s.id_sessio}>
                           Session {idx + 1} - {new Date(s.data_sessio).toLocaleDateString()} ({s.hora_inici}-{s.hora_fi})
                         </option>

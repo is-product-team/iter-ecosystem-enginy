@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { REQUEST_STATUSES } from '@iter/shared';
 
 export const createPeticioSchema = z.object({
   body: z.object({
@@ -27,6 +28,6 @@ export const updatePeticioStatusSchema = z.object({
     id: z.string().regex(/^\d+$/, 'ID ha de ser numèric'),
   }),
   body: z.object({
-    estat: z.enum(['Pendent', 'Aprovada', 'Rebutjada']),
+    estat: z.enum([REQUEST_STATUSES.PENDING, REQUEST_STATUSES.APPROVED, REQUEST_STATUSES.REJECTED]),
   }),
 });

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { ROLES } from '@iter/shared';
 
 import { env } from '../config/env.js';
 
@@ -37,7 +38,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 };
 
 export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user?.role !== 'ADMIN') {
+  if (req.user?.role !== ROLES.ADMIN) {
 
     return res.status(403).json({ error: 'Acceso denegado: Se requiere rol de Administrador' });
   }
@@ -45,7 +46,7 @@ export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => 
 };
 
 export const isCoordinator = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user?.role !== 'COORDINADOR' && req.user?.role !== 'ADMIN') {
+  if (req.user?.role !== ROLES.COORDINATOR && req.user?.role !== ROLES.ADMIN) {
     return res.status(403).json({ error: 'Acceso denegado: Se requiere rol de Coordinador' });
   }
   next();

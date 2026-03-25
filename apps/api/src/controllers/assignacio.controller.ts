@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { AssignmentChecklistSchema, ROLES } from '@iter/shared';
+import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES } from '@iter/shared';
 import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
 import { createNotificationInterna } from './notificacio.controller.js';
 
@@ -8,7 +8,7 @@ import { createNotificationInterna } from './notificacio.controller.js';
 export const getAssignments = async (req: Request, res: Response) => {
   const { role } = req.user!;
 
-  if (role !== 'ADMIN') {
+  if (role !== ROLES.ADMIN) {
     return res.status(403).json({ error: 'Accés denegat' });
   }
 
@@ -296,7 +296,7 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
       return res.status(404).json({ error: 'Petició no trobada.' });
     }
 
-    if (request.estat !== 'Aprovada') {
+    if (request.estat !== REQUEST_STATUSES.APPROVED) {
       return res.status(400).json({ error: 'La petició ha d\'estar aprovada per crear una assignació.' });
     }
 

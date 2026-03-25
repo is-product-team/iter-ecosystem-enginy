@@ -2,11 +2,21 @@
 
 import { useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { ROLES } from "@iter/shared";
 import DashboardLayout from "@/components/DashboardLayout";
 import Calendar, { CalendarEvent } from "../../components/ui/Calendar";
 import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 import { format } from "date-fns";
+
+interface Phase {
+  id_phase: number;
+  nom: string;
+  data_inici: string;
+  data_fi: string;
+  descripcio: string;
+  activa: boolean;
+}
 
 export default function CalendarPage() {
   const { user, loading: authLoading } = useAuth();
@@ -40,7 +50,7 @@ export default function CalendarPage() {
         return "calendar-event-card event-milestone";
       };
 
-      const phaseEvents = phasesData.map((f: any) => ({
+      const phaseEvents = phasesData.map((f: Phase) => ({
         id: `fase-${f.id_phase}`,
         title: `Fase: ${f.nom}`,
         date: f.data_inici,
@@ -51,7 +61,7 @@ export default function CalendarPage() {
       }));
 
       setEvents([...eventsRes.data, ...phaseEvents]);
-      setActiveFase(phasesData.find((f: any) => f.activa));
+      setActiveFase(phasesData.find((f: Phase) => f.activa));
     } catch (error) {
       console.error("Error fetching calendar data:", error);
     } finally {
@@ -93,7 +103,7 @@ export default function CalendarPage() {
             onEventClick={(e) => {
               // Si tiene id_assignment, navegar al detalle
               if (e.metadata?.id_assignment) {
-                const baseUrl = user?.role === 'ADMIN' ? '/admin/assignacions' : '/centro/assignacions';
+                const baseUrl = user?.rol.nom_rol === ROLES.ADMIN ? '/admin/assignacions' : '/centro/assignacions';
                 window.location.href = `${baseUrl}/${e.metadata.id_assignment}`;
               }
             }}
@@ -161,7 +171,7 @@ export default function CalendarPage() {
                 onClick={() => setIsLegendOpen(false)}
                 className="w-full mt-10 py-4 bg-consorci-darkBlue text-white text-[11px] font-black uppercase tracking-[0.2em] hover:bg-consorci-actionBlue transition-all shadow-lg active:scale-95"
               >
-                D'acord
+                D&apos;acord
               </button>
             </div>
           </div>

@@ -6,13 +6,15 @@ import {
     LineChart, Line, Cell
 } from 'recharts';
 
+import { REQUEST_STATUSES } from '@iter/shared';
+ 
 // --- COMPONENTS ---
-
+ 
 export const StatusDistribution = ({ data }: { data: { estat: string, total: number }[] }) => {
     // Ensure we have the three categories even if they are zero
-    const categories = ['Pendent', 'Aprovada', 'Rebutjada'];
+    const categories = Object.values(REQUEST_STATUSES);
     const chartData = categories.map(cat => {
-        const found = data.find(d => d.estat.toLowerCase() === cat.toLowerCase() || (cat === 'Aprovada' && d.estat === 'aceptado') || (cat === 'Rebutjada' && d.estat === 'rechazado'));
+        const found = data.find(d => d.estat === cat);
         return {
             name: cat,
             total: found ? found.total : 0

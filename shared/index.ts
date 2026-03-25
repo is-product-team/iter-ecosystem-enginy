@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { THEME } from './theme.ts';
+import { THEME } from './theme.js';
 
 export { THEME };
 
@@ -16,14 +16,30 @@ export const ROLES = {
 
 export type RoleTag = typeof ROLES[keyof typeof ROLES];
 
-// Define request statuses - Aligned with Prisma Enum 'RequestStatus' (or EstatRequest)
+// Define request statuses - Aligned with Prisma Enum 'RequestStatus'
 export const REQUEST_STATUSES = {
-  PENDING: 'Pending',
-  APPROVED: 'Approved',
-  REJECTED: 'Rejected'
+  PENDING: 'Pendent',
+  APPROVED: 'Aprovada',
+  REJECTED: 'Rebutjada'
 } as const;
 
 export type RequestStatus = typeof REQUEST_STATUSES[keyof typeof REQUEST_STATUSES];
+ 
+// Define assignment statuses - Aligned with Prisma Enum 'AssignmentStatus'
+export const ASSIGNMENT_STATUSES = {
+  PROVISIONAL: 'PROVISIONAL',
+  PUBLISHED: 'PUBLISHED',
+  DATA_ENTRY: 'DATA_ENTRY',
+  DATA_SUBMITTED: 'DATA_SUBMITTED',
+  VALIDATED: 'VALIDATED',
+  READY_TO_START: 'READY_TO_START',
+  VACANT: 'VACANT',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const;
+
+export type AssignmentStatusTag = typeof ASSIGNMENT_STATUSES[keyof typeof ASSIGNMENT_STATUSES];
 
 // Calendario Programa Iter (Curso 25-26 aprox)
 export const CALENDARI = {

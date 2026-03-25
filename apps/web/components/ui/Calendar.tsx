@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { THEME } from '@iter/shared';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { ca } from 'date-fns/locale';
 
@@ -40,7 +39,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
     const start = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 1 });
     const end = endOfWeek(endOfMonth(currentDate), { weekStartsOn: 1 });
     onRangeChange?.(start, end);
-  }, [currentDate]);
+  }, [currentDate, onRangeChange]);
 
   const prevMonth = () => setCurrentDate(new Date(year, currentDate.getMonth() - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, currentDate.getMonth() + 1, 1));
@@ -65,7 +64,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
       weeks.push(week);
     }
     return weeks;
-  }, [currentDate, year]);
+  }, [currentDate]);
 
   const getEventStyles = (type: string) => {
     switch (type) {
@@ -142,7 +141,14 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
             const firstDayOfWeek = week[0].date;
             const lastDayOfWeek = week[6].date;
 
-            const weekEvents: any[] = [];
+            interface WeekEvent extends CalendarEvent {
+              start: number;
+              span: number;
+              continuesBefore: boolean;
+              continuesAfter: boolean;
+            }
+
+            const weekEvents: WeekEvent[] = [];
             events.forEach(event => {
               const eStart = event.date.split('T')[0];
               const eEnd = (event.endDate || event.date).split('T')[0];
@@ -162,7 +168,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
             });
 
             // Layout tracks
-            const tracks: any[][] = [];
+            const tracks: WeekEvent[][] = [];
             weekEvents.sort((a, b) => b.span - a.span).forEach(event => {
               let trackIdx = 0;
               while (tracks[trackIdx] && tracks[trackIdx].some(e =>
