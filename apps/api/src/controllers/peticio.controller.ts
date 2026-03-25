@@ -114,7 +114,7 @@ export const createRequest = async (req: Request, res: Response) => {
     const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
     if (totalStudentsC + alumnes_aprox > 12) {
       return res.status(400).json({
-        error: `Límit superat. L'institut ya té ${totalStudentsC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
+        error: `Límit superat. L'institut ja té ${totalStudentsC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
       });
     }
   }
@@ -128,7 +128,7 @@ export const createRequest = async (req: Request, res: Response) => {
     });
 
     if (existingRequest) {
-      return res.status(400).json({ error: 'Aquest centre ya ha realitzat una sol·licitud per a aquest taller.' });
+      return res.status(400).json({ error: 'Aquest centre ja ha realitzat una sol·licitud per a aquest taller.' });
     }
 
     const nuevaRequest = await prisma.request.create({
@@ -176,7 +176,7 @@ export const updateRequest = async (req: Request, res: Response) => {
     }
 
     // Verificar permisos: Coordinador solo edita las suyas
-    if (role !== ROLES.ADMIN && existingRequest.id_center !== (centreId ? (typeof centreId === 'string' ? centreId : centreId) : 0)) {
+    if (role !== ROLES.ADMIN && existingRequest.id_center !== centreId) {
       return res.status(403).json({ error: 'No tens permís per editar aquesta petició.' });
     }
 
@@ -219,7 +219,7 @@ export const updateRequest = async (req: Request, res: Response) => {
       const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
       if (totalStudentsC + nuevosStudents > 12) {
         return res.status(400).json({
-          error: `Límit superat. L'institut ya té ${totalStudentsC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosStudents}) superaria el màxim de 12.`
+          error: `Límit superat. L'institut ja té ${totalStudentsC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosStudents}) superaria el màxim de 12.`
         });
       }
     }

@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { RequestStatus } from '@prisma/client';
+import { ASSIGNMENT_STATUSES, REQUEST_STATUSES } from '@iter/shared';
 import { createNotificationInterna } from '../controllers/notificacio.controller.js';
 
 export interface TetrisStats {
@@ -29,7 +30,7 @@ export async function runTetris() {
   // 1. Get all approved (or pending) petitions that don't have an assignment yet
   const petitions = await prisma.request.findMany({
     where: {
-      estat: { in: [RequestStatus.Aprovada, RequestStatus.Pendent] },
+      estat: { in: [REQUEST_STATUSES.APPROVED as any, REQUEST_STATUSES.PENDING as any] },
       assignment: null
     },
     include: {
@@ -89,11 +90,11 @@ export async function runTetris() {
 
       if (currentCapacity >= neededPlazas) {
         // 1. If petition is Pendent, approve it automatically
-        if (petition.estat === RequestStatus.Pendent) {
+        if (petition.estat === REQUEST_STATUSES.PENDING) {
           console.log(`✅ TetrisService: Auto-approving petition ${petition.id_request} for center ID ${petition.id_center}`);
           await prisma.request.update({
             where: { id_request: petition.id_request },
-            data: { estat: RequestStatus.Aprovada }
+            data: { estat: REQUEST_STATUSES.APPROVED as any }
           });
         }
 
@@ -103,13 +104,13 @@ export async function runTetris() {
             id_request: petition.id_request,
             id_center: petition.id_center,
             id_workshop: petition.id_workshop,
-            estat: 'PUBLISHED',
+            estat: ASSIGNMENT_STATUSES.PUBLISHED,
             checklist: {
               create: [
-                { pas_nom: 'Designar Profesores Referentes', completat: false },
-                { pas_nom: 'Subir Registro Nominal (Excel)', completat: false },
-                { pas_nom: 'Gestionar Acuerdo Pedagògic', completat: petition.modalitat !== 'C' },
-                { pas_nom: 'Autorizaciones de Imagen y Desplazamiento', completat: false }
+                { pas_nom: 'Designar Professors Referents', completat: false },
+                { pas_nom: 'Pujar Registre Nominal (Excel)', completat: false },
+                { pas_nom: 'Gestionar Acord Pedagògic', completat: petition.modalitat !== 'C' },
+                { pas_nom: 'Autoritzacions d\'Imatge i Desplaçament', completat: false }
               ]
             }
           }

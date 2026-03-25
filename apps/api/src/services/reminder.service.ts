@@ -93,7 +93,7 @@ export class ReminderService {
             await createNotificationInterna({
               id_user: user.id_user,
               titol: `Recordatori: Sessió de Taller`,
-              missatge: `Tens una sessió del taller "${session.assignment.workshop.titol}" rprogramada para hoy a las ${session.hora_inici || 'su hora habitual'}.`,
+              missatge: `Tens una sessió del taller "${session.assignment.workshop.titol}" programada per avui a les ${session.hora_inici || 'la seva hora habitual'}.`,
               tipus: 'SISTEMA',
               importancia: 'INFO'
             });
@@ -124,8 +124,8 @@ export class ReminderService {
 
         if (!existing) {
           await createNotificationInterna({
-            titol: `Hito Próximo: ${milestone.titol}`,
-            missatge: `Recuerda: El hito "${milestone.titol}" está programado para las próximas 24 horas.`,
+            titol: `Fita Pròxima: ${milestone.titol}`,
+            missatge: `Recorda: La fita "${milestone.titol}" està programada per a les properes 24 hores.`,
             tipus: 'FASE',
             importancia: 'WARNING'
           });
