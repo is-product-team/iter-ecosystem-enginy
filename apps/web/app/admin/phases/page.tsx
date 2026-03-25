@@ -9,7 +9,7 @@ import Loading from "@/components/Loading";
 import { toast } from "sonner";
 
 interface Fase {
-  id_fase: number;
+  id_phase: number;
   nom: string;
   descripcio: string;
   data_inici: string;
@@ -60,7 +60,7 @@ export default function PhaseManagementPage() {
     try {
       const api = getApi();
       await api.put(`/fases/${id}`, { [field]: value });
-      setFases(prev => prev.map(f => f.id_fase === id ? { ...f, [field]: value } : f));
+      setFases(prev => prev.map(f => f.id_phase === id ? { ...f, [field]: value } : f));
       toast.success("Data actualitzada.");
     } catch (error) {
       toast.error("Error al actualitzar la data.");
@@ -99,7 +99,7 @@ export default function PhaseManagementPage() {
           <div className="grid gap-6">
             {fases.sort((a, b) => a.ordre - b.ordre).map((fase) => (
               <div
-                key={fase.id_fase}
+                key={fase.id_phase}
                 className={`border bg-background-surface ${fase.activa
                     ? 'border-l-8 border-consorci-darkBlue border-t-border-subtle border-r-border-subtle border-b-border-subtle'
                     : 'border-l-8 border-border-subtle border-t-border-subtle border-r-border-subtle border-b-border-subtle opacity-70'
@@ -138,7 +138,7 @@ export default function PhaseManagementPage() {
                         <input
                           type="date"
                           value={fase.data_inici.split('T')[0]}
-                          onChange={(e) => updatePhaseDate(fase.id_fase, 'data_inici', e.target.value)}
+                          onChange={(e) => updatePhaseDate(fase.id_phase, 'data_inici', e.target.value)}
                           className="w-full bg-background-surface border border-border-subtle text-xs font-bold text-text-primary px-4 py-3 focus:outline-none focus:border-consorci-darkBlue rounded-none shadow-sm"
                         />
                       </div>
@@ -150,7 +150,7 @@ export default function PhaseManagementPage() {
                         <input
                           type="date"
                           value={fase.data_fi.split('T')[0]}
-                          onChange={(e) => updatePhaseDate(fase.id_fase, 'data_fi', e.target.value)}
+                          onChange={(e) => updatePhaseDate(fase.id_phase, 'data_fi', e.target.value)}
                           className="w-full bg-background-surface border border-border-subtle text-xs font-bold text-text-primary px-4 py-3 focus:outline-none focus:border-consorci-darkBlue rounded-none shadow-sm"
                         />
                       </div>
@@ -159,14 +159,14 @@ export default function PhaseManagementPage() {
 
                   <div className="md:w-56 flex flex-col justify-center border-l border-border-subtle pl-8">
                     <button
-                      onClick={() => togglePhase(fase.id_fase, fase.activa)}
-                      disabled={updating === fase.id_fase}
+                      onClick={() => togglePhase(fase.id_phase, fase.activa)}
+                      disabled={updating === fase.id_phase}
                       className={`w-full py-5 font-black text-[10px] uppercase tracking-widest transition-all ${fase.activa
                           ? 'bg-background-subtle text-text-muted border border-border-subtle cursor-not-allowed'
                           : 'bg-consorci-darkBlue text-white hover:bg-consorci-actionBlue hover:shadow-lg active:translate-y-0.5'
                         }`}
                     >
-                      {updating === fase.id_fase
+                      {updating === fase.id_phase
                         ? (
                           <div className="flex items-center justify-center gap-2">
                             <div className="w-3 h-3 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>

@@ -2,6 +2,8 @@
 FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat openssl
 RUN npm install -g turbo@2.7.4
+ENV COREPACK_ENABLE=0
+ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 
 # Stage 2: Pruner (Separa dependencias de Web y API)
