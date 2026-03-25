@@ -30,6 +30,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
       'Content-Type': 'application/json',
       'ngrok-skip-browser-warning': 'true',
     },
+    credentials: 'include',
     body: JSON.stringify({ email, password }),
   });
 

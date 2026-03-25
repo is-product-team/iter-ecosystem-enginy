@@ -20,12 +20,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return null;
   });
-  const [loading] = useState(false);
-
-  // No longer need immediate check in useEffect if initialized synchronously
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
-    // This could still be used for watching changes if needed, 
-    // but the sync initialization handles the hydration error/standard case.
+    // Basic hydration check - ensure client-side state is ready
+    const currentUser = getAuthUser();
+    if (currentUser) {
+      setUser(currentUser);
+    }
+    setLoading(false);
   }, []);
 
   const login = (userData: User) => {
