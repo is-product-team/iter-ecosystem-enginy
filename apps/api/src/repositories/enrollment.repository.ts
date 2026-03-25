@@ -3,7 +3,7 @@ import { BaseRepository } from './base.repository.js';
 
 export class EnrollmentRepository extends BaseRepository<Enrollment, Prisma.EnrollmentCreateInput, Prisma.EnrollmentUpdateInput> {
   constructor() {
-    super('enrollment');
+    super('enrollment', 'id_enrollment');
   }
 
   override async findById(id: number): Promise<Enrollment | null> {

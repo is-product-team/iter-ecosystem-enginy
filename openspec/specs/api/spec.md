@@ -17,3 +17,4 @@ The backend is built with Node.js 22 and Express, using Prisma ORM to interact w
 - **Enrollment**: Student registration and document validation.
 - **Attendance**: Real-time tracking of student presence.
 - **Telemetry**: High-frequency GPS data processing.
+- **Security**: Endpoint-level rate limiting (5 req/15 min for auth, 100 req/15 min general).

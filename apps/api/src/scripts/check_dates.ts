@@ -7,29 +7,28 @@ async function main() {
   console.log(`Checking assignments for user: ${email}`);
 
   // 1. Get user and professor ID
-  const user = await prisma.usuari.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email } });
   if (!user) { console.log('User not found'); return; }
 
-  const professor = await prisma.professor.findFirst({ where: { nom: user.nom_complet } });
-  if (!professor) { console.log('Professor not found'); return; }
+  const teacher = await prisma.teacher.findFirst({ where: { id_user: user.id_user } });
+  if (!teacher) { console.log('Teacher not found'); return; }
 
-  console.log(`Professor ID: ${professor.id_professor}`);
+  console.log(`Teacher ID: ${teacher.id_teacher}`);
 
-  // 2. Get assignments
-  const assignments = await prisma.assignacio.findMany({
+  // 2. Get assignments where this teacher is involved
+  const assignments = await prisma.assignment.findMany({
     where: {
-      OR: [
-        { prof1_id: professor.id_professor },
-        { prof2_id: professor.id_professor }
-      ]
+      teachers: {
+        some: { id_user: teacher.id_user }
+      }
     },
-    include: { taller: true }
+    include: { workshop: true }
   });
 
   console.log('Assignments found:', assignments.length);
-  assignments.forEach(a => {
-    console.log(`ID: ${a.id_assignacio}`);
-    console.log(`Taller: ${a.taller.titol}`);
+  assignments.forEach((a: any) => {
+    console.log(`ID: ${a.id_assignment}`);
+    console.log(`Workshop: ${a.workshop.titol}`);
     console.log(`Start: ${a.data_inici}`);
     console.log(`End:   ${a.data_fi}`);
     console.log('---');

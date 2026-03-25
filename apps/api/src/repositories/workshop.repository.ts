@@ -3,7 +3,7 @@ import { BaseRepository } from './base.repository.js';
 
 export class WorkshopRepository extends BaseRepository<Workshop, Prisma.WorkshopCreateInput, Prisma.WorkshopUpdateInput> {
   constructor() {
-    super('workshop');
+    super('workshop', 'id_workshop');
   }
 
   // Sobrescribimos findById para usar id_workshop

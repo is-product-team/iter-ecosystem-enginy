@@ -12,7 +12,12 @@ export interface CalendarEvent {
   endDate?: string;
   type: 'milestone' | 'deadline' | 'assignment' | 'session';
   description?: string;
-  metadata?: any;
+  metadata?: {
+    hora?: string;
+    centre?: string;
+    id_assignacio?: number;
+    [key: string]: unknown;
+  };
   colorClass?: string;
 }
 
@@ -60,7 +65,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
       weeks.push(week);
     }
     return weeks;
-  }, [currentDate]);
+  }, [currentDate, year]);
 
   const getEventStyles = (type: string) => {
     switch (type) {

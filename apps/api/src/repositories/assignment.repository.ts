@@ -3,7 +3,7 @@ import { BaseRepository } from './base.repository.js';
 
 export class AssignmentRepository extends BaseRepository<Assignment, Prisma.AssignmentCreateInput, Prisma.AssignmentUpdateInput> {
   constructor() {
-    super('assignment');
+    super('assignment', 'id_assignment');
   }
 
   override async findById(id: number): Promise<Assignment | null> {

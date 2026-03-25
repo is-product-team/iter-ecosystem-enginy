@@ -10,7 +10,7 @@ import { format } from "date-fns";
 
 export default function CalendarPage() {
   const { user, loading: authLoading } = useAuth();
-  const [activeFase, setActiveFase] = useState<any>(null);
+  const [activeFase, setActiveFase] = useState<Phase | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
   
