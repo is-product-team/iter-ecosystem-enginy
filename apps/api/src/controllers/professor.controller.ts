@@ -1,6 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
+import { ROLES } from '@iter/shared';
 
 export const getTeachers = async (req: Request, res: Response) => {
   const { centreId, role } = req.user! || {};
@@ -9,7 +10,7 @@ export const getTeachers = async (req: Request, res: Response) => {
     const where: any = {};
     
     // Scoping: Admin sees all, others only their center
-    if (role !== 'ADMIN') {
+    if (role !== ROLES.ADMIN) {
       if (!centreId) {
         return res.json([]); // No center assigned, no access
       }
@@ -50,10 +51,10 @@ export const createTeacher = async (req: Request, res: Response) => {
     const result = await prisma.$transaction(async (tx: any) => {
       // 1. Buscar el rol de profesor
       const rolProfe = await tx.role.findFirst({
-        where: { nom_rolee: 'PROFESSOR' }
+        where: { nom_role: ROLES.TEACHER }
       });
 
-      if (!rolProfe) throw new Error('Role PROFESSOR no trobat.');
+      if (!rolProfe) throw new Error(`Role ${ROLES.TEACHER} no trobat.`);
 
       // 2. Crear el usuario
       const salt = await bcrypt.genSalt(10);
@@ -163,7 +164,7 @@ export const getTeachersByCenter = async (req: Request, res: Response) => {
 
   try {
     // Scoping check
-    if (role !== 'ADMIN' && parseInt(idCenter as string) !== centreId) {
+    if (role !== ROLES.ADMIN && parseInt(idCenter as string) !== centreId) {
       return res.status(403).json({ error: 'Accés denegat' });
     }
 

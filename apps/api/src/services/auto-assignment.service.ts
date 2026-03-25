@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma.js';
+import { REQUEST_STATUSES } from '@iter/shared';
 
 interface PendingCenter {
     centerId: number;
@@ -20,7 +21,7 @@ export class AutoAssignmentService {
         // 1. Fetch Approved/Pending Petitions for Modalitat C that are not yet fully assigned
         const petitions = await prisma.request.findMany({
             where: {
-                estat: { in: ['Aprovada', 'Pendent'] },
+                estat: { in: [REQUEST_STATUSES.APPROVED, REQUEST_STATUSES.PENDING] },
                 modalitat: 'C',
                 assignment: null
             },
@@ -166,7 +167,7 @@ export class AutoAssignmentService {
         // Update Petition Status
         await prisma.request.update({
             where: { id_request: center.peticioId },
-            data: { estat: 'Aprovada' }
+            data: { estat: REQUEST_STATUSES.APPROVED }
         });
 
         // Create Assignment

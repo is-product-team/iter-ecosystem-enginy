@@ -2,6 +2,7 @@ import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 import { RequestStatus } from '@prisma/client';
 import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
+import { ROLES, REQUEST_STATUSES } from '@iter/shared';
 import { createNotificationInterna } from './notificacio.controller.js';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
@@ -16,12 +17,12 @@ export const getRequestns = async (req: Request, res: Response) => {
     const where: any = {};
 
     // Scoping: Admin sees all, others only their center
-    if (role !== 'ADMIN') {
+    if (role !== ROLES.ADMIN) {
       if (!centreId) {
         return res.json({ data: [], meta: { total: 0, page: Number(page), limit: Number(limit), totalPages: 0 } });
       }
       // If the user is a teacher, they should only see requests related to their assignments
-      if (role === 'TEACHER') {
+      if (role === ROLES.TEACHER) {
         const assignments = await prisma.assignment.findMany({
           where: {
             teachers: { some: { id_user: userId } }
@@ -136,7 +137,7 @@ export const createRequest = async (req: Request, res: Response) => {
         id_workshop: parseInt(id_workshop),
         alumnes_aprox: parseInt(alumnes_aprox),
         comentaris,
-        estat: 'Pendent',
+        estat: REQUEST_STATUSES.PENDING,
         modalitat,
         prof1_id: parseInt(prof1_id),
         prof2_id: parseInt(prof2_id),
@@ -175,18 +176,18 @@ export const updateRequest = async (req: Request, res: Response) => {
     }
 
     // Verificar permisos: Coordinador solo edita las suyas
-    if (role !== 'ADMIN' && existingRequest.id_center !== (centreId ? (typeof centreId === 'string' ? centreId : centreId) : 0)) {
+    if (role !== ROLES.ADMIN && existingRequest.id_center !== (centreId ? (typeof centreId === 'string' ? centreId : centreId) : 0)) {
       return res.status(403).json({ error: 'No tens permís per editar aquesta petició.' });
     }
 
     // Verificar estado: Solo se pueden editar las pendientes
-    if (existingRequest.estat !== 'Pendent') {
+    if (existingRequest.estat !== REQUEST_STATUSES.PENDING) {
       return res.status(400).json({ error: 'Només es poden editar requests pendents.' });
     }
 
     // --- VERIFICACIÓN DE FASE ---
     // Si NO es admin, verificamos la fase. Los admins pueden editar siempre.
-    if (role !== 'ADMIN') {
+    if (role !== ROLES.ADMIN) {
       const phaseStatus = await isPhaseActive(PHASES.APPLICATION);
       if (!phaseStatus.isActive) {
         let errorMessage = 'El període de sol·licitud de tallers no està actiu.';
@@ -257,10 +258,10 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
 
     await createNotificationInterna({
       id_center: updated.id_center,
-      titol: `Sol·licitud ${updated.estat === 'Aprovada' ? 'Aprovada' : 'Rebutjada'}`,
+      titol: `Sol·licitud ${updated.estat === REQUEST_STATUSES.APPROVED ? 'Aprovada' : 'Rebutjada'}`,
       missatge: `La teva sol·licitud per al taller "${updated.workshop.titol}" ha estat ${updated.estat.toLowerCase()}.`,
       tipus: 'PETICIO',
-      importancia: updated.estat === 'Aprovada' ? 'INFO' : 'WARNING'
+      importancia: updated.estat === REQUEST_STATUSES.APPROVED ? 'INFO' : 'WARNING'
     });
 
     res.json(updated);

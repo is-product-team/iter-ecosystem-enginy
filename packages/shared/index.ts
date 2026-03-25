@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { THEME } from './theme.ts';
+import { THEME } from './theme.js';
 
 export { THEME };
 
@@ -16,11 +16,11 @@ export const ROLES = {
 
 export type RoleTag = typeof ROLES[keyof typeof ROLES];
 
-// Define request statuses - Aligned with Prisma Enum 'RequestStatus' (or EstatRequest)
+// Define request statuses - Aligned with Prisma Enum 'RequestStatus'
 export const REQUEST_STATUSES = {
-  PENDING: 'Pending',
-  APPROVED: 'Approved',
-  REJECTED: 'Rejected'
+  PENDING: 'Pendent',
+  APPROVED: 'Aprovada',
+  REJECTED: 'Rebutjada'
 } as const;
 
 export type RequestStatus = typeof REQUEST_STATUSES[keyof typeof REQUEST_STATUSES];

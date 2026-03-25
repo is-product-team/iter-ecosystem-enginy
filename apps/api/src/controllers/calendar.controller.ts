@@ -9,7 +9,7 @@ import { generateICS, ICSEvent } from '../utils/ics.js';
 async function fetchEventsForUser(user: { userId: number, role: string, centreId?: number | null }, start?: string, end?: string) {
   // 1. Obtener el profesor asociado al usuario (si es rol profesor)
   let professorId: number | null = null;
-  if (user.role === ROLES.PROFESSOR) {
+  if (user.role === ROLES.TEACHER) {
     const professor = await prisma.teacher.findUnique({
       where: { id_user: user.userId }
     });
@@ -47,7 +47,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
           where: assignmentDateFilter, 
           include: { workshop: true, center: true, sessions: { include: { staff: { include: { user: true } } } } } 
         })
-      : user.role === ROLES.COORDINADOR
+      : user.role === ROLES.COORDINATOR
       ? prisma.assignment.findMany({ 
           where: { ...assignmentDateFilter, id_center: user.centreId! }, 
           include: { 
@@ -63,7 +63,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
             }
           } 
         })
-      : user.role === ROLES.PROFESSOR
+      : user.role === ROLES.TEACHER
       ? prisma.assignment.findMany({ 
           where: { 
             ...assignmentDateFilter, 
@@ -108,13 +108,13 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
 
   // Mapeo de Assignments y sus Sessions
   assignments.forEach((a: any) => {
-    if (a.data_inici && a.data_fi && user.role !== ROLES.PROFESSOR) {
+    if (a.data_inici && a.data_fi && user.role !== ROLES.TEACHER) {
       const startDate = new Date(a.data_inici);
       const endDate = new Date(a.data_fi);
       if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
         events.push({
           id: `assign-${a.id_assignment}`,
-          title: user.role === ROLES.COORDINADOR ? `Workshop: ${a.workshop?.titol}` : `${a.workshop?.titol}`,
+          title: user.role === ROLES.COORDINATOR ? `Workshop: ${a.workshop?.titol}` : `${a.workshop?.titol}`,
           date: startDate.toISOString(),
           endDate: endDate.toISOString(),
           type: 'assignment',
@@ -130,7 +130,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
     if (a.sessions) {
       a.sessions.forEach((s: any) => {
         const isSessionStaff = s.staff?.some((sp: any) => sp.id_user === user.userId);
-        if (user.role === ROLES.PROFESSOR && !isSessionStaff) return;
+        if (user.role === ROLES.TEACHER && !isSessionStaff) return;
 
         const sessionDate = s.data_session ? new Date(s.data_session) : null;
         if (sessionDate && !isNaN(sessionDate.getTime())) {
@@ -175,9 +175,9 @@ export const getCalendarICS = async (req: Request, res: Response) => {
     
     // Find user by sync token
     const user = await prisma.user.findFirst({
-      where: { sync_token: token },
+      where: { sync_token: token as string },
       include: { role: true }
-    });
+    }) as any;
 
     if (!user) {
       return res.status(404).send('Invalid sync token');

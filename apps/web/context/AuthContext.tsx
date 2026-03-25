@@ -14,21 +14,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window !== 'undefined') {
-      return getAuthUser();
-    }
-    return null;
-  });
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Basic hydration check - ensure client-side state is ready
     const currentUser = getAuthUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
-    setLoading(false);
+    Promise.resolve().then(() => {
+      if (currentUser) {
+        setUser(currentUser);
+      }
+      setLoading(false);
+    });
   }, []);
 
   const login = (userData: User) => {

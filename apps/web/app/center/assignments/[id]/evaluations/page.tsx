@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
-import assignmentService from '@/services/assignmentService';
+import assignmentService, { Assignment, Enrollment } from '@/services/assignmentService';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 export default function AssignmentEvaluationsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [user, setUser] = useState<User | null>(null);
-    const [assignment, setAssignment] = useState<any | null>(null);
+    const [assignment, setAssignment] = useState<Assignment | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
@@ -65,12 +65,12 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                     </div>
 
                     <div className="divide-y relative">
-                        {assignment.enrollments?.length === 0 ? (
+                        {(!assignment.enrollments || assignment.enrollments.length === 0) ? (
                             <div className="p-20 text-center">
                                 <p className="text-sm text-gray-400 italic">No enrollments found for this assignment.</p>
                             </div>
                         ) : (
-                            assignment.enrollments.map((ins: any) => (
+                            assignment.enrollments.map((ins: Enrollment) => (
                                 <div
                                     key={ins.id_enrollment}
                                     className="px-8 py-6 flex justify-between items-center hover:bg-gray-50 transition-colors"
