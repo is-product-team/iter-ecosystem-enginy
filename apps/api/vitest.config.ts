@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     alias: {
-      '@iter/shared': path.resolve(__dirname, '../../packages/shared'),
+      '@iter/shared': path.resolve(__dirname, '../../shared/index.ts'),
     },
   },
 });

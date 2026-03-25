@@ -16,9 +16,9 @@
     "ignoreDeprecations": "5.0",
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "paths": {
-      "@iter/shared": ["../../packages/shared/index.ts"]
+      "@iter/shared": ["../../shared/index.ts"]
     }
   },
-  "include": ["src/**/*", "src/types/**/*.d.ts", "prisma/**/*", "scripts/**/*", "../../packages/shared/**/*"],
+  "include": ["src/**/*", "src/types/**/*.d.ts", "prisma/**/*", "scripts/**/*", "../../shared/**/*"],
   "exclude": ["node_modules", "dist"]
 }

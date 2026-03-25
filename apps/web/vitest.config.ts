@@ -9,7 +9,7 @@ export default defineConfig({
     globals: true,
     alias: {
       '@': path.resolve(__dirname, './'),
-      '@iter/shared': path.resolve(__dirname, '../../packages/shared'),
+      '@iter/shared': path.resolve(__dirname, '../../shared/index.ts'),
     },
   },
 });

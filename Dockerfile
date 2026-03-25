@@ -1,8 +1,8 @@
 # Stage 1: Base (Node 22 + Librerías sistema)
 FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat openssl
-RUN npm install -g turbo@2.7.4
-ENV COREPACK_ENABLE=0
+RUN corepack enable
+ENV COREPACK_ENABLE=1
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 

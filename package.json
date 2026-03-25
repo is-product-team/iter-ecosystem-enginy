@@ -1,11 +1,11 @@
 {
   "name": "iter-ecosystem",
   "private": true,
+  "type": "module",
   "version": "1.0.0",
   "description": "Iter Ecosystem Monorepo - Professional Architecture",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/*"
   ],
   "scripts": {
     "dev": "turbo run dev --parallel",
@@ -19,7 +19,7 @@
     "db:seed": "turbo run db:seed",
     "db:studio": "turbo run studio",
     "test": "turbo run test",
-    "verify": "turbo run lint type-check test --filter=@iter/shared --filter=api --filter=web"
+    "verify": "turbo run lint type-check test --filter=api --filter=web"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.16",
@@ -29,11 +29,12 @@
     "typescript": "^5.3.3",
     "vitest": "^4.1.1"
   },
-  "packageManager": "npm@10.2.4",
   "engines": {
     "node": ">=18.0.0"
   },
+  "packageManager": "npm@10.2.4",
   "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "^5.22.0",
+    "zod": "^3.24.2"
   }
 }
