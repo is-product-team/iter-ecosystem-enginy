@@ -1,12 +1,11 @@
 import type { Config } from "tailwindcss";
-import { THEME } from "@iter/shared";
+import { THEME } from "../../shared/index.js";
 
 const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "../../packages/ui/src/**/*.tsx",
-    "../../packages/shared/index.ts",
+    "../../shared/index.ts",
   ],
   darkMode: 'class',
   theme: {

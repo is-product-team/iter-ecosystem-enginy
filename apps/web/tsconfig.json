@@ -27,7 +27,7 @@
         "./*"
       ],
       "@iter/shared": [
-        "../../shared/index.ts"
+        "../../shared"
       ]
     }
   },

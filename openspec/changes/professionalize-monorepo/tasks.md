@@ -1,7 +1,7 @@
 ## 1. Shared Constants & Types
 
 - [x] 1.1 Add `ASSIGNMENT_STATUSES` to `/shared/index.ts` containing all enum values from Prisma.
-- [x] 1.2 Export `ASSIGNMENT_STATUSES` and ensure ESM compatibility.
+- [/] 1.2 Export `ASSIGNMENT_STATUSES` and ensure ESM compatibility. (Fixing module resolution in Web)
 
 ## 2. Backend (API) Refactor
 

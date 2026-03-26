@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001 -H 0.0.0.0",
+    "dev": "next dev -p ${PORT:-3001} -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -22,7 +22,8 @@
     "react-dom": "19.2.3",
     "react-dropzone": "^15.0.0",
     "recharts": "^3.7.0",
-    "sonner": "^2.0.7"
+    "sonner": "^2.0.7",
+    "@iter/shared": "*"
   },
   "devDependencies": {
     "@types/node": "^20",
