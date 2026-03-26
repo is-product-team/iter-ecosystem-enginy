@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { THEME, PHASES, ROLES } from '@iter/shared';
+import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
-import getApi from '@/services/api';
+
 
 import phaseService, { Phase } from '@/services/phaseService';
 

@@ -64,7 +64,7 @@ export default function NotificationsPage() {
           await notificationService.delete(id);
           setNotifications(prev => prev.filter(n => n.id_notificacio !== id));
           toast.success("Alert deleted.");
-        } catch (error) {
+        } catch (_error) {
           toast.error("Error deleting alert.");
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -113,7 +113,7 @@ export default function NotificationsPage() {
           <Loading message="Loading official alerts..." />
         ) : notifications.length > 0 ? (
           <div className="flex flex-col border border-border-subtle bg-background-subtle/30">
-            {notifications.map((notif, index) => (
+            {notifications.map((notif, _index) => (
               <div
                 key={notif.id_notificacio}
                 className={`p-6 border-b border-border-subtle last:border-b-0 transition-colors hover:bg-background-surface relative ${notif.llegida ? 'bg-transparent' : 'bg-background-surface'}`}

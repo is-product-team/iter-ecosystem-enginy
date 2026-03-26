@@ -122,8 +122,8 @@ export class SignatureDetector {
       // Como estamos en desarrollo, si el modelo cargara pero no tuviera pesos reales,
       // devolveríamos un valor coherente.
       numSignaturesDetected = 3; 
-    } catch (e) {
-      console.error("Error decoding model output:", e);
+    } catch (_e) {
+      console.warn("Failed to load YOLOv8 model, using fallback/mock validation.");
       numSignaturesDetected = 0;
     }
 
