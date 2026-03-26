@@ -4,7 +4,17 @@ import { workshopRepository } from '../repositories/workshop.repository.js';
 export const getWorkshops = async (req: Request, res: Response) => {
   try {
     const workshops = await workshopRepository.findAllWithSectors();
-    res.json(workshops);
+    const total = await workshopRepository.count();
+    
+    res.json({
+      data: workshops,
+      meta: {
+        total,
+        page: 1,
+        limit: workshops.length,
+        totalPages: 1
+      }
+    });
   } catch (_error) {
     res.status(500).json({ error: 'Error al obtenir els tallers' });
   }
