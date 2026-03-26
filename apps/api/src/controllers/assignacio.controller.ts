@@ -834,17 +834,28 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
     fs.writeFileSync(filePath, req.file.buffer);
 
     const url = `/uploads/documents/${fileName}`;
+    
+    // Mapeo de campos en el JSON 'docs_status' de la inscripción
+    // Usamos las claves que el assignmentService.ts espera encontrar
     const fieldMap: Record<string, string> = {
-      'acord_pedagogic': 'url_acord_pedagogic',
-      'autoritzacio_mobilitat': 'url_autoritzacio_mobilitat',
-      'drets_imatge': 'url_drets_imatge'
+      'acord_pedagogic': 'acord_pedagogic',
+      'autoritzacio_mobilitat': 'autoritzacio_mobilitat',
+      'drets_imatge': 'drets_imatge',
+      'pedagogical_agreement': 'acord_pedagogic',
+      'mobility_authorization': 'autoritzacio_mobilitat',
+      'image_rights': 'drets_imatge'
     };
 
     const updateField = fieldMap[documentType];
+    
+    // Campos booleanos que indican que el documento ha sido subido
     const boolFieldMap: Record<string, string> = {
-      'acord_pedagogic': 'acord_pedagogic',
-      'autoritzacio_mobilitat': 'autoritzacio_mobilitat',
-      'drets_imatge': 'drets_imatge'
+      'acord_pedagogic': 'acord_pedagogic_present',
+      'autoritzacio_mobilitat': 'autoritzacio_mobilitat_present',
+      'drets_imatge': 'drets_imatge_present',
+      'pedagogical_agreement': 'acord_pedagogic_present',
+      'mobility_authorization': 'autoritzacio_mobilitat_present',
+      'image_rights': 'drets_imatge_present'
     };
     const boolField = boolFieldMap[documentType];
 

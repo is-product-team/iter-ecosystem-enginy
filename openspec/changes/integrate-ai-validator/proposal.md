@@ -1,7 +1,7 @@
 # Propuesta: Integración del Validador IA en la Subida de Documentos
 
 ## Goal
-Integrar la funcionalidad de Inteligencia Artificial (Visión por Computador y NLP) para validar documentos pdf directamente en el punto donde los coordinadores suben la documentación de los alumnos (`apps/web/app/centro/assignacions/[id]/page.tsx`).
+Integrar la funcionalidad de Inteligencia Artificial (Visión por Computador y NLP) para validar documentos pdf directamente en el punto donde los coordinadores suben la documentación de los alumnos (`apps/web/app/center/assignments/[id]/page.tsx`).
 
 ## Scope
 - Refactorizar el componente existente `DocumentUpload.tsx` para que actúe como interceptor.

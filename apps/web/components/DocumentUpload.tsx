@@ -48,13 +48,16 @@ export default function DocumentUpload({
         },
       });
 
-      // Extraemos la URL según el tipo de documento para actualizar la UI local
-      const newUrl = res.data[documentType === 'pedagogical_agreement' ? 'url_pedagogical_agreement' :
-        documentType === 'mobility_authorization' ? 'url_mobility_authorization' :
-          'url_image_rights'];
+      // Extraemos la URL desde el campo JSON 'docs_status' de la respuesta (modelo Enrollment)
+      const docsStatus = res.data.docs_status || {};
+      const fieldKey = documentType === 'pedagogical_agreement' ? 'acord_pedagogic' :
+                       documentType === 'mobility_authorization' ? 'autoritzacio_mobilitat' :
+                       'drets_imatge';
+      
+      const newUrl = docsStatus[fieldKey];
 
       setCurrentUrl(newUrl);
-      onUploadSuccess(newUrl);
+      if (newUrl) onUploadSuccess(newUrl);
       toast.success(`${label} uploaded successfully.`);
       
       // Limpiamos estados de error/bloqueo tras éxito
