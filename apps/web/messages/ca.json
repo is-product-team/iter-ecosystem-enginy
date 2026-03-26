@@ -1,0 +1,200 @@
+{
+  "Auth": {
+    "login": {
+      "title": "Inici de Sessió",
+      "subtitle": "Benvingut de nou. Si us plau, introdueix les teves credencials per accedir a la plataforma.",
+      "email": "Correu electrònic",
+      "email_placeholder": "el_teu_correu@exemple.com",
+      "password": "Contrasenya",
+      "password_placeholder": "••••••••",
+      "submit": "Iniciar Sessió",
+      "loading": "Verificant credencials...",
+      "error": "Correu o contrasenya incorrectes. Intenta-ho de nou.",
+      "no_account": "No tens compte? Contacta amb el teu centre.",
+      "forgot_password": "Has oblidat la contrasenya?"
+    },
+    "logout": {
+      "title": "Tancar Sessió",
+      "message": "Estàs segur que vols sortir?",
+      "confirm": "Sortir",
+      "cancel": "Cancel·lar"
+    }
+  },
+  "Admin": {
+    "dashboard": {
+      "title": "Panell d'Administració",
+      "subtitle": "Gestió global de centres, tallers i evaluacions del programa."
+    },
+    "Centers": {
+      "title": "Centres Educatius",
+      "add_btn": "Nou Centre",
+      "search_placeholder": "Cercar centre..."
+    },
+    "Workshops": {
+      "title": "Tallers i Peticions",
+      "create": "Publicar Taller",
+      "list_title": "Llistat de Tallers Actius"
+    }
+  },
+  "Center": {
+    "Assignments": {
+      "title": "Assignacions i Tallers",
+      "subtitle": "Gestiona les activitats assignades al teu centre.",
+      "create": "Nova Assignació",
+      "status": {
+        "pending": "Pendent",
+        "active": "Activa",
+        "completed": "Finalitzada"
+      }
+    },
+    "Teachers": {
+      "title": "Gestió de Professors",
+      "add": "Afegir Professor",
+      "import": "Importar llistat"
+    },
+    "Students": {
+      "title": "Gestió d'Alumnes",
+      "add": "Matricular Alumne",
+      "import": "Càrrega Massiva"
+    },
+    "Sessions": {
+      "title": "Planificació de Sessions",
+      "new": "Programar Sessió"
+    },
+    "Evaluations": {
+      "title": "Seguiment i Evaluació",
+      "subtitle": "Revisió de l'impacte i resultats dels tallers."
+    },
+    "Notifications": {
+      "title_user": "Avisos i Notificacions",
+      "subtitle_user": "Estigues al dia dels canvis de fase, resolucions de sol·licituds i comunicacions oficials.",
+      "loading": "Carregant avisos oficials...",
+      "empty": {
+        "title": "No tens avisos pendents",
+        "subtitle": "Quan hi hagi canvis en les teves sol·licituds o dates clau, apareixeran aquí."
+      },
+      "btn": {
+        "read": "Marcar com a llegit",
+        "delete": "Eliminar"
+      },
+      "delete_dialog": {
+        "title": "Eliminar Avís",
+        "message": "Estàs segur que vols eliminar aquest avís? Aquesta acció no es pot desfer."
+      },
+      "messages": {
+        "delete_ok": "Avís eliminat.",
+        "delete_error": "Error en eliminar l'avís."
+      }
+    }
+  },
+  "Calendar": {
+    "loading_auth": "Sincronitzant el teu calendari...",
+    "title": "Calendari Iter",
+    "subtitle": "Visualitza totes les fites, tallers i terminis en un calendari complet.",
+    "active_fase": "Fase Actual: {nom}",
+    "sync_phases": "Sincronitzant fases...",
+    "view_legend": "Veure Llegenda",
+    "legend_title": "Llegenda de Colors",
+    "assignment_label": "Assignació",
+    "assignment_desc": "Període total del taller al centre.",
+    "session_label": "Sessió de Taller",
+    "session_desc": "Dia i hora concrets de l'activitat.",
+    "phases_label": "Fases del Programa",
+    "phase_solicitud": "Sol·licitud i Inscripció",
+    "phase_planificacion": "Planificació i Assignació",
+    "phase_ejecucion": "Execució i Seguiment",
+    "phase_evaluacion": "Tancament i Evaluació",
+    "legend_ok": "Entès",
+    "event_details": "Detalls de l'esdeveniment",
+    "close": "Tancar",
+    "view_details": "Veure Detalls",
+    "ok": "D'acord"
+  },
+  "Student": {
+    "autoconsulta": {
+      "submitted": {
+        "title": "Gràcies per la teva participació!",
+        "subtitle": "La teva opinió ens ajuda a millorar el Programa Enginy. Les teves respostes han estat registrades correctament.",
+        "close_btn": "Tancar Finestra"
+      },
+      "header": {
+        "tagline": "Programa Enginy",
+        "title": "Autoconsulta de l'Alumne",
+        "subtitle": "Volem conèixer la teva experiència durant el taller. Sinceritat i detall ens ajudaran molt!"
+      },
+      "sections": {
+        "attitude": {
+          "title": "Actitud i Comportament",
+          "questions": {
+            "punctuality": "Has estat puntual en l'entrega de tasques?",
+            "respect": "Has respectat el material i les instal·lacions?",
+            "interest": "Quin interès has mostrat per l'aprenentatge?",
+            "autonomy": "T'has sentit autònom en la resolució de problemes?"
+          }
+        },
+        "satisfaction": {
+          "title": "Valoració i Satisfacció",
+          "experience": "Experiència global (1-10)",
+          "teacher": "Qualitat del docent (1-10)",
+          "pobre": "Pobre",
+          "excellent": "Excel·lent"
+        },
+        "impact": {
+          "title": "Impacte Vocacional",
+          "question": "T'ha ajudat a decidir-te pel teu futur professional?",
+          "options": {
+            "si": "Sí, m'ha aclarit les idees.",
+            "no": "No, ja ho tenia clar o no és per mi.",
+            "considerant": "Ho estic considerant ara mateix."
+          }
+        },
+        "feedback": {
+          "title": "Feedback Obert",
+          "improvements_label": "Què canviaries o milloraries del taller?",
+          "improvements_placeholder": "La teva opinió...",
+          "learnings_label": "Quins són els teus 3 aprenentatges clau?",
+          "learnings_placeholder": "1. ... 2. ... 3. ..."
+        }
+      },
+      "options": {
+        "frequency": {
+          "mai": "Mai",
+          "rarament": "Rarament",
+          "sovint": "Sovint",
+          "sempre": "Sempre"
+        },
+        "interest": {
+          "gens": "Gairebé gens",
+          "poc": "Un poc",
+          "molt": "Molt",
+          "moltissim": "Moltíssim"
+        }
+      },
+      "submit_btn": "Enviar Autoconsulta",
+      "sending": "Enviant...",
+      "error_submit": "Error en enviar l'autoconsulta."
+    }
+  },
+  "Metadata": {
+    "title": "Iter Web",
+    "description": "Aplicació web de Iter per a la gestió d'aprenentatge."
+  },
+  "Profile": {
+    "title": "El meu Perfil",
+    "subtitle": "Gestiona la teva informació personal i preferències de l'acadèmia.",
+    "edit_profile": "Editar Perfil",
+    "contact_info_label": "Dades de Contacte",
+    "email_label": "Correu Electrònic",
+    "center_referent_label": "Centre Referent",
+    "no_center_assigned": "Cap centre assignat",
+    "center_usage_hint": "S'utilitza per a la gestió de tallers i peticions.",
+    "security_label": "Seguretat",
+    "change_password": "Canviar Contrasenya",
+    "appearance_label": "Aparença de la interfície",
+    "themes": {
+      "light": "Clar",
+      "dark": "Fosc",
+      "system": "Sistema"
+    }
+  }
+}

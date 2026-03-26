@@ -78,7 +78,7 @@ services:
       - .:/app
       - node_modules_cache:/app/node_modules
     ports:
-      - "${WEB_PORT:-8002}:${PORT:-3001}"
+      - "${WEB_PORT:-8000}:8000"
     environment:
       - NEXT_TELEMETRY_DISABLED=1
     env_file:

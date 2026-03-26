@@ -1,4 +1,7 @@
+import createNextIntlPlugin from 'next-intl/plugin';
 import type { NextConfig } from "next";
+
+const withNextIntl = createNextIntlPlugin();
 
 const isElectronBuild = process.env.IS_ELECTRON_BUILD === 'true';
 
@@ -11,4 +14,4 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@iter/shared"],
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

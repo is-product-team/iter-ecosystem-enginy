@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import LandingPage from '../app/page';
+import LandingPage from '../app/[locale]/page';
 
 // Mocking components that might use window or browser-only features
 vi.mock('../components/ui/Hero', () => ({

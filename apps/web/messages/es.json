@@ -1,0 +1,200 @@
+{
+  "Auth": {
+    "login": {
+      "title": "Inicio de Sesión",
+      "subtitle": "Bienvenido de nuevo. Por favor, introduce tus credenciales para acceder a la plataforma.",
+      "email": "Correo electrónico",
+      "email_placeholder": "tu_correo@ejemplo.com",
+      "password": "Contraseña",
+      "password_placeholder": "••••••••",
+      "submit": "Iniciar Sesión",
+      "loading": "Verificando credenciales...",
+      "error": "Correo o contraseña incorrectos. Inténtalo de nuevo.",
+      "no_account": "¿No tienes cuenta? Contacta con tu centro.",
+      "forgot_password": "¿Has olvidado la contraseña?"
+    },
+    "logout": {
+      "title": "Cerrar Sesión",
+      "message": "¿Estás seguro de que quieres salir?",
+      "confirm": "Salir",
+      "cancel": "Cancelar"
+    }
+  },
+  "Admin": {
+    "dashboard": {
+      "title": "Panel de Administración",
+      "subtitle": "Gestión global de centros, talleres y evaluaciones del programa."
+    },
+    "Centers": {
+      "title": "Centros Educativos",
+      "add_btn": "Nuevo Centro",
+      "search_placeholder": "Buscar centro..."
+    },
+    "Workshops": {
+      "title": "Talleres y Peticiones",
+      "create": "Publicar Taller",
+      "list_title": "Listado de Talleres Activos"
+    }
+  },
+  "Center": {
+    "Assignments": {
+      "title": "Asignaciones y Talleres",
+      "subtitle": "Gestiona las actividades asignadas a tu centro.",
+      "create": "Nueva Asignación",
+      "status": {
+        "pending": "Pendiente",
+        "active": "Activa",
+        "completed": "Finalizada"
+      }
+    },
+    "Teachers": {
+      "title": "Gestión de Profesores",
+      "add": "Añadir Profesor",
+      "import": "Importar listado"
+    },
+    "Students": {
+      "title": "Gestión de Alumnos",
+      "add": "Matricular Alumno",
+      "import": "Carga Masiva"
+    },
+    "Sessions": {
+      "title": "Planificación de Sesiones",
+      "new": "Programar Sesión"
+    },
+    "Evaluations": {
+      "title": "Seguimiento y Evaluación",
+      "subtitle": "Revisión del impacto y resultados de los talleres."
+    },
+    "Notifications": {
+      "title_user": "Avisos y Notificaciones",
+      "subtitle_user": "Estate al día de los cambios de fase, resoluciones de solicitudes y comunicaciones oficiales.",
+      "loading": "Cargando avisos oficiales...",
+      "empty": {
+        "title": "No tienes avisos pendientes",
+        "subtitle": "Cuando haya cambios en tus solicitudes o fechas clave, aparecerán aquí."
+      },
+      "btn": {
+        "read": "Marcar como leído",
+        "delete": "Eliminar"
+      },
+      "delete_dialog": {
+        "title": "Eliminar Aviso",
+        "message": "¿Estás seguro de que quieres eliminar este aviso? Esta acción no se puede deshacer."
+      },
+      "messages": {
+        "delete_ok": "Aviso eliminado.",
+        "delete_error": "Error al eliminar el aviso."
+      }
+    }
+  },
+  "Calendar": {
+    "loading_auth": "Sincronizando tu calendario...",
+    "title": "Calendario Iter",
+    "subtitle": "Visualiza todos los hitos, talleres y plazos en un calendario completo.",
+    "active_fase": "Fase Actual: {nom}",
+    "sync_phases": "Sincronizando fases...",
+    "view_legend": "Ver Leyenda",
+    "legend_title": "Leyenda de Colores",
+    "assignment_label": "Asignación",
+    "assignment_desc": "Período total del taller en el centro.",
+    "session_label": "Sesión de Taller",
+    "session_desc": "Día y hora concretos de la actividad.",
+    "phases_label": "Fases del Programa",
+    "phase_solicitud": "Solicitud e Inscripción",
+    "phase_planificacion": "Planificación y Asignación",
+    "phase_ejecucion": "Ejecución y Seguimiento",
+    "phase_evaluacion": "Cierre y Evaluación",
+    "legend_ok": "Entendido",
+    "event_details": "Detalles del evento",
+    "close": "Cerrar",
+    "view_details": "Ver Detalles",
+    "ok": "De acuerdo"
+  },
+  "Student": {
+    "autoconsulta": {
+      "submitted": {
+        "title": "¡Gracias por tu participación!",
+        "subtitle": "Tu opinión nos ayuda a mejorar el Programa Enginy. Tus respuestas han sido registradas correctamente.",
+        "close_btn": "Cerrar Ventana"
+      },
+      "header": {
+        "tagline": "Programa Enginy",
+        "title": "Autoconsulta del Alumno",
+        "subtitle": "Queremos conocer tu experiencia durante el taller. ¡Sinceridad y detalle nos ayudarán mucho!"
+      },
+      "sections": {
+        "attitude": {
+          "title": "Actitud y Comportamiento",
+          "questions": {
+            "punctuality": "¿Has sido puntual en la entrega de tareas?",
+            "respect": "¿Has respetado el material y las instalaciones?",
+            "interest": "¿Qué interés has mostrado por el aprendizaje?",
+            "autonomy": "¿Te has sentido autónomo en la resolución de problemas?"
+          }
+        },
+        "satisfaction": {
+          "title": "Valoración y Satisfacción",
+          "experience": "Experiencia global (1-10)",
+          "teacher": "Calidad del docente (1-10)",
+          "pobre": "Pobre",
+          "excellent": "Excelente"
+        },
+        "impact": {
+          "title": "Impacto Vocacional",
+          "question": "¿Te ha ayudado a decidirte por tu futuro profesional?",
+          "options": {
+            "si": "Sí, me ha aclarado las ideas.",
+            "no": "No, ya lo tenía claro o no es para mí.",
+            "considerant": "Lo estoy considerando ahora mismo."
+          }
+        },
+        "feedback": {
+          "title": "Feedback Abierto",
+          "improvements_label": "¿Qué cambiarías o mejorarías del taller?",
+          "improvements_placeholder": "Tu opinión...",
+          "learnings_label": "¿Cuáles son tus 3 aprendizajes clave?",
+          "learnings_placeholder": "1. ... 2. ... 3. ..."
+        }
+      },
+      "options": {
+        "frequency": {
+          "mai": "Nunca",
+          "rarament": "Raramente",
+          "sovint": "A menudo",
+          "sempre": "Siempre"
+        },
+        "interest": {
+          "gens": "Casi nada",
+          "poc": "Un poco",
+          "molt": "Mucho",
+          "moltissim": "Muchísimo"
+        }
+      },
+      "submit_btn": "Enviar Autoconsulta",
+      "sending": "Enviando...",
+      "error_submit": "Error al enviar la autoconsulta."
+    }
+  },
+  "Metadata": {
+    "title": "Iter Web",
+    "description": "Aplicación web de Iter para la gestión de aprendizaje."
+  },
+  "Profile": {
+    "title": "Mi Perfil",
+    "subtitle": "Gestiona tu información personal y preferencias de la academia.",
+    "edit_profile": "Editar Perfil",
+    "contact_info_label": "Datos de Contacto",
+    "email_label": "Correo Electrónico",
+    "center_referent_label": "Centro Referente",
+    "no_center_assigned": "Ningún centro asignado",
+    "center_usage_hint": "Se utiliza para la gestión de talleres y peticiones.",
+    "security_label": "Seguridad",
+    "change_password": "Cambiar Contraseña",
+    "appearance_label": "Apariencia de la interfaz",
+    "themes": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    }
+  }
+}
