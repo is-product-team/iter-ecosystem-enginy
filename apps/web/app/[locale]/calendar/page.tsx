@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES } from "@iter/shared";
 import DashboardLayout from "@/components/DashboardLayout";
-import Calendar, { CalendarEvent } from "../../components/ui/Calendar";
+import Calendar, { CalendarEvent } from "../../../components/ui/Calendar";
 import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 import { format } from "date-fns";
@@ -100,7 +100,7 @@ export default function CalendarPage() {
             events={events}
             isLoading={loading}
             onRangeChange={fetchCalendarData}
-            onEventClick={(e) => {
+            onEventClick={(e: CalendarEvent) => {
               // Si tiene id_assignment, navegar al detalle
               if (e.metadata?.id_assignment) {
                 const baseUrl = user?.rol.nom_rol === ROLES.ADMIN ? '/admin/assignacions' : '/centro/assignacions';
