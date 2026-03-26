@@ -20,7 +20,7 @@ export default function AdminRequestsPage() {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
   const [centers, setCenters] = useState<Center[]>([]);
-  const [phases, setPhases] = useState<unknown[]>([]);
+  const [_phases, _setPhases] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,7 +61,7 @@ export default function AdminRequestsPage() {
       ]);
       setWorkshops(fetchedWorkshops);
       setRequests(fetchedRequests);
-      setPhases(fetchedPhases.data.data);
+      _setPhases(fetchedPhases.data.data);
       setCenters(fetchedCenters);
     } catch (err) {
       console.error(err);

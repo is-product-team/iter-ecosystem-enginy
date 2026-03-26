@@ -16,7 +16,7 @@ type ViewMode = 'workshop' | 'selection';
 
 export default function AssignmentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [user, setUser] = useState<User | null>(null);
+  const [_user, setUser] = useState<User | null>(null);
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
@@ -47,7 +47,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
         
         setAssignment(resAssig);
         setAllStudents(resStudents || []);
-      } catch (error) {
+      } catch (_error) {
         toast.error('Error loading data.');
         router.push('/center/assignments');
       } finally {
@@ -295,7 +295,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                             toast.success("Registration confirmed! Sessions generated.");
                             // Reload
                             window.location.reload();
-                        } catch(e) {
+                        } catch(_e) {
                             toast.error("Error confirming.");
                         }
                     }}

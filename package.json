@@ -5,7 +5,8 @@
   "version": "1.0.0",
   "description": "Iter Ecosystem Monorepo - Professional Architecture",
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "shared"
   ],
   "scripts": {
     "dev": "turbo run dev --parallel",

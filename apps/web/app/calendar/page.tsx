@@ -23,7 +23,7 @@ export default function CalendarPage() {
   const [activeFase, setActiveFase] = useState<Phase | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   // Overlay states
   const [isLegendOpen, setIsLegendOpen] = useState(false);
 
@@ -79,12 +79,12 @@ export default function CalendarPage() {
       <div className="w-full relative">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
-             <div className={`w-3 h-3 rounded-full animate-pulse ${activeFase ? 'bg-consorci-pinkRed' : 'bg-gray-300'}`}></div>
-             <div className="text-[11px] font-black text-text-primary uppercase tracking-widest">
-               {activeFase ? `Fase Actual: ${activeFase.nom}` : "Carregant fases..."}
-             </div>
+            <div className={`w-3 h-3 rounded-full animate-pulse ${activeFase ? 'bg-consorci-pinkRed' : 'bg-gray-300'}`}></div>
+            <div className="text-[11px] font-black text-text-primary uppercase tracking-widest">
+              {activeFase ? `Fase Actual: ${activeFase.nom}` : "Carregant fases..."}
+            </div>
           </div>
-          <button 
+          <button
             onClick={() => setIsLegendOpen(true)}
             className="px-6 py-2.5 bg-background-surface border-2 border-border-subtle text-text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:border-consorci-darkBlue hover:bg-consorci-darkBlue hover:text-white transition-all flex items-center gap-2 shadow-sm"
           >
@@ -114,7 +114,7 @@ export default function CalendarPage() {
         {isLegendOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-consorci-darkBlue/40 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-background-surface border-4 border-consorci-darkBlue w-full max-w-sm p-10 shadow-[0_0_50px_rgba(0,0,0,0.3)] relative">
-              <button 
+              <button
                 onClick={() => setIsLegendOpen(false)}
                 className="absolute top-6 right-6 text-text-muted hover:text-consorci-darkBlue transition-colors"
               >
@@ -122,11 +122,11 @@ export default function CalendarPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              
+
               <h3 className="text-xl font-black text-text-primary uppercase tracking-tighter border-b-4 border-consorci-darkBlue pb-4 mb-8">
                 Llegenda de Colors
               </h3>
-              
+
               <div className="space-y-6">
                 <div className="flex items-center gap-4 group cursor-default">
                   <div className="w-6 h-6 bg-consorci-lightBlue shadow-inner"></div>
@@ -145,29 +145,29 @@ export default function CalendarPage() {
                 </div>
 
                 <div className="pt-6 border-t-2 border-border-subtle">
-                   <span className="block text-[9px] font-black text-text-muted uppercase tracking-[0.3em] mb-6">Fases del Programa</span>
-                   <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 bg-consorci-darkBlue"></div>
-                        <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Inscripció</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 bg-consorci-actionBlue"></div>
-                        <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Planificació</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 bg-consorci-pinkRed"></div>
-                        <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Execució</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 bg-consorci-beige"></div>
-                        <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Avaluaicó</span>
-                      </div>
-                   </div>
+                  <span className="block text-[9px] font-black text-text-muted uppercase tracking-[0.3em] mb-6">Fases del Programa</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 bg-consorci-darkBlue"></div>
+                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Inscripció</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 bg-consorci-actionBlue"></div>
+                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Planificació</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 bg-consorci-pinkRed"></div>
+                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Execució</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-4 h-4 bg-consorci-beige"></div>
+                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Avaluaicó</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => setIsLegendOpen(false)}
                 className="w-full mt-10 py-4 bg-consorci-darkBlue text-white text-[11px] font-black uppercase tracking-[0.2em] hover:bg-consorci-actionBlue transition-all shadow-lg active:scale-95"
               >

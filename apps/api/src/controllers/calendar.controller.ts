@@ -40,18 +40,18 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
       where: dateFilter,
       include: { phase: true }
     }),
-    
+
     // 2. Assignments (basado en rol) + Sessions
-    user.role === ROLES.ADMIN 
-      ? prisma.assignment.findMany({ 
-          where: assignmentDateFilter, 
-          include: { workshop: true, center: true, sessions: { include: { staff: { include: { user: true } } } } } 
-        })
+    user.role === ROLES.ADMIN
+      ? prisma.assignment.findMany({
+        where: assignmentDateFilter,
+        include: { workshop: true, center: true, sessions: { include: { staff: { include: { user: true } } } } }
+      })
       : user.role === ROLES.COORDINATOR
-      ? prisma.assignment.findMany({ 
-          where: { ...assignmentDateFilter, id_center: user.centreId! }, 
-          include: { 
-            workshop: true, 
+        ? prisma.assignment.findMany({
+          where: { ...assignmentDateFilter, id_center: user.centreId! },
+          include: {
+            workshop: true,
             sessions: {
               include: {
                 staff: {
@@ -61,32 +61,32 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
                 }
               }
             }
-          } 
+          }
         })
-      : user.role === ROLES.TEACHER
-      ? prisma.assignment.findMany({ 
-          where: { 
-            ...assignmentDateFilter, 
-            OR: [
-              { teachers: { some: { id_user: user.userId } } },
-              { sessions: { some: { staff: { some: { id_user: user.userId } } } } }
-            ]
-          }, 
-          include: { 
-            workshop: true, 
-            center: true, 
-            sessions: {
-              include: {
-                staff: {
-                  include: {
-                    user: true
+        : user.role === ROLES.TEACHER
+          ? prisma.assignment.findMany({
+            where: {
+              ...assignmentDateFilter,
+              OR: [
+                { teachers: { some: { id_user: user.userId } } },
+                { sessions: { some: { staff: { some: { id_user: user.userId } } } } }
+              ]
+            },
+            include: {
+              workshop: true,
+              center: true,
+              sessions: {
+                include: {
+                  staff: {
+                    include: {
+                      user: true
+                    }
                   }
                 }
               }
             }
-          } 
-        })
-      : Promise.resolve([]),
+          })
+          : Promise.resolve([]),
   ]);
 
   const events: any[] = [];
@@ -118,7 +118,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
           date: startDate.toISOString(),
           endDate: endDate.toISOString(),
           type: 'assignment',
-          metadata: { 
+          metadata: {
             id_assignment: a.id_assignment,
             centre: a.center?.nom,
             adreca: a.center?.adreca
@@ -158,13 +158,13 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
     const user = req.user!;
     const { start, end } = req.query;
     const events = await fetchEventsForUser(
-      { userId: user.userId, role: user.role, centreId: user.centreId }, 
-      start as string, 
+      { userId: user.userId, role: user.role, centreId: user.centreId },
+      start as string,
       end as string
     );
     res.json(events);
   } catch (error) {
-    console.error("[Calendar] Error in getCalendarEvents:", error);
+    console.error("[Calendar] Critical error in getCalendarEvents:", error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -172,7 +172,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
 export const getCalendarICS = async (req: Request, res: Response) => {
   try {
     const { token } = req.params;
-    
+
     // Find user by sync token
     const user = await prisma.user.findFirst({
       where: { sync_token: token as string },

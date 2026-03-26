@@ -75,7 +75,7 @@ function CalendarSyncSection() {
         {loading ? (
           <div className="h-10 bg-background-subtle animate-pulse rounded-sm w-full"></div>
         ) : !token ? (
-          <button 
+          <button
             onClick={generateToken}
             disabled={regenerating}
             className="w-full py-3 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-all flex items-center justify-center gap-2"
@@ -89,7 +89,7 @@ function CalendarSyncSection() {
               <div className="flex-1 bg-background-surface border border-border-subtle p-3 text-[10px] font-mono text-text-muted truncate">
                 {syncUrl}
               </div>
-              <button 
+              <button
                 onClick={copyToClipboard}
                 className={`px-4 flex items-center justify-center transition-all ${copied ? 'bg-green-600 text-white' : 'bg-consorci-darkBlue text-white hover:bg-consorci-actionBlue'}`}
               >
@@ -97,15 +97,15 @@ function CalendarSyncSection() {
               </button>
             </div>
             <div className="flex justify-between items-center">
-               <span className="text-[9px] font-bold text-text-muted italic">Sincronització activa ✓</span>
-               <button 
-                 onClick={generateToken}
-                 disabled={regenerating}
-                 className="text-[9px] font-black text-consorci-pinkRed uppercase tracking-widest hover:underline flex items-center gap-1"
-               >
-                 {regenerating && <RefreshCw className="animate-spin w-3 h-3" />}
-                 Regenerar Link
-               </button>
+              <span className="text-[9px] font-bold text-text-muted italic">Sincronització activa ✓</span>
+              <button
+                onClick={generateToken}
+                disabled={regenerating}
+                className="text-[9px] font-black text-consorci-pinkRed uppercase tracking-widest hover:underline flex items-center gap-1"
+              >
+                {regenerating && <RefreshCw className="animate-spin w-3 h-3" />}
+                Regenerar Link
+              </button>
             </div>
           </div>
         )}
@@ -162,11 +162,11 @@ export default function ProfilePage() {
           <div className="px-8 pb-10 relative">
             {/* Avatar */}
             <div className="absolute -top-12 left-8">
-              <Avatar 
-                url={user.url_foto} 
-                name={user.nom_complet} 
-                id={user.id_user} 
-                type="usuari" 
+              <Avatar
+                url={user.url_foto}
+                name={user.nom_complet}
+                id={user.id_user}
+                type="usuari"
                 size="xl"
                 className="ring-4 ring-white shadow-xl"
                 isCoordinator={user.rol.nom_rol === ROLES.COORDINATOR}
@@ -234,9 +234,9 @@ export default function ProfilePage() {
                     <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-3">Interface Appearance</label>
                     <div className="flex border border-border-subtle p-0.5 max-w-sm">
                       {[
-                         { id: 'light', label: 'Light', icon: Sun },
-                         { id: 'dark', label: 'Dark', icon: Moon },
-                         { id: 'system', label: 'System', icon: Monitor },
+                        { id: 'light', label: 'Light', icon: Sun },
+                        { id: 'dark', label: 'Dark', icon: Moon },
+                        { id: 'system', label: 'System', icon: Monitor },
                       ].map((t) => {
                         const Icon = t.icon;
                         const isActive = mounted && theme === t.id;
@@ -244,11 +244,10 @@ export default function ProfilePage() {
                           <button
                             key={t.id}
                             onClick={() => setTheme(t.id)}
-                            className={`flex-1 flex items-center justify-center py-2 gap-2 transition-all ${
-                              isActive 
-                                ? 'bg-consorci-darkBlue text-white' 
+                            className={`flex-1 flex items-center justify-center py-2 gap-2 transition-all ${isActive
+                                ? 'bg-consorci-darkBlue text-white'
                                 : 'text-text-muted hover:text-text-secondary hover:bg-background-subtle'
-                            }`}
+                              }`}
                           >
                             <Icon className="w-3.5 h-3.5" />
                             <span className="text-[9px] font-bold uppercase tracking-widest">{t.label}</span>

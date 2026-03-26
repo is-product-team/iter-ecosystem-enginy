@@ -19,7 +19,7 @@ export const login = async (req: Request, res: Response) => {
     // 2. Verificar password
     console.log(`[Auth] Intento de login para: ${email}`);
     const validPassword = await bcrypt.compare(password, user.password_hash);
-    
+
     if (!validPassword) {
       console.warn(`[Auth] Password incorrecto para: ${email}`);
       return res.status(401).json({ error: 'Credencials invàlides' });
@@ -27,11 +27,11 @@ export const login = async (req: Request, res: Response) => {
 
     // 3. Generar JWT
     const token = jwt.sign(
-      { 
-        userId: user.id_user, 
-        email: user.email, 
+      {
+        userId: user.id_user,
+        email: user.email,
         role: (user as any).role.nom_role,
-        centreId: user.id_center 
+        centreId: user.id_center
       },
       env.JWT_SECRET,
       { expiresIn: '24h' }

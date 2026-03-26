@@ -47,10 +47,10 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
   const calendarWeeks = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 1 });
     const end = endOfWeek(endOfMonth(currentDate), { weekStartsOn: 1 });
-    
+
     const weeks = [];
     let currentIter = start;
-    
+
     while (currentIter <= end) {
       const week = [];
       for (let i = 0; i < 7; i++) {
@@ -140,7 +140,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
           {calendarWeeks.map((week, weekIdx) => {
             const firstDayOfWeek = week[0].date;
             const lastDayOfWeek = week[6].date;
-            
+
             interface WeekEvent extends CalendarEvent {
               start: number;
               span: number;
@@ -171,7 +171,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
             const tracks: WeekEvent[][] = [];
             weekEvents.sort((a, b) => b.span - a.span).forEach(event => {
               let trackIdx = 0;
-              while (tracks[trackIdx] && tracks[trackIdx].some(e => 
+              while (tracks[trackIdx] && tracks[trackIdx].some(e =>
                 (event.start >= e.start && event.start < e.start + e.span) ||
                 (e.start >= event.start && e.start < event.start + event.span)
               )) trackIdx++;
@@ -182,21 +182,19 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
             return (
               <div key={weekIdx} className="grid grid-cols-7 relative border-b border-border-subtle last:border-b-0 min-h-[140px]">
                 {week.map((dateObj, dayIdx) => (
-                  <div 
-                    key={dayIdx} 
+                  <div
+                    key={dayIdx}
                     onClick={() => setSelectedDate(new Date(dateObj.date))}
-                    className={`relative p-3 border-r border-border-subtle last:border-r-0 cursor-pointer hover:bg-background-subtle/30 transition-colors ${
-                      !dateObj.isCurrentMonth ? 'bg-background-subtle/20 opacity-50' : ''
-                    } ${dateObj.date === format(selectedDate, 'yyyy-MM-dd') ? 'bg-consorci-lightBlue/5' : ''}`}
+                    className={`relative p-3 border-r border-border-subtle last:border-r-0 cursor-pointer hover:bg-background-subtle/30 transition-colors ${!dateObj.isCurrentMonth ? 'bg-background-subtle/20 opacity-50' : ''
+                      } ${dateObj.date === format(selectedDate, 'yyyy-MM-dd') ? 'bg-consorci-lightBlue/5' : ''}`}
                   >
-                    <span className={`text-[12px] font-black tracking-tighter ${
-                      dateObj.date === format(new Date(), 'yyyy-MM-dd') ? 'text-consorci-lightBlue' : 'text-text-muted'
-                    }`}>
+                    <span className={`text-[12px] font-black tracking-tighter ${dateObj.date === format(new Date(), 'yyyy-MM-dd') ? 'text-consorci-lightBlue' : 'text-text-muted'
+                      }`}>
                       {dateObj.day}
                     </span>
                   </div>
                 ))}
-                
+
                 {/* Overlay */}
                 <div className="absolute top-10 left-0 w-full h-full pointer-events-none px-1 py-1">
                   {tracks.map((track, trackIdx) => (
@@ -237,7 +235,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
             {format(selectedDate, "eeee, d 'de' MMMM", { locale: ca })}
           </p>
         </div>
-        
+
         <div className="flex-1 overflow-auto p-8 flex flex-col gap-4">
           {selectedDayEvents.length === 0 ? (
             <div className="py-20 text-center flex flex-col items-center opacity-30">
@@ -248,7 +246,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
             </div>
           ) : (
             selectedDayEvents.map(event => (
-              <div 
+              <div
                 key={event.id}
                 onClick={() => onEventClick?.(event)}
                 className="group p-5 border border-border-subtle hover:border-consorci-lightBlue hover:shadow-xl transition-all cursor-pointer bg-background-subtle/30"
