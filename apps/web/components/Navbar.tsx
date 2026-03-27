@@ -101,6 +101,9 @@ const Navbar: React.FC = () => {
 
             <div className="flex items-center border-l border-border-subtle pl-8 h-8 my-auto gap-6">
               <div className="flex flex-col items-end">
+                <span className="text-consorci-darkBlue text-[11px] font-black uppercase tracking-widest mb-0.5">
+                  {user.fullName}
+                </span>
                 <span className="text-text-primary text-[10px] font-bold uppercase tracking-widest">
                   {user.center?.name || 'Educational center'}
                 </span>

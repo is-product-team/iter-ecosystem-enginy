@@ -1,8 +1,8 @@
 ## 1. Authentication & Core Types
 
 - [x] 1.1 Refactor `apps/web/lib/auth.ts`: Rename `nom_complet` -> `fullName`, `nom_rol` -> `name`, `codi_center` -> `centerCode`.
-- [ ] 1.2 Update `AuthContext.tsx` to ensure `login` and `user` state handle the new properties.
-- [ ] 1.3 Implement a migration helper in `AuthContext` to clear legacy `localStorage` user data.
+- [x] 1.2 Update `AuthContext.tsx` to ensure `login` and `user` state handle the new properties.
+- [x] 1.3 Implement a migration helper in `AuthContext` to clear legacy `localStorage` user data.
 
 ## 2. API Service Layer
 
@@ -12,11 +12,11 @@
 
 ## 3. Dashboard Components
 
-- [ ] 3.1 Update `Navbar` and `Sidebar` to display `user.fullName`.
-- [ ] 3.2 Update `Assignments` table to use `assignment.status` and `assignment.startDate`.
-- [ ] 3.3 Update `Profile` page to use `user.fullName` and `user.phone`.
+- [x] 3.1 Update `Navbar` and `Sidebar` to display `user.fullName`.
+- [x] 3.2 Update `Assignments` table to use `assignment.status` and `assignment.startDate`.
+- [x] 3.3 Update `Profile` page to use `user.fullName` and `user.phone`.
 
 ## 4. Verification
 
-- [ ] 4.1 Run `npm run type-check --workspace=web` to confirm zero errors.
-- [ ] 4.2 Perform manual smoke test of the login flow and data population.
+- [x] 4.1 Run `npm run type-check --workspace=web` to confirm zero errors.
+- [x] 4.2 Perform manual smoke test of the login flow and data population.
