@@ -16,7 +16,7 @@ export default function CenterDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.COORDINATOR)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
       router.push('/login');
     }
   }, [user, authLoading, router]);
@@ -33,7 +33,7 @@ export default function CenterDashboard() {
       }
     };
 
-    if (user && user.rol.nom_rol === ROLES.COORDINATOR) {
+    if (user && user.role.name === ROLES.COORDINATOR) {
       fetchPhases();
     }
   }, [user]);
@@ -53,7 +53,7 @@ export default function CenterDashboard() {
 
   return (
     <DashboardLayout
-      title={`Center Dashboard: ${user.center?.nom || 'Educational'}`}
+      title={`Center Dashboard: ${user.center?.name || 'Educational'}`}
       subtitle="Iter workshop management process."
     >
       {/* Institutional Section Timeline */}

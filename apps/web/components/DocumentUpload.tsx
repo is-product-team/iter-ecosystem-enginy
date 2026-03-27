@@ -5,8 +5,8 @@ import getApi from '@/services/api';
 import { toast } from 'sonner';
 
 interface DocumentUploadProps {
-  idAssignacio: number;
-  idInscripcio: number;
+  assignmentId: number;
+  enrollmentId: number;
   documentType: 'pedagogical_agreement' | 'mobility_authorization' | 'image_rights';
   initialUrl?: string | null;
   isValidated?: boolean;
@@ -15,8 +15,8 @@ interface DocumentUploadProps {
 }
 
 export default function DocumentUpload({
-  idAssignacio,
-  idInscripcio,
+  assignmentId,
+  enrollmentId,
   documentType,
   initialUrl,
   isValidated,
@@ -36,13 +36,13 @@ export default function DocumentUpload({
   const handleValidUpload = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('idInscripcio', idInscripcio.toString());
+    formData.append('idEnrollment', enrollmentId.toString());
     formData.append('documentType', documentType);
 
     try {
       setUploading(true);
       const api = getApi();
-      const res = await api.post(`/assignments/${idAssignacio}/student-document`, formData, {
+      const res = await api.post(`/assignments/${assignmentId}/student-document`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

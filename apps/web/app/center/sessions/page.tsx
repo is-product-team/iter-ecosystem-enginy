@@ -13,32 +13,32 @@ import Pagination from '@/components/Pagination';
 type AssignmentMode = 'single' | 'whole';
 
 interface Sessio {
-  id_sessio: number | string;
-  data_sessio: string;
-  hora_inici?: string;
-  hora_fi?: string;
+  id_session: number | string;
+  sessionDate: string;
+  startTime?: string;
+  endTime?: string;
   isPending?: boolean;
   assignmentTitle?: string;
-  assignacioId?: number;
+  assignmentId?: number;
   modality?: string;
   referent1?: string;
   referent2?: string;
-  staff?: { id_usuari?: number; id?: number; nom?: string; usuari?: { nom_complet: string } }[];
+  staff?: { id_user?: number; id?: number; name?: string; user?: { fullName: string } }[];
   status?: string;
 }
 
 interface BackendAssignment {
-  id_assignacio: number;
-  taller?: { titol: string; modalitat: string };
-  prof1?: { usuari: { nom_complet: string } };
-  prof2?: { usuari: { nom_complet: string } };
+  id_assignment: number;
+  workshop?: { title: string; modality: string };
+  teacher1?: { user: { fullName: string } };
+  teacher2?: { user: { fullName: string } };
   sessions?: Sessio[];
-  estat: string;
+  status: string;
 }
 
 interface Professor {
-  id_usuari: number;
-  nom: string;
+  id_user: number;
+  name: string;
 }
 
 export default function SessionsListPage() {
@@ -64,7 +64,7 @@ export default function SessionsListPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.COORDINATOR)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
       router.push('/login');
     }
   }, [user, authLoading, router]);
@@ -74,8 +74,8 @@ export default function SessionsListPage() {
       try {
         const api = getApi();
         const [resAssig, resProfs] = await Promise.all([
-          api.get(`/assignacions/centre/${user.center.id_center}`),
-          api.get('/professors')
+          api.get(`/assignments/center/${user.center.id_center}`),
+          api.get('/teachers')
         ]);
         
         const rawAssignacions = resAssig.data;
@@ -89,32 +89,32 @@ export default function SessionsListPage() {
             a.sessions.forEach((s: Sessio) => {
               flatSessions.push({
                 ...s,
-                assignmentTitle: a.taller?.titol,
-                assignacioId: a.id_assignacio,
-                modality: a.taller?.modalitat,
-                referent1: a.prof1?.usuari?.nom_complet,
-                referent2: a.prof2?.usuari?.nom_complet
+                assignmentTitle: a.workshop?.title,
+                assignmentId: a.id_assignment,
+                modality: a.workshop?.modality,
+                referent1: a.teacher1?.user?.fullName,
+                referent2: a.teacher2?.user?.fullName
               });
             });
-          } else if (a.estat !== 'PUBLISHED' && a.estat !== 'CANCELLED') {
+          } else if (a.status !== 'PUBLISHED' && a.status !== 'CANCELLED') {
               // If it doesn't have sessions but is in a phase where it should have them soon
               // We add it as a "placeholder" item so the user knows it's there
               flatSessions.push({
-                  id_sessio: `pending-${a.id_assignacio}`,
+                  id_session: `pending-${a.id_assignment}`,
                   isPending: true,
-                  assignmentTitle: a.taller?.titol,
-                  assignacioId: a.id_assignacio,
-                  modality: a.taller?.modalitat,
-                  referent1: a.prof1?.usuari?.nom_complet,
-                  referent2: a.prof2?.usuari?.nom_complet,
-                  data_sessio: new Date().toISOString(), // Use current date just for sorting
-                  status: a.estat
+                  assignmentTitle: a.workshop?.title,
+                  assignmentId: a.id_assignment,
+                  modality: a.workshop?.modality,
+                  referent1: a.teacher1?.user?.fullName,
+                  referent2: a.teacher2?.user?.fullName,
+                  sessionDate: new Date().toISOString(), // Use current date just for sorting
+                  status: a.status
               });
           }
         });
 
         // Sort by date
-        flatSessions.sort((a, b) => new Date(a.data_sessio).getTime() - new Date(b.data_sessio).getTime());
+        flatSessions.sort((a, b) => new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime());
         setSessions(flatSessions);
 
       } catch (error) {
@@ -161,8 +161,8 @@ export default function SessionsListPage() {
       
       if (mode === 'whole') {
         // Assign to the whole assignment (teaching staff)
-        await api.post(`/assignacions/${selectedAssignacioId}/staff`, { 
-          idUsuari: parseInt(selectedProfessorId) 
+        await api.post(`/assignments/${selectedAssignacioId}/staff`, { 
+          idUser: parseInt(selectedProfessorId) 
         });
         
         // OPTIONAL: Also add to all existing sessions individually if the backend logic requires it 
@@ -172,10 +172,10 @@ export default function SessionsListPage() {
         // For now, let's assume adding to the assignment staff is what's requested, 
         // BUT if the calendar view relies on session.staff, we might need to loop.
         // Let's loop to be safe and ensure they appear on the calendar for all days.
-        const targetAssignacio = assignacions.find(a => a.id_assignacio === parseInt(selectedAssignacioId));
+        const targetAssignacio = assignacions.find(a => a.id_assignment === parseInt(selectedAssignacioId));
         if (targetAssignacio?.sessions) {
            await Promise.all(targetAssignacio.sessions.map((s: Sessio) => 
-               api.post(`/assignacions/sessions/${s.id_sessio}/staff`, { idUsuari: parseInt(selectedProfessorId) })
+               api.post(`/assignments/sessions/${s.id_session}/staff`, { idUser: parseInt(selectedProfessorId) })
                  .catch(() => {}) // Ignore duplicates
            ));
         }
@@ -183,8 +183,8 @@ export default function SessionsListPage() {
         toast.success('Professor assigned to the whole workshop');
       } else {
         // Single session
-        await api.post(`/assignacions/sessions/${selectedSessioId}/staff`, { 
-          idUsuari: parseInt(selectedProfessorId) 
+        await api.post(`/assignments/sessions/${selectedSessioId}/staff`, { 
+          idUser: parseInt(selectedProfessorId) 
         });
         toast.success('Professor assigned to the selected day');
       }
@@ -202,10 +202,10 @@ export default function SessionsListPage() {
     }
   };
 
-  const handleRemoveStaff = async (idSessio: number, idUsuari: number) => {
+  const handleRemoveStaff = async (idSession: number, idUser: number) => {
     try {
       const api = getApi();
-      await api.delete(`/assignacions/sessions/${idSessio}/staff/${idUsuari}`);
+      await api.delete(`/assignments/sessions/${idSession}/staff/${idUser}`);
       await fetchData(); // Refresh list
       toast.success('Teacher removed successfully');
     } catch (error) {
@@ -214,7 +214,7 @@ export default function SessionsListPage() {
     }
   };
 
-  const selectedAssignacio = assignacions.find(a => a.id_assignacio.toString() === selectedAssignacioId);
+  const selectedAssignacio = assignacions.find(a => a.id_assignment.toString() === selectedAssignacioId);
 
   if (authLoading || loading) return <Loading fullScreen message="Loading sessions..." />;
 
@@ -279,12 +279,12 @@ export default function SessionsListPage() {
           <>
             <div className="divide-y divide-gray-100">
               {paginatedSessions.map((sessio) => {
-              const dateObj = new Date(sessio.data_sessio);
+              const dateObj = new Date(sessio.sessionDate);
               const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
               const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
 
               return (
-                <div key={sessio.id_sessio} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${sessio.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
+                <div key={sessio.id_session} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${sessio.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
                   <div className="flex items-start gap-4 mb-2 md:mb-0">
                     <div className={`p-3 rounded-full shrink-0 ${sessio.isPending ? 'bg-gray-200 text-gray-400' : sessio.modality === 'A' ? 'bg-blue-50 text-[#00426B]' : 'bg-orange-50 text-orange-600'}`}>
                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -296,7 +296,7 @@ export default function SessionsListPage() {
                         {sessio.assignmentTitle}
                         {!sessio.isPending && (
                           <span className="ml-2 text-[9px] font-normal text-gray-400 normal-case tracking-normal border border-gray-200 px-1.5 py-0.5 rounded">
-                            {sessio.hora_inici || '09:00'} - {sessio.hora_fi || '11:00'}
+                            {sessio.startTime || '09:00'} - {sessio.endTime || '11:00'}
                           </span>
                         )}
                       </h4>
@@ -339,16 +339,16 @@ export default function SessionsListPage() {
                           </span>
                         ) : sessio.staff && sessio.staff.length > 0 ? (
                           <div className="flex flex-wrap justify-end gap-2 max-w-[300px]">
-                            {sessio.staff.map((staffMember) => (
-                              <div key={staffMember.id_usuari} className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-2 py-1 rounded group/chip hover:border-red-200 transition-colors">
+                            {sessio.staff.map((staffMember: any) => (
+                              <div key={staffMember.id_user} className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-2 py-1 rounded group/chip hover:border-red-200 transition-colors">
                                 <span className="text-[10px] font-black text-[#4197CB] uppercase group-hover/chip:text-red-400 transition-colors">
-                                  {staffMember.usuari?.nom_complet || staffMember.nom}
+                                  {staffMember.user?.fullName || staffMember.name}
                                 </span>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    if (staffMember.id_usuari || staffMember.id) {
-                                      handleRemoveStaff(Number(sessio.id_sessio), (staffMember.id_usuari || staffMember.id) as number);
+                                    if (staffMember.id_user || staffMember.id) {
+                                      handleRemoveStaff(Number(sessio.id_session), (staffMember.id_user || staffMember.id) as number);
                                     }
                                   }}
                                   className="text-blue-300 hover:text-red-500 focus:outline-none transition-colors"
@@ -442,8 +442,8 @@ export default function SessionsListPage() {
                   >
                     <option value="">-- Choose a workshop --</option>
                     {assignacions.map(a => (
-                      <option key={a.id_assignacio} value={a.id_assignacio}>
-                        {a.taller?.titol} (Ref: {a.id_assignacio})
+                      <option key={a.id_assignment} value={a.id_assignment}>
+                        {a.workshop?.title} (Ref: {a.id_assignment})
                       </option>
                     ))}
                   </select>
@@ -462,8 +462,8 @@ export default function SessionsListPage() {
                     >
                       <option value="">-- Choose a session --</option>
                       {selectedAssignacio?.sessions?.map((s: Sessio, idx: number) => (
-                        <option key={s.id_sessio} value={s.id_sessio}>
-                          Session {idx + 1} - {new Date(s.data_sessio).toLocaleDateString()} ({s.hora_inici}-{s.hora_fi})
+                        <option key={s.id_session} value={s.id_session}>
+                          Session {idx + 1} - {new Date(s.sessionDate).toLocaleDateString()} ({s.startTime}-{s.endTime})
                         </option>
                       ))}
                     </select>
@@ -482,8 +482,8 @@ export default function SessionsListPage() {
                   >
                     <option value="">-- Choose a teacher --</option>
                     {allProfessors.map(p => (
-                      <option key={p.id_usuari} value={p.id_usuari}>
-                        {p.nom}
+                      <option key={p.id_user} value={p.id_user}>
+                        {p.name}
                       </option>
                     ))}
                   </select>

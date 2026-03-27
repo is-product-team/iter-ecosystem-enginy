@@ -21,14 +21,14 @@ export interface Workshop {
 
 interface BackendWorkshop {
   id_workshop: number;
-  titol: string;
-  modalitat: string;
-  icona?: string;
-  descripcio?: string;
-  durada_h?: number;
-  places_maximes?: number;
-  dies_execucio?: { dayOfWeek: number; startTime: string; endTime: string }[];
-  sector?: { nom: string };
+  title: string;
+  modality: string;
+  icon?: string;
+  description?: string;
+  durationHours?: number;
+  maxPlaces?: number;
+  executionDays?: { dayOfWeek: number; startTime: string; endTime: string }[];
+  sector?: { name: string };
   id_sector?: number;
 }
 
@@ -44,20 +44,20 @@ const workshopService = {
 
       return workshopsData.map((t: BackendWorkshop) => ({
         _id: t.id_workshop.toString(),
-        title: t.titol,
-        sector: t.sector?.nom || "General",
+        title: t.title,
+        sector: t.sector?.name || "General",
         id_sector: t.id_sector,
-        modality: t.modalitat,
+        modality: t.modality,
         term: "1st",
-        icon: t.icona || "🧩",
+        icon: t.icon || "🧩",
         technicalDetails: {
-          description: t.descripcio || "",
-          durationHours: t.durada_h || 0,
-          maxPlaces: t.places_maximes || 0,
+          description: t.description || "",
+          durationHours: t.durationHours || 0,
+          maxPlaces: t.maxPlaces || 0,
           defaultLocation: "Ca n'Olivella",
         },
         assignedReferents: [],
-        executionDays: t.dies_execucio || [],
+        executionDays: t.executionDays || [],
         image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop",
       }));
     } catch (error) {
@@ -70,14 +70,14 @@ const workshopService = {
     const api = getApi();
     try {
       const payload = {
-        titol: workshopData.title,
-        descripcio: workshopData.technicalDetails?.description,
-        durada_h: workshopData.technicalDetails?.durationHours,
-        places_maximes: workshopData.technicalDetails?.maxPlaces,
-        modalitat: workshopData.modality,
-        icona: workshopData.icon,
+        title: workshopData.title,
+        description: workshopData.technicalDetails?.description,
+        durationHours: workshopData.technicalDetails?.durationHours,
+        maxPlaces: workshopData.technicalDetails?.maxPlaces,
+        modality: workshopData.modality,
+        icon: workshopData.icon,
         id_sector: workshopData.id_sector || 1,
-        dies_execucio: workshopData.executionDays,
+        executionDays: workshopData.executionDays,
       };
 
       const response = await api.post("/workshops", payload);
@@ -85,20 +85,20 @@ const workshopService = {
 
       return {
         _id: t.id_workshop.toString(),
-        title: t.titol,
-        sector: t.sector?.nom || "General",
+        title: t.title,
+        sector: t.sector?.name || "General",
         id_sector: t.id_sector,
-        modality: t.modalitat,
-        icon: t.icona || "🧩",
+        modality: t.modality,
+        icon: t.icon || "🧩",
         term: "1st",
         technicalDetails: {
-          description: t.descripcio || "",
-          durationHours: t.durada_h || 0,
-          maxPlaces: t.places_maximes || 0,
+          description: t.description || "",
+          durationHours: t.durationHours || 0,
+          maxPlaces: t.maxPlaces || 0,
           defaultLocation: "Ca n'Olivella",
         },
         assignedReferents: [],
-        executionDays: t.dies_execucio || [],
+        executionDays: t.executionDays || [],
       };
     } catch (error) {
       console.error("Error in workshopService.create:", error);
@@ -111,15 +111,15 @@ const workshopService = {
     const api = getApi();
     try {
       const payload: Record<string, unknown> = {};
-      if (workshopData.title) payload.titol = workshopData.title;
-      if (workshopData.modality) payload.modalitat = workshopData.modality;
+      if (workshopData.title) payload.title = workshopData.title;
+      if (workshopData.modality) payload.modality = workshopData.modality;
       if (workshopData.id_sector) payload.id_sector = workshopData.id_sector;
-      if (workshopData.icon) payload.icona = workshopData.icon;
-      if (workshopData.executionDays) payload.dies_execucio = workshopData.executionDays;
+      if (workshopData.icon) payload.icon = workshopData.icon;
+      if (workshopData.executionDays) payload.executionDays = workshopData.executionDays;
       if (workshopData.technicalDetails) {
-        if (workshopData.technicalDetails.description) payload.descripcio = workshopData.technicalDetails.description;
-        if (workshopData.technicalDetails.durationHours) payload.durada_h = workshopData.technicalDetails.durationHours;
-        if (workshopData.technicalDetails.maxPlaces) payload.places_maximes = workshopData.technicalDetails.maxPlaces;
+        if (workshopData.technicalDetails.description) payload.description = workshopData.technicalDetails.description;
+        if (workshopData.technicalDetails.durationHours) payload.durationHours = workshopData.technicalDetails.durationHours;
+        if (workshopData.technicalDetails.maxPlaces) payload.maxPlaces = workshopData.technicalDetails.maxPlaces;
       }
 
       const response = await api.put(`/workshops/${id}`, payload);
@@ -127,20 +127,20 @@ const workshopService = {
 
       return {
         _id: t.id_workshop.toString(),
-        title: t.titol,
-        sector: t.sector?.nom || "General",
+        title: t.title,
+        sector: t.sector?.name || "General",
         id_sector: t.id_sector,
-        modality: t.modalitat,
+        modality: t.modality,
         term: "1st",
-        icon: t.icona || "🧩",
+        icon: t.icon || "🧩",
         technicalDetails: {
-          description: t.descripcio || "",
-          durationHours: t.durada_h || 0,
-          maxPlaces: t.places_maximes || 0,
+          description: t.description || "",
+          durationHours: t.durationHours || 0,
+          maxPlaces: t.maxPlaces || 0,
           defaultLocation: "Ca n'Olivella",
         },
         assignedReferents: [],
-        executionDays: t.dies_execucio || [],
+        executionDays: t.executionDays || [],
       };
     } catch (error) {
       console.error("Error in workshopService.update:", error);

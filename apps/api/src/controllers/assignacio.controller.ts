@@ -324,8 +324,9 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
         // Inicializar checklist por defecto para Phase 2
         checklist: {
           create: [
-            { stepName: 'Designar Profesores Referentes', isCompleted: false },
-            { stepName: 'Subir Registro Nominal (Excel)', isCompleted: false },
+            { stepName: 'DESIGNATE_TEACHERS', isCompleted: true },
+            { stepName: 'INPUT_STUDENTS', isCompleted: false },
+            { stepName: 'CONFIRM_REGISTRATION', isCompleted: false },
             { stepName: 'Acuerdo Pedagógico (Modalidad C)', isCompleted: request.modality !== 'C' }
           ]
         }
@@ -696,17 +697,29 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
  */
 export const validateEnrollmentDocument = async (req: Request, res: Response) => {
   const { idEnrollment } = req.params;
-  const { field, valid } = req.body; // field: 'validat_acord_pedagogic', etc.
+  const { field, valid } = req.body; // field: 'validated_pedagogical_agreement', etc.
   const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) {
-    return res.status(403).json({ error: 'Només els administradors poden validar documents.' });
+    return res.status(403).json({ error: 'Only admins can validate documents.' });
   }
 
-  const permittedFields = ['validat_acord_pedagogic', 'validat_autoritzacio_mobilitat', 'validat_drets_imatge'];
+  const permittedFields = ['validated_pedagogical_agreement', 'validated_mobility_authorization', 'validated_image_rights'];
   if (!permittedFields.includes(field)) {
-    return res.status(400).json({ error: 'Camp de validació no vàlid.' });
+    return res.status(400).json({ error: 'Invalid validation field.' });
   }
+
+  // Mapping to JSON keys if we want to keep them Catalan, BUT let's just use the English ones in the JSON too!
+  // The frontend mapping in assignmentService already expects acord_pedagogic etc. 
+  // Wait! If I change the JSON keys in DB, I must update assignmentService mapping.
+  // Actually, let's keep the JSON keys as they are in the DB but accept English from the frontend.
+  const fieldMap: Record<string, string> = {
+    'validated_pedagogical_agreement': 'validat_acord_pedagogic',
+    'validated_mobility_authorization': 'validat_autoritzacio_mobilitat',
+    'validated_image_rights': 'validat_drets_imatge'
+  };
+
+  const dbField = fieldMap[field];
 
   try {
     const enrollment = await prisma.enrollment.findUnique({ where: { id_enrollment: parseInt(idEnrollment as string) } });
@@ -717,14 +730,14 @@ export const validateEnrollmentDocument = async (req: Request, res: Response) =>
       data: {
         docs_status: {
           ...docsStatus,
-          [field]: !!valid
+          [dbField]: !!valid
         }
       }
     });
     res.json(updated);
   } catch (error) {
-    console.error("Error validant document:", error);
-    res.status(500).json({ error: 'Error al validar el document.' });
+    console.error("Error validating document:", error);
+    res.status(500).json({ error: 'Error validating the document.' });
   }
 };
 
@@ -746,31 +759,35 @@ async function logStatusChange(idAssignment: number, oldState: string, newState:
   }
 }
 // POST: Actualitzar Documents de Conformitat (Centro)
+// POST: Update Compliance Documents (Center)
 export const updateComplianceDocuments = async (req: Request, res: Response) => {
-  const idAssignment = req.params.idAssignment as string;
-  const { idStudent, acord_pedagogic, autoritzacio_mobilitat, drets_imatge } = req.body;
+  const _idAssignment = req.params.idAssignment as string;
+  const { enrollmentId, validated_pedagogical_agreement, validated_mobility_authorization, validated_image_rights } = req.body;
 
   try {
-    const enrollment = await prisma.enrollment.findUnique({ where: { id_enrollment: parseInt(idStudent) } });
-    const docsStatus = (enrollment?.docs_status as any) || {};
+    const enrollment = await prisma.enrollment.findUnique({ where: { id_enrollment: parseInt(enrollmentId) } });
+    if (!enrollment) return res.status(404).json({ error: 'Enrollment not found' });
+    
+    const docsStatus = (enrollment.docs_status as any) || {};
 
     const updated = await prisma.enrollment.update({
       where: {
-        id_enrollment: parseInt(idStudent)
+        id_enrollment: parseInt(enrollmentId)
       },
       data: {
         docs_status: {
           ...docsStatus,
-          acord_pedagogic,
-          autoritzacio_mobilitat,
-          drets_imatge
+          validat_acord_pedagogic: validated_pedagogical_agreement !== undefined ? !!validated_pedagogical_agreement : docsStatus.validat_acord_pedagogic,
+          validat_autoritzacio_mobilitat: validated_mobility_authorization !== undefined ? !!validated_mobility_authorization : docsStatus.validat_autoritzacio_mobilitat,
+          validat_drets_imatge: validated_image_rights !== undefined ? !!validated_image_rights : docsStatus.validat_drets_imatge
         }
       }
     });
 
     res.json(updated);
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualitzar documents.' });
+    console.error("Error updating compliance documents:", error);
+    res.status(500).json({ error: 'Error updating documents.' });
   }
 };
 

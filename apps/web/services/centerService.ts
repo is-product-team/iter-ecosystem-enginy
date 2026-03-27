@@ -1,12 +1,12 @@
 import getApi from "./api";
 
 export interface Center {
-  id_center: number;
-  codi_center: string;
-  nom: string;
-  adreca?: string;
-  telefon_contacte?: string;
-  email_contacte?: string;
+  centerId: number;
+  centerCode: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  email?: string;
 }
 
 const centerService = {
@@ -16,8 +16,15 @@ const centerService = {
   getAll: async (): Promise<Center[]> => {
     const api = getApi();
     try {
-      const response = await api.get<{ data: Center[], meta: unknown }>("/centers");
-      return response.data.data;
+      const response = await api.get<{ data: any[], meta: unknown }>("/centers");
+      return response.data.data.map((c: any) => ({
+        centerId: c.id_center,
+        centerCode: c.centerCode,
+        name: c.name,
+        address: c.address,
+        phone: c.phone,
+        email: c.email
+      }));
     } catch (error) {
       console.error("Error en centerService.getAll:", error);
       throw error;
@@ -27,7 +34,7 @@ const centerService = {
   /**
    * Crea un nuevo centro en el backend.
    */
-  create: async (centroData: Omit<Center, 'id_center'>): Promise<Center> => {
+  create: async (centroData: Omit<Center, 'centerId'>): Promise<Center> => {
     const api = getApi();
     try {
       const response = await api.post("/centers", centroData);

@@ -163,13 +163,13 @@ export default function ProfilePage() {
             {/* Avatar */}
             <div className="absolute -top-12 left-8">
               <Avatar
-                url={user.url_foto}
-                name={user.nom_complet}
+                url={user.photoUrl}
+                name={user.fullName}
                 id={user.id_user}
                 type="usuari"
                 size="xl"
                 className="ring-4 ring-white shadow-xl"
-                isCoordinator={user.rol.nom_rol === ROLES.COORDINATOR}
+                isCoordinator={user.role.name === ROLES.COORDINATOR}
                 email={user.email}
               />
             </div>
@@ -178,10 +178,10 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                   <h3 className="text-3xl font-black text-text-primary leading-tight">
-                    {user.nom_complet}
+                    {user.fullName}
                   </h3>
                   <p className="text-consorci-actionBlue font-bold tracking-tight uppercase text-xs mt-1">
-                    {user.rol.nom_rol} {user.center?.nom ? `• ${user.center.nom}` : ''}
+                    {user.role.name} {user.center?.name ? `• ${user.center.name}` : ''}
                   </p>
                 </div>
 
@@ -204,13 +204,23 @@ export default function ProfilePage() {
                           <p className="text-sm font-bold text-text-primary">{user.email}</p>
                         </div>
                       </div>
+
+                      <div className="flex items-center gap-3 p-4 bg-background-subtle border border-border-subtle">
+                        <div className="w-10 h-10 bg-background-surface flex items-center justify-center text-text-muted shadow-sm">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-text-muted uppercase tracking-tighter">Phone Number</p>
+                          <p className="text-sm font-bold text-text-primary">{user.phone || '—'}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-2">Referent Center</label>
                     <div className="p-4 border-2 border-dashed border-border-subtle bg-background-subtle/30">
-                      <p className="text-sm font-bold text-text-primary">{user.center?.nom || 'No center assigned'}</p>
+                      <p className="text-sm font-bold text-text-primary">{user.center?.name || 'No center assigned'}</p>
                       <p className="text-xs text-text-muted mt-1">Used for workshop management and requests.</p>
                     </div>
                   </div>

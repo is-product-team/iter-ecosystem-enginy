@@ -57,7 +57,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
 
     useEffect(() => {
         const currentUser = getUser();
-        if (!currentUser || (currentUser.rol.nom_rol !== ROLES.COORDINATOR && currentUser.rol.nom_rol !== ROLES.ADMIN)) {
+        if (!currentUser || (currentUser.role.name !== ROLES.COORDINATOR && currentUser.role.name !== ROLES.ADMIN)) {
             router.push('/login');
             return;
         }
@@ -92,8 +92,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                 if (resEval.data) {
                     const evalData = resEval.data;
                     setForm({
-                        attendancePercentage: evalData.attendance_percentage || 100,
-                        delayCount: evalData.delay_count || 0,
+                        attendancePercentage: evalData.attendancePercentage || 100,
+                        delayCount: evalData.lateCount || 0,
                         observations: evalData.observations || '',
                         competencies: evalData.competencies?.map((c: { id_competence: number; score: number }) => ({
                             id_competence: c.id_competence,
@@ -184,8 +184,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
         try {
             await evaluationService.upsertEvaluation({
                 enrollmentId: parseInt(enrollmentId),
-                attendance_percentage: form.attendancePercentage,
-                delay_count: form.delayCount,
+                attendancePercentage: form.attendancePercentage,
+                lateCount: form.delayCount,
                 observations: form.observations,
                 competencies: form.competencies
             });
@@ -208,7 +208,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
     return (
         <DashboardLayout
             title={`Student Evaluation`}
-            subtitle={`${enrollment.student?.name} ${enrollment.student?.surnames}`}
+            subtitle={`${enrollment.student?.fullName} ${enrollment.student?.lastName}`}
         >
             <div className="w-full pb-20">
                 <button
