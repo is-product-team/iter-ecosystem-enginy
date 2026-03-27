@@ -99,7 +99,7 @@ export default function CoordinacionScreen() {
                    <View className="bg-primary/10 px-2 py-0.5 rounded-md border border-primary/20 mr-2">
                       <Text className="text-primary font-bold text-[9px] uppercase tracking-wide">Equip Docent</Text>
                    </View>
-                   <Text className="flex-1 text-text-muted font-bold text-[10px] uppercase tracking-wide" numberOfLines={1}>{assig.taller.titol}</Text>
+                   <Text className="flex-1 text-text-muted font-bold text-[10px] uppercase tracking-wide" numberOfLines={1}>{assig.workshop.title}</Text>
                 </View>
                 
                 {renderReferent(assig.prof1, 'Referent Principal')}

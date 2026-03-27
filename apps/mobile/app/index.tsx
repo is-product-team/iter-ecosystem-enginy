@@ -30,10 +30,10 @@ export default function Index() {
         if (token && userData) {
           try {
             const user = JSON.parse(userData);
-            if (user.rol?.nom_rol === 'PROFESSOR') {
+            if (user.rol?.roleName === 'PROFESSOR') {
               setHasToken(true);
             } else {
-              console.warn("⚠️ [Auth] Rol no permès en mòbil:", user.rol?.nom_rol);
+              console.warn("⚠️ [Auth] Role not permitted on mobile:", user.rol?.roleName);
               setHasToken(false);
             }
           } catch (e) {

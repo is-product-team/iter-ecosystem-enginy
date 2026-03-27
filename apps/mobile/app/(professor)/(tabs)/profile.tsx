@@ -100,7 +100,7 @@ export default function PerfilScreen() {
                 </Text>
                 <View className="bg-background-subtle self-start px-2.5 py-1 rounded-md border border-border-subtle">
                    <Text className="text-primary dark:text-white text-[10px] font-bold uppercase tracking-wide">
-                     {user?.role?.nom_rol === ROLES.TEACHER ? t('Profile.role_professor') : t('Profile.role_admin')}
+                     {(user as any)?.role?.roleName === ROLES.TEACHER ? t('Profile.role_professor') : t('Profile.role_admin')}
                    </Text>
                 </View>
              </View>

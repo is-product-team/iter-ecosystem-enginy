@@ -34,7 +34,7 @@ export default function SessionScreen() {
       // 2. Initial state: Mark all as PRESENT by default (optional, distinct per preference)
       const initialAttendance: any = {};
       studentsList.forEach((s: any) => {
-          initialAttendance[s.id_alumne] = 'PRESENT';
+          initialAttendance[s.studentId] = 'PRESENT';
       });
 
       // 3. Check if attendance already exists (to pre-fill)
@@ -43,10 +43,10 @@ export default function SessionScreen() {
         if (existingRes.data && existingRes.data.length > 0) {
             // Map existing data
             existingRes.data.forEach((record: any) => {
-                initialAttendance[record.id_alumne] = record.estat;
+                initialAttendance[record.studentId] = record.status;
             });
-            if(existingRes.data[0].observacions) {
-                setObservations(existingRes.data[0].observacions);
+            if(existingRes.data[0].comments) {
+                setObservations(existingRes.data[0].comments);
             }
             setIsSubmitted(true); // Mark as submitted if data exists
         }
@@ -87,9 +87,9 @@ export default function SessionScreen() {
     try {
         const payload = Object.keys(attendance).map(studentId => ({
             id_assignacio: id,
-            id_alumne: studentId,
-            estat: attendance[studentId],
-            observacions: observations
+            studentId: studentId,
+            status: attendance[studentId],
+            comments: observations
         }));
 
         // Send one by one or batch if API supports. 
@@ -141,7 +141,7 @@ export default function SessionScreen() {
          </Text>
 
          {students.map((student) => {
-             const status = attendance[student.id_alumne];
+             const status = attendance[student.studentId];
              // Using simpler colors for "line of the app" - cleaner look
              let statusColor = "bg-background-surface text-emerald-700 border-emerald-100";  // Badge on gray bg
              let statusIcon = "checkmark-circle";
@@ -155,10 +155,10 @@ export default function SessionScreen() {
              }
 
              return (
-                 <View key={student.id_alumne} className="bg-background-subtle rounded-3xl mb-3 overflow-hidden border border-border-subtle">
+                 <View key={student.studentId} className="bg-background-subtle rounded-3xl mb-3 overflow-hidden border border-border-subtle">
                      {/* Attendance Row */}
                      <TouchableOpacity 
-                        onPress={() => toggleStatus(String(student.id_alumne))}
+                        onPress={() => toggleStatus(String(student.studentId))}
                         activeOpacity={0.7}
                         className="p-5 flex-row items-center justify-between"
                      >
@@ -168,7 +168,7 @@ export default function SessionScreen() {
                             </View>
                             <View className="flex-1 mr-2">
                                 <Text className="font-bold text-text-primary text-base mb-0.5" numberOfLines={1} ellipsizeMode="tail">
-                                    {student.alumne?.nom || student.nom} {student.alumne?.cognoms || student.cognoms}
+                                    {student.alumne?.nom || student.nom} {student.alumne?.surnames || student.surnames}
                                 </Text>
                                 <Text className="text-text-muted text-xs font-medium tracking-wide">ID: {student.alumne?.idalu || student.idalu}</Text>
                             </View>
@@ -193,7 +193,7 @@ export default function SessionScreen() {
                          </View>
                      ) : (
                         <TouchableOpacity
-                            onPress={() => router.push(`/(professor)/evaluation/${student.id_alumne}?id_assignacio=${id}`)}
+                            onPress={() => router.push(`/(professor)/evaluation/${student.studentId}?id_assignacio=${id}`)}
                             className="flex-row items-center justify-center py-4 bg-background-surface active:bg-background-subtle"
                         >
                             <Ionicons name="ribbon-outline" size={16} color={THEME.colors.primary} />

@@ -3,14 +3,85 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { router } from 'expo-router';
 import type { 
-  Rol, 
+  Role, 
   Phase, 
-  Notificacio, 
-  Assistencia,
-  Enrollment,
-  Student,
-  Assignment
+  Student as SharedStudent
 } from '@iter/shared';
+
+export interface Student {
+  id_student: number;
+  idalu: string;
+  fullName: string;
+  surnames: string;
+  grade?: string;
+  photoUrl?: string;
+}
+
+export interface Workshop {
+  id_workshop: number;
+  title: string;
+  description: string;
+  durationHours: number;
+  maxPlaces: number;
+  icon: string;
+}
+
+export interface Center {
+  id_center: number;
+  name: string;
+  address?: string;
+}
+
+export interface Enrollment {
+  id_enrollment: number;
+  id_assignment: number;
+  id_student: number;
+  student: Student;
+  [key: string]: any;
+}
+
+export interface Assignment {
+  id_assignment: number;
+  id_request?: number;
+  id_center: number;
+  center: Center;
+  id_workshop: number;
+  workshop: Workshop;
+  startDate: string; // Changed from data_inici
+  endDate: string;
+  status: string;
+  group: number;
+  sessions?: Session[];
+  [key: string]: any;
+}
+
+export interface Session {
+  id_session: number;
+  id_assignment: number;
+  sessionDate: string; // Changed from data_session
+  startTime: string;   // Changed from hora_inici
+  endTime: string;     // Changed from hora_fi
+}
+
+export interface Attendance {
+  id_attendance: number;
+  id_enrollment: number;
+  sessionNumber: number; // Changed from numero_sessio
+  status: string;        // Changed from estat
+  comments?: string;     // Changed from observacions
+  sessionDate: string;   // Changed from data_session
+  [key: string]: any;
+}
+
+export interface Notification {
+  id_notification: number;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  type: string;
+  importance: string;
+}
 
 const getBaseURL = () => {
   let url = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
@@ -81,7 +152,7 @@ export const logout = async () => {
 
 // --- Auth ---
 export const login = (data: { email: string; password?: string }) => 
-  api.post<{ token: string; user: { userId: number; role: Rol; centreId?: number } }>('auth/login', data);
+  api.post<{ token: string; user: { userId: number; role: Role; centreId?: number } }>('auth/login', data);
 
 // --- Assignments & Teachers ---
 export const getMyAssignments = () => 
@@ -95,15 +166,15 @@ export const getStudents = (id: string | number) =>
 
 // --- Attendance ---
 export const getAttendance = (idAssignment: string | number) => 
-  api.get<Assistencia[]>(`attendance/assignments/${idAssignment}`);
+  api.get<Attendance[]>(`attendance/assignments/${idAssignment}`);
 
 export const postAttendance = (data: { 
   id_enrollment: number; 
-  numero_sessio: number; 
-  estat: string; 
-  observacions?: string;
-  data_sessio?: string;
-}) => api.post<Assistencia>('attendance', data);
+  sessionNumber: number; // Changed from numero_sessio
+  status: string;        // Changed from estat
+  comments?: string;     // Changed from observacions
+  sessionDate?: string;
+}) => api.post<Attendance>('attendance', data);
 
 // --- Other Services ---
 export const postIncidencia = (data: { id_assignment: number; titol: string; descripcio: string }) => 
@@ -116,6 +187,6 @@ export const getCalendar = () =>
   api.get('calendar');
 
 export const getNotifications = () => 
-  api.get<Notificacio[]>('notifications');
+  api.get<Notification[]>('notifications');
 
 export default api;

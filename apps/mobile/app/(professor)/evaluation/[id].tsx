@@ -28,7 +28,7 @@ export default function EvaluacionScreen() {
 
         // 2. Fetch existing evaluation for this student/assignacio if exists
         // Assuming we evaluate an 'inscripcio'. We need to know the inscripcio ID or call by student+assignacio.
-        // The previous screen passed `id` as `student.id_alumne`.
+        // The previous screen passed `id` as `student.studentId`.
         // We might need to find the `inscripcio` id first or the backend handles it.
         // Let's assume the backend `avaluacio/inscripcio/:id` takes inscripcio ID.
         // We probably need a way to look it up. For now, let's fetch competencies first.
@@ -51,13 +51,13 @@ export default function EvaluacionScreen() {
       try {
           // Construct payload
           const payload = {
-              id_alumne: id,
-              id_assignacio: id_assignacio,
+              studentId: id,
+              assignmentId: id_assignacio,
               competencies: Object.keys(ratings).map(k => ({
                   id_competencia: parseInt(k),
                   puntuacio: ratings[parseInt(k)]
               })),
-              observacions: observations
+              comments: observations
           };
           
           await api.post('evaluacions/upset', payload); // Adjust endpoint as needed

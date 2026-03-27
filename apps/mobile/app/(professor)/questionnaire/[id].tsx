@@ -103,7 +103,7 @@ export default function WorkshopQualityScreen() {
       <Stack.Screen options={{ title: "Valoració del Taller" }} />
       <ScrollView className="flex-1 p-6" showsVerticalScrollIndicator={false}>
         <View className="mb-6">
-            <Text className="text-xl font-bold text-text-primary mb-2">{model.titol}</Text>
+            <Text className="text-xl font-bold text-text-primary mb-2">{model.title}</Text>
             <Text className="text-text-secondary">Si us plau, valora els següents aspectes del taller realitzat.</Text>
         </View>
 
