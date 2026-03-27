@@ -24,23 +24,23 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
   try {
     const targetId = parseInt(id);
     let fileName = '';
-    let targetName = 'perfil';
+    let targetName = 'profile';
 
-    if (type === 'alumne') {
+    if (type === 'student') {
       const alumne = await prisma.student.findUnique({ where: { id_student: targetId } });
       if (!alumne) return res.status(404).json({ error: 'Student no trobat.' });
-      targetName = sanitizeFileName(`${alumne.nom}_${alumne.cognoms}`);
-    } else if (type === 'usuari') {
+      targetName = sanitizeFileName(`${alumne.fullName}_${alumne.lastName}`);
+    } else if (type === 'user') {
       const usuari = await prisma.user.findUnique({ where: { id_user: targetId } });
       if (!usuari) return res.status(404).json({ error: 'User no trobat.' });
-      targetName = sanitizeFileName(usuari.nom_complet);
+      targetName = sanitizeFileName(usuari.fullName);
     } else {
       return res.status(400).json({ error: 'Tipus de perfil no vàlid.' });
     }
 
     const fileExt = path.extname(req.file.originalname);
     fileName = `foto_${type}_${targetId}_${targetName}_${Date.now()}${fileExt}`;
-    const profileDir = path.join('uploads', 'perfil');
+    const profileDir = path.join('uploads', 'profile');
     const filePath = path.join(profileDir, fileName);
 
     if (!fs.existsSync(profileDir)) {
@@ -49,17 +49,17 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
 
     fs.writeFileSync(filePath, req.file.buffer);
 
-    const url = `/uploads/perfil/${fileName}`;
+    const url = `/uploads/profile/${fileName}`;
 
-    if (type === 'alumne') {
+    if (type === 'student') {
       await prisma.student.update({
         where: { id_student: targetId },
-        data: { url_foto: url }
+        data: { photoUrl: url }
       });
     } else {
       await prisma.user.update({
         where: { id_user: targetId },
-        data: { url_foto: url }
+        data: { photoUrl: url }
       });
     }
 

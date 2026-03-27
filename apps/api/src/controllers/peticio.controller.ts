@@ -73,11 +73,11 @@ export const getRequestns = async (req: Request, res: Response) => {
 export const createRequest = async (req: Request, res: Response) => {
   const {
     id_workshop,
-    studentsAprox, // Renamed from alumnes_aprox
-    comments,      // Renamed from comentaris
+    studentsAprox,
+    comments,
     prof1_id,
     prof2_id,
-    modality       // Renamed from modalitat
+    modality
   } = req.body;
   const { centreId } = req.user!;
 
@@ -112,7 +112,7 @@ export const createRequest = async (req: Request, res: Response) => {
     });
 
     const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.studentsAprox || 0), 0);
-    if (totalStudentsC + studentsAprox > 12) {
+    if (totalStudentsC + parseInt(studentsAprox) > 12) {
       return res.status(400).json({
         error: `Límit superat. L'institut ja té ${totalStudentsC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
       });
@@ -137,8 +137,8 @@ export const createRequest = async (req: Request, res: Response) => {
         id_workshop: parseInt(id_workshop),
         studentsAprox: parseInt(studentsAprox),
         comments: comments,
-        status: RequestStatus.PENDING,
-        modality: modality as Modalitat,
+        status: REQUEST_STATUSES.PENDING,
+        modality,
         prof1_id: parseInt(prof1_id),
         prof2_id: parseInt(prof2_id),
       },
@@ -158,8 +158,8 @@ export const createRequest = async (req: Request, res: Response) => {
 export const updateRequest = async (req: Request, res: Response) => {
   const { id } = req.params;
   const {
-    studentsAprox, // Renamed from alumnes_aprox
-    comments,      // Renamed from comentaris
+    studentsAprox,
+    comments,
     prof1_id,
     prof2_id,
     modality       // Renamed from modalitat
@@ -183,7 +183,7 @@ export const updateRequest = async (req: Request, res: Response) => {
 
     // Verificar estado: Solo se pueden editar las pendientes
     if (existingRequest.status !== RequestStatus.PENDING) {
-      return res.status(400).json({ error: 'Només es poden editar sol·licituds pendents' });
+      return res.status(400).json({ error: 'Només es poden editar requests pendents.' });
     }
 
     // --- VERIFICACIÓN DE FASE ---
@@ -229,7 +229,7 @@ export const updateRequest = async (req: Request, res: Response) => {
       where: { id_request: peticioId },
       data: {
         studentsAprox: studentsAprox ? parseInt(studentsAprox) : undefined,
-        comments: comments,
+        comments,
         prof1_id: parseInt(prof1_id),
         prof2_id: parseInt(prof2_id),
       },
@@ -262,7 +262,7 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
       title: `Sol·licitud ${updated.status === RequestStatus.APPROVED ? 'Aprovada' : 'Rebutjada'}`,
       message: `La teva sol·licitud per al taller "${updated.workshop.title}" ha estat ${updated.status.toLowerCase()}.`,
       type: 'PETICIO',
-      importance: updated.status === RequestStatus.APPROVED ? 'INFO' : 'WARNING'
+      importancia: updated.status === RequestStatus.APPROVED ? 'INFO' : 'WARNING'
     });
 
     res.json(updated);

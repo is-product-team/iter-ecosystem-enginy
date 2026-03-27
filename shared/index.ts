@@ -18,9 +18,9 @@ export type RoleTag = typeof ROLES[keyof typeof ROLES];
 
 // Define request statuses - Aligned with Prisma Enum 'RequestStatus'
 export const REQUEST_STATUSES = {
-  PENDING: 'Pendent',
-  APPROVED: 'Aprovada',
-  REJECTED: 'Rebutjada'
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
 } as const;
 
 export type RequestStatus = typeof REQUEST_STATUSES[keyof typeof REQUEST_STATUSES];
@@ -73,40 +73,40 @@ export const esEmailValido = (email: string): boolean => {
 
 // Zod Schemas for Validation
 export const WorkshopSchema = z.object({
-  titol: z.string().min(3).max(100),
-  descripcio: z.string().optional(),
-  durada_h: z.number().int().min(1).max(100),
-  places_maximes: z.number().int().min(1).max(50),
-  modalitat: z.enum(['A', 'B', 'C']),
-  icona: z.string().optional(),
+  title: z.string().min(3).max(100),
+  description: z.string().optional(),
+  durationHours: z.number().int().min(1).max(100),
+  maxPlaces: z.number().int().min(1).max(50),
+  modality: z.enum(['A', 'B', 'C']),
+  icon: z.string().optional(),
   id_sector: z.number().int(),
-  dies_execucio: z.array(z.any()).optional()
+  executionDays: z.array(z.any()).optional()
 });
 
 export const StudentSchema = z.object({
   idalu: z.string().min(3),
-  nom: z.string().min(1),
-  cognoms: z.string().min(1),
-  curs: z.string().optional(),
+  name: z.string().min(1),
+  lastName: z.string().min(1),
+  grade: z.string().optional(),
   id_center_origin: z.number().int().optional().nullable()
 });
 
 export const RequestSchema = z.object({
   id_center: z.number().int(),
   id_workshop: z.number().int(),
-  alumnes_aprox: z.number().int().min(1).max(100),
-  comentaris: z.string().optional()
+  studentsAprox: z.number().int().min(1).max(100),
+  comments: z.string().optional()
 });
 
 export const AssignmentChecklistSchema = z.object({
-  completat: z.boolean(),
+  isCompleted: z.boolean(),
   url_evidencia: z.string().optional().nullable()
 });
 
 export const CenterAttendanceSchema = z.object({
   id_enrollment: z.number().int(),
-  estat: z.enum(['Present', 'Absència Justificada', 'Absència', 'Retard']),
-  observacions: z.string().optional().nullable()
+  status: z.enum(['PRESENT', 'ABSENCE_JUSTIFIED', 'ABSENCE', 'LATE']),
+  observations: z.string().optional().nullable()
 });
 
 export type WorkshopInput = z.infer<typeof WorkshopSchema>;

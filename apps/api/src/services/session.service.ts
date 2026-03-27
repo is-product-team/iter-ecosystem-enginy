@@ -74,7 +74,7 @@ export class SessionService {
         const existingAttendance = await prisma.attendance.findMany({
             where: {
                 enrollment: { id_assignment: idAssignment },
-                numero_sessio: sessionNum
+                sessionNumber: sessionNum
             },
             select: { id_enrollment: true }
         });
@@ -88,9 +88,9 @@ export class SessionService {
             await prisma.attendance.createMany({
                 data: missingEnrollments.map((e: any) => ({
                     id_enrollment: e.id_enrollment,
-                    numero_sessio: sessionNum,
-                    data_session: date,
-                    estat: 'Present' // Default state
+                    sessionNumber: sessionNum,
+                    sessionDate: date,
+                    estat: 'PRESENT' // Default state
                 }))
             });
         }
@@ -104,7 +104,7 @@ export class SessionService {
         const count = await prisma.attendance.count({
             where: {
                 enrollment: { id_assignment: idAssignment },
-                numero_sessio: sessionNum
+                sessionNumber: sessionNum
             }
         });
         return count > 0 ? 'Recorded' : 'Pending';
@@ -119,10 +119,10 @@ export class SessionService {
             include: { workshop: true }
         });
 
-        if (!assignacio || !assignacio.data_inici) return;
+        if (!assignacio || !assignacio.startDate) return;
 
         const schedule = assignacio.workshop.dies_execucio;
-        const sessionDates = this.generateDatesFromSchedule(assignacio.data_inici, schedule as any);
+        const sessionDates = this.generateDatesFromSchedule(assignacio.startDate, schedule as any);
 
         // Delete future sessions that might be outdated
         // Actually, better to just create if they don't exist or update dates
@@ -143,7 +143,7 @@ export class SessionService {
         await prisma.session.createMany({
             data: sessionDates.map(date => ({
                 id_assignment: idAssignment,
-                data_session: date
+                sessionDate: date
             }))
         });
     }

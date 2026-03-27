@@ -20,26 +20,26 @@ async function seedInfrastructure() {
   const roles = await Promise.all(
     Object.values(ROLES).map((roleName) =>
       prisma.role.upsert({
-        where: { name: roleName },
+        where: { roleName: roleName },
         update: {},
-        create: { name: roleName },
+        create: { roleName: roleName },
       })
     )
   );
 
   const rolesMap = {
-    ADMIN: roles.find((r) => r.name === ROLES.ADMIN)!,
-    COORDINATOR: roles.find((r) => r.name === ROLES.COORDINATOR)!,
-    TEACHER: roles.find((r) => r.name === ROLES.TEACHER)!,
+    ADMIN: roles.find((r) => r.roleName === ROLES.ADMIN)!,
+    COORDINATOR: roles.find((r) => r.roleName === ROLES.COORDINATOR)!,
+    TEACHER: roles.find((r) => r.roleName === ROLES.TEACHER)!,
   };
 
   const sectors = ['Transformació Digital', 'Creació Artística', 'Industrial i Logística'];
   const createdSectors = await Promise.all(
     sectors.map((name) =>
       prisma.sector.upsert({
-        where: { name: name },
+        where: { name },
         update: {},
-        create: { name: name },
+        create: { name },
       })
     )
   );
@@ -99,9 +99,9 @@ async function seedUsers(roles: any, passDefault: string) {
       create: {
         centerCode: c.codi,
         name: c.nom,
-        email: c.email,
+        contactEmail: c.email,
         address: c.adreca,
-        phone: c.tel,
+        contactPhone: c.tel,
       },
     });
     centres.push(centre);
@@ -179,7 +179,7 @@ async function seedTallers(sectors: any) {
     await prisma.workshop.create({ // For simplicity and sample data, we use create or we could check existence by title
       data: {
         title: t.titol,
-        modality: t.modality,
+        modality: t.modalitat,
         id_sector: t.sectorId,
         durationHours: 3,
         maxPlaces: 20,
@@ -196,20 +196,20 @@ async function seedFases() {
   const currentYear = now.getFullYear();
 
   const fasesData = [
-    { nom: PHASES.APPLICATION, ordre: 1, activa: true },
-    { nom: PHASES.PLANNING, ordre: 2, activa: false },
-    { nom: PHASES.EXECUTION, ordre: 3, activa: false },
-    { nom: PHASES.CLOSURE, ordre: 4, activa: false },
+    { name: PHASES.APPLICATION, order: 1, isActive: true },
+    { name: PHASES.PLANNING, order: 2, isActive: false },
+    { name: PHASES.EXECUTION, order: 3, isActive: false },
+    { name: PHASES.CLOSURE, order: 4, isActive: false },
   ];
 
   for (const fase of fasesData) {
     await prisma.phase.upsert({
-      where: { name: fase.nom },
-      update: { order: fase.ordre, isActive: fase.activa },
+      where: { name: fase.name },
+      update: { order: fase.order, isActive: fase.isActive },
       create: {
-        name: fase.nom,
-        order: fase.ordre,
-        isActive: fase.activa,
+        name: fase.name,
+        order: fase.order,
+        isActive: fase.isActive,
         startDate: new Date(`${currentYear}-09-01`),
         endDate: new Date(`${currentYear + 1}-06-30`),
       },
@@ -219,15 +219,15 @@ async function seedFases() {
 
 async function main() {
   console.log('🌱  Iniciant procés de seeding...');
-  
+
   // En desenvolupament, de vegades volem netejar, però el seeding professional prefereix upsert.
   // Si realment volem netejar: await prisma.$executeRaw`TRUNCATE TABLE ...`
-  
+
   const infra = await seedInfrastructure();
-  
+
   const salt = await bcrypt.genSalt(10);
   const passDefault = await bcrypt.hash('Iter@1234', salt);
-  
+
   await seedUsers(infra.roles, passDefault);
   await seedTallers(infra.sectors);
   await seedFases();

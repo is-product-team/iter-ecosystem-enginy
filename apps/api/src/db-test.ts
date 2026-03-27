@@ -19,7 +19,7 @@ async function test() {
                 id: user.id_user,
                 email: user.email,
                 role: user.role?.nom_role,
-                center: user.center ? user.center.nom : 'None'
+                center: user.center ? user.center.name : 'None'
             });
 
             console.log('--- Testing Password Comparison ---');

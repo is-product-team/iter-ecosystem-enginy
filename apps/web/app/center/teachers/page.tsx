@@ -276,7 +276,7 @@ export default function TeachersCRUD() {
                           formData.append('foto', file);
                           try {
                             const api = getApi();
-                            const res = await api.post(`/upload/perfil/usuari/${editingTeacher.user.id_user}`, formData, {
+                            const res = await api.post(`/upload/profile/user/${editingTeacher.user.id_user}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
                             toast.success("Photo updated.");

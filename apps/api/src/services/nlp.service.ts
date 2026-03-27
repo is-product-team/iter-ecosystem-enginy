@@ -1,6 +1,6 @@
 
 export interface NLPAnalysisResult {
-    attendanceStatus?: 'Present' | 'Retard' | 'Absencia' | 'Absencia_Justificada';
+    attendanceStatus?: 'PRESENT' | 'LATE' | 'ABSENCE' | 'ABSENCE_JUSTIFIED';
     competenceUpdate?: {
         competenceName: string; // 'Transversal' usually
         score: number;
@@ -22,13 +22,13 @@ export class NLPService {
 
         // 1. Detect Punctuality
         if (lowerText.includes('tarde') || lowerText.includes('retraso') || lowerText.includes('retard')) {
-            result.attendanceStatus = 'Retard';
+            result.attendanceStatus = 'LATE';
         } else if (lowerText.includes('falta') || lowerText.includes('no ha venido') || lowerText.includes('absent')) {
-            result.attendanceStatus = 'Absencia';
+            result.attendanceStatus = 'ABSENCE';
         } else if (lowerText.includes('justificad')) {
-            result.attendanceStatus = 'Absencia_Justificada';
+            result.attendanceStatus = 'ABSENCE_JUSTIFIED';
         } else if (lowerText.includes('puntual') || lowerText.includes('a tiempo')) {
-            result.attendanceStatus = 'Present';
+            result.attendanceStatus = 'PRESENT';
         }
 
         // 2. Detect Competence (Teamwork / Initiative)

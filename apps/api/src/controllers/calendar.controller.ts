@@ -20,7 +20,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
 
   // Filtros de fecha
   const dateFilter = start && end ? {
-    data: {
+    date: {
       gte: new Date(start as string),
       lte: new Date(end as string),
     }
@@ -93,15 +93,15 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
 
   // Mapeo de Milestones
   dbEvents.forEach((e: any) => {
-    const date = e.data ? new Date(e.data) : null;
+    const date = e.date ? new Date(e.date) : null;
     if (date && !isNaN(date.getTime())) {
       events.push({
         id: `milestone-${e.id_event}`,
-        title: e.titol,
+        title: e.title,
         date: date.toISOString(),
         type: e.type,
-        description: e.descripcio || '',
-        metadata: { fase: e.phase?.nom || 'General' }
+        description: e.description || '',
+        metadata: { fase: e.phase?.name || 'General' }
       });
     }
   });
@@ -114,7 +114,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
       if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
         events.push({
           id: `assign-${a.id_assignment}`,
-          title: user.role === ROLES.COORDINATOR ? `Workshop: ${a.workshop?.titol}` : `${a.workshop?.titol}`,
+          title: user.role === ROLES.COORDINATOR ? `Workshop: ${a.workshop?.title}` : `${a.workshop?.title}`,
           date: startDate.toISOString(),
           endDate: endDate.toISOString(),
           type: 'assignment',
@@ -136,13 +136,13 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
         if (sessionDate && !isNaN(sessionDate.getTime())) {
           events.push({
             id: `session-${s.id_session}`,
-            title: `SESSIÓ: ${a.workshop?.titol || 'Workshop'}`,
+            title: `SESSIÓ: ${a.workshop?.title || 'Workshop'}`,
             date: sessionDate.toISOString(),
             type: 'session',
             metadata: {
               id_assignment: a.id_assignment,
               hora: `${s.hora_inici || '09:00'} - ${s.hora_fi || '13:00'}`,
-              centre: a.center?.nom || 'Centre Iter'
+              centre: a.center?.name || 'Centre Iter'
             }
           });
         }
@@ -185,7 +185,7 @@ export const getCalendarICS = async (req: Request, res: Response) => {
 
     const events = await fetchEventsForUser({
       userId: user.id_user,
-      role: user.role.nom_role,
+      role: user.role.roleName,
       centreId: user.id_center
     });
 

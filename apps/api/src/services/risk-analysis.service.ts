@@ -17,13 +17,13 @@ export class RiskAnalysisService {
         const factors: string[] = [];
         let riskScore = 0;
 
-        // 1. Fetch Attendance (Last 5 sessions)
+        // 1. Fetch Attendance (Last 3 sessions)
         const recentAttendance = await prisma.attendance.findMany({
             where: {
                 enrollment: { id_student: studentId }
             },
-            orderBy: { data_session: 'desc' },
-            take: 5
+            orderBy: { sessionDate: 'desc' },
+            take: 3
         });
 
         // 2. Calculate Attendance Risk
@@ -32,8 +32,11 @@ export class RiskAnalysisService {
             let late = 0;
 
             recentAttendance.forEach((a: any) => {
-                if (a.estat === 'Absencia') absences++;
-                if (a.estat === 'Retard') late++;
+                if (a.status === 'ABSENCIA' || a.status === 'ABSENCIA_JUSTIFICADA') {
+                    absences++;
+                    factors.push(`Falta el ${a.sessionDate.toLocaleDateString()}`);
+                }
+                if (a.status === 'LATE') late++;
             });
 
             if (absences >= 2) {
@@ -92,8 +95,8 @@ export class RiskAnalysisService {
 
         await createNotificationInterna({
             id_center: student.center_origin.id_center,
-            titol: `⚠️ Alerta de Riesgo: ${student.nom} ${student.cognoms}`,
-            missatge: `El alumno presenta un riesgo de abandono del ${score}%. Factores: ${factors.join(', ')}. Se recomienda intervención.`,
+            title: `⚠️ Alerta de Riesgo: ${student.name} ${student.lastName}`,
+            message: `El alumno presenta un riesgo de abandono del ${score}%. Factores: ${factors.join(', ')}. Se recomienda intervención.`,
             tipus: 'SISTEMA',
             importancia: 'URGENT'
         });

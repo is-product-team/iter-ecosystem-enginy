@@ -8,7 +8,7 @@ export const getTeachers = async (req: Request, res: Response) => {
 
   try {
     const where: any = {};
-    
+
     // Scoping: Admin sees all, others only their center
     if (role !== ROLES.ADMIN) {
       if (!centreId) {
@@ -19,13 +19,13 @@ export const getTeachers = async (req: Request, res: Response) => {
 
     const teachers = await prisma.teacher.findMany({
       where,
-      include: { 
+      include: {
         center: true,
         user: {
           select: {
             id_user: true,
             email: true,
-            url_foto: true
+            photoUrl: true
           }
         }
       }
@@ -39,7 +39,7 @@ export const getTeachers = async (req: Request, res: Response) => {
 export const createTeacher = async (req: Request, res: Response) => {
   const { centreId } = req.user!;
   const { nom, contacte, password } = req.body;
-  
+
   try {
     const finalCenterId = centreId ? centreId : req.body.id_center;
 
@@ -73,8 +73,8 @@ export const createTeacher = async (req: Request, res: Response) => {
       // 3. Crear el profesor vinculado
       const professor = await tx.teacher.create({
         data: {
-          nom,
-          contacte,
+          name: nom,
+          contact: contacte,
           id_center: finalCenterId,
           id_user: usuari.id_user
         }
@@ -146,7 +146,7 @@ export const getTeacherAssignments = async (req: Request, res: Response) => {
           }
         },
         sessions: {
-            orderBy: { sessionDate: 'asc' }
+          orderBy: { sessionDate: 'asc' }
         }
       }
     });
@@ -176,7 +176,7 @@ export const getTeachersByCenter = async (req: Request, res: Response) => {
             id_user: true,
             email: true,
             fullName: true,
-            url_foto: true
+            photoUrl: true
           }
         }
       }

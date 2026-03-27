@@ -25,7 +25,7 @@ export class QuestionariService {
     }) {
         return await prisma.questionnaireModel.create({
             data: {
-                nom: data.nom,
+                name: data.nom,
                 destinatari: data.destinatari,
                 questions: {
                     create: data.questions,

@@ -24,7 +24,7 @@ export class StudentRepository extends BaseRepository<Student, Prisma.StudentCre
     return this.prisma.student.findMany({
       where: { id_center_origin: centerId },
       include: { center_origin: true },
-      orderBy: { cognoms: 'asc' }
+      orderBy: { surnames: 'asc' }
     });
   }
 }

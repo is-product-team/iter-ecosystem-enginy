@@ -19,6 +19,6 @@ const upload = multer({
   }
 });
 
-router.post('/perfil/:type/:id', authenticateToken, upload.single('foto'), uploadController.uploadProfilePicture);
+router.post('/profile/:type/:id', authenticateToken, upload.single('foto'), uploadController.uploadProfilePicture);
 
 export default router;

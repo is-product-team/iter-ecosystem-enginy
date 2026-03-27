@@ -8,15 +8,15 @@ import { RiskAnalysisService } from '../services/risk-analysis.service.js';
 export const getStatsByStatus = async (req: Request, res: Response) => {
   try {
     const counts = await prisma.request.groupBy({
-      by: ['estat'],
+      by: ['status'],
       _count: {
-        _all: true
+        status: true
       }
     });
 
     const stats = counts.map((c: any) => ({
-      estat: c.estat.toLowerCase(),
-      total: c._count._all,
+      status: c.status.toLowerCase(),
+      total: c._count.status,
       last_update: new Date()
     }));
 
@@ -39,9 +39,9 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
     });
 
     const stats = tallers.map((t: any) => ({
-      _id: t.titol,
+      _id: t.title,
       total_solicitudes: t.requests.length,
-      alumnes_totals: t.requests.reduce((acc: number, p: any) => acc + (p.alumnes_aprox || 0), 0)
+      alumnes_totals: t.requests.reduce((acc: number, p: any) => acc + (p.studentsAprox || 0), 0)
     })).sort((a: any, b: any) => b.total_solicitudes - a.total_solicitudes);
 
     res.json(stats);
@@ -56,7 +56,7 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
 export const getRecentActivity = async (req: Request, res: Response) => {
   try {
     const logs = await prisma.auditLog.findMany({
-      orderBy: { data_hora: 'desc' },
+      orderBy: { createdAt: 'desc' },
       take: 10,
       include: { user: true }
     });
@@ -73,7 +73,7 @@ export const cleanupLogs = async (req: Request, res: Response) => {
   try {
     const result = await prisma.auditLog.deleteMany({
       where: {
-        data_hora: { lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+        createdAt: { lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
       }
     });
     res.json({ success: true, deletedCount: result.count });
@@ -118,7 +118,7 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
   try {
     const assignacions = await prisma.assignment.findMany({
       where: {
-        estat: { in: ['PUBLISHED', 'DATA_ENTRY', 'DATA_SUBMITTED', 'VALIDATED'] }
+        status: { in: ['PUBLISHED', 'DATA_ENTRY', 'DATA_SUBMITTED', 'VALIDATED'] }
       },
       include: {
         center: true,
@@ -139,7 +139,7 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
 
       return {
         id_assignment: a.id_assignment,
-        center: a.center.nom,
+        center: a.center.name,
         workshop_id: a.id_workshop,
         estat: a.estat,
         completat: isComplete,

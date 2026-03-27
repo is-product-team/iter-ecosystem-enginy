@@ -34,7 +34,7 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
     });
 
     if (!assignacio) {
-      return res.status(404).json({ error: 'Assignment not found.' });
+      return res.status(404).json({ error: 'Assignment not found.', importance: 'WARNING' });
     }
 
     const results = [];
@@ -43,13 +43,16 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
       const alumne = await prisma.student.upsert({
         where: { idalu: s.idalu },
         update: {
-          name: s.name,
-          surnames: s.surnames,
+          fullName: s.nom,
+          lastName: s.cognoms,
           curs: s.curs
         },
         create: {
-          ...s,
-          id_center_origin: assignacio.id_center
+          fullName: s.nom,
+          lastName: s.cognoms, // Renamed 'surnames' to 'lastName'
+          idalu: s.idalu,
+          curs: s.curs,
+          originCenterCode: assignacio.center.centerCode // Fixed field name and derived value prefix
         }
       });
 

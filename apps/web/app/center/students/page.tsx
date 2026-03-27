@@ -301,7 +301,7 @@ export default function StudentsCRUD() {
                           formData.append('foto', file);
                           try {
                             const api = getApi();
-                            const res = await api.post(`/upload/perfil/alumne/${editingStudent.id_student}`, formData, {
+                            const res = await api.post(`/upload/profile/student/${editingStudent.id_student}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
                             toast.success("Photo updated.");

@@ -37,18 +37,18 @@ export const generateEnquestes = async (req: Request, res: Response) => {
         for (const teacher of assignacio.teachers) {
             questionnairesData.push({
                 id_assignment: assignacio.id_assignment,
-                destinatari: QuestionnaireTarget.PROFESSOR,
+                target: QuestionnaireTarget.PROFESSOR,
                 token: uuidv4(),
-                completa: false
+                isCompleted: false
             });
         }
 
         // Centro (1 por asignación)
         questionnairesData.push({
             id_assignment: assignacio.id_assignment,
-            destinatari: QuestionnaireTarget.CENTRE,
+            target: QuestionnaireTarget.CENTRE,
             token: uuidv4(),
-            completa: false
+            isCompleted: false
         });
 
         // Guardar en Prisma (Postgres)
@@ -78,13 +78,13 @@ export const getEnquestaByToken = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Encuesta no válida' });
         }
 
-        if (enquesta.completa) {
-            return res.status(400).json({ error: 'Esta encuesta ya ha sido completada' });
+        if (enquesta.isCompleted) {
+            return res.json({ message: 'Aquesta enquesta ja ha estat completada.' });
         }
 
         // Obtener preguntas del modelo (según destinatario)
         const model = await prisma.questionnaireModel.findFirst({
-            where: { destinatari: enquesta.destinatari },
+            where: { target: enquesta.target },
             include: { questions: true }
         });
 
@@ -100,20 +100,22 @@ export const getEnquestaByToken = async (req: Request, res: Response) => {
 // POST: Enviar respuesta encuesta
 export const submitEnquesta = async (req: Request, res: Response) => {
     const token = req.params.token as string;
-    // const { respostes } = req.body;
+    const { responses, grade } = req.body;
 
     try {
         const enquesta = await prisma.questionnaire.findUnique({ where: { token } });
 
         if (!enquesta) return res.status(404).json({ error: 'Encuesta no encontrada' });
-        if (enquesta.completa) return res.status(400).json({ error: 'Encuesta ya completada' });
+        if (enquesta.isCompleted) return res.status(400).json({ error: 'Encuesta ya completada' });
 
         // 1. Marcar como completada en Postgres
         await prisma.questionnaire.update({
-            where: { token },
-            data: {
-                completa: true,
-                data_completat: new Date()
+            where: { id_questionnaire: enquesta.id_questionnaire },
+            data: { 
+                responses: responses as any,
+                isCompleted: true,
+                completedAt: new Date(),
+                grade: grade
             }
         });
 

@@ -30,8 +30,8 @@ export const login = async (req: Request, res: Response) => {
       {
         userId: user.id_user,
         email: user.email,
-        role: (user as any).role.name,
-        centerId: user.id_center
+        role: (user as any).role.roleName,
+        centreId: user.id_center
       },
       env.JWT_SECRET,
       { expiresIn: '24h' }

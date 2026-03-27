@@ -10,7 +10,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
 
   try {
     if (!Array.isArray(assistencia) || !id_assignment) {
-        return res.status(400).json({ error: 'Format de dades incorrecte. S\'espera array d\'assistencia i id_assignment.' });
+      return res.status(400).json({ error: 'Format de dades incorrecte. S\'espera array d\'assistencia i id_assignment.' });
     }
 
     const today = new Date();
@@ -18,66 +18,66 @@ export const registerAttendance = async (req: Request, res: Response) => {
 
     // Determines session number (defaults to 1 if not strictly scheduled)
     const sessionMatch = await prisma.session.findFirst({
-        where: { 
-            id_assignment: parseInt(id_assignment),
-            sessionDate: today
-        }
+      where: {
+        id_assignment: parseInt(id_assignment),
+        sessionDate: today
+      }
     });
     const sessionNum = sessionMatch ? sessionMatch.id_session : 1;
 
-    // Helper to map mobile status (UPPERCASE) to Prisma Enum (PascalCase)
+    // Helper to map mobile status (UPPERCASE) to Prisma Enum (uppercase English)
     const mapStatus = (status: string) => {
-        switch (status) {
-            case 'PRESENT': return 'PRESENT';
-            case 'ABSENT': return 'ABSENT';
-            case 'RETARD': return 'LATE';
-            default: return 'PRESENT'; // Fallback
-        }
+      switch (status) {
+        case 'PRESENT': return 'PRESENT';
+        case 'ABSENT': return 'ABSENCE';
+        case 'RETARD': return 'LATE';
+        default: return 'PRESENT'; // Fallback
+      }
     };
 
     const results = await Promise.all(assistencia.map(async (item: any) => {
-        // Resolve student ID
-        const idStudentInt = parseInt(item.id_student);
-        
-        // Find Enrollment (Enrollment)
-        const validEnrollment = await prisma.enrollment.findFirst({
-             where: {
-                 id_assignment: parseInt(id_assignment),
-                 id_student: idStudentInt
-             }
-        });
+      // Resolve student ID
+      const idStudentInt = parseInt(item.id_student);
 
-        if (!validEnrollment) return null;
-
-        const prismaStatus = mapStatus(item.estat);
-
-        // Check for existing attendance today
-        const existing = await prisma.attendance.findFirst({
-            where: {
-                id_enrollment: validEnrollment.id_enrollment,
-                sessionDate: today
-            }
-        });
-
-        if (existing) {
-            return prisma.attendance.update({
-                where: { id_attendance: existing.id_attendance },
-                data: {
-                    status: prismaStatus as any, // Cast to any to avoid strict typing issues with generated enums if imports missing
-                    comments: item.observacions
-                }
-            });
-        } else {
-            return prisma.attendance.create({
-                data: {
-                    id_enrollment: validEnrollment.id_enrollment,
-                    sessionNumber: sessionNum,
-                    sessionDate: today,
-                    status: prismaStatus as any, 
-                    comments: item.observacions
-                }
-            });
+      // Find Enrollment (Enrollment)
+      const validEnrollment = await prisma.enrollment.findFirst({
+        where: {
+          id_assignment: parseInt(id_assignment),
+          id_student: idStudentInt
         }
+      });
+
+      if (!validEnrollment) return null;
+
+      const prismaStatus = mapStatus(item.estat);
+
+      // Check for existing attendance today
+      const existing = await prisma.attendance.findFirst({
+        where: {
+          id_enrollment: validEnrollment.id_enrollment,
+          sessionDate: today
+        }
+      });
+
+      if (existing) {
+        return prisma.attendance.update({
+          where: { id_attendance: existing.id_attendance },
+          data: {
+            status: prismaStatus as any,
+            observations: item.observacions
+          }
+        });
+      } else {
+        return prisma.attendance.create({
+          data: {
+            id_enrollment: validEnrollment.id_enrollment,
+            sessionNumber: sessionNum,
+            sessionDate: today,
+            status: prismaStatus as any,
+            observations: item.observacions
+          }
+        });
+      }
     }));
 
     res.json({ success: true, processed: results.filter(r => r !== null).length });

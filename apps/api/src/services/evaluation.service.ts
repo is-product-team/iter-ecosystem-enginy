@@ -23,17 +23,17 @@ export class EvaluationService {
     async upsertEvaluation(data: {
         id_enrollment: number;
         id_assignment: number;
-        percentatge_asistencia: number;
-        numero_retards: number;
-        observacions?: string;
-        competences: { id_competence: number; puntuacio: number }[];
+        attendancePercentage: number;
+        lateCount: number;
+        observations?: string;
+        competences: { id_competence: number; score: number }[];
     }) {
         const {
             id_enrollment,
             id_assignment,
-            percentatge_asistencia,
-            numero_retards,
-            observacions,
+            attendancePercentage,
+            lateCount,
+            observations,
             competences
         } = data;
 
@@ -41,16 +41,16 @@ export class EvaluationService {
         const avaluacioDocent = await prisma.evaluation.upsert({
             where: { id_enrollment },
             update: {
-                percentatge_asistencia,
-                numero_retards,
-                observacions,
+                attendancePercentage,
+                lateCount,
+                observations,
             },
             create: {
                 id_enrollment,
                 id_assignment,
-                percentatge_asistencia,
-                numero_retards,
-                observacions: data.observacions,
+                attendancePercentage,
+                lateCount,
+                observations: data.observations,
             },
         });
 
@@ -64,7 +64,7 @@ export class EvaluationService {
             data: competences.map((c) => ({
                 id_evaluation_teacher: avaluacioDocent.id_evaluation_teacher,
                 id_competence: c.id_competence,
-                puntuacio: c.puntuacio,
+                score: c.score,
             })),
         });
 

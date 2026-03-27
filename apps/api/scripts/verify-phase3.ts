@@ -20,7 +20,7 @@ async function main() {
     console.log('\n2. Testing DB Integration (ReadOnly check)');
     try {
         let assignment = await prisma.assignment.findFirst({
-            where: { data_inici: { not: null } }
+            where: { startDate: { not: null } }
         });
 
         // If no assignment exists, create a dummy one for testing
@@ -36,9 +36,9 @@ async function main() {
                     data: {
                         id_center: center.id_center,
                         id_workshop: workshop.id_workshop,
-                        data_inici: new Date('2026-02-01'),
-                        data_fi: new Date('2026-04-10'),
-                        estat: 'IN_PROGRESS'
+                        startDate: new Date('2026-02-01'),
+                        endDate: new Date('2026-04-10'),
+                        status: 'IN_PROGRESS'
                     }
                 });
                 createdDummy = true;
@@ -49,7 +49,7 @@ async function main() {
         }
 
         if (assignment) {
-            console.log(`Found Assignment ID: ${assignment.id_assignment} starting ${assignment.data_inici}`);
+            console.log(`Found Assignment ID: ${assignment.id_assignment} starting ${assignment.startDate}`);
             const sessionsStatus = await Promise.all(
                 [1, 2, 3].map(async i => ({
                     num: i,

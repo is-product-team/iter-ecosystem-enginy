@@ -14,16 +14,16 @@ export class ReminderService {
    */
   static start() {
     if (this.interval) return;
-    
-    console.log('⏰ ReminderService: Starting background checks (1h interval)');
-    
+
+    // Starting background checks
+
     // Run immediately on start
     this.checkReminders();
-    
+
     // Then every hour
     this.interval = setInterval(() => {
       this.checkReminders();
-    }, 60 * 60 * 1000); 
+    }, 60 * 60 * 1000);
   }
 
   static stop() {
@@ -39,7 +39,7 @@ export class ReminderService {
   private static async checkReminders() {
     const now = new Date();
     const next24h = addHours(now, 24);
-    
+
     try {
       // 1. Check for upcoming Sessions
       const upcomingSessions = await prisma.session.findMany({
@@ -73,13 +73,13 @@ export class ReminderService {
         // Notify all staff assigned to this session
         const staffUsers = session.staff.map(s => s.user);
         const teachers = session.assignment.teachers.map(t => t.user);
-        
+
         // Unique users to notify
         const usersToNotify = Array.from(new Set([...staffUsers, ...teachers]));
 
         for (const user of usersToNotify) {
           const reminderId = `rem-session-${session.id_session}-${user.id_user}`;
-          
+
           // Check if notification already exists to avoid spamming
           const existing = await prisma.notification.findFirst({
             where: {
@@ -93,9 +93,9 @@ export class ReminderService {
             await createNotificationInterna({
               id_user: user.id_user,
               title: `Recordatori: Sessió de Taller`,
-              message: `Tens una sessió del taller "${session.assignment.workshop.title}" programada per avui a les ${session.startTime || 'la seva hora habitual'}.`,
-              type: 'SISTEMA',
-              importance: 'INFO'
+              message: `Tens una sessió del taller "${session.assignment.workshop.title}" programada per avui a les ${session.hora_inici || 'la seva hora habitual'}.`,
+              tipus: 'SISTEMA',
+              importancia: 'INFO'
             });
           }
         }
@@ -126,8 +126,8 @@ export class ReminderService {
           await createNotificationInterna({
             title: `Fita Pròxima: ${milestone.title}`,
             message: `Recorda: La fita "${milestone.title}" està programada per a les properes 24 hores.`,
-            type: 'FASE',
-            importance: 'WARNING'
+            tipus: 'FASE',
+            importancia: 'WARNING'
           });
         }
       }

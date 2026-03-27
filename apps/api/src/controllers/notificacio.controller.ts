@@ -10,10 +10,10 @@ export const getNotificationns = async (req: Request, res: Response) => {
       OR: [
         // 1. Notificationnes globales (sin usuario ni centro específico)
         { id_user: null, id_center: null },
-        
+
         // 2. Notificationnes para mi usuario específico
         ...(userId ? [{ id_user: userId }] : []),
-        
+
         // 3. Notificationnes para mi centro
         ...(centreId ? [{ id_center: centreId }] : [])
       ]
@@ -40,7 +40,7 @@ export const markAsRead = async (req: Request, res: Response) => {
 
   try {
     const updated = await prisma.notification.update({
-      where: { id_notificacio: parseInt(id as string) },
+      where: { id_notification: parseInt(id as string) },
       data: { isRead: true }
     });
 
@@ -57,7 +57,7 @@ export const deleteNotification = async (req: Request, res: Response) => {
 
   try {
     await prisma.notification.delete({
-      where: { id_notificacio: parseInt(id as string) }
+      where: { id_notification: parseInt(id as string) }
     });
 
     res.json({ success: true });

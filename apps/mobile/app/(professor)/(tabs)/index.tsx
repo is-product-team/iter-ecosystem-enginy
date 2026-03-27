@@ -5,12 +5,14 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME, PHASES } from '@iter/shared';
+import { useTranslation } from 'react-i18next';
 import api, { getMyAssignments, getFases, getNotificacions } from '../../../services/api';
 
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
 
 export default function DashboardScreen() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [fases, setFases] = useState<any[]>([]);
@@ -140,9 +142,9 @@ export default function DashboardScreen() {
         title: workshop.taller.titol,
         date: workshop.data_inici,
         type: 'assignment',
-        description: workshop.taller.descripcio || 'Sense descripció',
+        description: workshop.taller.descripcio || t('Common.no_description'),
         metadata: {
-            hora: new Date(workshop.data_inici).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(workshop.data_inici).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+            hora: new Date(workshop.data_inici).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(workshop.data_inici).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }), 
             centre: workshop.centre.nom,
             adreca: workshop.centre.adreca,
             id_assignacio: workshop.id_assignacio,
@@ -185,14 +187,14 @@ export default function DashboardScreen() {
         <View className="px-6 pb-6 pt-4 bg-background-surface border-b border-border-subtle mb-6">
           <View className="flex-row items-baseline">
             <Text className="text-text-muted text-xs font-bold uppercase tracking-widest mr-2">
-              {new Date().toLocaleDateString('ca-ES', { weekday: 'long' })}
+              {new Date().toLocaleDateString(i18n.language, { weekday: 'long' })}
             </Text>
             <Text className="text-text-muted opacity-60 text-xs font-bold uppercase tracking-widest">
-              {new Date().toLocaleDateString('ca-ES', { day: 'numeric', month: 'long' })}
+              {new Date().toLocaleDateString(i18n.language, { day: 'numeric', month: 'long' })}
             </Text>
           </View>
           <Text className="text-3xl font-extrabold text-text-primary leading-tight mt-1">
-            Hola, {userName}
+            {t('Dashboard.welcome', { name: userName })}
           </Text>
         </View>
 
@@ -201,30 +203,30 @@ export default function DashboardScreen() {
           {/* Phase Status */}
           <View className="w-full bg-background-subtle rounded-2xl p-4 flex-row items-center justify-between mb-8">
              <View>
-                 <Text className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">Fase Actual</Text>
+                 <Text className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">{t('Dashboard.current_phase')}</Text>
                  <Text className="text-xl font-bold text-text-primary tracking-tight">
-                    {fases.find(f => f.activa)?.nom || 'Càrrega de dades'}
+                    {fases.find(f => f.activa)?.nom || t('Dashboard.loading_data')}
                  </Text>
              </View>
              <View className="flex-row items-center bg-background-surface px-3 py-1.5 rounded-full border border-border-subtle">
                 <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                <Text className="text-xs font-semibold text-text-secondary">Actiu</Text>
+                <Text className="text-xs font-semibold text-text-secondary">{t('Dashboard.active')}</Text>
              </View>
           </View>
 
            {/* Workshop Evaluation - Only in Phase 4 */}
            {(isEvalPhase) && pendingAssignments.length > 0 && (
              <View className="mb-8">
-               <Text className="text-text-primary text-lg font-bold mb-4">Tasques Pendents</Text>
+               <Text className="text-text-primary text-lg font-bold mb-4">{t('Dashboard.pending_tasks')}</Text>
                {pendingAssignments.map(assign => (
                  <TouchableOpacity
                     key={assign.id_assignacio}
-                    onPress={() => router.push(`/(professor)/questionari/${assign.id_assignacio}`)}
+                    onPress={() => router.push(`/(professor)/questionnaire/${assign.id_assignacio}`)}
                     className="w-full bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-5 border border-orange-200 dark:border-orange-800 mb-3 flex-row items-center justify-between"
                  >
                     <View className="flex-1 mr-4">
                       <Text className="text-text-primary dark:text-orange-100 font-bold text-base mb-1">{assign.taller.titol}</Text>
-                      <Text className="text-text-secondary dark:text-orange-200/70 text-xs font-medium">Avaluar taller finalitzat</Text>
+                      <Text className="text-text-secondary dark:text-orange-200/70 text-xs font-medium">{t('Dashboard.evaluate_finished_workshop')}</Text>
                     </View>
                     <View className="w-10 h-10 bg-orange-100 dark:bg-orange-800 rounded-full items-center justify-center">
                        <Ionicons name="star" size={20} color="#F97316" />
@@ -235,7 +237,7 @@ export default function DashboardScreen() {
            )}
 
           {/* Next Session */}
-          <Text className="text-text-primary text-lg font-bold mb-4">Propera Sessió</Text>
+          <Text className="text-text-primary text-lg font-bold mb-4">{t('Dashboard.next_session')}</Text>
 
           {nextWorkshop ? (
              <TouchableOpacity 
@@ -254,13 +256,13 @@ export default function DashboardScreen() {
                            <Text className="text-gray-200 dark:text-text-primary text-xs font-bold ml-2">
                               {nextWorkshop.hora_inici 
                                 ? `${nextWorkshop.hora_inici}${nextWorkshop.hora_fi ? ' - ' + nextWorkshop.hora_fi : ''}`
-                                : new Date(nextWorkshop.data_inici).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                : new Date(nextWorkshop.data_inici).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })
                               }
                            </Text>
                         </View>
                         {isPhaseActive(PHASES.EJECUCION) && (
                             <View className="bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/30">
-                                <Text className="text-emerald-400 text-[10px] font-black uppercase tracking-wide">En Curs</Text>
+                                <Text className="text-emerald-400 text-[10px] font-black uppercase tracking-wide">{t('Dashboard.in_progress')}</Text>
                             </View>
                         )}
                     </View>
@@ -282,8 +284,8 @@ export default function DashboardScreen() {
                     <View className="flex-row justify-between items-center pt-4 border-t border-slate-800 dark:border-border-subtle">
                         <Text className="text-slate-400 dark:text-text-muted text-xs font-bold uppercase tracking-widest">
                            {isEvalPhase 
-                             ? (isEvaluated(nextWorkshop) ? 'Taller Valorat' : 'Avaluar Taller')
-                             : (isPhaseActive(PHASES.EJECUCION) ? 'Gestionar Sessió' : 'Veure Detalls')
+                             ? (isEvaluated(nextWorkshop) ? t('Dashboard.evaluated_workshop') : t('Dashboard.evaluate_workshop'))
+                             : (isPhaseActive(PHASES.EJECUCION) ? t('Dashboard.manage_session') : t('Dashboard.view_details'))
                            }
                         </Text>
                         <View className="w-10 h-10 rounded-full bg-white/10 dark:bg-background-surface items-center justify-center">
@@ -298,7 +300,7 @@ export default function DashboardScreen() {
              </TouchableOpacity>
           ) : (
             <View className="w-full items-center justify-center py-10 rounded-2xl border-2 border-dashed border-border-subtle mb-8">
-               <Text className="text-text-muted font-medium text-sm">No tens tallers propers</Text>
+               <Text className="text-text-muted font-medium text-sm">{t('Dashboard.no_upcoming_workshops')}</Text>
             </View>
           )}
 

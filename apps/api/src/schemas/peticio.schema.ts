@@ -4,8 +4,8 @@ import { REQUEST_STATUSES } from '@iter/shared';
 export const createPeticioSchema = z.object({
   body: z.object({
     id_workshop: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()),
-    alumnes_aprox: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
-    comentaris: z.string().optional().nullable(),
+    studentsAprox: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
+    comments: z.string().optional().nullable(),
     prof1_id: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
     prof2_id: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
   }),
@@ -16,8 +16,8 @@ export const updatePeticioSchema = z.object({
     id: z.string().regex(/^\d+$/, 'ID ha de ser numèric'),
   }),
   body: z.object({
-    alumnes_aprox: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
-    comentaris: z.string().optional().nullable(),
+    studentsAprox: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
+    comments: z.string().optional().nullable(),
     prof1_id: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
     prof2_id: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
   }),
@@ -28,6 +28,6 @@ export const updatePeticioStatusSchema = z.object({
     id: z.string().regex(/^\d+$/, 'ID ha de ser numèric'),
   }),
   body: z.object({
-    estat: z.enum([REQUEST_STATUSES.PENDING, REQUEST_STATUSES.APPROVED, REQUEST_STATUSES.REJECTED]),
+    status: z.enum([REQUEST_STATUSES.PENDING, REQUEST_STATUSES.APPROVED, REQUEST_STATUSES.REJECTED]),
   }),
 });

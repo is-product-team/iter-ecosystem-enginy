@@ -21,7 +21,7 @@ export const getEnrollmentEvaluation = async (req: Request, res: Response) => {
 
 export const upsertEvaluation = async (req: Request, res: Response) => {
     try {
-        let { id_enrollment, id_student, id_assignment, observacions, competencies, percentatge_asistencia, numero_retards } = req.body;
+        let { id_enrollment, id_student, id_assignment, observations, competencies, attendancePercentage, lateCount } = req.body;
 
         if (!id_enrollment) {
             if (id_student && id_assignment) {
@@ -49,10 +49,10 @@ export const upsertEvaluation = async (req: Request, res: Response) => {
         const dataToUpsert = {
             id_enrollment: parseInt(id_enrollment),
             id_assignment: parseInt(id_assignment),
-            observacions: observacions || '',
+            observations: observations || '',
             competences: competencies || [], // Mapped to competences
-            percentatge_asistencia: percentatge_asistencia || 100, 
-            numero_retards: numero_retards || 0
+            attendancePercentage: attendancePercentage || 100, 
+            lateCount: lateCount || 0
         };
 
         const result = await evaluationService.upsertEvaluation(dataToUpsert as any);
@@ -108,25 +108,25 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
             const existingAttendance = await prisma.attendance.findFirst({
                 where: {
                     id_enrollment: enrollmentRecord.id_enrollment,
-                    numero_sessio: parseInt(sessionId)
+                    sessionNumber: parseInt(sessionId)
                 }
             });
 
             const dataToSave = {
                 id_enrollment: enrollmentRecord.id_enrollment,
-                numero_sessio: parseInt(sessionId),
-                data_session: new Date(),
-                estat: nlpResult.attendanceStatus || (existingAttendance ? existingAttendance.estat : 'Present'),
-                observacions: text
+                sessionNumber: parseInt(sessionId),
+                sessionDate: new Date(),
+                status: nlpResult.attendanceStatus || (existingAttendance ? (existingAttendance as any).status : 'PRESENT'),
+                observations: text
             };
 
             if (existingAttendance) {
                 attendanceRecord = await prisma.attendance.update({
                     where: { id_attendance: existingAttendance.id_attendance },
                     data: {
-                        estat: dataToSave.estat,
-                        observacions: dataToSave.observacions,
-                        data_session: new Date()
+                        status: dataToSave.status,
+                        observations: dataToSave.observations,
+                        sessionDate: new Date()
                     }
                 });
             } else {
@@ -139,7 +139,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
         let competenceEval = null;
         if (nlpResult.competenceUpdate && enrollmentRecord) {
             const competence = await prisma.competence.findFirst({
-                where: { tipus: 'Transversal' }
+                where: { type: 'Transversal' }
             });
 
             if (competence) {
@@ -152,9 +152,9 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
                         data: {
                             id_enrollment: enrollmentRecord.id_enrollment,
                             id_assignment: enrollmentRecord.id_assignment,
-                            percentatge_asistencia: 100,
-                            numero_retards: 0,
-                            observacions: 'Initialized by Voice Assistant'
+                            attendancePercentage: 100,
+                            lateCount: 0,
+                            observations: 'Initialized by Voice Assistant'
                         }
                     });
                 }
@@ -163,7 +163,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
                     data: {
                         id_evaluation_teacher: docentEval.id_evaluation_teacher,
                         id_competence: competence.id_competence,
-                        puntuacio: nlpResult.competenceUpdate.score
+                        score: nlpResult.competenceUpdate.score
                     }
                 });
             }
