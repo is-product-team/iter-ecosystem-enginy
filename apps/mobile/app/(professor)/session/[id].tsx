@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
-import api, { getChecklist, getStudents, postAttendance, getAttendance } from '../../../services/api';
+import api, { getStudents, getAttendance } from '../../../services/api';
 
 export default function SessionScreen() {
   const { t } = useTranslation();
@@ -15,43 +15,39 @@ export default function SessionScreen() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false); // New state to track if already submitted
-  const [students, setStudents] = useState<any[]>([]);
-  const [attendance, setAttendance] = useState<{[key: string]: string}>({}); // 'PRESENT', 'ABSENT', 'RETARD'
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [attendance, setAttendance] = useState<{[key: string]: string}>({}); 
   const [observations, setObservations] = useState('');
-  const [sessionData, setSessionData] = useState<any>(null); // To store taller info if needed
-
-
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 1. Get List of Students
+      // 1. Get List of Enrollments (Standardized)
       const studentsRes = await getStudents(id as string);
-      const studentsList = studentsRes.data;
-      setStudents(studentsList);
+      const enrollmentList = studentsRes.data;
+      setEnrollments(enrollmentList);
       
-      // 2. Initial state: Mark all as PRESENT by default (optional, distinct per preference)
+      // 2. Initial state: Mark all as PRESENT by default
       const initialAttendance: any = {};
-      studentsList.forEach((s: any) => {
-          initialAttendance[s.studentId] = 'PRESENT';
+      enrollmentList.forEach((e: any) => {
+          initialAttendance[e.studentId] = 'PRESENT';
       });
 
       // 3. Check if attendance already exists (to pre-fill)
       try {
         const existingRes = await getAttendance(id as string);
         if (existingRes.data && existingRes.data.length > 0) {
-            // Map existing data
             existingRes.data.forEach((record: any) => {
                 initialAttendance[record.studentId] = record.status;
             });
-            if(existingRes.data[0].comments) {
-                setObservations(existingRes.data[0].comments);
+            if(existingRes.data[0].observations) {
+                setObservations(existingRes.data[0].observations);
             }
-            setIsSubmitted(true); // Mark as submitted if data exists
+            setIsSubmitted(true);
         }
       } catch (err) {
-        // No existing attendance, continue with defaults
+        // No existing attendance
       }
 
       setAttendance(initialAttendance);
@@ -71,13 +67,13 @@ export default function SessionScreen() {
   );
 
   const toggleStatus = (studentId: string) => {
-    if (isSubmitted) return; // Prevent changes if submitted
+    if (isSubmitted) return;
     setAttendance(prev => {
         const current = prev[studentId];
         let next = 'PRESENT';
         if (current === 'PRESENT') next = 'ABSENT';
-        else if (current === 'ABSENT') next = 'RETARD';
-        else if (current === 'RETARD') next = 'PRESENT';
+        else if (current === 'ABSENT') next = 'LATE';
+        else if (current === 'LATE') next = 'PRESENT';
         return { ...prev, [studentId]: next };
     });
   };
@@ -86,23 +82,13 @@ export default function SessionScreen() {
     setSubmitting(true);
     try {
         const payload = Object.keys(attendance).map(studentId => ({
-            id_assignacio: id,
-            studentId: studentId,
+            assignmentId: parseInt(id as string),
+            studentId: parseInt(studentId),
             status: attendance[studentId],
-            comments: observations
+            observations: observations
         }));
 
-        // Send one by one or batch if API supports. 
-        // Assuming batch or we iterate. The prompt implies "send to coordinators".
-        // Let's assume the API handles bulk or we call `postAttendance` for the session.
-        // Looking at api.ts: export const postAttendance = (data: any) => api.post('assistencia', data);
-        // Usually expects an array or a single object. Let's try sending the array.
-        
-        // This is a simplified version, as the real API might need one call per student
-        // or a specific batch endpoint. The original code was:
-        // await postAttendance({ assistencia: payload, id_assignacio: id }); 
-        
-        await api.post('attendance/batch', { assistencia: payload, id_assignacio: id }); 
+        await api.post('attendance/batch', { attendance: payload, assignmentId: id }); 
         
         Alert.alert(t('Common.success'), t('Session.attendance_sent_success'), [
             { text: t('Common.ok'), onPress: () => router.back() }
@@ -140,51 +126,51 @@ export default function SessionScreen() {
             {t('Session.attendance_instruction')}
          </Text>
 
-         {students.map((student) => {
-             const status = attendance[student.studentId];
-             // Using simpler colors for "line of the app" - cleaner look
-             let statusColor = "bg-background-surface text-emerald-700 border-emerald-100";  // Badge on gray bg
+         {enrollments.map((item) => {
+             const student = item.student;
+             const status = attendance[item.studentId];
+             let statusColor = "bg-background-surface text-emerald-700 border-emerald-100";
              let statusIcon = "checkmark-circle";
              
              if (status === 'ABSENT') {
                  statusColor = "bg-background-surface text-rose-700 border-rose-100";
                  statusIcon = "close-circle";
-             } else if (status === 'RETARD') {
+             } else if (status === 'LATE') {
                  statusColor = "bg-background-surface text-amber-700 border-amber-100";
                  statusIcon = "time";
              }
 
              return (
-                 <View key={student.studentId} className="bg-background-subtle rounded-3xl mb-3 overflow-hidden border border-border-subtle">
+                 <View key={item.enrollmentId} className="bg-background-subtle rounded-3xl mb-3 overflow-hidden border border-border-subtle">
                      {/* Attendance Row */}
                      <TouchableOpacity 
-                        onPress={() => toggleStatus(String(student.studentId))}
+                        onPress={() => toggleStatus(String(item.studentId))}
                         activeOpacity={0.7}
                         className="p-5 flex-row items-center justify-between"
                      >
                         <View className="flex-row items-center flex-1">
                             <View className="w-12 h-12 bg-background-surface rounded-full items-center justify-center mr-4">
-                                <Text className="font-bold text-text-muted text-lg">{student.alumne?.nom?.charAt(0) || student.nom?.charAt(0)}</Text>
+                                <Text className="font-bold text-text-muted text-lg">{student.fullName?.charAt(0)}</Text>
                             </View>
                             <View className="flex-1 mr-2">
                                 <Text className="font-bold text-text-primary text-base mb-0.5" numberOfLines={1} ellipsizeMode="tail">
-                                    {student.alumne?.nom || student.nom} {student.alumne?.surnames || student.surnames}
+                                    {student.fullName} {student.lastName}
                                 </Text>
-                                <Text className="text-text-muted text-xs font-medium tracking-wide">ID: {student.alumne?.idalu || student.idalu}</Text>
+                                <Text className="text-text-muted text-xs font-medium tracking-wide">ID: {student.idalu}</Text>
                             </View>
                         </View>
 
                         <View className={`px-3 py-1.5 rounded-full border flex-row items-center ${statusColor.split(' ')[0]} ${statusColor.split(' ')[2]}`}>
-                            <Ionicons name={statusIcon as any} size={14} color={status === 'ABSENT' ? '#BE123C' : status === 'RETARD' ? '#B45309' : '#047857'} />
+                            <Ionicons name={statusIcon as any} size={14} color={status === 'ABSENT' ? '#BE123C' : status === 'LATE' ? '#B45309' : '#047857'} />
                             <Text className={`font-bold text-[10px] ml-1.5 uppercase tracking-wider ${statusColor.split(' ')[1]}`}>
                                 {t(`Session.status_${status.toLowerCase()}`)}
                             </Text>
                         </View>
                      </TouchableOpacity>
 
-                     {/* Evaluation Divider & Action */}
+                     {/* Evaluation Action */}
                      <View className="h-[1px] w-full bg-border-subtle" />
-                     {student.evaluated ? (
+                     {item.evaluated ? (
                          <View className="flex-row items-center justify-center py-4 bg-background-subtle opacity-60">
                              <Ionicons name="checkmark-done-circle" size={16} color={THEME.colors.success} />
                              <Text className="ml-2 font-bold text-xs text-text-muted uppercase tracking-wider">
@@ -193,7 +179,7 @@ export default function SessionScreen() {
                          </View>
                      ) : (
                         <TouchableOpacity
-                            onPress={() => router.push(`/(professor)/evaluation/${student.studentId}?id_assignacio=${id}`)}
+                            onPress={() => router.push(`/(professor)/evaluation/${item.enrollmentId}?assignmentId=${id}`)}
                             className="flex-row items-center justify-center py-4 bg-background-surface active:bg-background-subtle"
                         >
                             <Ionicons name="ribbon-outline" size={16} color={THEME.colors.primary} />
@@ -206,7 +192,6 @@ export default function SessionScreen() {
              );
          })}
 
-         {/* Observations */}
          <View className="mt-6 mb-24">
             <Text className="text-text-primary font-bold mb-3 ml-1">{t('Session.observations_label')}</Text>
             <TextInput 
@@ -222,10 +207,7 @@ export default function SessionScreen() {
 
       </ScrollView>
 
-      {/* Footer Action */}
       <View className="absolute bottom-0 left-0 right-0 p-6 bg-background-surface border-t border-border-subtle">
-
-
          <TouchableOpacity 
             onPress={submitAttendance}
              disabled={submitting || isSubmitted}

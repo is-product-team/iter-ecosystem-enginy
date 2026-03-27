@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma.js';
-import { createNotificationInterna } from '../controllers/notificacio.controller.js';
-import { addHours, isBefore, isAfter } from 'date-fns';
+import { createNotificationInternal } from '../controllers/notification.controller.js';
+import { addHours } from 'date-fns';
 
 /**
  * ReminderService handles background checks for upcoming events
@@ -14,8 +14,6 @@ export class ReminderService {
    */
   static start() {
     if (this.interval) return;
-
-    // Starting background checks
 
     // Run immediately on start
     this.checkReminders();
@@ -78,19 +76,17 @@ export class ReminderService {
         const usersToNotify = Array.from(new Set([...staffUsers, ...teachers]));
 
         for (const user of usersToNotify) {
-          const reminderId = `rem-session-${session.sessionId}-${user.userId}`;
-
           // Check if notification already exists to avoid spamming
           const existing = await prisma.notification.findFirst({
             where: {
               userId: user.userId,
-              title: { startsWith: 'Recordatori: ' },
+              title: { startsWith: 'Reminder: ' },
               message: { contains: session.assignment.workshop.title }
             }
           });
 
           if (!existing) {
-            await createNotificationInterna({
+            await createNotificationInternal({
               userId: user.userId,
               title: `Reminder: Workshop Session`,
               message: `You have a session for the workshop "${session.assignment.workshop.title}" scheduled for today at ${session.startTime || 'its usual time'}.`,
@@ -123,7 +119,7 @@ export class ReminderService {
           });
   
           if (!existing) {
-            await createNotificationInterna({
+            await createNotificationInternal({
               title: `Upcoming Milestone: ${milestone.title}`,
               message: `Remember: The milestone "${milestone.title}" is scheduled for the next 24 hours.`,
               type: 'PHASE',

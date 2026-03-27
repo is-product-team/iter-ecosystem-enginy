@@ -1,16 +1,16 @@
 import getApi from "./api";
 
 export interface Request {
-  id_request: number;
+  requestId: number;
   centerId: number;
-  id_workshop: number;
-  approxStudents: number | null;
+  workshopId: number;
+  studentsAprox: number | null;
   comments: string | null;
-  requestDate: string;
+  createdAt: string;
   status: string;
   modality?: string;
-  teacher1Id?: number;
-  teacher2Id?: number;
+  prof1Id?: number;
+  prof2Id?: number;
   studentIds?: number[];
   workshop?: {
     title: string;
@@ -25,16 +25,16 @@ export interface Request {
 }
 
 interface BackendRequest {
-  id_request: number;
-  id_center: number;
-  id_workshop: number;
-  approxStudents: number | null;
+  requestId: number;
+  centerId: number;
+  workshopId: number;
+  studentsAprox: number | null;
   comments: string | null;
-  requestDate: string;
+  createdAt: string;
   status: string;
   modality: string;
-  teacher1Id?: number;
-  teacher2Id?: number;
+  prof1Id?: number;
+  prof2Id?: number;
   studentIds?: number[];
   workshop?: {
     title: string;
@@ -57,16 +57,16 @@ const requestService = {
     try {
       const response = await api.get<{ data: BackendRequest[], meta: unknown }>("/requests?limit=0");
       return response.data.data.map((r: BackendRequest) => ({
-        id_request: r.id_request,
-        centerId: r.id_center,
-        id_workshop: r.id_workshop,
-        approxStudents: r.approxStudents,
+        requestId: r.requestId,
+        centerId: r.centerId,
+        workshopId: r.workshopId,
+        studentsAprox: r.studentsAprox,
         comments: r.comments,
-        requestDate: r.requestDate,
+        createdAt: r.createdAt,
         status: r.status,
         modality: r.modality,
-        teacher1Id: r.teacher1Id,
-        teacher2Id: r.teacher2Id,
+        prof1Id: r.prof1Id,
+        prof2Id: r.prof2Id,
         studentIds: r.studentIds,
         workshop: r.workshop ? {
           title: r.workshop.title,
@@ -89,36 +89,36 @@ const requestService = {
    * Creates a new request.
    */
   create: async (data: {
-    id_workshop: number;
-    approxStudents: number;
+    workshopId: number;
+    studentsAprox: number;
     comments?: string;
-    teacher1Id?: number;
-    teacher2Id?: number;
+    prof1Id?: number;
+    prof2Id?: number;
     modality?: string;
   }): Promise<Request> => {
     const api = getApi();
     try {
       const payload = {
-        id_workshop: data.id_workshop,
-        approxStudents: data.approxStudents,
+        workshopId: data.workshopId,
+        studentsAprox: data.studentsAprox,
         comments: data.comments,
-        teacher1Id: data.teacher1Id,
-        teacher2Id: data.teacher2Id,
+        prof1Id: data.prof1Id,
+        prof2Id: data.prof2Id,
         modality: data.modality,
       };
       const response = await api.post<BackendRequest>("/requests", payload);
       const r = response.data;
       return {
-        id_request: r.id_request,
-        centerId: r.id_center,
-        id_workshop: r.id_workshop,
-        approxStudents: r.approxStudents,
+        requestId: r.requestId,
+        centerId: r.centerId,
+        workshopId: r.workshopId,
+        studentsAprox: r.studentsAprox,
         comments: r.comments,
-        requestDate: r.requestDate,
+        createdAt: r.createdAt,
         status: r.status,
         modality: r.modality,
-        teacher1Id: r.teacher1Id,
-        teacher2Id: r.teacher2Id,
+        prof1Id: r.prof1Id,
+        prof2Id: r.prof2Id,
         studentIds: r.studentIds,
       };
     } catch (error) {
@@ -131,33 +131,33 @@ const requestService = {
   /**
    * Updates an existing request.
    */
-  update: async (id: number, data: {
-    approxStudents?: number;
+  update: async (requestId: number, data: {
+    studentsAprox?: number;
     comments?: string;
-    teacher1Id?: number;
-    teacher2Id?: number;
+    prof1Id?: number;
+    prof2Id?: number;
   }): Promise<Request> => {
     const api = getApi();
     try {
       const payload = {
-        approxStudents: data.approxStudents,
+        studentsAprox: data.studentsAprox,
         comments: data.comments,
-        teacher1Id: data.teacher1Id,
-        teacher2Id: data.teacher2Id,
+        prof1Id: data.prof1Id,
+        prof2Id: data.prof2Id,
       };
-      const response = await api.put<BackendRequest>(`/requests/${id}`, payload);
+      const response = await api.put<BackendRequest>(`/requests/${requestId}`, payload);
       const r = response.data;
       return {
-        id_request: r.id_request,
-        centerId: r.id_center,
-        id_workshop: r.id_workshop,
-        approxStudents: r.approxStudents,
+        requestId: r.requestId,
+        centerId: r.centerId,
+        workshopId: r.workshopId,
+        studentsAprox: r.studentsAprox,
         comments: r.comments,
-        requestDate: r.requestDate,
+        createdAt: r.createdAt,
         status: r.status,
         modality: r.modality,
-        teacher1Id: r.teacher1Id,
-        teacher2Id: r.teacher2Id,
+        prof1Id: r.prof1Id,
+        prof2Id: r.prof2Id,
         studentIds: r.studentIds,
       };
     } catch (error) {
@@ -170,22 +170,22 @@ const requestService = {
   /**
    * Updates the status of a request.
    */
-  updateStatus: async (id: number, status: string): Promise<Request> => {
+  updateStatus: async (requestId: number, status: string): Promise<Request> => {
     const api = getApi();
     try {
-      const response = await api.patch<BackendRequest>(`/requests/${id}/status`, { status });
+      const response = await api.patch<BackendRequest>(`/requests/${requestId}/status`, { status });
       const r = response.data;
       return {
-        id_request: r.id_request,
-        centerId: r.id_center,
-        id_workshop: r.id_workshop,
-        approxStudents: r.approxStudents,
+        requestId: r.requestId,
+        centerId: r.centerId,
+        workshopId: r.workshopId,
+        studentsAprox: r.studentsAprox,
         comments: r.comments,
-        requestDate: r.requestDate,
+        createdAt: r.createdAt,
         status: r.status,
         modality: r.modality,
-        teacher1Id: r.teacher1Id,
-        teacher2Id: r.teacher2Id,
+        prof1Id: r.prof1Id,
+        prof2Id: r.prof2Id,
         studentIds: r.studentIds,
       };
     } catch (error) {

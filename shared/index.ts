@@ -3,8 +3,8 @@ import { THEME } from './theme';
 
 export { THEME };
 
-// Exportar tipos de Prisma para que estén disponibles en todo el monorepo
-// Nota: Requiere que la API haya ejecutado "npx prisma generate"
+// Export Prisma types to be available in the whole monorepo
+// Note: Requires API to run "npx prisma generate"
 export type * from '@prisma/client';
 
 // Define exact roles expected by the Database
@@ -41,12 +41,12 @@ export const ASSIGNMENT_STATUSES = {
 
 export type AssignmentStatusTag = typeof ASSIGNMENT_STATUSES[keyof typeof ASSIGNMENT_STATUSES];
 
-// Calendario Programa Iter (Curso 25-26 aprox)
-export const CALENDARI = {
-  REUNION_PRESENTACION: '2025-09-30',
-  LIMITE_DEMANDA: '2025-10-10',
-  COMUNICACION_ASIGNACIONES: '2025-10-20',
-  GESTION_VACANTES: '2025-11-01',
+// Iter Program Calendar (Approx Course 25-26)
+export const CALENDAR = {
+  PRESENTATION_MEETING: '2025-09-30',
+  DEMAND_LIMIT: '2025-10-10',
+  ASSIGNMENT_COMMUNICATION: '2025-10-20',
+  VACANCY_MANAGEMENT: '2025-11-01',
 } as const;
 
 // Official phase names for consistency in DB and UI
@@ -58,15 +58,15 @@ export const PHASES = {
 } as const;
 
 export const PHASES_TIMELINE = [
-  { id: 'PRESENTATION', name: PHASES.APPLICATION, data: CALENDARI.REUNION_PRESENTACION },
-  { id: 'DEMAND', name: 'Enviament de Demanda', data: CALENDARI.LIMITE_DEMANDA },
-  { id: 'ASSIGNMENT', name: PHASES.PLANNING, data: CALENDARI.COMUNICACION_ASIGNACIONES },
-  { id: 'VACANTS', name: 'Gestió de Vacants i Incidències', data: CALENDARI.GESTION_VACANTES },
-  { id: 'VALIDATION', name: PHASES.CLOSURE, data: null }
+  { id: 'PRESENTATION', name: PHASES.APPLICATION, date: CALENDAR.PRESENTATION_MEETING },
+  { id: 'DEMAND', name: 'Demand Submission', date: CALENDAR.DEMAND_LIMIT },
+  { id: 'ASSIGNMENT', name: PHASES.PLANNING, date: CALENDAR.ASSIGNMENT_COMMUNICATION },
+  { id: 'VACANTS', name: 'Vacancy & Issue Management', date: CALENDAR.VACANCY_MANAGEMENT },
+  { id: 'VALIDATION', name: PHASES.CLOSURE, date: null }
 ] as const;
 
 // Utility functions
-export const esEmailValido = (email: string): boolean => {
+export const isEmailValid = (email: string): boolean => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
 };
@@ -79,7 +79,7 @@ export const WorkshopSchema = z.object({
   maxPlaces: z.number().int().min(1).max(50),
   modality: z.enum(['A', 'B', 'C']),
   icon: z.string().optional(),
-  id_sector: z.number().int(),
+  sectorId: z.number().int(),
   executionDays: z.array(z.any()).optional()
 });
 
@@ -100,11 +100,11 @@ export const RequestSchema = z.object({
 
 export const AssignmentChecklistSchema = z.object({
   isCompleted: z.boolean(),
-  url_evidencia: z.string().optional().nullable()
+  evidenceUrl: z.string().optional().nullable()
 });
 
 export const CenterAttendanceSchema = z.object({
-  id_enrollment: z.number().int(),
+  enrollmentId: z.number().int(),
   status: z.enum(['PRESENT', 'ABSENCE_JUSTIFIED', 'ABSENCE', 'LATE']),
   observations: z.string().optional().nullable()
 });

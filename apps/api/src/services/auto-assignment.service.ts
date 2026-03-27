@@ -1,5 +1,5 @@
 import { REQUEST_STATUSES } from '@iter/shared';
-import { RequestStatus } from '@prisma/client';
+import { RequestStatus, Modality, AssignmentStatus } from '@prisma/client';
 import prisma from '../lib/prisma.js';
 
 interface PendingCenter {
@@ -8,6 +8,7 @@ interface PendingCenter {
     requestId: number;
     timestamp: Date;
     assignedCount: number;
+    demand?: number;
 }
 
 export class AutoAssignmentService {
@@ -19,11 +20,11 @@ export class AutoAssignmentService {
      * Rule: If demand > supply, split evenly among centers. Remainder goes by priority.
      */
     async generateAssignments() {
-        // 1. Fetch Approved/Pending Petitions for Modalitat C that are not yet fully assigned
-        const petitions = await prisma.request.findMany({
+        // 1. Fetch Approved/Pending Requests for Modality C that are not yet fully assigned
+        const requests = await prisma.request.findMany({
             where: {
-                status: { in: [REQUEST_STATUSES.APPROVED, REQUEST_STATUSES.PENDING] as any },
-                modality: 'C',
+                status: { in: [REQUEST_STATUSES.APPROVED, REQUEST_STATUSES.PENDING] as RequestStatus[] },
+                modality: Modality.C,
                 assignment: null
             },
             include: {
@@ -35,26 +36,26 @@ export class AutoAssignmentService {
             }
         });
 
-        if (petitions.length === 0) {
-            console.log('ℹ️ AutoAssignmentService: No approved petitions of Modalitat C found that are not yet assigned.');
-            return { message: 'No petitions found to process.' };
+        if (requests.length === 0) {
+            console.log('ℹ️ AutoAssignmentService: No approved requests of Modality C found that are not yet assigned.');
+            return { message: 'No requests found to process.' };
         }
 
-        console.log(`🚀 AutoAssignmentService: Processing ${petitions.length} petitions of Modalitat C...`);
+        console.log(`🚀 AutoAssignmentService: Processing ${requests.length} requests of Modality C...`);
 
-        // 2. Group Petitions by Workshop
-        const workshopMap = new Map<number, typeof petitions>();
-        petitions.forEach((p: any) => {
-            if (!workshopMap.has(p.workshopId)) {
-                workshopMap.set(p.workshopId, []);
+        // 2. Group Requests by Workshop
+        const workshopMap = new Map<number, typeof requests>();
+        requests.forEach((r) => {
+            if (!workshopMap.has(r.workshopId)) {
+                workshopMap.set(r.workshopId, []);
             }
-            workshopMap.get(p.workshopId)?.push(p);
+            workshopMap.get(r.workshopId)?.push(r);
         });
 
         const results = [];
 
         // 3. Process each Workshop
-        for (const [workshopId, workshopPetitions] of workshopMap.entries()) {
+        for (const [workshopId, workshopRequests] of workshopMap.entries()) {
             const workshop = await prisma.workshop.findUnique({ where: { workshopId: workshopId } });
             if (!workshop) continue;
 
@@ -64,10 +65,10 @@ export class AutoAssignmentService {
                 include: { enrollments: true }
             });
 
-            const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => sum + (a.enrollments?.length || 0), 0);
-            const remainingCapacity = workshop.maxPlaces - occupiedPlazas;
+            const occupiedPlaces = existingAssignments.reduce((sum: number, a: any) => sum + (a.enrollments?.length || 0), 0);
+            const remainingCapacity = workshop.maxPlaces - occupiedPlaces;
 
-            console.log(`📊 AutoAssignment: Workshop ID ${workshopId} (${workshop.title}): Capacity: ${workshop.maxPlaces}, Occupied: ${occupiedPlazas}, Remaining: ${remainingCapacity}`);
+            console.log(`📊 AutoAssignment: Workshop ID ${workshopId} (${workshop.title}): Capacity: ${workshop.maxPlaces}, Occupied: ${occupiedPlaces}, Remaining: ${remainingCapacity}`);
 
             if (remainingCapacity <= 0) {
                 console.warn(`🚫 AutoAssignment: Workshop ${workshopId} is full. Skipping.`);
@@ -75,50 +76,43 @@ export class AutoAssignmentService {
             }
 
             // Group by Center
-            const centersData: PendingCenter[] = [];
-
             const centerMap = new Map<number, PendingCenter>();
 
-            workshopPetitions.forEach((p: any) => {
-                const demand = p.studentsAprox || 0;
+            workshopRequests.forEach((r) => {
+                const demand = r.studentsAprox || 0;
                 if (demand === 0) return;
 
-                if (!centerMap.has(p.centerId)) {
-                    centerMap.set(p.centerId, {
-                        centerId: p.centerId,
+                if (!centerMap.has(r.centerId)) {
+                    centerMap.set(r.centerId, {
+                        centerId: r.centerId,
                         students: [], 
-                        requestId: p.requestId,
-                        timestamp: p.createdAt,
-                        assignedCount: 0
+                        requestId: r.requestId,
+                        timestamp: r.createdAt,
+                        assignedCount: 0,
+                        demand: 0
                     });
                 }
-                const entry = centerMap.get(p.centerId)!;
-                entry.assignedCount += demand; 
+                const entry = centerMap.get(r.centerId)!;
+                entry.demand = (entry.demand || 0) + demand; 
 
-                if (p.createdAt < entry.timestamp) {
-                    entry.timestamp = p.createdAt;
+                if (r.createdAt < entry.timestamp) {
+                    entry.timestamp = r.createdAt;
                 }
             });
 
-            centersData.push(...Array.from(centerMap.values()).map(c => {
-                const demand = c.assignedCount;
-                c.assignedCount = 0; 
-                return { ...c, demand };
-            }));
-
-            const centers = centersData as any[];
-            const totalDemand = centers.reduce((sum: number, c: any) => sum + c.demand, 0);
+            const centers = Array.from(centerMap.values());
+            const totalDemand = centers.reduce((sum: number, c) => sum + (c.demand || 0), 0);
 
             if (totalDemand <= remainingCapacity) {
-                centers.forEach((c: any) => c.assignedCount = c.demand);
+                centers.forEach((c) => c.assignedCount = c.demand || 0);
             } else {
                 const numCenters = centers.length;
                 const baseShare = Math.floor(remainingCapacity / numCenters);
 
                 let leftoverSpots = remainingCapacity;
 
-                centers.forEach((c: any) => {
-                    const allocation = Math.min(c.demand, baseShare);
+                centers.forEach((c) => {
+                    const allocation = Math.min(c.demand || 0, baseShare);
                     c.assignedCount = allocation;
                     leftoverSpots -= allocation;
                 });
@@ -128,7 +122,7 @@ export class AutoAssignmentService {
                 let i = 0;
                 while (leftoverSpots > 0) {
                     const center = centers[i % numCenters];
-                    if (center.assignedCount < center.demand) {
+                    if (center.assignedCount < (center.demand || 0)) {
                         center.assignedCount++;
                         leftoverSpots--;
                     }
@@ -151,7 +145,7 @@ export class AutoAssignmentService {
     private async persistAssignment(center: PendingCenter, workshopId: number) {
         await prisma.request.update({
             where: { requestId: center.requestId },
-            data: { status: REQUEST_STATUSES.APPROVED as any }
+            data: { status: REQUEST_STATUSES.APPROVED as RequestStatus }
         });
 
         const assignment = await prisma.assignment.create({
@@ -159,12 +153,12 @@ export class AutoAssignmentService {
                 requestId: center.requestId,
                 centerId: center.centerId,
                 workshopId: workshopId,
-                status: 'PUBLISHED',
+                status: AssignmentStatus.PUBLISHED,
                 checklist: {
                     create: [
-                        { stepName: 'Designar Profesores Referentes', isCompleted: false },
-                        { stepName: 'Subir Registro Nominal (Excel)', isCompleted: true },
-                        { stepName: 'Acuerdo Pedagógico (Modalidad C)', isCompleted: false }
+                        { stepName: 'Assign Reference Teachers', isCompleted: false },
+                        { stepName: 'Upload Nominal Register (Excel)', isCompleted: true },
+                        { stepName: 'Pedagogical Agreement (Modality C)', isCompleted: false }
                     ]
                 }
             }

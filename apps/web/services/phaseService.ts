@@ -1,12 +1,12 @@
 import getApi from "./api";
 
 export interface Phase {
-  id_phase: number;
+  phaseId: number;
   name: string;
   description: string;
   startDate: string;
   endDate: string;
-  active: boolean;
+  isActive: boolean;
   order: number;
 }
 
@@ -18,12 +18,12 @@ const phaseService = {
       // The API returns data in the 'data' field of the response body
       const rawData = response.data.data || [];
       return rawData.map((f: any) => ({
-        id_phase: f.id_phase,
+        phaseId: f.phaseId,
         name: f.name,
         description: f.description,
         startDate: f.startDate,
         endDate: f.endDate,
-        active: f.isActive,
+        isActive: f.isActive,
         order: f.order
       }));
     } catch (error) {

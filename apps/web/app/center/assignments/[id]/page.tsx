@@ -58,22 +58,22 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     fetchData();
   }, [id, router]);
 
-  const handleAddStudent = async (idStudent: number) => {
+  const handleAddStudent = async (studentId: number) => {
     try {
       if (!assignment) return;
-      const currentIds = assignment.enrollments?.map((i: Enrollment) => i.id_student) || [];
-      if (currentIds.includes(idStudent)) {
+      const currentIds = assignment.enrollments?.map((i: Enrollment) => i.studentId) || [];
+      if (currentIds.includes(studentId)) {
         toast.warning("This student is already enrolled.");
         return;
       }
 
-      const maxSeats = assignment.request?.approxStudents || assignment.workshop?.maxSeats || 20;
+      const maxSeats = assignment.request?.approxStudents || assignment.workshop?.maxPlaces || 20;
       if (currentIds.length >= maxSeats) {
         toast.error(`Limit of ${maxSeats} seats reached.`);
         return;
       }
 
-      const updated = await assignmentService.updateEnrollments(parseInt(id), [...currentIds, idStudent]);
+      const updated = await assignmentService.updateEnrollments(parseInt(id), [...currentIds, studentId]);
       setAssignment(updated);
       toast.success('Student added successfully.');
     } catch (error) {
@@ -81,19 +81,17 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     }
   };
 
-  const handleRemoveStudent = async (idStudent: number) => {
+  const handleRemoveStudent = async (studentId: number) => {
     try {
       if (!assignment) return;
-      const currentIds = assignment.enrollments?.map((i: Enrollment) => i.id_student) || [];
-      const updated = await assignmentService.updateEnrollments(parseInt(id), currentIds.filter((id: number) => id !== idStudent));
+      const currentIds = assignment.enrollments?.map((i: Enrollment) => i.studentId) || [];
+      const updated = await assignmentService.updateEnrollments(parseInt(id), currentIds.filter((id: number) => id !== studentId));
       setAssignment(updated);
       toast.success('Student removed successfully.');
     } catch (error) {
       toast.error('Error removing student.');
     }
   };
-
-
 
   const getStatusLabel = (status: string) => {
     const maps: Record<string, string> = {
@@ -109,9 +107,9 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
   if (loading || !assignment) return <Loading fullScreen message="Loading workshop details..." />;
 
   const allDocumentsValidated = assignment.enrollments && assignment.enrollments.length > 0 && assignment.enrollments.every((ins: Enrollment) => 
-    ins.validated_pedagogical_agreement && 
-    ins.validated_mobility_authorization && 
-    ins.validated_image_rights
+    ins.validatedPedagogicalAgreement && 
+    ins.validatedMobilityAuthorization && 
+    ins.validatedImageRights
   );
 
   const filteredStudents = allStudents.filter(a => {
@@ -169,7 +167,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
             <div>
               <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">Participating Students</h3>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                {assignment.enrollments?.length || 0} of {assignment.request?.approxStudents || assignment.workshop?.maxSeats || 20} seats occupied.
+                {assignment.enrollments?.length || 0} of {assignment.request?.approxStudents || assignment.workshop?.maxPlaces || 20} seats occupied.
               </p>
             </div>
             <button 
@@ -183,14 +181,14 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
           <div className="divide-y divide-gray-100">
             {assignment.enrollments?.map((ins: Enrollment) => (
-              <div key={ins.id_enrollment} className="p-8 hover:bg-gray-50/50 transition-colors">
+              <div key={ins.enrollmentId} className="p-8 hover:bg-gray-50/50 transition-colors">
                 <div className="flex flex-col lg:flex-row gap-10 items-start lg:items-center">
                   {/* Student Info */}
                   <div className="flex items-center gap-6 min-w-[280px]">
                     <Avatar 
                       url={ins.student.photoUrl} 
                       name={`${ins.student.fullName} ${ins.student.lastName}`} 
-                      id={ins.student.id_student} 
+                      id={ins.student.studentId} 
                       type="student" 
                       size="lg"
                       className="shadow-md"
@@ -209,28 +207,28 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                     <DocumentUpload 
                       assignmentId={parseInt(id)}
-                      enrollmentId={ins.id_enrollment}
+                      enrollmentId={ins.enrollmentId}
                       documentType="pedagogical_agreement"
                       initialUrl={ins.pedagogicalAgreementUrl}
-                      isValidated={ins.validated_pedagogical_agreement}
+                      isValidated={ins.validatedPedagogicalAgreement}
                       label="Pedagogical Agreement"
                       onUploadSuccess={() => {}}
                     />
                     <DocumentUpload 
                       assignmentId={parseInt(id)}
-                      enrollmentId={ins.id_enrollment}
+                      enrollmentId={ins.enrollmentId}
                       documentType="mobility_authorization"
                       initialUrl={ins.mobilityAuthorizationUrl}
-                      isValidated={ins.validated_mobility_authorization}
+                      isValidated={ins.validatedMobilityAuthorization}
                       label="Mobility Auth"
                       onUploadSuccess={() => {}}
                     />
                     <DocumentUpload 
                       assignmentId={parseInt(id)}
-                      enrollmentId={ins.id_enrollment}
+                      enrollmentId={ins.enrollmentId}
                       documentType="image_rights"
                       initialUrl={ins.imageRightsUrl}
-                      isValidated={ins.validated_image_rights}
+                      isValidated={ins.validatedImageRights}
                       label="Image Rights"
                       onUploadSuccess={() => {}}
                     />
@@ -239,7 +237,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                   {/* Actions */}
                   <div className="shrink-0">
                     <button 
-                      onClick={() => handleRemoveStudent(ins.id_student)}
+                      onClick={() => handleRemoveStudent(ins.student.studentId)}
                       className="p-3 text-gray-200 hover:text-red-500 hover:bg-red-50 transition-all rounded-full"
                       title="Remove student"
                     >
@@ -312,7 +310,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
       </div>
 
-      {/* MODAL: SELECCIÓ D'ALUMNAT */}
+      {/* MODAL: STUDENT SELECTION */}
       {viewMode === 'selection' && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           {/* Backdrop blurred */}
@@ -394,15 +392,15 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {paginatedStudents.map(a => {
-                        const isAlreadyAdded = assignment.enrollments?.some((i: Enrollment) => i.id_student === a.id_student);
+                        const isAlreadyAdded = assignment.enrollments?.some((i: Enrollment) => i.studentId === a.studentId);
                         return (
-                          <tr key={a.id_student} className={`hover:bg-[#F8FAFC] transition-colors group ${isAlreadyAdded ? 'bg-green-50/10' : ''}`}>
+                          <tr key={a.studentId} className={`hover:bg-[#F8FAFC] transition-colors group ${isAlreadyAdded ? 'bg-green-50/10' : ''}`}>
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
                                 <Avatar 
                                   url={a.photoUrl} 
                                   name={`${a.fullName} ${a.lastName}`} 
-                                  id={a.id_student} 
+                                  id={a.studentId} 
                                   type="student" 
                                   size="sm"
                                   className={isAlreadyAdded ? 'ring-2 ring-green-500' : ''}
@@ -420,7 +418,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                                   <>
                                     <span className="text-[9px] font-black text-green-600 uppercase tracking-widest mr-2">Participates</span>
                                     <button 
-                                      onClick={() => handleRemoveStudent(a.id_student)}
+                                      onClick={() => handleRemoveStudent(a.studentId)}
                                       className="p-2 text-gray-200 hover:text-red-500 hover:bg-red-50 transition-all"
                                       title="Remove student"
                                     >
@@ -429,7 +427,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                                   </>
                                 ) : (
                                   <button 
-                                    onClick={() => handleAddStudent(a.id_student)}
+                                    onClick={() => handleAddStudent(a.studentId)}
                                     className="px-4 py-1.5 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all"
                                   >
                                     Add

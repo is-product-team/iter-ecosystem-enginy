@@ -1,63 +1,65 @@
 import express from 'express';
 const router = express.Router();
 
-// Importar archivos de rutas individuales
+// Import individual route files
 import authRoutes from './auth.routes.js';
-import tallerRoutes from './taller.routes.js';
-import centroRoutes from './centro.routes.js';
-import peticioRoutes from './peticio.routes.js'; 
-import assignacioRoutes from './assignacio.routes.js';
-import alumneRoutes from './alumne.routes.js';
-import professorRoutes from './professor.routes.js';
+import workshopRoutes from './workshop.routes.js';
+import centerRoutes from './center.routes.js';
+import requestRoutes from './request.routes.js'; 
+import assignmentRoutes from './assignment.routes.js';
+import studentRoutes from './student.routes.js';
+import teacherRoutes from './teacher.routes.js';
 import calendarRoutes from './calendar.routes.js';
 import phaseRoutes from './phase.routes.js';
 import statsRoutes from './stats.routes.js';
 import sectorRoutes from './sector.routes.js';
-import assistenciaRoutes from './assistencia.routes.js';
-import notificacioRoutes from './notificacio.routes.js';
+import attendanceRoutes from './attendance.routes.js';
+import notificationRoutes from './notification.routes.js';
 import evaluationRoutes from './evaluation.routes.js'; 
-import questionariRoutes from './questionari.routes.js';
+import questionnaireRoutes from './questionnaire.routes.js';
+import surveyRoutes from './survey.routes.js';
 import uploadRoutes from './upload.routes.js';
 import profileRoutes from './profile.routes.js';
 
-// --- Definir las rutas base ---
+// --- Define Base Routes ---
 
-// Rutas de Usuario/Perfil
+// User/Profile Routes
 router.use('/profile', profileRoutes);
 
-// Rutas de Autenticación (Login, Registro)
+// Authentication Routes (Login, Register)
 router.use('/auth', authRoutes);
 
-// Rutas de Maestros
-router.use('/workshops', tallerRoutes);
-router.use('/centers', centroRoutes);
+// Master Data Routes
+router.use('/workshops', workshopRoutes);
+router.use('/centers', centerRoutes);
 router.use('/sectors', sectorRoutes);
 
-// Rutas del Flujo de Negocio (Solicitudes y Asignaciones)
-router.use('/requests', peticioRoutes);
-router.use('/assignments', assignacioRoutes);
-router.use('/notifications', notificacioRoutes);
+// Business Flow Routes (Requests and Assignments)
+router.use('/requests', requestRoutes);
+router.use('/assignments', assignmentRoutes);
+router.use('/notifications', notificationRoutes);
 router.use('/evaluation', evaluationRoutes); 
 
-// Rutas de Alumnos y Profesores
-router.use('/students', alumneRoutes);
-router.use('/teachers', professorRoutes);
-router.use('/attendance', assistenciaRoutes);
+// Student and Teacher Routes
+router.use('/students', studentRoutes);
+router.use('/teachers', teacherRoutes);
+router.use('/attendance', attendanceRoutes);
 
-// Rutas de Calendario
+// Calendar Routes
 router.use('/calendar', calendarRoutes);
 router.use('/phases', phaseRoutes);
 
-// Rutas de Estadísticas
+// Statistics Routes
 router.use('/stats', statsRoutes);
 
-// Rutas de Evaluación y Cuestionarios
-router.use('/questionnaires', questionariRoutes);
+// Evaluation and Questionnaire Routes
+router.use('/questionnaires', questionnaireRoutes);
+router.use('/surveys', surveyRoutes);
 
-// Rutas de Carga de Archivos
+// File Upload Routes
 router.use('/upload', uploadRoutes);
 
-// Health Check (Para ver si la API respira)
+// Health Check
 router.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });

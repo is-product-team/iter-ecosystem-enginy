@@ -30,7 +30,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
     || "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop";
 
   const handleDelete = () => {
-    if (confirm("Estàs segur que vols eliminar aquest taller? Aquesta acció no es pot desfer.")) {
+    if (confirm("Are you sure you want to delete this workshop? This action cannot be undone.")) {
       onDelete(selectedWorkshop._id);
     }
   };
@@ -42,7 +42,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
         <button
           onClick={onClose}
           className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 backdrop-blur-md p-2 z-50 text-white transition-all active:scale-95 border border-white/20"
-          title="Tancar"
+          title="Close"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -76,7 +76,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
           <div className="md:w-3/5 p-8 md:p-12 flex flex-col">
             <div className="flex justify-between items-start mb-6 gap-4">
               <div className="flex-1">
-                <p className="text-consorci-lightBlue font-black text-[10px] uppercase tracking-widest mb-2">Detalls del Taller</p>
+                <p className="text-consorci-lightBlue font-black text-[10px] uppercase tracking-widest mb-2">Workshop Details</p>
                 <h1 className="text-consorci-darkBlue text-4xl font-black leading-none tracking-tight flex items-center gap-4">
                   <div className="w-12 h-12 flex items-center justify-center bg-gray-50 border border-gray-100 shrink-0">
                     <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
@@ -90,7 +90,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
                 <button
                   onClick={() => onEdit(selectedWorkshop)}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 transition-all active:scale-95 border border-gray-200"
-                  title="Editar"
+                  title="Edit"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -99,7 +99,7 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
                 <button
                   onClick={handleDelete}
                   className="bg-red-50 hover:bg-red-100 text-red-600 p-2 transition-all active:scale-95 border border-red-100"
-                  title="Eliminar"
+                  title="Delete"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -167,13 +167,13 @@ export default function WorkshopDetail({ visible, onClose, selectedWorkshop, onE
                 <svg className="w-4 h-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Baixar Fitxa Tècnica (PDF)
+                Download Technical Sheet (PDF)
               </button>
               <button
                 onClick={onClose}
                 className="bg-[#00426B] hover:bg-[#0775AB] text-white font-black text-[10px] uppercase tracking-widest px-8 py-3 transition-all"
               >
-                Tancar
+                Close
               </button>
             </div>
           </div>

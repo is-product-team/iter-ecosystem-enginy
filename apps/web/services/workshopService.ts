@@ -4,7 +4,7 @@ export interface Workshop {
   _id: string;
   title: string;
   sector: string;
-  id_sector?: number;
+  sectorId?: number;
   modality: string;
   term: string;
   icon?: string;
@@ -20,7 +20,7 @@ export interface Workshop {
 }
 
 interface BackendWorkshop {
-  id_workshop: number;
+  workshopId: number;
   title: string;
   modality: string;
   icon?: string;
@@ -29,7 +29,7 @@ interface BackendWorkshop {
   maxPlaces?: number;
   executionDays?: { dayOfWeek: number; startTime: string; endTime: string }[];
   sector?: { name: string };
-  id_sector?: number;
+  sectorId?: number;
 }
 
 const workshopService = {
@@ -43,10 +43,10 @@ const workshopService = {
       const workshopsData = response.data.data;
 
       return workshopsData.map((t: BackendWorkshop) => ({
-        _id: t.id_workshop.toString(),
+        _id: t.workshopId.toString(),
         title: t.title,
         sector: t.sector?.name || "General",
-        id_sector: t.id_sector,
+        sectorId: t.sectorId,
         modality: t.modality,
         term: "1st",
         icon: t.icon || "🧩",
@@ -76,7 +76,7 @@ const workshopService = {
         maxPlaces: workshopData.technicalDetails?.maxPlaces,
         modality: workshopData.modality,
         icon: workshopData.icon,
-        id_sector: workshopData.id_sector || 1,
+        sectorId: workshopData.sectorId || 1,
         executionDays: workshopData.executionDays,
       };
 
@@ -84,10 +84,10 @@ const workshopService = {
       const t = response.data;
 
       return {
-        _id: t.id_workshop.toString(),
+        _id: t.workshopId.toString(),
         title: t.title,
         sector: t.sector?.name || "General",
-        id_sector: t.id_sector,
+        sectorId: t.sectorId,
         modality: t.modality,
         icon: t.icon || "🧩",
         term: "1st",
@@ -113,7 +113,7 @@ const workshopService = {
       const payload: Record<string, unknown> = {};
       if (workshopData.title) payload.title = workshopData.title;
       if (workshopData.modality) payload.modality = workshopData.modality;
-      if (workshopData.id_sector) payload.id_sector = workshopData.id_sector;
+      if (workshopData.sectorId) payload.sectorId = workshopData.sectorId;
       if (workshopData.icon) payload.icon = workshopData.icon;
       if (workshopData.executionDays) payload.executionDays = workshopData.executionDays;
       if (workshopData.technicalDetails) {
@@ -126,10 +126,10 @@ const workshopService = {
       const t = response.data;
 
       return {
-        _id: t.id_workshop.toString(),
+        _id: t.workshopId.toString(),
         title: t.title,
         sector: t.sector?.name || "General",
-        id_sector: t.id_sector,
+        sectorId: t.sectorId,
         modality: t.modality,
         term: "1st",
         icon: t.icon || "🧩",
@@ -157,8 +157,8 @@ const workshopService = {
     try {
       await api.delete(`/workshops/${id}`);
     } catch (error) {
-      console.error("Error in workshopService.getAll:", error);
-      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Could not fetch workshops";
+      console.error("Error in workshopService.delete:", error);
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Could not delete workshop";
       throw new Error(errorMessage);
     }
   },

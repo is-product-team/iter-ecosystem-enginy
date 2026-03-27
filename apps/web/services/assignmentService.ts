@@ -1,11 +1,11 @@
 import getApi from "./api";
 
 export interface Enrollment {
-  id_enrollment: number;
-  id_assignment: number;
-  id_student: number;
+  enrollmentId: number;
+  assignmentId: number;
+  studentId: number;
   student: {
-    id_student: number;
+    studentId: number;
     fullName: string;
     lastName: string;
     grade: string;
@@ -13,33 +13,33 @@ export interface Enrollment {
     photoUrl?: string | null;
   };
   pedagogicalAgreementUrl?: string | null;
-  validated_pedagogical_agreement: boolean;
+  isPedagogicalAgreementValidated: boolean;
   mobilityAuthorizationUrl?: string | null;
-  validated_mobility_authorization: boolean;
+  isMobilityAuthorizationValidated: boolean;
   imageRightsUrl?: string | null;
-  validated_image_rights: boolean;
-  teacher_evaluation?: boolean;
+  isImageRightsValidated: boolean;
+  hasTeacherEvaluation?: boolean;
 }
 
 export interface Assignment {
-  id_assignment: number;
-  id_request: number | null;
-  id_center: number;
-  id_workshop: number;
+  assignmentId: number;
+  requestId: number | null;
+  centerId: number;
+  workshopId: number;
   startDate: string | null;
   endDate: string | null;
   status: string;
-  workshop?: { title: string; modality: string; maxSeats: number };
+  workshop?: { title: string; modality: string; maxPlaces: number };
   center?: { name: string };
   request?: { approxStudents: number };
-  teacher1?: { id_user: number; name: string };
-  teacher2?: { id_user: number; name: string };
+  teacher1?: { userId: number; name: string };
+  teacher2?: { userId: number; name: string };
   enrollments?: Enrollment[];
   checklist?: unknown[];
 }
 
 interface BackendStudent {
-  id_student: number;
+  studentId: number;
   fullName: string;
   lastName: string;
   grade: string;
@@ -48,34 +48,34 @@ interface BackendStudent {
 }
 
 interface BackendEnrollment {
-  id_enrollment: number;
-  id_assignment: number;
-  id_student: number;
+  enrollmentId: number;
+  assignmentId: number;
+  studentId: number;
   student: BackendStudent;
-  docs_status?: {
-    acord_pedagogic?: string;
-    validat_acord_pedagogic?: boolean;
-    autoritzacio_mobilitat?: string;
-    validat_autoritzacio_mobilitat?: boolean;
-    drets_imatge?: string;
-    validat_drets_imatge?: boolean;
+  docsStatus?: {
+    pedagogicalAgreement?: string;
+    isPedagogicalAgreementValidated?: boolean;
+    mobilityAuthorization?: string;
+    isMobilityAuthorizationValidated?: boolean;
+    imageRights?: string;
+    isImageRightsValidated?: boolean;
   };
   evaluations?: unknown[];
 }
 
 interface BackendAssignment {
-  id_assignment: number;
-  id_request: number | null;
-  id_center: number;
-  id_workshop: number;
+  assignmentId: number;
+  requestId: number | null;
+  centerId: number;
+  workshopId: number;
   startDate: string | null;
   endDate: string | null;
   status: string;
   workshop?: { title: string; modality: string; maxPlaces: number };
   center?: { name: string };
   request?: { approxStudents: number };
-  teacher1?: { id_user: number; name: string };
-  teacher2?: { id_user: number; name: string };
+  teacher1?: { userId: number; name: string };
+  teacher2?: { userId: number; name: string };
   enrollments?: BackendEnrollment[];
   checklist?: unknown[];
 }
@@ -84,52 +84,52 @@ const assignmentService = {
   /**
    * Gets all assignments for a center.
    */
-  getByCenter: async (idCenter: number): Promise<Assignment[]> => {
+  getByCenter: async (centerId: number): Promise<Assignment[]> => {
     const api = getApi();
     try {
-      const response = await api.get<BackendAssignment[]>(`/assignments/centre/${idCenter}`);
+      const response = await api.get<BackendAssignment[]>(`/assignments/center/${centerId}`);
       return response.data.map((a: BackendAssignment) => ({
-        id_assignment: a.id_assignment,
-        id_request: a.id_request,
-        id_center: a.id_center,
-        id_workshop: a.id_workshop,
+        assignmentId: a.assignmentId,
+        requestId: a.requestId,
+        centerId: a.centerId,
+        workshopId: a.workshopId,
         startDate: a.startDate,
         endDate: a.endDate,
         status: a.status,
         workshop: a.workshop ? { 
           title: a.workshop.title,
           modality: a.workshop.modality,
-          maxSeats: a.workshop.maxPlaces
+          maxPlaces: a.workshop.maxPlaces
         } : undefined,
         center: a.center ? { name: a.center.name } : undefined,
         request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
-        teacher1: a.teacher1 ? { id_user: a.teacher1.id_user, name: a.teacher1.name } : undefined,
-        teacher2: a.teacher2 ? { id_user: a.teacher2.id_user, name: a.teacher2.name } : undefined,
+        teacher1: a.teacher1 ? { userId: a.teacher1.userId, name: a.teacher1.name } : undefined,
+        teacher2: a.teacher2 ? { userId: a.teacher2.userId, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
-          id_enrollment: i.id_enrollment,
-          id_assignment: i.id_assignment,
-          id_student: i.id_student,
+          enrollmentId: i.enrollmentId,
+          assignmentId: i.assignmentId,
+          studentId: i.studentId,
           student: {
-            id_student: i.student.id_student,
+            studentId: i.student.studentId,
             fullName: i.student.fullName,
             lastName: i.student.lastName,
             grade: i.student.grade,
             idalu: i.student.idalu,
             photoUrl: i.student.photoUrl,
           },
-          pedagogicalAgreementUrl: i.docs_status?.acord_pedagogic,
-          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
-          mobilityAuthorizationUrl: i.docs_status?.autoritzacio_mobilitat,
-          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
-          imageRightsUrl: i.docs_status?.drets_imatge,
-          validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
-          teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
+          pedagogicalAgreementUrl: i.docsStatus?.pedagogicalAgreement,
+          isPedagogicalAgreementValidated: i.docsStatus?.isPedagogicalAgreementValidated ?? false,
+          mobilityAuthorizationUrl: i.docsStatus?.mobilityAuthorization,
+          isMobilityAuthorizationValidated: i.docsStatus?.isMobilityAuthorizationValidated ?? false,
+          imageRightsUrl: i.docsStatus?.imageRights,
+          isImageRightsValidated: i.docsStatus?.isImageRightsValidated ?? false,
+          hasTeacherEvaluation: (i.evaluations?.length ?? 0) > 0,
         })),
         checklist: a.checklist,
       }));
     } catch (error) {
       console.error(error);
-      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Error al carregar l'assignació";
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Error loading assignment";
       throw new Error(errorMessage);
     }
   },
@@ -137,23 +137,23 @@ const assignmentService = {
   /**
    * Creates an assignment from a request.
    */
-  createFromRequest: async (idRequest: number): Promise<Assignment> => {
+  createFromRequest: async (requestId: number): Promise<Assignment> => {
     const api = getApi();
     try {
-      const response = await api.post<BackendAssignment>("/assignments", { idRequest });
+      const response = await api.post<BackendAssignment>("/assignments", { requestId });
       const a = response.data;
       return {
-        id_assignment: a.id_assignment,
-        id_request: a.id_request,
-        id_center: a.id_center,
-        id_workshop: a.id_workshop,
+        assignmentId: a.assignmentId,
+        requestId: a.requestId,
+        centerId: a.centerId,
+        workshopId: a.workshopId,
         startDate: a.startDate,
         endDate: a.endDate,
         status: a.status,
         workshop: a.workshop ? { 
           title: a.workshop.title,
           modality: a.workshop.modality,
-          maxSeats: a.workshop.maxPlaces
+          maxPlaces: a.workshop.maxPlaces
         } : undefined,
         center: a.center ? { name: a.center.name } : undefined,
         checklist: a.checklist,
@@ -167,10 +167,10 @@ const assignmentService = {
   /**
    * Updates a checklist item.
    */
-  updateChecklistItem: async (idItem: number, completed: boolean, evidenceUrl?: string): Promise<unknown> => {
+  updateChecklistItem: async (checklistId: number, isCompleted: boolean, evidenceUrl?: string): Promise<unknown> => {
     const api = getApi();
     try {
-      const response = await api.patch<{ data: unknown }>(`/assignments/checklist/${idItem}`, { completat: completed, url_evidencia: evidenceUrl });
+      const response = await api.patch<{ data: unknown }>(`/assignments/checklist/${checklistId}`, { isCompleted, evidenceUrl });
       return response.data;
     } catch (error) {
       console.error("Error in assignmentService.updateChecklistItem:", error);
@@ -200,41 +200,41 @@ const assignmentService = {
     try {
       const response = await api.get<BackendAssignment[]>("/assignments");
       return response.data.map((a: BackendAssignment) => ({
-        id_assignment: a.id_assignment,
-        id_request: a.id_request,
-        id_center: a.id_center,
-        id_workshop: a.id_workshop,
+        assignmentId: a.assignmentId,
+        requestId: a.requestId,
+        centerId: a.centerId,
+        workshopId: a.workshopId,
         startDate: a.startDate,
         endDate: a.endDate,
         status: a.status,
         workshop: a.workshop ? { 
           title: a.workshop.title,
           modality: a.workshop.modality,
-          maxSeats: a.workshop.maxPlaces
+          maxPlaces: a.workshop.maxPlaces
         } : undefined,
         center: a.center ? { name: a.center.name } : undefined,
         request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
-        teacher1: a.teacher1 ? { id_user: a.teacher1.id_user, name: a.teacher1.name } : undefined,
-        teacher2: a.teacher2 ? { id_user: a.teacher2.id_user, name: a.teacher2.name } : undefined,
+        teacher1: a.teacher1 ? { userId: a.teacher1.userId, name: a.teacher1.name } : undefined,
+        teacher2: a.teacher2 ? { userId: a.teacher2.userId, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
-          id_enrollment: i.id_enrollment,
-          id_assignment: i.id_assignment,
-          id_student: i.id_student,
+          enrollmentId: i.enrollmentId,
+          assignmentId: i.assignmentId,
+          studentId: i.studentId,
           student: {
-            id_student: i.student.id_student,
+            studentId: i.student.studentId,
             fullName: i.student.fullName,
             lastName: i.student.lastName,
             grade: i.student.grade,
             idalu: i.student.idalu,
             photoUrl: i.student.photoUrl,
           },
-          pedagogicalAgreementUrl: i.docs_status?.acord_pedagogic,
-          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
-          mobilityAuthorizationUrl: i.docs_status?.autoritzacio_mobilitat,
-          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
-          imageRightsUrl: i.docs_status?.drets_imatge,
-          validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
-          teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
+          pedagogicalAgreementUrl: i.docsStatus?.pedagogicalAgreement,
+          isPedagogicalAgreementValidated: i.docsStatus?.isPedagogicalAgreementValidated ?? false,
+          mobilityAuthorizationUrl: i.docsStatus?.mobilityAuthorization,
+          isMobilityAuthorizationValidated: i.docsStatus?.isMobilityAuthorizationValidated ?? false,
+          imageRightsUrl: i.docsStatus?.imageRights,
+          isImageRightsValidated: i.docsStatus?.isImageRightsValidated ?? false,
+          hasTeacherEvaluation: (i.evaluations?.length ?? 0) > 0,
         })),
         checklist: a.checklist,
       }));
@@ -247,47 +247,47 @@ const assignmentService = {
   /**
    * Gets a specific assignment by ID.
    */
-  getById: async (id: number): Promise<Assignment> => {
+  getById: async (assignmentId: number): Promise<Assignment> => {
     const api = getApi();
     try {
-      const response = await api.get<BackendAssignment>(`/assignments/${id}`);
+      const response = await api.get<BackendAssignment>(`/assignments/${assignmentId}`);
       const a = response.data;
       return {
-        id_assignment: a.id_assignment,
-        id_request: a.id_request,
-        id_center: a.id_center,
-        id_workshop: a.id_workshop,
+        assignmentId: a.assignmentId,
+        requestId: a.requestId,
+        centerId: a.centerId,
+        workshopId: a.workshopId,
         startDate: a.startDate,
         endDate: a.endDate,
         status: a.status,
         workshop: a.workshop ? { 
           title: a.workshop.title,
           modality: a.workshop.modality,
-          maxSeats: a.workshop.maxPlaces
+          maxPlaces: a.workshop.maxPlaces
         } : undefined,
         center: a.center ? { name: a.center.name } : undefined,
         request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
-        teacher1: a.teacher1 ? { id_user: a.teacher1.id_user, name: a.teacher1.name } : undefined,
-        teacher2: a.teacher2 ? { id_user: a.teacher2.id_user, name: a.teacher2.name } : undefined,
+        teacher1: a.teacher1 ? { userId: a.teacher1.userId, name: a.teacher1.name } : undefined,
+        teacher2: a.teacher2 ? { userId: a.teacher2.userId, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
-          id_enrollment: i.id_enrollment,
-          id_assignment: i.id_assignment,
-          id_student: i.id_student,
+          enrollmentId: i.enrollmentId,
+          assignmentId: i.assignmentId,
+          studentId: i.studentId,
           student: {
-            id_student: i.student.id_student,
+            studentId: i.student.studentId,
             fullName: i.student.fullName,
             lastName: i.student.lastName,
             grade: i.student.grade,
             idalu: i.student.idalu,
             photoUrl: i.student.photoUrl,
           },
-          pedagogicalAgreementUrl: i.docs_status?.acord_pedagogic,
-          validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
-          mobilityAuthorizationUrl: i.docs_status?.autoritzacio_mobilitat,
-          validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
-          imageRightsUrl: i.docs_status?.drets_imatge,
-          validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
-          teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
+          pedagogicalAgreementUrl: i.docsStatus?.pedagogicalAgreement,
+          isPedagogicalAgreementValidated: i.docsStatus?.isPedagogicalAgreementValidated ?? false,
+          mobilityAuthorizationUrl: i.docsStatus?.mobilityAuthorization,
+          isMobilityAuthorizationValidated: i.docsStatus?.isMobilityAuthorizationValidated ?? false,
+          imageRightsUrl: i.docsStatus?.imageRights,
+          isImageRightsValidated: i.docsStatus?.isImageRightsValidated ?? false,
+          hasTeacherEvaluation: (i.evaluations?.length ?? 0) > 0,
         })),
         checklist: a.checklist,
       };
@@ -300,14 +300,14 @@ const assignmentService = {
   /**
    * Updates enrollments for an assignment.
    */
-  updateEnrollments: async (id: number, studentIds: number[]): Promise<Assignment> => {
+  updateEnrollments: async (assignmentId: number, studentIds: number[]): Promise<Assignment> => {
     const api = getApi();
     try {
-      await api.post(`/assignments/${id}/inscripcions`, { ids_alumnes: studentIds });
-      return assignmentService.getById(id);
+      await api.post(`/assignments/${assignmentId}/enrollments`, { studentIds });
+      return assignmentService.getById(assignmentId);
     } catch (error) {
       console.error(error);
-      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Error al carregar les assignacions";
+      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Error loading assignments";
       throw new Error(errorMessage);
     }
   },
@@ -315,10 +315,10 @@ const assignmentService = {
   /**
    * Confirms registration and generates sessions.
    */
-  confirmRegistration: async (id: number): Promise<void> => {
+  confirmRegistration: async (assignmentId: number): Promise<void> => {
     const api = getApi();
     try {
-      await api.post(`/assignments/${id}/confirm-registration`);
+      await api.post(`/assignments/${assignmentId}/confirm-registration`);
     } catch (error) {
       console.error("Error in assignmentService.confirmRegistration:", error);
       throw error;
@@ -328,10 +328,10 @@ const assignmentService = {
   /**
    * Sends an error notification for a document.
    */
-  sendDocumentNotification: async (idAssignment: number, documentName: string, comment: string, greeting: string): Promise<unknown> => {
+  sendDocumentNotification: async (assignmentId: number, documentName: string, comment: string, greeting: string): Promise<unknown> => {
     const api = getApi();
     try {
-      const response = await api.post<{ data: unknown }>(`/assignments/${idAssignment}/document-notification`, { documentName, comment, greeting });
+      const response = await api.post<{ data: unknown }>(`/assignments/${assignmentId}/document-notification`, { documentName, comment, greeting });
       return response.data;
     } catch (error) {
       console.error("Error in assignmentService.sendDocumentNotification:", error);
@@ -342,10 +342,10 @@ const assignmentService = {
   /**
    * Validates a specific document within an enrollment.
    */
-  validateDocument: async (idEnrollment: number, field: string, valid: boolean): Promise<unknown> => {
+  validateDocument: async (enrollmentId: number, field: string, valid: boolean): Promise<unknown> => {
     const api = getApi();
     try {
-      const response = await api.patch<{ data: unknown }>(`/assignments/inscripcions/${idEnrollment}/validate`, { field, valid });
+      const response = await api.patch<{ data: unknown }>(`/assignments/enrollments/${enrollmentId}/validate`, { field, valid });
       return response.data;
     } catch (error) {
       console.error("Error in assignmentService.validateDocument:", error);

@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma.js';
-import { createNotificationInterna } from '../controllers/notificacio.controller.js';
+import { createNotificationInternal } from '../controllers/notification.controller.js';
 
 export interface RiskResult {
     studentId: number;
@@ -32,9 +32,9 @@ export class RiskAnalysisService {
             let late = 0;
 
             recentAttendance.forEach((a: any) => {
-                if (a.status === 'ABSENCIA' || a.status === 'ABSENCIA_JUSTIFICADA') {
+                if (a.status === 'ABSENT' || a.status === 'JUSTIFIED_ABSENCE') {
                     absences++;
-                    factors.push(`Falta el ${a.sessionDate.toLocaleDateString()}`);
+                    factors.push(`Absent on ${a.sessionDate.toLocaleDateString()}`);
                 }
                 if (a.status === 'LATE') late++;
             });
@@ -88,13 +88,13 @@ export class RiskAnalysisService {
         // Find Student Info
         const student = await prisma.student.findUnique({
             where: { studentId: studentId },
-            include: { center_origin: true }
+            include: { centerOrigin: true }
         });
 
-        if (!student || !student.center_origin) return;
+        if (!student || !student.centerOrigin) return;
 
-        await createNotificationInterna({
-            centerId: student.center_origin.centerId,
+        await createNotificationInternal({
+            centerId: student.centerOrigin.centerId,
             title: `⚠️ Risk Alert: ${student.fullName} ${student.lastName}`,
             message: `The student shows a dropout risk of ${score}%. Factors: ${factors.join(', ')}. Intervention is recommended.`,
             type: 'SYSTEM',

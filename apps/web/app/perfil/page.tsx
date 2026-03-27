@@ -165,7 +165,7 @@ export default function ProfilePage() {
               <Avatar
                 url={user.photoUrl}
                 name={user.fullName}
-                id={user.id_user}
+                id={user.userId}
                 type="usuari"
                 size="xl"
                 className="ring-4 ring-white shadow-xl"
@@ -255,8 +255,8 @@ export default function ProfilePage() {
                             key={t.id}
                             onClick={() => setTheme(t.id)}
                             className={`flex-1 flex items-center justify-center py-2 gap-2 transition-all ${isActive
-                                ? 'bg-consorci-darkBlue text-white'
-                                : 'text-text-muted hover:text-text-secondary hover:bg-background-subtle'
+                              ? 'bg-consorci-darkBlue text-white'
+                              : 'text-text-muted hover:text-text-secondary hover:bg-background-subtle'
                               }`}
                           >
                             <Icon className="w-3.5 h-3.5" />

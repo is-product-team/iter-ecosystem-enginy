@@ -1,12 +1,12 @@
 import getApi from "./api";
 
 export interface Teacher {
-  id_teacher: number;
+  teacherId: number;
   name: string;
   contact: string;
   centerId?: number;
   user?: {
-    id_user: number;
+    userId: number;
     email: string;
     fullName?: string;
     photoUrl?: string | null;
@@ -14,12 +14,12 @@ export interface Teacher {
 }
 
 interface BackendTeacher {
-  id_teacher: number;
+  teacherId: number;
   name: string;
   contact: string;
-  id_center: number;
+  centerId: number;
   user?: {
-    id_user: number;
+    userId: number;
     email: string;
     fullName: string;
     photoUrl: string | null;
@@ -31,35 +31,35 @@ const teacherService = {
     const api = getApi();
     const response = await api.get<BackendTeacher[]>("/teachers");
     return response.data.map((t: BackendTeacher) => ({
-      id_teacher: t.id_teacher,
+      teacherId: t.teacherId,
       name: t.name,
       contact: t.contact,
-      centerId: t.id_center,
+      centerId: t.centerId,
       user: t.user ? {
-        id_user: t.user.id_user,
+        userId: t.user.userId,
         email: t.user.email,
         fullName: t.user.fullName,
         photoUrl: t.user.photoUrl
       } : undefined
     }));
   },
-  getByCenter: async (idCenter: number): Promise<Teacher[]> => {
+  getByCenter: async (centerId: number): Promise<Teacher[]> => {
     const api = getApi();
-    const response = await api.get<BackendTeacher[]>(`/teachers/centre/${idCenter}`);
+    const response = await api.get<BackendTeacher[]>(`/teachers/center/${centerId}`);
     return response.data.map((t: BackendTeacher) => ({
-      id_teacher: t.id_teacher,
+      teacherId: t.teacherId,
       name: t.name,
       contact: t.contact,
-      centerId: t.id_center,
+      centerId: t.centerId,
       user: t.user ? {
-        id_user: t.user.id_user,
+        userId: t.user.userId,
         email: t.user.email,
         fullName: t.user.fullName,
         photoUrl: t.user.photoUrl
       } : undefined
     }));
   },
-  create: async (data: Omit<Teacher, 'id_teacher'>): Promise<Teacher> => {
+  create: async (data: Omit<Teacher, 'teacherId'>): Promise<Teacher> => {
     const api = getApi();
     const response = await api.post<Teacher>("/teachers", data);
     return response.data;

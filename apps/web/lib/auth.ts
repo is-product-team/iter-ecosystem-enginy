@@ -1,7 +1,7 @@
 import { RoleTag } from '@iter/shared';
 
 export interface User {
-  id_user: number;
+  userId: number;
   fullName: string;
   email: string;
   photoUrl?: string | null;
@@ -41,7 +41,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
   }
 
   const data = await res.json();
-  
+
   // Store user in localStorage, but cookie handles the token
   if (typeof window !== 'undefined') {
     localStorage.setItem('user', JSON.stringify(data.user));

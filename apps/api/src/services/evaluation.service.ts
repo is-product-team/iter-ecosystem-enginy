@@ -2,7 +2,7 @@ import prisma from '../lib/prisma.js';
 
 export class EvaluationService {
     /**
-     * Obtiene la evaluación docente de una inscripción específica.
+     * Retrieves the teacher evaluation for a specific enrollment.
      */
     async getEvaluationByEnrollment(enrollmentId: number) {
         return await prisma.evaluation.findUnique({
@@ -18,7 +18,7 @@ export class EvaluationService {
     }
 
     /**
-     * Crea o actualiza una evaluación docente.
+     * Creates or updates a teacher evaluation.
      */
     async upsertEvaluation(data: {
         enrollmentId: number;
@@ -37,8 +37,8 @@ export class EvaluationService {
             competences
         } = data;
 
-        // 1. Crear o actualizar la evaluación docente principal
-        const avaluacioDocent = await prisma.evaluation.upsert({
+        // 1. Create or update the main teacher evaluation
+        const teacherEvaluation = await prisma.evaluation.upsert({
             where: { enrollmentId },
             update: {
                 attendancePercentage,
@@ -50,42 +50,40 @@ export class EvaluationService {
                 assignmentId,
                 attendancePercentage,
                 lateCount,
-                observations: data.observations,
+                observations: observations,
             },
         });
 
-        // 2. Eliminar competencias previas si existen (para re-crearlas)
+        // 2. Delete previous competences if they exist (to re-create them)
         await prisma.competenceEvaluation.deleteMany({
-            where: { evaluationId: avaluacioDocent.evaluationId },
+            where: { evaluationId: teacherEvaluation.evaluationId },
         });
 
-        // 3. Crear las nuevas puntuaciones de competencias
+        // 3. Create new competence scores
         const competencesCreated = await prisma.competenceEvaluation.createMany({
             data: competences.map((c) => ({
-                evaluationId: avaluacioDocent.evaluationId,
+                evaluationId: teacherEvaluation.evaluationId,
                 competenceId: c.competenceId,
                 score: c.score,
             })),
         });
 
-        return { ...avaluacioDocent, competencesCount: competencesCreated.count };
+        return { ...teacherEvaluation, competencesCount: competencesCreated.count };
     }
 
     /**
-     * MOCK AI: Simula el análisis de Speech-to-Text y sentimientos/puntuaciones.
-     * En una versión real, esto llamaría a OpenAI o un servicio similar.
+     * MOCK AI: Simulates Speech-to-Text and sentiment/score analysis.
+     * In a real version, this would call OpenAI or a similar service.
      */
     async analyzeObservationsAI(text: string) {
-
-
-        // Simulación de delay
+        // Simulation delay
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Lógica de mock: busca palabras clave para sugerir puntuaciones
-        const keywordsPositive = ['bueno', 'excelente', 'bien', 'disciplinado', 'responsable', 'proactivo'];
-        const keywordsNegative = ['mal', 'falta', 'atención', 'distraído', 'pasivo'];
+        // Mock logic: looks for keywords to suggest scores
+        const keywordsPositive = ['good', 'excellent', 'well', 'disciplined', 'responsible', 'proactive', 'bueno', 'excelente', 'bien', 'responsable'];
+        const keywordsNegative = ['bad', 'missing', 'attention', 'distracted', 'passive', 'mal', 'falta', 'atención', 'distraído', 'pasivo'];
 
-        let scoreSuggestion = 3; // Suficiente por defecto
+        let scoreSuggestion = 3; // Sufficient by default
 
         const words = text.toLowerCase().split(/\s+/);
         const positiveCount = words.filter(w => keywordsPositive.includes(w)).length;
@@ -98,12 +96,12 @@ export class EvaluationService {
             transcription: text,
             sentiment: positiveCount >= negativeCount ? 'Positive' : 'Negative',
             suggestedScore: Math.max(1, Math.min(5, scoreSuggestion)),
-            summary: `Análisis automático: El alumno muestra una actitud ${positiveCount >= negativeCount ? 'favorable' : 'a mejorar'}.`
+            summary: `Automated analysis: The student shows a ${positiveCount >= negativeCount ? 'favorable' : 'to-be-improved'} attitude.`
         };
     }
 
     /**
-     * Obtiene todas las competencias disponibles en el sistema.
+     * Retrieves all available competencies in the system.
      */
     async getCompetencies() {
         return await prisma.competence.findMany();

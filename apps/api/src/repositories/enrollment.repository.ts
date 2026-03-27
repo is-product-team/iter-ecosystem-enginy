@@ -24,11 +24,11 @@ export class EnrollmentRepository extends BaseRepository<Enrollment, Prisma.Enro
         student: true,
         attendance: true
       },
-      orderBy: { student: { surnames: 'asc' } }
+      orderBy: { student: { lastName: 'asc' } }
     });
   }
 
-  // Lógica específica para asistencia
+  // Specific attendance logic
   async registerAttendance(enrollmentId: number, data: Omit<Prisma.AttendanceCreateInput, 'enrollment'>): Promise<Attendance> {
     return this.prisma.attendance.create({
       data: {

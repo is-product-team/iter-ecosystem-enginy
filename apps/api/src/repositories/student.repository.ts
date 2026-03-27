@@ -1,30 +1,31 @@
-import { PrismaClient } from '@prisma/client';
+import { Student, Prisma } from '@prisma/client';
+import { BaseRepository } from './base.repository.js';
 
-export class StudentRepository {
-  private prisma: PrismaClient;
-
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
+export class StudentRepository extends BaseRepository<Student, Prisma.StudentCreateInput, Prisma.StudentUpdateInput> {
+  constructor() {
+    super('student', 'studentId');
   }
 
-  async findById(studentId: number) {
+  override async findById(id: number): Promise<Student | null> {
     return this.prisma.student.findUnique({
-      where: { studentId: studentId },
-      include: { center_origin: true }
+      where: { studentId: id },
+      include: { centerOrigin: true }
     });
   }
 
-  async findByIdalu(idalu: string) {
+  async findByIdalu(idalu: string): Promise<Student | null> {
     return this.prisma.student.findUnique({
       where: { idalu }
     });
   }
 
-  async findByCenter(centerId: number) {
+  async findByCenter(centerId: number): Promise<Student[]> {
     return this.prisma.student.findMany({
       where: { originCenterId: centerId },
-      include: { center_origin: true },
+      include: { centerOrigin: true },
       orderBy: { lastName: 'asc' }
     });
   }
 }
+
+export const studentRepository = new StudentRepository();

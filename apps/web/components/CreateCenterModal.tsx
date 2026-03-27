@@ -17,11 +17,11 @@ const CreateCenterModal = ({
   onCenterSaved,
   initialData,
 }: CreateCenterModalProps) => {
-  const [codiCenter, setCodiCenter] = useState("");
+  const [centerCode, setCenterCode] = useState("");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [phoneContact, setPhoneContact] = useState("");
-  const [emailContact, setEmailContact] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,25 +29,25 @@ const CreateCenterModal = ({
   React.useEffect(() => {
     if (visible) {
       if (initialData) {
-        setCodiCenter(initialData.centerCode);
+        setCenterCode(initialData.centerCode);
         setName(initialData.name);
         setAddress(initialData.address || "");
-        setPhoneContact(initialData.phone || "");
-        setEmailContact(initialData.email || "");
+        setContactPhone(initialData.contactPhone || "");
+        setContactEmail(initialData.contactEmail || "");
       } else {
         // Reset form
-        setCodiCenter("");
+        setCenterCode("");
         setName("");
         setAddress("");
-        setPhoneContact("");
-        setEmailContact("");
+        setContactPhone("");
+        setContactEmail("");
       }
       setError(null);
     }
   }, [visible, initialData]);
 
   const handleSubmit = async () => {
-    if (!codiCenter || !name) {
+    if (!centerCode || !name) {
       setError("The center code and name are required.");
       return;
     }
@@ -55,11 +55,11 @@ const CreateCenterModal = ({
     setError(null);
 
     const centerData: Omit<Center, "centerId"> = {
-      centerCode: codiCenter,
+      centerCode: centerCode,
       name: name,
       address: address,
-      phone: phoneContact,
-      email: emailContact,
+      contactPhone: contactPhone,
+      contactEmail: contactEmail,
     };
 
     try {
@@ -138,8 +138,8 @@ const CreateCenterModal = ({
               <input
                 className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all outline-none"
                 placeholder="Ex: 08012345"
-                value={codiCenter}
-                onChange={(e) => setCodiCenter(e.target.value)}
+                value={centerCode}
+                onChange={(e) => setCenterCode(e.target.value)}
               />
             </div>
 
@@ -174,8 +174,8 @@ const CreateCenterModal = ({
               <input
                 className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all outline-none"
                 placeholder="Ex: 931234567"
-                value={phoneContact}
-                onChange={(e) => setPhoneContact(e.target.value)}
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
               />
             </div>
 
@@ -186,8 +186,8 @@ const CreateCenterModal = ({
               <input
                 className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all outline-none"
                 placeholder="Ex: contact@centre.edu"
-                value={emailContact}
-                onChange={(e) => setEmailContact(e.target.value)}
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
               />
             </div>
           </div>

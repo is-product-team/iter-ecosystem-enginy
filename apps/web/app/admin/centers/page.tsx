@@ -232,10 +232,10 @@ export default function CentersScreen() {
                       {center.address || "No address"}
                     </td>
                     <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
-                      {center.email || "N/A"}
+                      {center.contactEmail || "N/A"}
                     </td>
                     <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
-                      {center.phone || "N/A"}
+                      {center.contactPhone || "N/A"}
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">

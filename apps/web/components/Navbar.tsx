@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
       const fetchUnread = async () => {
         try {
           const list = await notificationService.getAll();
-          setUnreadCount(list.filter(n => !n.llegida).length);
+          setUnreadCount(list.filter(n => !n.isRead).length);
         } catch (error) {
           console.error("Error fetching notifications for navbar", error);
         }
@@ -37,14 +37,14 @@ const Navbar: React.FC = () => {
   const isAdmin = user.role.name === ROLES.ADMIN;
   const isCoordinator = user.role.name === ROLES.COORDINATOR;
 
-  const getInicioPath = () => {
+  const getHomePath = () => {
     if (isAdmin) return `/${locale}/admin`;
     if (isCoordinator) return `/${locale}/center`;
     return `/${locale}`;
   };
 
   const navLinks = [
-    { label: 'Home', path: getInicioPath(), show: true },
+    { label: 'Home', path: getHomePath(), show: true },
     { label: 'Notifications', path: `/${locale}/center/notifications`, show: true, isNotifications: true },
     { label: 'Calendar', path: `/${locale}/calendar`, show: true },
     { label: 'Profile', path: `/${locale}/profile`, show: true },
@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
       <div className="max-w-[1440px] mx-auto container-responsive">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href={getInicioPath()} className="flex items-center">
+            <Link href={getHomePath()} className="flex items-center">
               <Image 
                 src="/logo.png" 
                 alt="Iter Logo" 

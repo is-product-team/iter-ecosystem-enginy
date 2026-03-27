@@ -23,7 +23,7 @@ async function test() {
             });
 
             console.log('--- Testing Password Comparison ---');
-            const valid = await bcrypt.compare('Iter@1234', user.password_hash);
+            const valid = await bcrypt.compare('Iter@1234', user.passwordHash);
             console.log('Password valid:', valid);
         } else {
             console.log('User NOT found: admin@admin.com');

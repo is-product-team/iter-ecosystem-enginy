@@ -1,7 +1,7 @@
 import getApi from "./api";
 
 export interface Student {
-  id_student: number;
+  studentId: number;
   fullName: string;
   lastName: string;
   idalu: string;
@@ -16,7 +16,7 @@ const studentService = {
     const response = await api.get<Student[]>("/students");
     return response.data;
   },
-  create: async (data: Omit<Student, 'id_student'>): Promise<Student> => {
+  create: async (data: Omit<Student, 'studentId'>): Promise<Student> => {
     const api = getApi();
     const response = await api.post<Student>("/students", data);
     return response.data;

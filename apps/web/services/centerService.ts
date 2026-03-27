@@ -5,76 +5,72 @@ export interface Center {
   centerCode: string;
   name: string;
   address?: string;
-  phone?: string;
-  email?: string;
+  contactPhone?: string;
+  contactEmail?: string;
 }
 
 const centerService = {
   /**
-   * Obtiene todos los centros desde el backend.
+   * Gets all centers from the backend.
    */
   getAll: async (): Promise<Center[]> => {
     const api = getApi();
     try {
       const response = await api.get<{ data: any[], meta: unknown }>("/centers");
       return response.data.data.map((c: any) => ({
-        centerId: c.id_center,
+        centerId: c.centerId,
         centerCode: c.centerCode,
         name: c.name,
         address: c.address,
-        phone: c.phone,
-        email: c.email
+        contactPhone: c.contactPhone,
+        contactEmail: c.contactEmail
       }));
     } catch (error) {
-      console.error("Error en centerService.getAll:", error);
+      console.error("Error in centerService.getAll:", error);
       throw error;
     }
   },
 
   /**
-   * Crea un nuevo centro en el backend.
+   * Creates a new center in the backend.
    */
-  create: async (centroData: Omit<Center, 'centerId'>): Promise<Center> => {
+  create: async (centerData: Omit<Center, 'centerId'>): Promise<Center> => {
     const api = getApi();
     try {
-      const response = await api.post("/centers", centroData);
+      const response = await api.post("/centers", centerData);
       return response.data;
     } catch (error) {
-      console.error("Error en centerService.create:", error);
-      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "No se pudo crear el centro";
+      console.error("Error in centerService.create:", error);
+      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Could not create center";
       throw new Error(errorMessage);
     }
   },
 
   /**
-   * Actualiza un centro existente.
+   * Updates an existing center.
    */
-  update: async (id: number, centroData: Partial<Center>): Promise<Center> => {
+  update: async (id: number, centerData: Partial<Center>): Promise<Center> => {
     const api = getApi();
     try {
-      // The backend controller only has updateCenterAttendance for PATCH.
-      // But usually we need more. Let's look at the controller again.
-      // It only has getCenters, getCenterById, createCenter, updateCenterAttendance.
-      // I'll implement what's available and assume more might be needed or added.
-      const response = await api.patch(`/centers/${id}`, centroData);
+      const response = await api.patch(`/centers/${id}`, centerData);
       return response.data;
     } catch (error) {
-      console.error("Error en centerService.update:", error);
-      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "No se pudo actualizar el centro";
+      console.error("Error in centerService.update:", error);
+      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Could not update center";
       throw new Error(errorMessage);
     }
   },
 
   /**
-   * Elimina un centro (not implemented in backend yet, but adding for frontend completeness)
+   * Deletes a center.
    */
   delete: async (id: number): Promise<void> => {
     const api = getApi();
     try {
       await api.delete(`/centers/${id}`);
     } catch (error) {
-      console.error("Error en centerService.delete:", error);
-      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "No se pudo eliminar el centro";
+      console.error("Error in centerService.delete:", error);
+      const errorMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Could not delete center";
       throw new Error(errorMessage);
     }
   },

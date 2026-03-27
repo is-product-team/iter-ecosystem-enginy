@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma.js';
 import * as xlsx from 'xlsx';
-import { ROLES } from '@iter/shared';
 
 /**
  * Upload Excel and import students to an assignment
@@ -23,71 +22,62 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
     // Expecting columns: "nom", "cognoms", "idalu", "curs"
     const studentsToCreate = data.map(row => ({
       name: row.nom || row.Nombre || '',
-      surnames: row.cognoms || row.Apellidos || '',
+      lastName: row.cognoms || row.Apellidos || '',
       idalu: String(row.idalu || row.ID || ''),
-      curs: row.curs || row.Curso || ''
+      grade: row.curs || row.Curso || ''
     })).filter(s => s.name && s.idalu);
 
-    const assignacio = await prisma.assignment.findUnique({
+    const assignment = await prisma.assignment.findUnique({
       where: { assignmentId: parseInt(idAssignment as string) },
       include: { center: true }
     });
 
-    if (!assignacio) {
-      return res.status(404).json({ error: 'Assignment not found.', importance: 'WARNING' });
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found.' });
     }
 
     const results = [];
     for (const s of studentsToCreate) {
-      // Upsert student (they might already exist if they are in multiple workshops or from previous years)
-      const alumne = await prisma.student.upsert({
+      // Upsert student
+      const student = await prisma.student.upsert({
         where: { idalu: s.idalu },
         update: {
-          fullName: s.nom,
-          lastName: s.cognoms,
-          curs: s.curs
+          fullName: s.name,
+          lastName: s.lastName,
+          grade: s.grade
         },
         create: {
-          fullName: s.nom,
-          lastName: s.cognoms, // Renamed 'surnames' to 'lastName'
+          fullName: s.name,
+          lastName: s.lastName,
           idalu: s.idalu,
-          curs: s.curs,
-          originCenterCode: assignacio.center.centerCode // Fixed field name and derived value prefix
+          grade: s.grade,
+          originCenterId: assignment.centerId
         }
       });
 
-      // Create inscription
-      const inscripcio = await prisma.enrollment.upsert({
-        where: {
-          // We don't have a unique key for inscripcio, so we manually check
-          enrollmentId: -1 // dummy
-        },
-        update: {},
-        create: {
-          assignmentId: assignacio.assignmentId,
-          studentId: alumne.studentId
-        }
-      }).catch(async () => {
-        // Manual check for existing
-        const existing = await prisma.enrollment.findFirst({
-          where: { assignmentId: assignacio.assignmentId, studentId: alumne.studentId }
+      // Create enrollment (check if exists first since we don't have a simple unique key for it)
+      const existingEnrollment = await prisma.enrollment.findFirst({
+        where: { assignmentId: assignment.assignmentId, studentId: student.studentId }
+      });
+
+      if (!existingEnrollment) {
+        const enrollment = await prisma.enrollment.create({
+          data: {
+            assignmentId: assignment.assignmentId,
+            studentId: student.studentId
+          }
         });
-        if (!existing) {
-          return prisma.enrollment.create({
-            data: { assignmentId: assignacio.assignmentId, studentId: alumne.studentId }
-          });
-        }
-        return existing;
-      });
-
-      results.push(inscripcio);
+        results.push(enrollment);
+      } else {
+        results.push(existingEnrollment);
+      }
     }
 
     // Update checklist
     await prisma.assignmentChecklist.updateMany({
       where: {
-        assignmentId: assignacio.assignmentId,
-        stepName: { contains: 'Registro Nominal' }
+        assignmentId: assignment.assignmentId,
+        stepName: { contains: 'Nominal' } // Standardized search
       },
       data: {
         isCompleted: true,
@@ -96,7 +86,7 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
     });
 
     res.json({
-      message: `${results.length} students enrolled successfully.`,
+      message: `${results.length} students processed successfully.`,
       count: results.length
     });
   } catch (error) {

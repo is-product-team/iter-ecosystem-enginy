@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Linking, Platform, ActivityIndicator, RefreshControl } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME, PHASES } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
-import api, { getMyAssignments, getPhases, getNotifications } from '../../../services/api';
+import { getMyAssignments, getPhases } from '../../../services/api';
 
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
@@ -15,7 +15,7 @@ export default function DashboardScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [fases, setFases] = useState<any[]>([]);
+  const [phases, setPhases] = useState<any[]>([]);
   const [assignments, setAssignments] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -24,9 +24,9 @@ export default function DashboardScreen() {
   const [userName, setUserName] = useState('Professor');
   
   // 1. Helpers
-  const isPhaseActive = (nomFase: string) => {
-    const fase = fases.find(f => f.nom === nomFase);
-    return fase ? fase.activa : false;
+  const isPhaseActive = (phaseName: string) => {
+    const phase = phases.find(p => p.name === phaseName);
+    return phase ? phase.isActive : false;
   };
 
   const checkRoleAndFetchData = async (isRefresh = false) => {
@@ -38,15 +38,17 @@ export default function DashboardScreen() {
             ? localStorage.getItem('user') 
             : await SecureStore.getItemAsync('user');
         } catch (storageError) {
-          console.warn("⚠️ [Dashboard] Error accedint al magatzem:", storageError);
+          console.warn("⚠️ [Dashboard] Error accessing storage:", storageError);
           router.replace('/login');
           return;
         }
         
         if (userData) {
           const user = JSON.parse(userData);
-          if (user.nom) setUserName(user.nom);
-          if (user.rol?.roleName !== 'PROFESSOR') {
+          if (user.firstName) setUserName(user.firstName);
+          else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
+          
+          if (user.role?.roleName !== 'PROFESSOR') {
             router.replace('/login');
             return;
           }
@@ -55,11 +57,11 @@ export default function DashboardScreen() {
           return;
         }
 
-        const [fasesRes, assignmentsRes] = await Promise.all([
+        const [phasesRes, assignmentsRes] = await Promise.all([
           getPhases(),
           getMyAssignments()
         ]);
-        setFases(fasesRes.data);
+        setPhases(phasesRes.data);
         setAssignments(assignmentsRes.data);
       } catch (error: any) {
         console.error("Error fetching dashboard data:", error);
@@ -77,25 +79,25 @@ export default function DashboardScreen() {
         if (assign.sessions && assign.sessions.length > 0) {
             assign.sessions.forEach((sess: any) => {
                 allSessions.push({
-                    id_assignacio: assign.id_assignacio,
-                    taller: assign.taller,
-                    centre: assign.centre,
+                    assignmentId: assign.assignmentId,
+                    workshop: assign.workshop,
+                    center: assign.center,
                     startDate: sess.sessionDate, 
                     startTime: sess.startTime,
                     endTime: sess.endTime,
                     isSession: true,
-                    enviaments: assign.enviaments // Pass enviaments
+                    submissions: assign.submissions
                 });
             });
         } else {
              allSessions.push({
-                id_assignacio: assign.id_assignacio,
-                taller: assign.taller,
-                centre: assign.centre,
+                assignmentId: assign.assignmentId,
+                workshop: assign.workshop,
+                center: assign.center,
                 startDate: assign.startDate,
                 startTime: null,
                 isSession: false,
-                enviaments: assign.enviaments
+                submissions: assign.submissions
              });
         }
     });
@@ -104,9 +106,9 @@ export default function DashboardScreen() {
   };
 
   const isEvaluated = (assignment: any) => {
-      if (!assignment.enviaments) return false;
-      return assignment.enviaments.some((e: any) => 
-          e.status === 'Respost' && e.model?.destinatari === 'PROFESSOR'
+      if (!assignment.submissions) return false;
+      return assignment.submissions.some((s: any) => 
+          s.status === 'RESPONDED' && s.target === 'TEACHER'
       );
   };
 
@@ -123,31 +125,24 @@ export default function DashboardScreen() {
 
   // 3. Derived State
   const nextWorkshop = getNextSession();
-  const activePhase = fases.find(f => f.activa);
-  const activePhaseName = activePhase ? activePhase.nom : '';
-  const isEvalPhase = activePhaseName.includes('Avaluació') || activePhaseName.includes('Tancament') || activePhaseName.includes('Fase 4');
+  const activePhase = phases.find(p => p.isActive);
+  const activePhaseName = activePhase ? activePhase.name : '';
+  const isEvalPhase = activePhaseName.includes('Evaluation') || activePhaseName.includes('Closure') || activePhaseName.includes('Phase 4');
 
-  const handleWorkshopClick = (workshop: any) => {
-    // If we are clicking 'nextWorkshop' (which might be a session object), we need to ensure it has enviaments
-    // However, sessions object created in getNextSession carries enviaments now.
-    
-    // Check if evaluated using the assignment data (workshop)
-    // If workshop is just a session, we might need to find the original assignment or ensure enviaments is passed. 
-    // In getNextSession above I added enviaments to the flattened object.
-    
-    const evaluated = isEvaluated(workshop);
+  const handleWorkshopClick = (assignment: any) => {
+    const evaluated = isEvaluated(assignment);
 
     const formattedEvent: CalendarEvent = {
-        id: workshop.id_assignacio,
-        title: workshop.workshop.title,
-        date: workshop.startDate,
+        id: assignment.assignmentId,
+        title: assignment.workshop.title,
+        date: assignment.startDate,
         type: 'assignment',
-        description: workshop.taller.descripcio || t('Common.no_description'),
+        description: assignment.workshop.description || t('Common.no_description'),
         metadata: {
-            hora: new Date(workshop.startDate).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(workshop.startDate).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }), 
-            centre: workshop.center.name,
-            adreca: workshop.center.address,
-            id_assignacio: workshop.id_assignacio,
+            hora: new Date(assignment.startDate).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(assignment.startDate).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }), 
+            centre: assignment.center.name,
+            adreca: assignment.center.address,
+            assignmentId: assignment.assignmentId,
             isEvaluation: isEvalPhase,
             isEvaluated: evaluated
         }
@@ -205,7 +200,7 @@ export default function DashboardScreen() {
              <View>
                  <Text className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">{t('Dashboard.current_phase')}</Text>
                  <Text className="text-xl font-bold text-text-primary tracking-tight">
-                    {fases.find(f => f.activa)?.nom || t('Dashboard.loading_data')}
+                    {phases.find(p => p.isActive)?.name || t('Dashboard.loading_data')}
                  </Text>
              </View>
              <View className="flex-row items-center bg-background-surface px-3 py-1.5 rounded-full border border-border-subtle">
@@ -220,8 +215,8 @@ export default function DashboardScreen() {
                <Text className="text-text-primary text-lg font-bold mb-4">{t('Dashboard.pending_tasks')}</Text>
                {pendingAssignments.map(assign => (
                  <TouchableOpacity
-                    key={assign.id_assignacio}
-                    onPress={() => router.push(`/(professor)/questionnaire/${assign.id_assignacio}`)}
+                    key={assign.assignmentId}
+                    onPress={() => router.push(`/(professor)/questionnaire/${assign.assignmentId}`)}
                     className="w-full bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-5 border border-orange-200 dark:border-orange-800 mb-3 flex-row items-center justify-between"
                  >
                     <View className="flex-1 mr-4">
@@ -316,9 +311,3 @@ export default function DashboardScreen() {
     </View>
   );
 }
-
-// Helper to check for active sessions today
-const hasActiveSession = (assignments: any[]) => {
-   const today = new Date().toLocaleDateString();
-   return assignments.some(a => new Date(a.startDate).toLocaleDateString() === today);
-};

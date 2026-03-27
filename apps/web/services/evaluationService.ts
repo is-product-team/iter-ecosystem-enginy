@@ -13,8 +13,8 @@ export const evaluationService = {
                     attendancePercentage: d.attendancePercentage,
                     lateCount: d.lateCount,
                     observations: d.observations,
-                    competencies: d.competences?.map((c: { id_competence: number, score: number }) => ({
-                        id_competence: c.id_competence,
+                    competencies: d.competencies?.map((c: { competenceId: number, score: number }) => ({
+                        competenceId: c.competenceId,
                         score: c.score
                     }))
                 }
@@ -23,9 +23,9 @@ export const evaluationService = {
         return response;
     },
 
-    upsertEvaluation: (data: { enrollmentId: number, attendancePercentage: number, lateCount: number, observations: string, competencies: { id_competence: number, score: number }[] }) =>
+    upsertEvaluation: (data: { enrollmentId: number, attendancePercentage: number, lateCount: number, observations: string, competencies: { competenceId: number, score: number }[] }) =>
         api.post('/evaluation/upsert', {
-            id_enrollment: data.enrollmentId,
+            enrollmentId: data.enrollmentId,
             attendancePercentage: data.attendancePercentage,
             lateCount: data.lateCount,
             observations: data.observations,

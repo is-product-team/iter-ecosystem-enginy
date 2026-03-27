@@ -30,7 +30,7 @@ export default function RequestsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -83,8 +83,8 @@ export default function RequestsPage() {
 
   const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
   const paginatedWorkshops = filteredWorkshops.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const selectedWorkshop = workshops.find(w => w._id === selectedWorkshopId);
@@ -104,7 +104,7 @@ export default function RequestsPage() {
   const handleEdit = (request: Request) => {
     setEditingRequestId(request.id_request);
     // Find the workshop ID string (assuming it matches)
-    const workshop = workshops.find(w => parseInt(w._id) === request.id_workshop);
+    const workshop = workshops.find(w => parseInt(w._id) === request.workshopId);
     if (workshop) {
       setSelectedWorkshopId(workshop._id);
     }
@@ -163,7 +163,7 @@ export default function RequestsPage() {
       } else {
         // Create
         await requestService.create({
-          id_workshop: parseInt(selectedWorkshopId),
+          workshopId: parseInt(selectedWorkshopId),
           approxStudents: Number(approxStudents),
           comments,
           teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
@@ -239,7 +239,7 @@ export default function RequestsPage() {
                   </tr>
                 ) : filteredWorkshops.length > 0 ? (
                   paginatedWorkshops.map((workshop) => {
-                    const existingRequest = requests.find(r => r.id_workshop === parseInt(workshop._id));
+                    const existingRequest = requests.find(r => r.workshopId === parseInt(workshop._id));
                     const isSelected = selectedWorkshopId === workshop._id;
 
                     return (
@@ -251,65 +251,65 @@ export default function RequestsPage() {
                           }
                         }}
                         className={`group transition-colors ${existingRequest && existingRequest.status !== REQUEST_STATUSES.PENDING && !isSelected
-                            ? 'bg-gray-50 opacity-60 cursor-default'
-                            : isSelected
-                              ? 'bg-blue-50/50 cursor-pointer border-l-4 border-l-[#00426B]'
-                              : (!existingRequest && !editingRequestId)
-                                ? 'hover:bg-gray-50 cursor-pointer border-l-4 border-l-transparent'
-                                : 'cursor-default border-l-4 border-l-transparent'
+                          ? 'bg-gray-50 opacity-60 cursor-default'
+                          : isSelected
+                            ? 'bg-blue-50/50 cursor-pointer border-l-4 border-l-[#00426B]'
+                            : (!existingRequest && !editingRequestId)
+                              ? 'hover:bg-gray-50 cursor-pointer border-l-4 border-l-transparent'
+                              : 'cursor-default border-l-4 border-l-transparent'
                           }`}
                       >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 flex items-center justify-center font-bold text-xs shrink-0 ${workshop.modality === 'A' ? 'bg-green-100 text-green-700' :
-                            workshop.modality === 'B' ? 'bg-orange-100 text-orange-700' :
-                              'bg-purple-100 text-purple-700'
-                          }`}>
-                          {workshop.modality}
-                        </div>
-                        <WorkshopIcon iconName={workshop.icon} className="w-6 h-6 text-[#00426B]" />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="font-bold text-gray-800 text-sm group-hover:text-[#00426B] transition-colors">{workshop.title}</div>
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">{workshop.sector}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {existingRequest && (
-                        <>
-                          <div className="text-xs font-medium text-gray-700">1. {existingRequest.teacher1?.name}</div>
-                          <div className="text-xs font-medium text-gray-700">2. {existingRequest.teacher2?.name || '-'}</div>
-                        </>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      {existingRequest ? (
-                        existingRequest.status === REQUEST_STATUSES.PENDING ? (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(existingRequest);
-                            }}
-                            className="text-[10px] font-black border border-yellow-400 bg-yellow-50 px-3 py-1 text-yellow-600 uppercase tracking-widest hover:bg-yellow-100 transition-colors"
-                          >
-                            Edit
-                          </button>
-                        ) : (
-                          <span className={`text-[10px] font-black border px-2 py-1 uppercase tracking-widest ${existingRequest.status === REQUEST_STATUSES.APPROVED
-                              ? 'border-green-200 bg-green-50 text-green-600'
-                              : 'border-red-200 bg-red-50 text-red-600'
-                            }`}>
-                            {existingRequest.status}
-                          </span>
-                        )
-                      ) : isSelected ? (
-                        <span className="text-[10px] font-black border border-[#00426B] px-2 py-1 text-[#00426B] uppercase tracking-widest bg-blue-50">Selected</span>
-                      ) : (
-                        !editingRequestId && (
-                          <span className="text-[10px] font-black border border-transparent group-hover:border-gray-300 px-2 py-1 text-gray-300 uppercase tracking-widest transition-all group-hover:text-gray-400">Select</span>
-                        )
-                      )}
-                    </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 flex items-center justify-center font-bold text-xs shrink-0 ${workshop.modality === 'A' ? 'bg-green-100 text-green-700' :
+                              workshop.modality === 'B' ? 'bg-orange-100 text-orange-700' :
+                                'bg-purple-100 text-purple-700'
+                              }`}>
+                              {workshop.modality}
+                            </div>
+                            <WorkshopIcon iconName={workshop.icon} className="w-6 h-6 text-[#00426B]" />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-bold text-gray-800 text-sm group-hover:text-[#00426B] transition-colors">{workshop.title}</div>
+                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">{workshop.sector}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {existingRequest && (
+                            <>
+                              <div className="text-xs font-medium text-gray-700">1. {existingRequest.teacher1?.name}</div>
+                              <div className="text-xs font-medium text-gray-700">2. {existingRequest.teacher2?.name || '-'}</div>
+                            </>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {existingRequest ? (
+                            existingRequest.status === REQUEST_STATUSES.PENDING ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(existingRequest);
+                                }}
+                                className="text-[10px] font-black border border-yellow-400 bg-yellow-50 px-3 py-1 text-yellow-600 uppercase tracking-widest hover:bg-yellow-100 transition-colors"
+                              >
+                                Edit
+                              </button>
+                            ) : (
+                              <span className={`text-[10px] font-black border px-2 py-1 uppercase tracking-widest ${existingRequest.status === REQUEST_STATUSES.APPROVED
+                                ? 'border-green-200 bg-green-50 text-green-600'
+                                : 'border-red-200 bg-red-50 text-red-600'
+                                }`}>
+                                {existingRequest.status}
+                              </span>
+                            )
+                          ) : isSelected ? (
+                            <span className="text-[10px] font-black border border-[#00426B] px-2 py-1 text-[#00426B] uppercase tracking-widest bg-blue-50">Selected</span>
+                          ) : (
+                            !editingRequestId && (
+                              <span className="text-[10px] font-black border border-transparent group-hover:border-gray-300 px-2 py-1 text-gray-300 uppercase tracking-widest transition-all group-hover:text-gray-400">Select</span>
+                            )
+                          )}
+                        </td>
                       </tr>
                     );
                   })
@@ -459,8 +459,8 @@ export default function RequestsPage() {
                     type="submit"
                     disabled={submitting}
                     className={`w-full py-4 rounded-none font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${submitting
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-[#00426B] text-white hover:bg-[#0775AB] shadow-md hover:shadow-lg active:translate-y-0.5'
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-[#00426B] text-white hover:bg-[#0775AB] shadow-md hover:shadow-lg active:translate-y-0.5'
                       }`}
                   >
                     {submitting ? (

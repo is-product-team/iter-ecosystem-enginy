@@ -5,20 +5,19 @@ import { router } from 'expo-router';
 import type { 
   Role, 
   Phase, 
-  Student as SharedStudent
 } from '@iter/shared';
 
 export interface Student {
-  id_student: number;
+  studentId: number;
   idalu: string;
   fullName: string;
-  surnames: string;
+  lastName: string;
   grade?: string;
   photoUrl?: string;
 }
 
 export interface Workshop {
-  id_workshop: number;
+  workshopId: number;
   title: string;
   description: string;
   durationHours: number;
@@ -27,27 +26,27 @@ export interface Workshop {
 }
 
 export interface Center {
-  id_center: number;
+  centerId: number;
   name: string;
   address?: string;
 }
 
 export interface Enrollment {
-  id_enrollment: number;
-  id_assignment: number;
-  id_student: number;
+  enrollmentId: number;
+  assignmentId: number;
+  studentId: number;
   student: Student;
   [key: string]: any;
 }
 
 export interface Assignment {
-  id_assignment: number;
-  id_request?: number;
-  id_center: number;
+  assignmentId: number;
+  requestId?: number;
+  centerId: number;
   center: Center;
-  id_workshop: number;
+  workshopId: number;
   workshop: Workshop;
-  startDate: string; // Changed from data_inici
+  startDate: string;
   endDate: string;
   status: string;
   group: number;
@@ -56,28 +55,28 @@ export interface Assignment {
 }
 
 export interface Session {
-  id_session: number;
-  id_assignment: number;
-  sessionDate: string; // Changed from data_session
-  startTime: string;   // Changed from hora_inici
-  endTime: string;     // Changed from hora_fi
+  sessionId: number;
+  assignmentId: number;
+  sessionDate: string;
+  startTime: string;
+  endTime: string;
 }
 
 export interface Attendance {
-  id_attendance: number;
-  id_enrollment: number;
-  sessionNumber: number; // Changed from numero_sessio
-  status: string;        // Changed from estat
-  comments?: string;     // Changed from observacions
-  sessionDate: string;   // Changed from data_session
+  attendanceId: number;
+  enrollmentId: number;
+  sessionNumber: number;
+  status: string;
+  observations?: string;
+  sessionDate: string;
   [key: string]: any;
 }
 
 export interface Notification {
-  id_notification: number;
+  notificationId: number;
   title: string;
   message: string;
-  read: boolean;
+  isRead: boolean;
   createdAt: string;
   type: string;
   importance: string;
@@ -146,13 +145,13 @@ export const logout = async () => {
       await SecureStore.deleteItemAsync('user');
     }
   } catch (error) {
-    console.error('Error al cerrar sesión:', error);
+    console.error('Error closing session:', error);
   }
 };
 
 // --- Auth ---
 export const login = (data: { email: string; password?: string }) => 
-  api.post<{ token: string; user: { userId: number; role: Role; centreId?: number } }>('auth/login', data);
+  api.post<{ token: string; user: { userId: number; role: Role; centerId?: number } }>('auth/login', data);
 
 // --- Assignments & Teachers ---
 export const getMyAssignments = () => 
@@ -162,23 +161,23 @@ export const getChecklist = (id: string | number) =>
   api.get(`assignments/${id}/checklist`);
 
 export const getStudents = (id: string | number) => 
-  api.get<(Enrollment & { alumne: Student })[]>(`assignments/${id}/students`);
+  api.get<Enrollment[]>(`assignments/${id}/students`);
 
 // --- Attendance ---
-export const getAttendance = (idAssignment: string | number) => 
-  api.get<Attendance[]>(`attendance/assignments/${idAssignment}`);
+export const getAttendance = (assignmentId: string | number) => 
+  api.get<Attendance[]>(`attendance/assignments/${assignmentId}`);
 
 export const postAttendance = (data: { 
-  id_enrollment: number; 
-  sessionNumber: number; // Changed from numero_sessio
-  status: string;        // Changed from estat
-  comments?: string;     // Changed from observacions
+  enrollmentId: number; 
+  sessionNumber: number;
+  status: string;
+  observations?: string;
   sessionDate?: string;
 }) => api.post<Attendance>('attendance', data);
 
 // --- Other Services ---
-export const postIncidencia = (data: { id_assignment: number; titol: string; descripcio: string }) => 
-  api.post('assignments/incidencies', data);
+export const postIncident = (data: { assignmentId: number; title: string; description: string }) => 
+  api.post('assignments/incidents', data);
 
 export const getPhases = () => 
   api.get<Phase[]>('phases');

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 import prisma from '../lib/prisma.js';
-import { createNotificationInterna } from '../controllers/notificacio.controller.js';
+import { createNotificationInternal } from '../controllers/notification.controller.js';
 
 const router = Router();
 
@@ -55,8 +55,8 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
       data: { isActive: false }
     });
 
-    // Notificar a todos los centros del inicio de la nueva fase
-    await createNotificationInterna({
+    // Notify all centers about the start of the new phase
+    await createNotificationInternal({
       title: `New Phase: ${updatedPhase.name}`,
       message: `The phase "${updatedPhase.name}" has started. Check the calendar for details.`,
       type: 'PHASE',

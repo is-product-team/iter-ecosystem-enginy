@@ -1,4 +1,4 @@
-import { PrismaClient, Modalitat } from '@prisma/client';
+import { PrismaClient, Modality } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { PHASES, ROLES } from '@iter/shared';
 import dotenv from 'dotenv';
@@ -179,10 +179,10 @@ async function seedUsers(roles: any, passDefault: string) {
 async function seedWorkshops(sectors: any) {
   console.log('📚  Generating workshop catalog...');
   const workshops = [
-    { title: 'Robotics and IoT', sectorId: sectors.tech.sectorId, modality: Modalitat.A, icon: 'ROBOT' },
-    { title: 'Digital Cinema', sectorId: sectors.creative.sectorId, modality: Modalitat.B, icon: 'FILM' },
-    { title: '3D Printing', sectorId: sectors.industrial.sectorId, modality: Modalitat.A, icon: 'TOOLS' },
-    { title: 'Web Development', sectorId: sectors.tech.sectorId, modality: Modalitat.C, icon: 'CODE' },
+    { title: 'Robotics and IoT', sectorId: sectors.tech.sectorId, modality: Modality.A, icon: 'ROBOT' },
+    { title: 'Digital Cinema', sectorId: sectors.creative.sectorId, modality: Modality.B, icon: 'FILM' },
+    { title: '3D Printing', sectorId: sectors.industrial.sectorId, modality: Modality.A, icon: 'TOOLS' },
+    { title: 'Web Development', sectorId: sectors.tech.sectorId, modality: Modality.C, icon: 'CODE' },
   ];
 
   for (const w of workshops) {

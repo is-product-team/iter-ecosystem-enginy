@@ -79,5 +79,38 @@
     "loading_data": "Càrrega de dades",
     "evaluate_finished_workshop": "Avaluar taller finalitzat",
     "in_progress": "En Curs"
+  },
+  "Evaluation": {
+    "title": "Avaluació Competencial",
+    "technical_competencies": "Competències Tècniques",
+    "transversal_competencies": "Competències Transversals",
+    "observations_label": "Observacions",
+    "observations_placeholder": "Afegeix comentaris qualitatius sobre l'evolució de l'alumne...",
+    "save_button": "Guardar Avaluació",
+    "incomplete_error": "Incomplet",
+    "incomplete_message": "Si us plau, puntua totes les competències.",
+    "save_success_title": "Guardat",
+    "save_success_message": "Avaluació guardada correctament",
+    "load_error": "No s'han pogut carregar les dades."
+  },
+  "Questionnaire": {
+    "title": "Valoració del Taller",
+    "instruction": "Si us plau, valora els següents aspectes del taller realitzat.",
+    "placeholder": "Escriu la teva resposta...",
+    "submit_button": "Enviar Valoració",
+    "incomplete_error": "Incomplet",
+    "incomplete_message": "Si us plau, respon totes les preguntes de valoració.",
+    "thanks_title": "Gràcies",
+    "thanks_message": "La teva valoració s'ha enviat correctament.",
+    "model_not_found": "No s'ha trobat el model de qüestionari.",
+    "load_error": "No s'ha pogut carregar el qüestionari.",
+    "submit_error": "No s'ha pogut enviar el qüestionari."
+  },
+  "Notifications": {
+    "tagline": "Comunicacions",
+    "title": "Avisos Oficials",
+    "mark_read": "Marcar com a llegit",
+    "delete": "Eliminar",
+    "empty": "No hi ha avisos nous"
   }
 }

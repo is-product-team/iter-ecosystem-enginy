@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma.js';
-import { createNotificationInterna } from '../controllers/notificacio.controller.js';
+import { createNotificationInternal } from '../controllers/notification.controller.js';
 
 export class TetrisService {
     /**
@@ -43,9 +43,9 @@ export class TetrisService {
                 });
 
                 // 4. Notify center
-                await createNotificationInterna({
+                await createNotificationInternal({
                     centerId: p.centerId,
-                    title: '¡Taller Asignado (Tetris)!',
+                    title: 'Workshop Assigned (Tetris)!',
                     message: `Your request for the workshop "${vacancy.workshop.title}" has been approved and assigned.`,
                     type: 'REQUEST',
                     importance: 'INFO'

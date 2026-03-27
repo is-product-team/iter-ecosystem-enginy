@@ -13,7 +13,7 @@ export interface PopularStat {
 }
 
 export interface ActivityLog {
-  id_log: number;
+  logId: number;
   actionType: string;
   userId?: number;
   timestamp: string;

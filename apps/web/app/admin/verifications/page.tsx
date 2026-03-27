@@ -70,7 +70,7 @@ export default function DocumentVerificationPage() {
     setSendingNotif(true);
     try {
       await assignmentService.sendDocumentNotification(
-        selectedAssignment.id_assignment,
+        selectedAssignment.assignmentId,
         notificationData.documentName,
         notificationData.comment,
         notificationData.greeting
@@ -142,7 +142,7 @@ export default function DocumentVerificationPage() {
                 </tr>
               ) : assignments.length > 0 ? (
                 paginatedAssignments.map((assig) => (
-                  <tr key={assig.id_assignment} className="hover:bg-gray-50 transition-colors">
+                  <tr key={assig.assignmentId} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-800 text-sm">{assig.center?.name}</div>
                       <div className="text-[10px] font-bold text-[#4197CB] uppercase tracking-tight">{assig.workshop?.title}</div>
@@ -160,16 +160,16 @@ export default function DocumentVerificationPage() {
                     <td className="px-6 py-4">
                       <div className="space-y-2">
                         {assig.enrollments?.map((ins) => (
-                          <div key={ins.id_enrollment} className="flex items-center justify-between gap-4 p-3 border border-gray-100 bg-gray-50/50 group">
+                          <div key={ins.enrollmentId} className="flex items-center justify-between gap-4 p-3 border border-gray-100 bg-gray-50/50 group">
                             <div className="flex flex-col gap-1 min-w-0">
                               <div className="text-xs font-bold text-gray-700 truncate">
                                 {ins.student?.fullName}
                               </div>
                                 <div className="flex flex-wrap gap-2">
                                   {[
-                                    { id: 'pedagogical_agreement', name: 'Pedagogical Agreement', url: ins.pedagogicalAgreementUrl, valid: ins.validated_pedagogical_agreement, validField: 'validated_pedagogical_agreement' },
-                                    { id: 'mobility_authorization', name: 'Mobility Auth.', url: ins.mobilityAuthorizationUrl, valid: ins.validated_mobility_authorization, validField: 'validated_mobility_authorization' },
-                                    { id: 'image_rights', name: 'Image Rights', url: ins.imageRightsUrl, valid: ins.validated_image_rights, validField: 'validated_image_rights' }
+                                    { id: 'pedagogical_agreement', name: 'Pedagogical Agreement', url: ins.pedagogicalAgreementUrl, valid: ins.isPedagogicalAgreementValidated, validField: 'isPedagogicalAgreementValidated' },
+                                    { id: 'mobility_authorization', name: 'Mobility Auth.', url: ins.mobilityAuthorizationUrl, valid: ins.isMobilityAuthorizationValidated, validField: 'isMobilityAuthorizationValidated' },
+                                    { id: 'image_rights', name: 'Image Rights', url: ins.imageRightsUrl, valid: ins.isImageRightsValidated, validField: 'isImageRightsValidated' }
                                   ].map(doc => (
                                     <div key={doc.id} className="flex items-center gap-1">
                                       {doc.url ? (
@@ -193,7 +193,7 @@ export default function DocumentVerificationPage() {
                                           </a>
                                             {!doc.valid ? (
                                                 <button 
-                                                  onClick={() => handleValidateDocument(ins.id_enrollment, doc.validField, true)}
+                                                  onClick={() => handleValidateDocument(ins.enrollmentId, doc.validField, true)}
                                                   className="bg-green-50 text-green-600 px-3 py-1.5 text-[9px] font-black uppercase hover:bg-green-100 transition-all border border-green-200 border-l-0"
                                                   title="Accept document"
                                                 >
@@ -201,7 +201,7 @@ export default function DocumentVerificationPage() {
                                                 </button>
                                             ) : (
                                               <button 
-                                                  onClick={() => handleValidateDocument(ins.id_enrollment, doc.validField, false)}
+                                                  onClick={() => handleValidateDocument(ins.enrollmentId, doc.validField, false)}
                                                   className="bg-red-50 text-red-500 px-3 py-1.5 text-[9px] font-black uppercase hover:bg-red-100 transition-all border border-red-200 border-l-0"
                                                   title="Revoke validation"
                                                 >

@@ -32,12 +32,12 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
     const fetchData = async () => {
       try {
         const api = getApi();
-        
+
         // Fetch phases first for gating
         const resFases = await api.get("/phases");
         const phasesData = resFases.data.data;
         const isPlanning = phasesData.find((f: { name: string, active: boolean }) => f.name === PHASES.PLANNING)?.active;
-        
+
         if (!isPlanning) {
           toast.error('The teacher designation period is not active.');
           router.push('/center/assignments');
@@ -46,16 +46,16 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
 
         // Fetch assignment
         const found = await assignmentService.getById(parseInt(id));
-        
+
         if (!found) {
           toast.error('Assignment not found.');
           router.push('/center/assignments');
           return;
         }
         setAssignment(found);
-        setProf1Id(found.teacher1?.id_user?.toString() || '');
-        setProf2Id(found.teacher2?.id_user?.toString() || '');
-        
+        setProf1Id(found.teacher1?.userId?.toString() || '');
+        setProf2Id(found.teacher2?.userId?.toString() || '');
+
         // Fetch all teachers from center
         const resProfs = await teacherService.getByCenter(currentUser.centerId || 0);
         setTeachers(resProfs || []);
@@ -83,12 +83,12 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
     try {
       setLoading(true);
       const api = getApi();
-      
+
       await api.patch(`/assignments/checklist/designate-teachers/${id}`, {
         teacher1Id: parseInt(prof1Id),
         teacher2Id: parseInt(prof2Id)
       });
-      
+
       toast.success('Teachers designated correctly.');
       router.push('/center/assignments');
     } catch (error) {
@@ -101,8 +101,8 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
   if (loading && !assignment) return <Loading fullScreen message="Loading designation..." />;
 
   return (
-    <DashboardLayout 
-      title={`Designate Teachers: ${assignment?.workshop?.title}`} 
+    <DashboardLayout
+      title={`Designate Teachers: ${assignment?.workshop?.title}`}
       subtitle="Designate the two referring teachers who will be responsible for monitoring."
     >
       <div className="max-w-2xl mx-auto pb-20">
@@ -112,11 +112,11 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
               <span className="w-6 h-px bg-gray-200"></span>
               Selection of Referents
             </h3>
-            
+
             <div className="space-y-8">
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Main Teacher</label>
-                <select 
+                <select
                   value={prof1Id}
                   onChange={(e) => setProf1Id(e.target.value)}
                   className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 outline-none rounded-none transition-all font-bold text-gray-800"
@@ -130,7 +130,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
 
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Second Teacher</label>
-                <select 
+                <select
                   value={prof2Id}
                   onChange={(e) => setProf2Id(e.target.value)}
                   className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 outline-none rounded-none transition-all font-bold text-gray-800"
@@ -145,16 +145,15 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
-            <button 
+            <button
               onClick={handleSave}
               disabled={loading}
-              className={`flex-1 py-5 font-black uppercase text-xs tracking-[0.2em] shadow-lg transition-all ${
-                loading ? 'bg-gray-100 text-gray-300' : 'bg-blue-900 text-white hover:bg-black'
-              }`}
+              className={`flex-1 py-5 font-black uppercase text-xs tracking-[0.2em] shadow-lg transition-all ${loading ? 'bg-gray-100 text-gray-300' : 'bg-blue-900 text-white hover:bg-black'
+                }`}
             >
               {loading ? 'Saving...' : 'Confirm Designation'}
             </button>
-            <button 
+            <button
               onClick={() => router.back()}
               className="px-10 bg-white text-gray-400 py-5 font-black uppercase text-xs tracking-widest border border-gray-100 hover:bg-gray-50 transition-all"
             >

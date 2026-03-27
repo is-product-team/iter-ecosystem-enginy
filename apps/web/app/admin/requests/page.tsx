@@ -152,7 +152,7 @@ export default function AdminRequestsPage() {
   const handleEditClick = (request: Request) => {
     setEditingRequest(request);
     setEditFormData({
-      approxStudents: request.approxStudents || 0,
+      approxStudents: request.studentsAprox || 0,
       comments: request.comments || ''
     });
     setIsEditModalOpen(true);
@@ -163,8 +163,8 @@ export default function AdminRequestsPage() {
     if (!editingRequest) return;
 
     try {
-      await requestService.update(editingRequest.id_request, {
-        approxStudents: editFormData.approxStudents,
+      await requestService.update(editingRequest.requestId, {
+        studentsAprox: editFormData.approxStudents,
         comments: editFormData.comments
       });
       toast.success('Request updated successfully.');
@@ -188,8 +188,8 @@ export default function AdminRequestsPage() {
   const workshopRequests = useMemo(() => {
     const map: Record<number, Request[]> = {};
     filteredRequests.forEach(r => {
-      if (!map[r.id_workshop]) map[r.id_workshop] = [];
-      map[r.id_workshop].push(r);
+      if (!map[r.workshopId]) map[r.workshopId] = [];
+      map[r.workshopId].push(r);
     });
     return map;
   }, [filteredRequests]);
@@ -339,17 +339,17 @@ export default function AdminRequestsPage() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {currentRequests.map(r => (
-                        <tr key={r.id_request} className="hover:bg-gray-50/50 transition-colors">
+                        <tr key={r.requestId} className="hover:bg-gray-50/50 transition-colors">
                           <td className="px-6 py-4">
                             <div className="text-sm font-bold text-[#00426B]">{r.center?.name}</div>
-                            <div className="text-[10px] font-bold text-gray-400">{new Date(r.requestDate).toLocaleDateString()}</div>
+                            <div className="text-[10px] font-bold text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</div>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1Id ? `Teacher ${r.teacher1Id}` : '-'}</div>
-                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2Id ? `Teacher ${r.teacher2Id}` : '-'}</div>
+                            <div className="text-xs font-medium text-gray-700">1. {r.prof1Id ? `Teacher ${r.prof1Id}` : '-'}</div>
+                            <div className="text-xs font-medium text-gray-700">2. {r.prof2Id ? `Teacher ${r.prof2Id}` : '-'}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <span className="bg-gray-100 px-2 py-1 text-xs font-black text-[#00426B]">{r.approxStudents}</span>
+                            <span className="bg-gray-100 px-2 py-1 text-xs font-black text-[#00426B]">{r.studentsAprox}</span>
                           </td>
                           <td className="px-6 py-4">
                             <span className={`text-[9px] font-black uppercase px-2 py-1 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200 text-orange-600 bg-orange-50' :
@@ -377,14 +377,14 @@ export default function AdminRequestsPage() {
                                 </button>
                                 {r.status === REQUEST_STATUSES.PENDING && (
                                   <button
-                                    onClick={() => handleApprove(r.id_request)}
+                                    onClick={() => handleApprove(r.requestId)}
                                     className="px-3 py-1.5 bg-[#00426B] text-white text-[9px] font-black uppercase tracking-widest hover:bg-[#0775AB]"
                                   >
                                     Approve
                                   </button>
                                 )}
                                 <button
-                                  onClick={() => handleReject(r.id_request)}
+                                  onClick={() => handleReject(r.requestId)}
                                   className="px-3 py-1.5 border border-red-200 text-red-600 text-[9px] font-black uppercase tracking-widest hover:bg-red-50"
                                 >
                                   Reject

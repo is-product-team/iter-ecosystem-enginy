@@ -163,14 +163,14 @@ export default function DocumentUpload({
               onClick={() => handleValidUpload(pendingFile)}
               className="px-3 py-1 text-[8px] font-bold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition-all uppercase"
             >
-              Forçar Pujada Manual
+              Force Manual Upload
             </button>
           )}
           
           <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${
             uploading || validatingAI ? 'bg-gray-50 border-gray-100 text-gray-300' : 'border-[#00426B] text-[#00426B] hover:bg-blue-50'
           }`}>
-            {uploading ? 'PUJANT...' : validatingAI ? 'VALIDANT (IA)...' : currentUrl ? 'CANVIAR' : 'ADJUNTAR'}
+            {uploading ? 'UPLOADING...' : validatingAI ? 'VALIDATING (AI)...' : currentUrl ? 'CHANGE' : 'ATTACH'}
             <input
               type="file"
               className="hidden"

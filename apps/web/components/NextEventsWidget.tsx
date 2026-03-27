@@ -53,12 +53,12 @@ const NextEventsWidget: React.FC = () => {
       </div>
 
       <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6 flex items-center justify-between">
-        Properes Fites
+        Upcoming Milestones
         <button
           onClick={() => router.push('/calendar')}
           className="text-consorci-darkBlue hover:text-consorci-lightBlue lowercase font-bold tracking-normal"
         >
-          veure tots →
+          view all →
         </button>
       </h3>
 
@@ -77,7 +77,7 @@ const NextEventsWidget: React.FC = () => {
               <div className="flex-1 overflow-hidden">
                 <h4 className="text-sm font-bold text-gray-800 truncate group-hover/item:text-consorci-darkBlue transition-colors">{event.title}</h4>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
-                  {event.type === 'milestone' ? 'Hito Programa' : event.type === 'deadline' ? 'Termini' : 'Taller'}
+                  {event.type === 'milestone' ? 'Program Milestone' : event.type === 'deadline' ? 'Deadline' : 'Workshop'}
                 </p>
               </div>
             </div>
@@ -85,7 +85,7 @@ const NextEventsWidget: React.FC = () => {
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">No hi ha esdeveniments propers</p>
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">No upcoming events</p>
         </div>
       )}
     </div>

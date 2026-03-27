@@ -77,7 +77,7 @@ export default function AssignmentsPage() {
 
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find(f => f.name === phaseName);
-    return phase ? phase.active : false;
+    return phase ? phase.isActive : false;
   };
 
   const filteredAssignments = assignments.filter(a => {
@@ -162,13 +162,13 @@ export default function AssignmentsPage() {
                   <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Assigned Workshop</th>
                   <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Center</th>
                   <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Planning</th>
-                  <th className="px-10 py-8 text-[11px) font-black uppercase text-gray-400 tracking-[0.2em]">Status</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Status</th>
                   <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {paginatedAssignments.map(a => (
-                  <tr key={a.id_assignment} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
+                  <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
                     <td className="px-10 py-10">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black uppercase tracking-widest text-[#4197CB] mb-2">WORKSHOP IDENTIFIER</span>
@@ -194,7 +194,7 @@ export default function AssignmentsPage() {
                     </td>
                     <td className="px-10 py-10 text-right">
                       <button
-                        onClick={() => router.push(`/center/assignments/${a.id_assignment}`)}
+                        onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
                         className="btn-primary py-2 px-6 text-[10px]"
                       >
                         Manage

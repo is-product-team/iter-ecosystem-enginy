@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { THEME } from '@iter/shared';
+import { useTranslation } from 'react-i18next';
 
 export interface CalendarEvent {
   id: string;
@@ -22,6 +23,7 @@ interface EventDetailModalProps {
 
 const EventDetailModal: React.FC<EventDetailModalProps> = ({ visible, onClose, event }) => {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
 
   if (!event) return null;
 
@@ -65,12 +67,12 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ visible, onClose, e
                       className="text-xs font-bold uppercase tracking-wider"
                       style={{ color: getEventColor(event.type) }}
                     >
-                      {event.type === 'assignment' ? 'Taller' : event.type}
+                      {event.type === 'assignment' ? t('Common.workshop') : t(`Common.${event.type}`)}
                     </Text>
                   </View>
                   {event.type === 'assignment' && (
                      <View className="px-3 py-1 bg-green-100 dark:bg-green-900/20 rounded-full self-start">
-                        <Text className="text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wider">PENDENT</Text>
+                        <Text className="text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wider">{t('Common.pending')}</Text>
                      </View>
                   )}
                 </View>
@@ -80,7 +82,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ visible, onClose, e
                 </Text>
                 
                 <Text className="text-lg text-text-muted font-medium">
-                   {new Date(event.date).toLocaleDateString('ca-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                   {new Date(event.date).toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                 </Text>
               </View>
 
@@ -94,23 +96,23 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ visible, onClose, e
                        <Ionicons name="time" size={24} color="#F97316" />
                     </View>
                     <View className="flex-1 pt-1">
-                       <Text className="text-text-primary font-bold text-lg mb-0.5">Horari</Text>
+                       <Text className="text-text-primary font-bold text-lg mb-0.5">{t('Common.time')}</Text>
                        <Text className="text-text-secondary text-base">
-                          {event.metadata?.hora || 'Tot el dia'}
+                          {event.metadata?.time || t('Common.all_day')}
                        </Text>
                     </View>
                  </View>
 
                  {/* Location Row */}
-                 {event.metadata?.adreca && (
+                 {(event.metadata?.address || event.metadata?.center) && (
                      <View className="flex-row items-start">
                         <View className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 items-center justify-center mr-4">
                            <Ionicons name="location" size={24} color="#3B82F6" />
                         </View>
                         <View className="flex-1 pt-1">
-                           <Text className="text-text-primary font-bold text-lg mb-0.5">Ubicació</Text>
-                           <Text className="text-text-secondary text-base font-medium">{event.metadata.centre}</Text>
-                           <Text className="text-text-muted text-sm mt-0.5 leading-5">{event.metadata.adreca}</Text>
+                           <Text className="text-text-primary font-bold text-lg mb-0.5">{t('Common.location')}</Text>
+                           <Text className="text-text-secondary text-base font-medium">{event.metadata.center}</Text>
+                           <Text className="text-text-muted text-sm mt-0.5 leading-5">{event.metadata.address}</Text>
                         </View>
                      </View>
                  )}
@@ -122,7 +124,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ visible, onClose, e
                            <Ionicons name="document-text" size={24} color="#8B5CF6" />
                         </View>
                         <View className="flex-1 pt-1">
-                           <Text className="text-text-primary font-bold text-lg mb-0.5">Descripció</Text>
+                           <Text className="text-text-primary font-bold text-lg mb-0.5">{t('Common.description')}</Text>
                            <Text className="text-text-secondary text-base leading-6">
                               {event.description}
                            </Text>
@@ -133,24 +135,24 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ visible, onClose, e
               
               {/* Action Buttons */}
               <View className="mt-10 space-y-3">
-                 {event.type === 'assignment' && event.metadata?.id_assignacio && (
+                 {event.type === 'assignment' && event.metadata?.assignmentId && (
                     <TouchableOpacity 
                        onPress={() => {
                          onClose();
-                         router.push(`/(professor)/sesion/${event.metadata.id_assignacio}`);
+                         router.push(`/(professor)/session/${event.metadata.assignmentId}`);
                        }}
                        className="w-full bg-primary h-14 rounded-2xl items-center justify-center shadow-lg shadow-primary/20"
                     >
-                        <Text className="text-white text-lg font-bold tracking-wide uppercase">Gestionar Sessió</Text>
+                        <Text className="text-white text-lg font-bold tracking-wide uppercase">{t('Session.manage_session')}</Text>
                     </TouchableOpacity>
                  )}
 
                 <TouchableOpacity className="w-full h-14 rounded-2xl items-center justify-center border border-border-subtle bg-background-subtle">
-                    <Text className="text-text-secondary text-base font-semibold">Afegir al Calendari</Text>
+                    <Text className="text-text-secondary text-base font-semibold">{t('Calendar.add_to_calendar')}</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity className="w-full h-12 items-center justify-center mt-2">
-                    <Text className="text-red-400 text-sm font-medium">Eliminar esdeveniment</Text>
+                    <Text className="text-red-400 text-sm font-medium">{t('Calendar.remove_event')}</Text>
                 </TouchableOpacity>
               </View>
 

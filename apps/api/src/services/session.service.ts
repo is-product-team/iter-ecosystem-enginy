@@ -5,7 +5,7 @@ export class SessionService {
     /**
      * Generates a list of dates based on a starting date and a list of week days.
      * @param startDate The date to start from.
-     * @param schedule Array of days (e.g. ['Dilluns', 'Dimecres'] or ['Lunes', 'Miércoles'])
+     * @param schedule Array of days (e.g. ['Monday', 'Wednesday'])
      * @param totalSessions Total number of sessions to generate.
      */
     static generateDatesFromSchedule(startDate: Date, schedule: string[], totalSessions: number = 10): Date[] {
@@ -14,6 +14,7 @@ export class SessionService {
         }
 
         const dayMap: Record<string, number> = {
+            'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4, 'friday': 5, 'saturday': 6,
             'diumenge': 0, 'dilluns': 1, 'dimarts': 2, 'dimecres': 3, 'dijous': 4, 'divendres': 5, 'dissabte': 6,
             'domingo': 0, 'lunes': 1, 'martes': 2, 'miércoles': 3, 'jueves': 4, 'viernes': 5, 'sabado': 6, 'sábado': 6
         };
@@ -58,7 +59,7 @@ export class SessionService {
 
     /**
      * Ensures attendance records exist for a given assignment and session number.
-     * If not, creates them for all currently enrolled students with status 'Present' (default) or 'Absencia' (to be decided, using Present as neutral initialization).
+     * If not, creates them for all currently enrolled students.
      */
     static async ensureAttendanceRecords(assignmentId: number, sessionNum: number, date: Date) {
         // 1. Get all enrollments for this assignment
@@ -83,7 +84,7 @@ export class SessionService {
         const missingEnrollments = enrollments.filter((e: any) => !existingIds.has(e.enrollmentId));
 
         if (missingEnrollments.length > 0) {
-            await prisma.attendance.createMany({
+            await (prisma.attendance as any).createMany({
                 data: missingEnrollments.map((e: any) => ({
                     enrollmentId: e.enrollmentId,
                     sessionNumber: sessionNum,
@@ -133,7 +134,7 @@ export class SessionService {
         });
 
         // Create new ones
-        await prisma.session.createMany({
+        await (prisma.session as any).createMany({
             data: sessionDates.map(date => ({
                 assignmentId: assignmentId,
                 sessionDate: date

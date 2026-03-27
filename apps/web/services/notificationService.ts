@@ -1,28 +1,31 @@
-import api from './api';
+import getApi from './api';
 
-export interface Notificacio {
-  id_notificacio: number;
-  titol: string;
-  missatge: string;
-  llegida: boolean;
-  data_creacio: string;
-  tipus: 'PETICIO' | 'FASE' | 'SISTEMA';
-  importancia: 'INFO' | 'WARNING' | 'URGENT';
+export interface Notification {
+  notificationId: number;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+  type: 'REQUEST' | 'PHASE' | 'SYSTEM';
+  importance: 'INFO' | 'WARNING' | 'URGENT';
 }
 
 const notificationService = {
-  getAll: async (): Promise<Notificacio[]> => {
-    const response = await api().get('/notifications');
+  getAll: async (): Promise<Notification[]> => {
+    const api = getApi();
+    const response = await api.get('/notifications');
     return response.data;
   },
 
-  markAsRead: async (id: number): Promise<Notificacio> => {
-    const response = await api().patch(`/notifications/${id}/read`);
+  markAsRead: async (notificationId: number): Promise<Notification> => {
+    const api = getApi();
+    const response = await api.patch(`/notifications/${notificationId}/read`);
     return response.data;
   },
 
-  delete: async (id: number): Promise<void> => {
-    await api().delete(`/notifications/${id}`);
+  delete: async (notificationId: number): Promise<void> => {
+    const api = getApi();
+    await api.delete(`/notifications/${notificationId}`);
   }
 };
 
