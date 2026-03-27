@@ -10,12 +10,12 @@ import Loading from "@/components/Loading";
 import { format } from "date-fns";
 
 interface Phase {
-  id_phase: number;
-  nom: string;
-  data_inici: string;
-  data_fi: string;
-  descripcio: string;
-  activa: boolean;
+  phaseId: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+  isActive: boolean;
 }
 
 export default function CalendarPage() {
@@ -37,31 +37,31 @@ export default function CalendarPage() {
 
       const [eventsRes, phasesRes] = await Promise.all([
         api.get(`/calendar?start=${startStr}&end=${endStr}`),
-        api.get("/fases")
+        api.get("/phases")
       ]);
 
       const phasesData = phasesRes.data.data;
-      const getPhaseColor = (nom: string) => {
-        const n = nom.toLowerCase();
-        if (n.includes("sol·licitud") || n.includes("inscripció")) return "calendar-event-card event-phase-inscription";
-        if (n.includes("planificació") || n.includes("assignació")) return "calendar-event-card event-phase-planning";
-        if (n.includes("execució") || n.includes("seguiment")) return "calendar-event-card event-phase-execution";
-        if (n.includes("tancament") || n.includes("avaluació")) return "calendar-event-card event-phase-evaluation";
+      const getPhaseColor = (name: string) => {
+        const n = name.toLowerCase();
+        if (n.includes("sol·licitud") || n.includes("inscripció") || n.includes("application")) return "calendar-event-card event-phase-inscription";
+        if (n.includes("planificació") || n.includes("assignació") || n.includes("planning")) return "calendar-event-card event-phase-planning";
+        if (n.includes("execució") || n.includes("seguiment") || n.includes("execution")) return "calendar-event-card event-phase-execution";
+        if (n.includes("tancament") || n.includes("avaluació") || n.includes("closure")) return "calendar-event-card event-phase-evaluation";
         return "calendar-event-card event-milestone";
       };
 
       const phaseEvents = phasesData.map((f: Phase) => ({
-        id: `fase-${f.id_phase}`,
-        title: `Fase: ${f.nom}`,
-        date: f.data_inici,
-        endDate: f.data_fi,
+        id: `phase-${f.phaseId}`,
+        title: `Phase: ${f.name}`,
+        date: f.startDate,
+        endDate: f.endDate,
         type: 'milestone',
-        description: f.descripcio,
-        colorClass: getPhaseColor(f.nom)
+        description: f.description,
+        colorClass: getPhaseColor(f.name)
       }));
 
       setEvents([...eventsRes.data, ...phaseEvents]);
-      setActiveFase(phasesData.find((f: Phase) => f.activa));
+      setActiveFase(phasesData.find((f: Phase) => f.isActive));
     } catch (error) {
       console.error("Error fetching calendar data:", error);
     } finally {
@@ -81,7 +81,7 @@ export default function CalendarPage() {
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 rounded-full animate-pulse ${activeFase ? 'bg-consorci-pinkRed' : 'bg-gray-300'}`}></div>
             <div className="text-[11px] font-black text-text-primary uppercase tracking-widest">
-              {activeFase ? `Fase Actual: ${activeFase.nom}` : "Carregant fases..."}
+              {activeFase ? `Fase Actual: ${activeFase.name}` : "Carregant fases..."}
             </div>
           </div>
           <button
@@ -101,10 +101,10 @@ export default function CalendarPage() {
             isLoading={loading}
             onRangeChange={fetchCalendarData}
             onEventClick={(e) => {
-              // Si tiene id_assignment, navegar al detalle
-              if (e.metadata?.id_assignment) {
+              // Si tiene assignmentId, navegar al detalle
+              if (e.metadata?.assignmentId) {
                 const baseUrl = user?.role.name === ROLES.ADMIN ? '/admin/assignments' : '/center/assignments';
-                window.location.href = `${baseUrl}/${e.metadata.id_assignment}`;
+                window.location.href = `${baseUrl}/${e.metadata.assignmentId}`;
               }
             }}
           />

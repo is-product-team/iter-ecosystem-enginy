@@ -82,15 +82,15 @@ export default function AdminRequestsPage() {
     }
   }, [user, authLoading, router]);
 
-  const handleApprove = (idRequest: number) => {
+  const handleApprove = (requestId: number) => {
     setConfirmConfig({
       isOpen: true,
       title: 'Approve Request',
       message: 'Are you sure you want to approve this request and generate the assignment immediately?',
       onConfirm: async () => {
         try {
-          await requestService.updateStatus(idRequest, REQUEST_STATUSES.APPROVED);
-          await assignmentService.createFromRequest(idRequest);
+          await requestService.updateStatus(requestId, REQUEST_STATUSES.APPROVED);
+          await assignmentService.createFromRequest(requestId);
           await fetchData();
           toast.success('Request approved and assignment generated successfully.');
         } catch (err) {
@@ -101,7 +101,7 @@ export default function AdminRequestsPage() {
     });
   };
 
-  const handleReject = async (idRequest: number) => {
+  const handleReject = async (requestId: number) => {
     setConfirmConfig({
       isOpen: true,
       title: 'Reject Request',
@@ -109,7 +109,7 @@ export default function AdminRequestsPage() {
       isDestructive: true,
       onConfirm: async () => {
         try {
-          await requestService.updateStatus(idRequest, REQUEST_STATUSES.REJECTED);
+          await requestService.updateStatus(requestId, REQUEST_STATUSES.REJECTED);
           await fetchData();
           toast.success('Request rejected.');
         } catch (err) {
@@ -345,8 +345,8 @@ export default function AdminRequestsPage() {
                             <div className="text-[10px] font-bold text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</div>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="text-xs font-medium text-gray-700">1. {r.prof1Id ? `Teacher ${r.prof1Id}` : '-'}</div>
-                            <div className="text-xs font-medium text-gray-700">2. {r.prof2Id ? `Teacher ${r.prof2Id}` : '-'}</div>
+                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1?.name || (r.prof1Id ? `Teacher ${r.prof1Id}` : '-')}</div>
+                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2?.name || (r.prof2Id ? `Teacher ${r.prof2Id}` : '-')}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
                             <span className="bg-gray-100 px-2 py-1 text-xs font-black text-[#00426B]">{r.studentsAprox}</span>

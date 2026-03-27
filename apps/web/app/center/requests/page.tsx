@@ -408,7 +408,7 @@ export default function RequestsPage() {
                         >
                           <option value="">Select the Main Referent *</option>
                           {teachers.map(t => (
-                            <option key={t.id_teacher} value={t.id_teacher}>{t.name}</option>
+                            <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
                           ))}
                         </select>
                         <select
@@ -419,7 +419,7 @@ export default function RequestsPage() {
                         >
                           <option value="">Select the Second Referent *</option>
                           {teachers.map(t => (
-                            <option key={t.id_teacher} value={t.id_teacher}>{t.name}</option>
+                            <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
                           ))}
                         </select>
                       </div>

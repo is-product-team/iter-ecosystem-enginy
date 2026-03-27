@@ -123,7 +123,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
                 >
                   <option value="">Select...</option>
                   {teachers.map((p: Teacher) => (
-                    <option key={p.id_teacher} value={p.id_teacher}>{p.name} ({p.contact})</option>
+                    <option key={p.teacherId} value={p.teacherId}>{p.name} ({p.contact})</option>
                   ))}
                 </select>
               </div>
@@ -137,7 +137,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
                 >
                   <option value="">Select...</option>
                   {teachers.map((p: Teacher) => (
-                    <option key={p.id_teacher} value={p.id_teacher}>{p.name} ({p.contact})</option>
+                    <option key={p.teacherId} value={p.teacherId}>{p.name} ({p.contact})</option>
                   ))}
                 </select>
               </div>

@@ -46768,7 +46768,7 @@
                     "length": 8,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_phase' does not exist on type 'Phase'."
+                    "messageText": "Property 'phaseId' does not exist on type 'Phase'."
                 },
                 {
                     "start": 2766,
@@ -47156,28 +47156,28 @@
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 4599,
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 5313,
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 5334,
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 }
             ]
         ],
@@ -47319,28 +47319,28 @@
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 18896,
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 19549,
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 19570,
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 }
             ]
         ],
@@ -47399,14 +47399,14 @@
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 6972,
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 7323,
@@ -47420,14 +47420,14 @@
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 8314,
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 11389,
@@ -47441,7 +47441,7 @@
                     "length": 10,
                     "code": 2339,
                     "category": 1,
-                    "messageText": "Property 'id_teacher' does not exist on type 'Teacher'."
+                    "messageText": "Property 'teacherId' does not exist on type 'Teacher'."
                 },
                 {
                     "start": 12105,

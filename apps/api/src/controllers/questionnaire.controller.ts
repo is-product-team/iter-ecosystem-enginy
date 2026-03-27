@@ -59,12 +59,12 @@ export const submitResponses = async (req: Request, res: Response) => {
     }
 };
 
-export const submitAutoconsulta = async (req: Request, res: Response) => {
+export const submitSelfConsultation = async (req: Request, res: Response) => {
     try {
         const result = await questionnaireService.submitStudentSelfConsultation(req.body);
         res.json(result);
     } catch (error) {
-        console.error("Error in questionnaire.controller.submitAutoconsulta:", error);
+        console.error("Error in questionnaire.controller.submitSelfConsultation:", error);
         res.status(500).json({ error: 'Failed to submit student self-consultation' });
     }
 };

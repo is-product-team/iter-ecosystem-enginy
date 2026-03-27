@@ -17,7 +17,7 @@ router.get('/models', authenticateToken, getModels);
 router.get('/model/:id', authenticateToken, getModel);
 router.post('/track', authenticateToken, trackSubmission);
 router.post('/respond', submitResponses); // Can be anonymous if using a link
-router.post('/autoconsulta', authenticateToken, submitAutoconsulta);
+router.post('/self-consultation', authenticateToken, submitSelfConsultation);
 router.get('/reports', authenticateToken, getReports);
 
 export default router;

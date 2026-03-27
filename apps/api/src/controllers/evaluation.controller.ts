@@ -25,15 +25,15 @@ export const upsertEvaluation = async (req: Request, res: Response) => {
 
         if (!enrollmentId) {
             if (studentId && assignmentId) {
-                const inscripcio = await prisma.enrollment.findFirst({
+                const enrollment = await prisma.enrollment.findFirst({
                     where: {
                         studentId: parseInt(studentId),
                         assignmentId: parseInt(assignmentId)
                     }
                 });
 
-                if (inscripcio) {
-                    enrollmentId = inscripcio.enrollmentId;
+                if (enrollment) {
+                    enrollmentId = enrollment.enrollmentId;
                 } else {
                     return res.status(404).json({ error: 'Enrollment not found for this student and assignment.' });
                 }
@@ -116,7 +116,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
                 enrollmentId: enrollmentRecord.enrollmentId,
                 sessionNumber: parseInt(sessionId),
                 sessionDate: new Date(),
-                status: nlpResult.attendanceStatus || (existingAttendance ? (existingAttendance as any).status : 'PRESENT'),
+                status: nlpResult.attendanceStatus || (existingAttendance ? existingAttendance.status : 'PRESENT'),
                 observations: text
             };
 
@@ -143,12 +143,12 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
             });
 
             if (competence) {
-                let docentEval = await prisma.evaluation.findUnique({
+                let teacherEval = await prisma.evaluation.findUnique({
                     where: { enrollmentId: enrollmentRecord.enrollmentId }
                 });
 
-                if (!docentEval) {
-                    docentEval = await prisma.evaluation.create({
+                if (!teacherEval) {
+                    teacherEval = await prisma.evaluation.create({
                         data: {
                             enrollmentId: enrollmentRecord.enrollmentId,
                             assignmentId: enrollmentRecord.assignmentId,
@@ -161,7 +161,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
                 competenceEval = await prisma.competenceEvaluation.create({
                     data: {
-                        evaluationId: docentEval.evaluationId,
+                        evaluationId: teacherEval.evaluationId,
                         competenceId: competence.competenceId,
                         score: nlpResult.competenceUpdate.score
                     }

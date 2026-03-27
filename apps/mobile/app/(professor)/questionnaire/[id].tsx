@@ -26,11 +26,11 @@ export default function WorkshopQualityScreen() {
         // 1. Fetch all models
         const res = await api.get('questionnaires/models');
         // 2. Filter for Professor
-        const professorModel = res.data.find((m: any) => m.target === 'PROFESSOR' || m.destinatari === 'PROFESSOR');
+        const professorModel = res.data.find((m: any) => m.target === 'PROFESSOR');
         
         if (professorModel) {
             // 3. Fetch full details (questions)
-            const modelId = professorModel.modelId || professorModel.id_model;
+            const modelId = professorModel.modelId;
             const detailRes = await api.get(`questionnaires/model/${modelId}`);
             setModel(detailRes.data);
         } else {
@@ -48,10 +48,10 @@ export default function WorkshopQualityScreen() {
   const handleSubmit = async () => {
     // Validate
     if (!model) return;
-    const questions = model.questions || model.preguntes;
+    const questions = model.questions;
     const missing = questions.some((p: any) => {
-        const type = p.responseType || p.tipus_resposta;
-        const qId = p.questionId || p.id_pregunta;
+        const type = p.type;
+        const qId = p.questionId;
         return type.startsWith('Likert') && !answers[qId];
     });
 
@@ -62,22 +62,21 @@ export default function WorkshopQualityScreen() {
 
     setSubmitting(true);
     try {
-        const modelId = model.modelId || model.id_model;
         const trackRes = await api.post('questionnaires/track', {
-            modelId: modelId,
-            assignmentId: parseInt(id as string)
+            assignmentId: parseInt(id as string),
+            target: 'PROFESSOR'
         });
-        const submissionId = trackRes.data.submissionId || trackRes.data.id_enviament;
+        const token = trackRes.data.token;
 
         // 2. Submit responses
-        const respostesPayload = Object.keys(answers).map(k => ({
+        const responsesPayload = Object.keys(answers).map(k => ({
             questionId: parseInt(k),
             value: String(answers[parseInt(k)])
         }));
 
         await api.post('questionnaires/respond', {
-            submissionId: submissionId,
-            responses: respostesPayload
+            token: token,
+            responses: responsesPayload
         });
 
         Alert.alert(t('Questionnaire.thanks_title'), t('Questionnaire.thanks_message'), [
@@ -102,25 +101,25 @@ export default function WorkshopQualityScreen() {
 
   if (!model) return null;
 
-  const questions = model.questions || model.preguntes;
+  const questions = model.questions;
 
   return (
     <View className="flex-1 bg-background-page">
       <Stack.Screen options={{ title: t('Questionnaire.title') }} />
       <ScrollView className="flex-1 p-6" showsVerticalScrollIndicator={false}>
         <View className="mb-6">
-            <Text className="text-xl font-bold text-text-primary mb-2">{model.title}</Text>
+            <Text className="text-xl font-bold text-text-primary mb-2">{model.name}</Text>
             <Text className="text-text-secondary">{t('Questionnaire.instruction')}</Text>
         </View>
 
         {questions.map((p: any) => {
-            const qId = p.questionId || p.id_pregunta;
-            const type = p.responseType || p.tipus_resposta;
-            const statement = p.statement || p.enunciat;
+            const qId = p.questionId;
+            const type = p.type;
+            const text = p.text;
 
             return (
                 <View key={qId} className="mb-8 bg-background-surface p-6 rounded-2xl border border-border-subtle shadow-sm">
-                    <Text className="text-base font-bold text-text-primary mb-4">{statement}</Text>
+                    <Text className="text-base font-bold text-text-primary mb-4">{text}</Text>
                     
                     {type === 'Likert_1_5' || type === 'Likert_1_10' ? (
                     <View className="flex-row justify-between gap-2">

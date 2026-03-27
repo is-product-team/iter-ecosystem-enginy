@@ -75,14 +75,14 @@ export const createRequest = async (req: Request, res: Response) => {
     workshopId,
     studentsAprox,
     comments,
-    prof1_id,
-    prof2_id,
+    prof1Id,
+    prof2Id,
     modality
   } = req.body;
   const { centerId } = req.user!;
 
-  if (!workshopId || !centerId || !prof1_id || !prof2_id) {
-    return res.status(400).json({ error: 'Missing mandatory fields (workshopId, centerId, prof1_id, prof2_id)' });
+  if (!workshopId || !centerId || !prof1Id || !prof2Id) {
+    return res.status(400).json({ error: 'Missing mandatory fields (workshopId, centerId, prof1Id, prof2Id)' });
   }
 
   // --- PHASE VERIFICATION ---
@@ -139,8 +139,8 @@ export const createRequest = async (req: Request, res: Response) => {
         comments: comments,
         status: REQUEST_STATUSES.PENDING as RequestStatus,
         modality: modality as Modality,
-        prof1_id: parseInt(prof1_id),
-        prof2_id: parseInt(prof2_id),
+        prof1Id: parseInt(prof1Id),
+        prof2Id: parseInt(prof2Id),
       },
       include: {
         workshop: true
@@ -160,8 +160,8 @@ export const updateRequest = async (req: Request, res: Response) => {
   const {
     studentsAprox,
     comments,
-    prof1_id,
-    prof2_id,
+    prof1Id,
+    prof2Id,
     modality
   } = req.body;
   const { centerId, role } = req.user!;
@@ -230,8 +230,8 @@ export const updateRequest = async (req: Request, res: Response) => {
       data: {
         studentsAprox: studentsAprox ? parseInt(studentsAprox) : undefined,
         comments,
-        prof1_id: parseInt(prof1_id),
-        prof2_id: parseInt(prof2_id),
+        prof1Id: parseInt(prof1Id),
+        prof2Id: parseInt(prof2Id),
         modality: modality as Modality,
       },
       include: {

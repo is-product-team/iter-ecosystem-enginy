@@ -28,9 +28,9 @@ async function main() {
   console.log('Assignments found:', assignments.length);
   assignments.forEach((a: any) => {
     console.log(`ID: ${a.assignmentId}`);
-    console.log(`Workshop: ${a.workshop.titol}`);
-    console.log(`Start: ${a.data_inici}`);
-    console.log(`End:   ${a.data_fi}`);
+    console.log(`Workshop: ${a.workshop.title}`);
+    console.log(`Start: ${a.startDate}`);
+    console.log(`End:   ${a.endDate}`);
     console.log('---');
   });
 }

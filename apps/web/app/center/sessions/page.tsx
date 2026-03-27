@@ -13,7 +13,7 @@ import Pagination from '@/components/Pagination';
 type AssignmentMode = 'single' | 'whole';
 
 interface Sessio {
-  id_session: number | string;
+  sessionId: number | string;
   sessionDate: string;
   startTime?: string;
   endTime?: string;
@@ -28,7 +28,7 @@ interface Sessio {
 }
 
 interface BackendAssignment {
-  id_assignment: number;
+  assignmentId: number;
   workshop?: { title: string; modality: string };
   teacher1?: { user: { fullName: string } };
   teacher2?: { user: { fullName: string } };
@@ -90,7 +90,7 @@ export default function SessionsListPage() {
               flatSessions.push({
                 ...s,
                 assignmentTitle: a.workshop?.title,
-                assignmentId: a.id_assignment,
+                assignmentId: a.assignmentId,
                 modality: a.workshop?.modality,
                 referent1: a.teacher1?.user?.fullName,
                 referent2: a.teacher2?.user?.fullName
@@ -100,10 +100,10 @@ export default function SessionsListPage() {
             // If it doesn't have sessions but is in a phase where it should have them soon
             // We add it as a "placeholder" item so the user knows it's there
             flatSessions.push({
-              id_session: `pending-${a.id_assignment}`,
+              sessionId: `pending-${a.assignmentId}`,
               isPending: true,
               assignmentTitle: a.workshop?.title,
-              assignmentId: a.id_assignment,
+              assignmentId: a.assignmentId,
               modality: a.workshop?.modality,
               referent1: a.teacher1?.user?.fullName,
               referent2: a.teacher2?.user?.fullName,
@@ -165,17 +165,10 @@ export default function SessionsListPage() {
           idUser: parseInt(selectedProfessorId)
         });
 
-        // OPTIONAL: Also add to all existing sessions individually if the backend logic requires it 
-        // asking the user "Assign to all sessions?" might be better but for now let's stick to the prompt.
-        // The prompt says "un profesor para un taller completo".
-        // In our robust model, we might want to ensure they are on the sessions too.
-        // For now, let's assume adding to the assignment staff is what's requested, 
-        // BUT if the calendar view relies on session.staff, we might need to loop.
-        // Let's loop to be safe and ensure they appear on the calendar for all days.
-        const targetAssignacio = assignacions.find(a => a.id_assignment === parseInt(selectedAssignacioId));
+        const targetAssignacio = assignacions.find(a => a.assignmentId === parseInt(selectedAssignacioId));
         if (targetAssignacio?.sessions) {
           await Promise.all(targetAssignacio.sessions.map((s: Sessio) =>
-            api.post(`/assignments/sessions/${s.id_session}/staff`, { idUser: parseInt(selectedProfessorId) })
+            api.post(`/assignments/sessions/${s.sessionId}/staff`, { idUser: parseInt(selectedProfessorId) })
               .catch(() => { }) // Ignore duplicates
           ));
         }
@@ -202,10 +195,10 @@ export default function SessionsListPage() {
     }
   };
 
-  const handleRemoveStaff = async (idSession: number, idUser: number) => {
+  const handleRemoveStaff = async (sessionId: number, idUser: number) => {
     try {
       const api = getApi();
-      await api.delete(`/assignments/sessions/${idSession}/staff/${idUser}`);
+      await api.delete(`/assignments/sessions/${sessionId}/staff/${idUser}`);
       await fetchData(); // Refresh list
       toast.success('Teacher removed successfully');
     } catch (error) {
@@ -214,7 +207,7 @@ export default function SessionsListPage() {
     }
   };
 
-  const selectedAssignacio = assignacions.find(a => a.id_assignment.toString() === selectedAssignacioId);
+  const selectedAssignacio = assignacions.find(a => a.assignmentId.toString() === selectedAssignacioId);
 
   if (authLoading || loading) return <Loading fullScreen message="Loading sessions..." />;
 
@@ -284,7 +277,7 @@ export default function SessionsListPage() {
                 const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
 
                 return (
-                  <div key={sessio.id_session} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${sessio.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
+                  <div key={sessio.sessionId} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${sessio.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
                     <div className="flex items-start gap-4 mb-2 md:mb-0">
                       <div className={`p-3 rounded-full shrink-0 ${sessio.isPending ? 'bg-gray-200 text-gray-400' : sessio.modality === 'A' ? 'bg-blue-50 text-[#00426B]' : 'bg-orange-50 text-orange-600'}`}>
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -348,7 +341,7 @@ export default function SessionsListPage() {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       if (staffMember.userId || staffMember.id) {
-                                        handleRemoveStaff(Number(sessio.id_session), (staffMember.userId || staffMember.id) as number);
+                                        handleRemoveStaff(Number(sessio.sessionId), (staffMember.userId || staffMember.id) as number);
                                       }
                                     }}
                                     className="text-blue-300 hover:text-red-500 focus:outline-none transition-colors"
@@ -440,8 +433,8 @@ export default function SessionsListPage() {
                   >
                     <option value="">-- Choose a workshop --</option>
                     {assignacions.map(a => (
-                      <option key={a.id_assignment} value={a.id_assignment}>
-                        {a.workshop?.title} (Ref: {a.id_assignment})
+                      <option key={a.assignmentId} value={a.assignmentId}>
+                        {a.workshop?.title} (Ref: {a.assignmentId})
                       </option>
                     ))}
                   </select>
@@ -460,7 +453,7 @@ export default function SessionsListPage() {
                     >
                       <option value="">-- Choose a session --</option>
                       {selectedAssignacio?.sessions?.map((s: Sessio, idx: number) => (
-                        <option key={s.id_session} value={s.id_session}>
+                        <option key={s.sessionId} value={s.sessionId}>
                           Session {idx + 1} - {new Date(s.sessionDate).toLocaleDateString()} ({s.startTime}-{s.endTime})
                         </option>
                       ))}

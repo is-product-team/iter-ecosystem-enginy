@@ -67,8 +67,8 @@ export default function PerfilScreen() {
   };
 
   const getUserInitials = () => {
-    if (!user?.nom_complet) return '??';
-    return user.nom_complet.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
+    if (!user?.fullName) return '??';
+    return user.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
   return (
@@ -96,7 +96,7 @@ export default function PerfilScreen() {
              </View>
              <View className="flex-1 justify-center">
                 <Text className="text-xl font-extrabold text-text-primary leading-tight mb-1.5" numberOfLines={1}>
-                  {user?.nom_complet || t('Common.loading')}
+                  {user?.fullName || t('Common.loading')}
                 </Text>
                 <View className="bg-background-subtle self-start px-2.5 py-1 rounded-md border border-border-subtle">
                    <Text className="text-primary dark:text-white text-[10px] font-bold uppercase tracking-wide">

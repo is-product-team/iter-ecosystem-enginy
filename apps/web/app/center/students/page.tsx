@@ -87,7 +87,7 @@ export default function StudentsCRUD() {
     e.preventDefault();
     try {
       if (editingStudent) {
-        await studentService.update(editingStudent.id_student, formData);
+        await studentService.update(editingStudent.studentId, formData);
         toast.success("Student updated successfully.");
       } else {
         await studentService.create(formData);
@@ -201,14 +201,14 @@ export default function StudentsCRUD() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {paginatedStudents.map(a => (
-                  <tr key={a.id_student} className="hover:bg-gray-50 transition-colors group">
+                  <tr key={a.studentId} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <Avatar 
                           url={a.photoUrl} 
                           name={`${a.fullName} ${a.lastName}`} 
-                          id={a.id_student} 
-                          type="alumne" 
+                          id={a.studentId} 
+                          type="student" 
                           size="md"
                         />
                         <div>
@@ -227,7 +227,7 @@ export default function StudentsCRUD() {
                     <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">
                         <button onClick={() => handleEdit(a)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Edit</button>
-                        <button onClick={() => handleDelete(a.id_student)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                        <button onClick={() => handleDelete(a.studentId)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       </div>
@@ -283,8 +283,8 @@ export default function StudentsCRUD() {
                   <Avatar 
                     url={editingStudent.photoUrl} 
                     name={`${editingStudent.fullName} ${editingStudent.lastName}`} 
-                    id={editingStudent.id_student} 
-                    type="alumne" 
+                    id={editingStudent.studentId} 
+                    type="student" 
                     size="xl"
                     className="shadow-xl ring-4 ring-white"
                   />
@@ -301,7 +301,7 @@ export default function StudentsCRUD() {
                           formData.append('foto', file);
                           try {
                             const api = getApi();
-                            const res = await api.post(`/upload/profile/student/${editingStudent.id_student}`, formData, {
+                            const res = await api.post(`/upload/profile/student/${editingStudent.studentId}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
                             toast.success("Photo updated.");

@@ -80,7 +80,7 @@ export default function TeachersCRUD() {
     e.preventDefault();
     try {
       if (editingTeacher) {
-        await teacherService.update(editingTeacher.id_teacher, formData);
+        await teacherService.update(editingTeacher.teacherId, formData);
         toast.success("Teacher updated successfully.");
       } else {
         await teacherService.create(formData);
@@ -179,13 +179,13 @@ export default function TeachersCRUD() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {paginatedTeachers.map(p => (
-                    <tr key={p.id_teacher} className="hover:bg-gray-50 transition-colors group">
+                    <tr key={p.teacherId} className="hover:bg-gray-50 transition-colors group">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
                           <Avatar
                             url={p.user?.photoUrl}
                             name={p.name}
-                            id={p.user?.userId || p.id_teacher}
+                            id={p.user?.userId || p.teacherId}
                             type="usuari"
                             size="md"
                             email={p.user?.email}
@@ -201,7 +201,7 @@ export default function TeachersCRUD() {
                       <td className="px-6 py-5">
                         <div className="flex justify-end items-center gap-2">
                           <button onClick={() => handleEdit(p)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Edit</button>
-                          <button onClick={() => handleDelete(p.id_teacher)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                          <button onClick={() => handleDelete(p.teacherId)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
                         </div>
@@ -258,7 +258,7 @@ export default function TeachersCRUD() {
                   <Avatar
                     url={editingTeacher.user?.photoUrl}
                     name={editingTeacher.name}
-                    id={editingTeacher.user?.userId || editingTeacher.id_teacher}
+                    id={editingTeacher.user?.userId || editingTeacher.teacherId}
                     type="usuari"
                     size="xl"
                     className="shadow-xl ring-4 ring-white"

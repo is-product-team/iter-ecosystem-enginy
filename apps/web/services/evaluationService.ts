@@ -43,8 +43,8 @@ export const evaluationService = {
     analyzeObservations: (text: string) =>
         api.post('/evaluation/analyze', { text }),
 
-    submitAutoconsulta: (data: Record<string, unknown>) =>
-        api.post('/questionnaires/autoconsulta', data),
+    submitSelfConsultation: (data: Record<string, unknown>) =>
+        api.post('/questionnaires/self-consultation', data),
 
     getReports: () =>
         api.get('/questionnaires/reports'),

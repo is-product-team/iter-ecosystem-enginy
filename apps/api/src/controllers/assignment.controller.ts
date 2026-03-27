@@ -314,8 +314,8 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
         status: 'PUBLISHED',
         teachers: {
           create: [
-            ...(request.prof1_id ? [{ userId: request.prof1_id, isPrincipal: true }] : []),
-            ...(request.prof2_id ? [{ userId: request.prof2_id, isPrincipal: false }] : [])
+            ...(request.prof1Id ? [{ userId: request.prof1Id, isPrincipal: true }] : []),
+            ...(request.prof2Id ? [{ userId: request.prof2Id, isPrincipal: false }] : [])
           ]
         },
         // Initialize default checklist for Phase 2
@@ -878,7 +878,7 @@ export const addTeachingStaff = async (req: Request, res: Response) => {
   try {
     const relation = await prisma.assignmentTeacher.upsert({
       where: {
-        assignmentuserId: {
+        assignmentId_userId: {
           assignmentId: parseInt(assignmentId as string),
           userId: parseInt(userId as string)
         }
@@ -904,7 +904,7 @@ export const removeTeachingStaff = async (req: Request, res: Response) => {
   try {
     await prisma.assignmentTeacher.delete({
       where: {
-        assignmentuserId: {
+        assignmentId_userId: {
           assignmentId: parseInt(assignmentId as string),
           userId: parseInt(userId as string)
         }
@@ -924,7 +924,7 @@ export const addSessionTeacher = async (req: Request, res: Response) => {
   try {
     const relation = await prisma.sessionTeacher.upsert({
       where: {
-        sessionuserId: {
+        sessionId_userId: {
           sessionId: parseInt(sessionId as string),
           userId: parseInt(userId as string)
         }
@@ -948,7 +948,7 @@ export const removeSessionTeacher = async (req: Request, res: Response) => {
   try {
     await prisma.sessionTeacher.delete({
       where: {
-        sessionuserId: {
+        sessionId_userId: {
           sessionId: parseInt(sessionId as string),
           userId: parseInt(userId as string)
         }
