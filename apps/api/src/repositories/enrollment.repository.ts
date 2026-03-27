@@ -12,7 +12,7 @@ export class EnrollmentRepository extends BaseRepository<Enrollment, Prisma.Enro
       include: {
         student: true,
         assignment: { include: { workshop: true, center: true } },
-        attendance: { orderBy: { numero_sessio: 'asc' } }
+        attendance: { orderBy: { sessionNumber: 'asc' } }
       }
     });
   }
@@ -24,7 +24,7 @@ export class EnrollmentRepository extends BaseRepository<Enrollment, Prisma.Enro
         student: true,
         attendance: true
       },
-      orderBy: { student: { cognoms: 'asc' } }
+      orderBy: { student: { surnames: 'asc' } }
     });
   }
 

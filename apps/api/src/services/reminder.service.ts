@@ -44,7 +44,7 @@ export class ReminderService {
       // 1. Check for upcoming Sessions
       const upcomingSessions = await prisma.session.findMany({
         where: {
-          data_session: {
+          sessionDate: {
             gt: now,
             lte: next24h
           }
@@ -84,18 +84,18 @@ export class ReminderService {
           const existing = await prisma.notification.findFirst({
             where: {
               id_user: user.id_user,
-              titol: { startsWith: 'Recordatori: ' },
-              missatge: { contains: session.assignment.workshop.titol }
+              title: { startsWith: 'Recordatori: ' },
+              message: { contains: session.assignment.workshop.title }
             }
           });
 
           if (!existing) {
             await createNotificationInterna({
               id_user: user.id_user,
-              titol: `Recordatori: Sessió de Taller`,
-              missatge: `Tens una sessió del taller "${session.assignment.workshop.titol}" programada per avui a les ${session.hora_inici || 'la seva hora habitual'}.`,
-              tipus: 'SISTEMA',
-              importancia: 'INFO'
+              title: `Recordatori: Sessió de Taller`,
+              message: `Tens una sessió del taller "${session.assignment.workshop.title}" programada per avui a les ${session.startTime || 'la seva hora habitual'}.`,
+              type: 'SISTEMA',
+              importance: 'INFO'
             });
           }
         }
@@ -104,7 +104,7 @@ export class ReminderService {
       // 2. Check for upcoming Milestones (CalendarEvents)
       const upcomingMilestones = await prisma.calendarEvent.findMany({
         where: {
-          data: {
+          date: {
             gt: now,
             lte: next24h
           }
@@ -118,16 +118,16 @@ export class ReminderService {
           where: {
             id_user: null,
             id_center: null,
-            titol: milestone.titol
+            title: milestone.title
           }
         });
 
         if (!existing) {
           await createNotificationInterna({
-            titol: `Fita Pròxima: ${milestone.titol}`,
-            missatge: `Recorda: La fita "${milestone.titol}" està programada per a les properes 24 hores.`,
-            tipus: 'FASE',
-            importancia: 'WARNING'
+            title: `Fita Pròxima: ${milestone.title}`,
+            message: `Recorda: La fita "${milestone.title}" està programada per a les properes 24 hores.`,
+            type: 'FASE',
+            importance: 'WARNING'
           });
         }
       }

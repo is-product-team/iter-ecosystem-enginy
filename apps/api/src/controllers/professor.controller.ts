@@ -51,7 +51,7 @@ export const createTeacher = async (req: Request, res: Response) => {
     const result = await prisma.$transaction(async (tx: any) => {
       // 1. Buscar el rol de profesor
       const rolProfe = await tx.role.findFirst({
-        where: { nom_role: ROLES.TEACHER }
+        where: { roleName: ROLES.TEACHER }
       });
 
       if (!rolProfe) throw new Error(`Role ${ROLES.TEACHER} no trobat.`);
@@ -62,9 +62,9 @@ export const createTeacher = async (req: Request, res: Response) => {
 
       const usuari = await tx.user.create({
         data: {
-          nom_complet: nom,
+          fullName: nom,
           email: contacte, // Usamos el contacto como email principal
-          password_hash: passwordHash,
+          passwordHash: passwordHash,
           id_role: rolProfe.id_role,
           id_center: finalCenterId
         }
@@ -139,14 +139,14 @@ export const getTeacherAssignments = async (req: Request, res: Response) => {
             user: {
               select: {
                 id_user: true,
-                nom_complet: true,
+                fullName: true,
                 email: true
               }
             }
           }
         },
         sessions: {
-            orderBy: { data_session: 'asc' }
+            orderBy: { sessionDate: 'asc' }
         }
       }
     });
@@ -175,7 +175,7 @@ export const getTeachersByCenter = async (req: Request, res: Response) => {
           select: {
             id_user: true,
             email: true,
-            nom_complet: true,
+            fullName: true,
             url_foto: true
           }
         }

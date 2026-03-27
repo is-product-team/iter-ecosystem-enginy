@@ -5,9 +5,9 @@ export const getSyncToken = async (req: Request, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id_user: req.user!.userId },
-      select: { sync_token: true }
+      select: { syncToken: true }
     });
-    res.json({ sync_token: user?.sync_token });
+    res.json({ sync_token: user?.syncToken });
   } catch (error) {
     res.status(500).json({ error: 'Error fetching sync token' });
   }
@@ -18,7 +18,7 @@ export const generateSyncToken = async (req: Request, res: Response) => {
     const newToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     await prisma.user.update({
       where: { id_user: req.user!.userId },
-      data: { sync_token: newToken }
+      data: { syncToken: newToken }
     });
     res.json({ sync_token: newToken });
   } catch (error) {

@@ -20,7 +20,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
     const sessionMatch = await prisma.session.findFirst({
         where: { 
             id_assignment: parseInt(id_assignment),
-            data_session: today
+            sessionDate: today
         }
     });
     const sessionNum = sessionMatch ? sessionMatch.id_session : 1;
@@ -28,10 +28,10 @@ export const registerAttendance = async (req: Request, res: Response) => {
     // Helper to map mobile status (UPPERCASE) to Prisma Enum (PascalCase)
     const mapStatus = (status: string) => {
         switch (status) {
-            case 'PRESENT': return 'Present';
-            case 'ABSENT': return 'Absencia'; // Maps to "Absencia" or "Absencia_Justificada" if needed
-            case 'RETARD': return 'Retard';
-            default: return 'Present'; // Fallback
+            case 'PRESENT': return 'PRESENT';
+            case 'ABSENT': return 'ABSENT';
+            case 'RETARD': return 'LATE';
+            default: return 'PRESENT'; // Fallback
         }
     };
 
@@ -55,7 +55,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
         const existing = await prisma.attendance.findFirst({
             where: {
                 id_enrollment: validEnrollment.id_enrollment,
-                data_session: today
+                sessionDate: today
             }
         });
 
@@ -63,18 +63,18 @@ export const registerAttendance = async (req: Request, res: Response) => {
             return prisma.attendance.update({
                 where: { id_attendance: existing.id_attendance },
                 data: {
-                    estat: prismaStatus as any, // Cast to any to avoid strict typing issues with generated enums if imports missing
-                    observacions: item.observacions
+                    status: prismaStatus as any, // Cast to any to avoid strict typing issues with generated enums if imports missing
+                    comments: item.observacions
                 }
             });
         } else {
             return prisma.attendance.create({
                 data: {
                     id_enrollment: validEnrollment.id_enrollment,
-                    numero_sessio: sessionNum,
-                    data_session: today,
-                    estat: prismaStatus as any, 
-                    observacions: item.observacions
+                    sessionNumber: sessionNum,
+                    sessionDate: today,
+                    status: prismaStatus as any, 
+                    comments: item.observacions
                 }
             });
         }

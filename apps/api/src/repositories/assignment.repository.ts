@@ -28,7 +28,7 @@ export class AssignmentRepository extends BaseRepository<Assignment, Prisma.Assi
         center: true,
         teachers: { include: { user: true } }
       },
-      orderBy: { data_inici: 'asc' }
+      orderBy: { startDate: 'asc' }
     });
   }
 

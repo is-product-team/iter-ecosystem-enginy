@@ -11,7 +11,7 @@ export class CenterRepository extends BaseRepository<Center, Prisma.CenterCreate
     return this.prisma.center.findUnique({
       where: { id_center: id },
       include: {
-        users: { select: { id_user: true, nom_complet: true, email: true, role: true } },
+        users: { select: { id_user: true, fullName: true, email: true, role: true } },
         assignments: { include: { workshop: true } }
       }
     });
@@ -19,7 +19,7 @@ export class CenterRepository extends BaseRepository<Center, Prisma.CenterCreate
 
   async findByCode(code: string): Promise<Center | null> {
     return this.model.findUnique({
-      where: { codi_center: code }
+      where: { centerCode: code }
     });
   }
 }

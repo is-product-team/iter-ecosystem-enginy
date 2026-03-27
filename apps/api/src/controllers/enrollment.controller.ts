@@ -22,11 +22,11 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
 
     // Expecting columns: "nom", "cognoms", "idalu", "curs"
     const studentsToCreate = data.map(row => ({
-      nom: row.nom || row.Nombre || '',
-      cognoms: row.cognoms || row.Apellidos || '',
+      name: row.nom || row.Nombre || '',
+      surnames: row.cognoms || row.Apellidos || '',
       idalu: String(row.idalu || row.ID || ''),
       curs: row.curs || row.Curso || ''
-    })).filter(s => s.nom && s.idalu);
+    })).filter(s => s.name && s.idalu);
 
     const assignacio = await prisma.assignment.findUnique({
       where: { id_assignment: parseInt(idAssignment as string) },
@@ -43,8 +43,8 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
       const alumne = await prisma.student.upsert({
         where: { idalu: s.idalu },
         update: {
-          nom: s.nom,
-          cognoms: s.cognoms,
+          name: s.name,
+          surnames: s.surnames,
           curs: s.curs
         },
         create: {
@@ -84,11 +84,11 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
     await prisma.assignmentChecklist.updateMany({
       where: {
         id_assignment: assignacio.id_assignment,
-        pas_nom: { contains: 'Registro Nominal' }
+        stepName: { contains: 'Registro Nominal' }
       },
       data: {
-        completat: true,
-        data_completat: new Date()
+        isCompleted: true,
+        completedAt: new Date()
       }
     });
 

@@ -11,23 +11,22 @@ export function mapUserResponse(prismaUser: any) {
     id_usuari: prismaUser.id_user,
     email: prismaUser.email,
     nom_complet: prismaUser.nom_complet,
-    url_foto: prismaUser.url_foto,
-    id_center: prismaUser.id_center,
+    role: prismaUser.role ? prismaUser.role.name : null,
+    centerId: prismaUser.id_center,
     id_centre: prismaUser.id_center,
     center: prismaUser.center ? {
       id_center: prismaUser.center.id_center,
-      id_centre: prismaUser.center.id_center,
-      nom: prismaUser.center.nom,
-      codi_center: prismaUser.center.codi_center
+      name: prismaUser.center.name,
+      centerCode: prismaUser.center.centerCode
     } : null,
     centre: prismaUser.center ? {
       id_center: prismaUser.center.id_center,
       id_centre: prismaUser.center.id_center,
-      nom: prismaUser.center.nom,
-      codi_center: prismaUser.center.codi_center
+      name: prismaUser.center.name,
+      centerCode: prismaUser.center.centerCode
     } : null,
     rol: prismaUser.role ? {
-      nom_rol: prismaUser.role.nom_role
+      name: prismaUser.role.name
     } : null,
     sync_token: prismaUser.sync_token
   };

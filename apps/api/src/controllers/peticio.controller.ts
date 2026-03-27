@@ -1,8 +1,8 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { RequestStatus } from '@prisma/client';
-import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
-import { ROLES, REQUEST_STATUSES } from '@iter/shared';
+import { RequestStatus, Modalitat } from '@prisma/client';
+import { ROLES, REQUEST_STATUSES, PHASES } from '@iter/shared';
+import { isPhaseActive } from '../lib/phaseUtils.js';
 import { createNotificationInterna } from './notificacio.controller.js';
 
 // GET: Ver peticiones (Filtra por centro si es COORDINADOR) con paginación
@@ -48,7 +48,7 @@ export const getRequestns = async (req: Request, res: Response) => {
           workshop: true
         },
         orderBy: {
-          data_request: 'desc'
+          createdAt: 'desc'
         }
       }),
       prisma.request.count({ where }),
@@ -73,11 +73,11 @@ export const getRequestns = async (req: Request, res: Response) => {
 export const createRequest = async (req: Request, res: Response) => {
   const {
     id_workshop,
-    alumnes_aprox,
-    comentaris,
+    studentsAprox, // Renamed from alumnes_aprox
+    comments,      // Renamed from comentaris
     prof1_id,
     prof2_id,
-    modalitat
+    modality       // Renamed from modalitat
   } = req.body;
   const { centreId } = req.user!;
 
@@ -98,8 +98,8 @@ export const createRequest = async (req: Request, res: Response) => {
   }
 
   // --- VALIDACIONES DE MODALIDAD C (REGLAS DEL PROGRAMA) ---
-  if (modalitat === 'C') {
-    if (alumnes_aprox > 4) {
+  if (modality === 'C') {
+    if (studentsAprox > 4) {
       return res.status(400).json({ error: 'En la Modalitat C, el màxim és de 4 alumnes d\'un mateix institut per projecte.' });
     }
 
@@ -107,12 +107,12 @@ export const createRequest = async (req: Request, res: Response) => {
     const requestsC = await prisma.request.findMany({
       where: {
         id_center: centreId,
-        modalitat: 'C'
+        modality: 'C'
       }
     });
 
-    const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
-    if (totalStudentsC + alumnes_aprox > 12) {
+    const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.studentsAprox || 0), 0);
+    if (totalStudentsC + studentsAprox > 12) {
       return res.status(400).json({
         error: `Límit superat. L'institut ja té ${totalStudentsC} alumnes en projectes de Modalitat C. El màxim total permès és 12.`
       });
@@ -133,12 +133,12 @@ export const createRequest = async (req: Request, res: Response) => {
 
     const nuevaRequest = await prisma.request.create({
       data: {
-        id_center: centreId,
+        id_center: parseInt(centreId),
         id_workshop: parseInt(id_workshop),
-        alumnes_aprox: parseInt(alumnes_aprox),
-        comentaris,
-        estat: REQUEST_STATUSES.PENDING,
-        modalitat,
+        studentsAprox: parseInt(studentsAprox),
+        comments: comments,
+        status: RequestStatus.PENDING,
+        modality: modality as Modalitat,
         prof1_id: parseInt(prof1_id),
         prof2_id: parseInt(prof2_id),
       },
@@ -158,10 +158,11 @@ export const createRequest = async (req: Request, res: Response) => {
 export const updateRequest = async (req: Request, res: Response) => {
   const { id } = req.params;
   const {
-    alumnes_aprox,
-    comentaris,
+    studentsAprox, // Renamed from alumnes_aprox
+    comments,      // Renamed from comentaris
     prof1_id,
     prof2_id,
+    modality       // Renamed from modalitat
   } = req.body;
   const { centreId, role } = req.user!;
 
@@ -181,8 +182,8 @@ export const updateRequest = async (req: Request, res: Response) => {
     }
 
     // Verificar estado: Solo se pueden editar las pendientes
-    if (existingRequest.estat !== REQUEST_STATUSES.PENDING) {
-      return res.status(400).json({ error: 'Només es poden editar requests pendents.' });
+    if (existingRequest.status !== RequestStatus.PENDING) {
+      return res.status(400).json({ error: 'Només es poden editar sol·licituds pendents' });
     }
 
     // --- VERIFICACIÓN DE FASE ---
@@ -201,8 +202,8 @@ export const updateRequest = async (req: Request, res: Response) => {
     }
 
     // --- VALIDACIONES DE MODALIDAD C (REGLAS DEL PROGRAMA) ---
-    if (existingRequest.modalitat === 'C' && alumnes_aprox !== undefined) {
-      const nuevosStudents = parseInt(alumnes_aprox);
+    if (existingRequest.modality === 'C' && studentsAprox !== undefined) {
+      const nuevosStudents = parseInt(studentsAprox);
       if (nuevosStudents > 4) {
         return res.status(400).json({ error: 'En la Modalitat C, el màxim és de 4 alumnes d\'un mateix institut per projecte.' });
       }
@@ -211,12 +212,12 @@ export const updateRequest = async (req: Request, res: Response) => {
       const requestsC = await prisma.request.findMany({
         where: {
           id_center: existingRequest.id_center,
-          modalitat: 'C',
+          modality: 'C',
           id_request: { not: peticioId } // Excluir la actual
         }
       });
 
-      const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.alumnes_aprox || 0), 0);
+      const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.studentsAprox || 0), 0);
       if (totalStudentsC + nuevosStudents > 12) {
         return res.status(400).json({
           error: `Límit superat. L'institut ja té ${totalStudentsC} alumnes en altres projectes de Modalitat C. Amb aquest canvi (${nuevosStudents}) superaria el màxim de 12.`
@@ -227,8 +228,8 @@ export const updateRequest = async (req: Request, res: Response) => {
     const updatedRequest = await prisma.request.update({
       where: { id_request: peticioId },
       data: {
-        alumnes_aprox: alumnes_aprox ? parseInt(alumnes_aprox) : undefined,
-        comentaris,
+        studentsAprox: studentsAprox ? parseInt(studentsAprox) : undefined,
+        comments: comments,
         prof1_id: parseInt(prof1_id),
         prof2_id: parseInt(prof2_id),
       },
@@ -247,21 +248,21 @@ export const updateRequest = async (req: Request, res: Response) => {
 // PATCH: Cambiar estado (Aprobar/Rechazar)
 export const updateRequestStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { estat } = req.body;
+  const { status } = req.body;
 
   try {
     const updated = await prisma.request.update({
       where: { id_request: parseInt(id as string) },
-      data: { estat: estat as RequestStatus },
+      data: { status: status as RequestStatus },
       include: { workshop: true }
     });
 
     await createNotificationInterna({
       id_center: updated.id_center,
-      titol: `Sol·licitud ${updated.estat === REQUEST_STATUSES.APPROVED ? 'Aprovada' : 'Rebutjada'}`,
-      missatge: `La teva sol·licitud per al taller "${updated.workshop.titol}" ha estat ${updated.estat.toLowerCase()}.`,
-      tipus: 'PETICIO',
-      importancia: updated.estat === REQUEST_STATUSES.APPROVED ? 'INFO' : 'WARNING'
+      title: `Sol·licitud ${updated.status === RequestStatus.APPROVED ? 'Aprovada' : 'Rebutjada'}`,
+      message: `La teva sol·licitud per al taller "${updated.workshop.title}" ha estat ${updated.status.toLowerCase()}.`,
+      type: 'PETICIO',
+      importance: updated.status === RequestStatus.APPROVED ? 'INFO' : 'WARNING'
     });
 
     res.json(updated);

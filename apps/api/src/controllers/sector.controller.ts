@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 export const getSectors = async (req: Request, res: Response) => {
   try {
     const sectors = await prisma.sector.findMany({
-      orderBy: { nom: 'asc' }
+      orderBy: { name: 'asc' }
     });
     res.json(sectors);
   } catch (error) {

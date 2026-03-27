@@ -30,7 +30,7 @@ export async function runTetris() {
   // 1. Get all approved (or pending) petitions that don't have an assignment yet
   const petitions = await prisma.request.findMany({
     where: {
-      estat: { in: [REQUEST_STATUSES.APPROVED as any, REQUEST_STATUSES.PENDING as any] },
+      status: { in: [RequestStatus.APPROVED, RequestStatus.PENDING] },
       assignment: null
     },
     include: {
@@ -38,12 +38,12 @@ export async function runTetris() {
       center: true
     },
     orderBy: {
-      data_request: 'asc' // Strict FIFO: First come, first served
+      createdAt: 'asc' // Strict FIFO: First come, first served
     }
   });
 
   stats.totalPetitions = petitions.length;
-  stats.totalStudents = petitions.reduce((acc: number, p: any) => acc + (p.alumnes_aprox || 0), 0);
+  stats.totalStudents = petitions.reduce((acc: number, p: any) => acc + (p.studentsAprox || 0), 0);
 
   if (petitions.length === 0) {
     console.log('ℹ️ TetrisService: No approved petitions found waiting for assignment.');
@@ -64,7 +64,7 @@ export async function runTetris() {
 
   for (const tallerId in tallerGroups) {
     const tallerPetitions = tallerGroups[tallerId];
-    const taller = (tallerPetitions[0] as any).taller;
+    const taller = (tallerPetitions[0] as any).workshop;
 
     // 1. Calculate strictly occupied capacity from existing assignments
     const existingAssignments = await prisma.assignment.findMany({
@@ -73,12 +73,12 @@ export async function runTetris() {
     });
 
     const occupiedPlazas = (existingAssignments as any[]).reduce((sum: number, a: any) => {
-      return sum + (a.peticio?.alumnes_aprox || 0);
+      return sum + (a.request?.studentsAprox || 0);
     }, 0);
 
-    let currentCapacity = taller.places_maximes - occupiedPlazas;
+    let currentCapacity = taller.maxPlaces - occupiedPlazas;
 
-    console.log(`📊 Workshop ID ${tallerId} (${taller.titol}): Plazas Totales: ${taller.places_maximes}, Ocupadas: ${occupiedPlazas}, Disponibles: ${currentCapacity}`);
+    console.log(`📊 Workshop ID ${tallerId} (${taller.title}): Plazas Totales: ${taller.maxPlaces}, Ocupadas: ${occupiedPlazas}, Disponibles: ${currentCapacity}`);
 
     if (currentCapacity <= 0) {
       console.log(`🚫 Workshop ${tallerId} está lleno. Saltando ${tallerPetitions.length} peticiones.`);
@@ -86,15 +86,15 @@ export async function runTetris() {
       continue;
     }
     for (const petition of tallerPetitions) {
-      const neededPlazas = petition.alumnes_aprox || 0;
+      const neededPlazas = petition.studentsAprox || 0;
 
       if (currentCapacity >= neededPlazas) {
         // 1. If petition is Pendent, approve it automatically
-        if (petition.estat === REQUEST_STATUSES.PENDING) {
+        if (petition.status === RequestStatus.PENDING) {
           console.log(`✅ TetrisService: Auto-approving petition ${petition.id_request} for center ID ${petition.id_center}`);
           await prisma.request.update({
             where: { id_request: petition.id_request },
-            data: { estat: REQUEST_STATUSES.APPROVED as any }
+            data: { status: RequestStatus.APPROVED }
           });
         }
 
@@ -104,13 +104,13 @@ export async function runTetris() {
             id_request: petition.id_request,
             id_center: petition.id_center,
             id_workshop: petition.id_workshop,
-            estat: ASSIGNMENT_STATUSES.PUBLISHED,
+            status: 'PUBLISHED',
             checklist: {
               create: [
-                { pas_nom: 'Designar Professors Referents', completat: false },
-                { pas_nom: 'Pujar Registre Nominal (Excel)', completat: false },
-                { pas_nom: 'Gestionar Acord Pedagògic', completat: petition.modalitat !== 'C' },
-                { pas_nom: 'Autoritzacions d\'Imatge i Desplaçament', completat: false }
+                { stepName: 'Designar Professors Referents', isCompleted: false },
+                { stepName: 'Pujar Registre Nominal (Excel)', isCompleted: false },
+                { stepName: 'Gestionar Acord Pedagògic', isCompleted: petition.modality !== 'C' },
+                { stepName: 'Autoritzacions d\'Imatge i Desplaçament', isCompleted: false }
               ]
             }
           }
@@ -119,10 +119,10 @@ export async function runTetris() {
         // 3. Send Notification
         await createNotificationInterna({
           id_center: petition.id_center,
-          titol: 'Sol·licitud Assignada Automàticament',
-          missatge: `La teva sol·licitud per al taller "${taller.titol}" ha estat acceptada i assignada via procés automàtic.`,
-          tipus: 'PETICIO',
-          importancia: 'INFO'
+          title: 'Sol·licitud Assignada Automàticament',
+          message: `La teva sol·licitud per al taller "${taller.title}" ha estat acceptada i assignada via procés automàtic.`,
+          type: 'PETICIO',
+          importance: 'INFO'
         });
 
         createdAssignments.push(assignacio);

@@ -18,7 +18,7 @@ export const login = async (req: Request, res: Response) => {
 
     // 2. Verificar password
     console.log(`[Auth] Intento de login para: ${email}`);
-    const validPassword = await bcrypt.compare(password, user.password_hash);
+    const validPassword = await bcrypt.compare(password, user.passwordHash);
 
     if (!validPassword) {
       console.warn(`[Auth] Password incorrecto para: ${email}`);
@@ -30,8 +30,8 @@ export const login = async (req: Request, res: Response) => {
       {
         userId: user.id_user,
         email: user.email,
-        role: (user as any).role.nom_role,
-        centreId: user.id_center
+        role: (user as any).role.name,
+        centerId: user.id_center
       },
       env.JWT_SECRET,
       { expiresIn: '24h' }

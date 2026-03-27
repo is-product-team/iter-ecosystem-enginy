@@ -22,7 +22,7 @@ export const getNotificationns = async (req: Request, res: Response) => {
     const notificacions = await prisma.notification.findMany({
       where,
       orderBy: {
-        data_creacio: 'desc'
+        createdAt: 'desc'
       },
       take: 50
     });
@@ -41,7 +41,7 @@ export const markAsRead = async (req: Request, res: Response) => {
   try {
     const updated = await prisma.notification.update({
       where: { id_notificacio: parseInt(id as string) },
-      data: { llegida: true }
+      data: { isRead: true }
     });
 
     res.json(updated);
@@ -71,20 +71,20 @@ export const deleteNotification = async (req: Request, res: Response) => {
 export const createNotificationInterna = async (data: {
   id_user?: number;
   id_center?: number;
-  titol: string;
-  missatge: string;
-  tipus: 'PETICIO' | 'FASE' | 'SISTEMA';
-  importancia?: 'INFO' | 'WARNING' | 'URGENT';
+  title: string;
+  message: string;
+  type: 'PETICIO' | 'FASE' | 'SISTEMA';
+  importance?: 'INFO' | 'WARNING' | 'URGENT';
 }) => {
   try {
     const notif = await prisma.notification.create({
       data: {
         id_user: data.id_user,
         id_center: data.id_center,
-        titol: data.titol,
-        missatge: data.missatge,
-        tipus: data.tipus,
-        importancia: data.importancia || 'INFO'
+        title: data.title,
+        message: data.message,
+        type: data.type,
+        importance: data.importance || 'INFO'
       }
     });
 

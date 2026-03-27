@@ -1,5 +1,5 @@
-import prisma from '../lib/prisma.js';
 import { REQUEST_STATUSES } from '@iter/shared';
+import { RequestStatus } from '@prisma/client';
 
 interface PendingCenter {
     centerId: number;
@@ -21,8 +21,8 @@ export class AutoAssignmentService {
         // 1. Fetch Approved/Pending Petitions for Modalitat C that are not yet fully assigned
         const petitions = await prisma.request.findMany({
             where: {
-                estat: { in: [REQUEST_STATUSES.APPROVED, REQUEST_STATUSES.PENDING] },
-                modalitat: 'C',
+                status: { in: [RequestStatus.APPROVED, RequestStatus.PENDING] },
+                modality: 'C',
                 assignment: null
             },
             include: {
@@ -30,7 +30,7 @@ export class AutoAssignmentService {
                 workshop: true
             },
             orderBy: {
-                data_request: 'asc'
+                createdAt: 'asc'
             }
         });
 
@@ -64,9 +64,9 @@ export class AutoAssignmentService {
             });
 
             const occupiedPlazas = existingAssignments.reduce((sum: number, a: any) => sum + a.enrollments.length, 0);
-            const remainingCapacity = taller.places_maximes - occupiedPlazas;
+            const remainingCapacity = taller.maxPlaces - occupiedPlazas;
 
-            console.log(`📊 AutoAssignment: Workshop ID ${tallerId} (${taller.titol}): Capacity: ${taller.places_maximes}, Occupied: ${occupiedPlazas}, Remaining: ${remainingCapacity}`);
+            console.log(`📊 AutoAssignment: Workshop ID ${tallerId} (${taller.title}): Capacity: ${taller.maxPlaces}, Occupied: ${occupiedPlazas}, Remaining: ${remainingCapacity}`);
 
             if (remainingCapacity <= 0) {
                 console.warn(`🚫 AutoAssignment: Workshop ${tallerId} is full. Skipping.`);
@@ -82,7 +82,7 @@ export class AutoAssignmentService {
             const centerMap = new Map<number, PendingCenter>();
 
             workshopPetitions.forEach((p: any) => {
-                const demand = p.alumnes_aprox || 0;
+                const demand = p.studentsAprox || 0;
                 if (demand === 0) return;
 
                 if (!centerMap.has(p.id_center)) {
@@ -90,15 +90,15 @@ export class AutoAssignmentService {
                         centerId: p.id_center,
                         students: [], // No actual students yet
                         peticioId: p.id_request, 
-                        timestamp: p.data_request,
+                        timestamp: p.createdAt,
                         assignedCount: 0
                     });
                 }
                 const entry = centerMap.get(p.id_center)!;
                 entry.assignedCount += demand; // Store initial demand here for calc
                 
-                if (p.data_request < entry.timestamp) {
-                    entry.timestamp = p.data_request;
+                if (p.createdAt < entry.timestamp) {
+                    entry.timestamp = p.createdAt;
                 }
             });
 
@@ -164,11 +164,26 @@ export class AutoAssignmentService {
         // Take the first N students
         // center.students.slice(0, center.assignedCount); // Removed as unused
 
-        // Update Petition Status
-        await prisma.request.update({
+        // Fetch the original petition to get its modality
+        const petition = await prisma.request.findUnique({
             where: { id_request: center.peticioId },
-            data: { estat: REQUEST_STATUSES.APPROVED }
+            select: { modality: true, studentsAprox: true, status: true }
         });
+
+        if (!petition) {
+            console.error(`Error: Petition with ID ${center.peticioId} not found.`);
+            return;
+        }
+
+        const neededPlazas = petition.studentsAprox || 0;
+        
+        // 5. Upgrade status if pending
+        if (petition.status === RequestStatus.PENDING) {
+            await prisma.request.update({
+                where: { id_request: center.peticioId },
+                data: { status: RequestStatus.APPROVED }
+            });
+        }
 
         // Create Assignment
         const assignacio = await prisma.assignment.create({
@@ -176,39 +191,36 @@ export class AutoAssignmentService {
                 id_request: center.peticioId,
                 id_center: center.centerId,
                 id_workshop: tallerId,
-                estat: 'PUBLISHED',
+                status: 'PUBLISHED',
                 checklist: {
-                    create: [
-                        { pas_nom: 'Designar Profesores Referentes', completat: false },
-                        { pas_nom: 'Subir Registro Nominal (Excel)', completat: true },
-                        { pas_nom: 'Acuerdo Pedagógico (Modalidad C)', completat: false }
-                    ]
+                    createMany: {
+                        data: [
+                            { stepName: 'Designar Professors Referents', isCompleted: false },
+                            { stepName: 'Pujar Registre Nominal (Excel)', isCompleted: false },
+                            { stepName: 'Gestionar Acord Pedagògic', isCompleted: petition.modality !== 'C' },
+                            { stepName: 'Autoritzacions d\'Imatge i Desplaçament', isCompleted: false }
+                        ]
+                    }
                 }
-            }
+            },
+            include: { workshop: true }
         });
 
         // Note: Specific enrollments are created later by the center.
         // For now we just create the Assignment framework.
 
-        // Generate Sessions (Copy from original)
-        const taller = await prisma.workshop.findUnique({ where: { id_workshop: tallerId } });
-        if (taller && taller.dies_execucio) {
-            const schedule = taller.dies_execucio as any[];
-            if (Array.isArray(schedule) && schedule.length > 0) {
-                const sessionsData = schedule.map(slot => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + 1);
-                    while (d.getDay() !== slot.dayOfWeek) {
-                        d.setDate(d.getDate() + 1);
-                    }
-                    return {
+        // Generate Sessions
+        if (assignacio.workshop && assignacio.workshop.executionDays) {
+            const sessionsData = assignacio.workshop.executionDays as any[];
+            if (Array.isArray(sessionsData)) {
+                await prisma.session.createMany({
+                    data: sessionsData.map(slot => ({
                         id_assignment: assignacio.id_assignment,
-                        data_session: d,
-                        hora_inici: (slot as any).startTime,
-                        hora_fi: (slot as any).endTime
-                    };
+                        sessionDate: new Date(),
+                        startTime: slot.startTime,
+                        endTime: slot.endTime
+                    }))
                 });
-                await prisma.session.createMany({ data: sessionsData });
             }
         }
 
