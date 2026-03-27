@@ -30,7 +30,7 @@ export const getCenters = async (req: Request, res: Response) => {
 export const getCenterById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const centre = await prisma.center.findUnique({
-    where: { id_center: parseInt(id as string) }
+    where: { centerId: parseInt(id as string) }
   });
   if (!centre) return res.status(404).json({ error: 'Centro no encontrado' });
   res.json(centre);
@@ -48,7 +48,7 @@ export const createCenter = async (req: Request, res: Response) => {
 export const updateCenter = async (req: Request, res: Response) => {
   const { id } = req.params;
   const updated = await prisma.center.update({
-    where: { id_center: parseInt(id as string) },
+    where: { centerId: parseInt(id as string) },
     data: req.body
   });
   res.json(updated);
@@ -58,7 +58,7 @@ export const updateCenter = async (req: Request, res: Response) => {
 export const deleteCenter = async (req: Request, res: Response) => {
   const { id } = req.params;
   await prisma.center.delete({
-    where: { id_center: parseInt(id as string) }
+    where: { centerId: parseInt(id as string) }
   });
   res.status(204).send();
 };

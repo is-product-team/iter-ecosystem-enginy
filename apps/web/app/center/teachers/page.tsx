@@ -42,7 +42,7 @@ export default function TeachersCRUD() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.COORDINATOR)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
       router.push('/login');
       return;
     }
@@ -183,7 +183,7 @@ export default function TeachersCRUD() {
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
                           <Avatar 
-                            url={p.user?.url_foto} 
+                            url={p.user?.photoUrl} 
                             name={p.name} 
                             id={p.user?.id_user || p.id_teacher} 
                             type="usuari" 
@@ -256,7 +256,7 @@ export default function TeachersCRUD() {
               {editingTeacher && (
                 <div className="p-8 bg-gray-50/50 border-b border-gray-50 flex flex-col items-center gap-4">
                   <Avatar 
-                    url={editingTeacher.user?.url_foto} 
+                    url={editingTeacher.user?.photoUrl} 
                     name={editingTeacher.name} 
                     id={editingTeacher.user?.id_user || editingTeacher.id_teacher} 
                     type="usuari" 

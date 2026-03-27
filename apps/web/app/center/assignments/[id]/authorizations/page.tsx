@@ -104,7 +104,7 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
                   <tr key={ins.id_enrollment} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="text-sm font-bold text-consorci-darkBlue uppercase tracking-tight">
-                        {ins.student?.name} {ins.student?.surnames}
+                        {ins.student?.fullName}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">

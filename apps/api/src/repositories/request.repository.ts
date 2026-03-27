@@ -3,12 +3,12 @@ import { BaseRepository } from './base.repository.js';
 
 export class RequestRepository extends BaseRepository<Request, Prisma.RequestCreateInput, Prisma.RequestUpdateInput> {
   constructor() {
-    super('request', 'id_request');
+    super('request', 'requestId');
   }
 
   override async findById(id: number): Promise<any> {
     return this.prisma.request.findUnique({
-      where: { id_request: id },
+      where: { requestId: id },
       include: {
         center: true,
         workshop: true
@@ -18,7 +18,7 @@ export class RequestRepository extends BaseRepository<Request, Prisma.RequestCre
 
   async findByCenter(centerId: number): Promise<Peticio[]> {
     return this.model.findMany({
-      where: { id_center: centerId },
+      where: { centerId: centerId },
       include: { workshop: true },
       orderBy: { data_request: 'desc' }
     });
@@ -27,7 +27,7 @@ export class RequestRepository extends BaseRepository<Request, Prisma.RequestCre
   async findAllDetailed(role: string, centerId?: number): Promise<Peticio[]> {
     const where: Prisma.RequestWhereInput = {};
     if (role !== 'ADMIN' && centerId) {
-      where.id_center = centerId;
+      where.centerId = centerId;
     }
 
     return this.model.findMany({

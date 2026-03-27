@@ -13,9 +13,9 @@ export default function Home() {
   useEffect(() => {
     if (!loading) {
       if (user) {
-        if (user.rol.nom_rol === ROLES.ADMIN) {
+        if (user.role.name === ROLES.ADMIN) {
           router.push('/admin');
-        } else if (user.rol.nom_rol === ROLES.COORDINATOR) {
+        } else if (user.role.name === ROLES.COORDINATOR) {
           router.push('/center');
         }
       } else {

@@ -10,16 +10,16 @@ async function main() {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) { console.log('User not found'); return; }
 
-  const teacher = await prisma.teacher.findFirst({ where: { id_user: user.id_user } });
+  const teacher = await prisma.teacher.findFirst({ where: { userId: user.userId } });
   if (!teacher) { console.log('Teacher not found'); return; }
 
-  console.log(`Teacher ID: ${teacher.id_teacher}`);
+  console.log(`Teacher ID: ${teacher.teacherId}`);
 
   // 2. Get assignments where this teacher is involved
   const assignments = await prisma.assignment.findMany({
     where: {
       teachers: {
-        some: { id_user: teacher.id_user }
+        some: { userId: teacher.userId }
       }
     },
     include: { workshop: true }
@@ -27,7 +27,7 @@ async function main() {
 
   console.log('Assignments found:', assignments.length);
   assignments.forEach((a: any) => {
-    console.log(`ID: ${a.id_assignment}`);
+    console.log(`ID: ${a.assignmentId}`);
     console.log(`Workshop: ${a.workshop.titol}`);
     console.log(`Start: ${a.data_inici}`);
     console.log(`End:   ${a.data_fi}`);

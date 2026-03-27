@@ -70,11 +70,11 @@ export default function SessionsListPage() {
   }, [user, authLoading, router]);
 
   const fetchData = useCallback(async () => {
-    if (user && user.center?.id_center) {
+    if (user && user.center?.centerId) {
       try {
         const api = getApi();
         const [resAssig, resProfs] = await Promise.all([
-          api.get(`/assignments/center/${user.center.id_center}`),
+          api.get(`/assignments/center/${user.center.centerId}`),
           api.get('/teachers')
         ]);
         

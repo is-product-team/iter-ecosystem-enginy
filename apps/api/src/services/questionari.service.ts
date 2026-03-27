@@ -11,42 +11,46 @@ export class QuestionariService {
         });
     }
 
-    async getModelById(id_model: number) {
+    async getModelById(modelId: number) {
         return await prisma.questionnaireModel.findUnique({
-            where: { id_model },
+            where: { modelId: modelId },
             include: { questions: true },
         });
     }
 
     async createModel(data: {
-        nom: string;
-        destinatari: QuestionnaireTarget;
-        questions: { text: string; tipus: ResponseType; opcions?: any }[];
+        name: string;
+        target: QuestionnaireTarget;
+        questions: { text: string; type: ResponseType; options?: any }[];
     }) {
         return await prisma.questionnaireModel.create({
             data: {
-                name: data.nom,
-                destinatari: data.destinatari,
+                name: data.name,
+                target: data.target,
                 questions: {
-                    create: data.questions,
+                    create: data.questions.map(q => ({
+                        text: q.text,
+                        type: q.type,
+                        options: q.options
+                    })),
                 },
             },
             include: { questions: true },
         });
     }
 
-    async trackEnviament(id_assignment: number, destinatari: QuestionnaireTarget) {
+    async trackEnviament(assignmentId: number, target: QuestionnaireTarget) {
         return await prisma.questionnaire.create({
             data: {
-                id_assignment,
-                destinatari,
+                assignmentId,
+                target,
                 token: uuidv4(),
-                completa: false
+                isCompleted: false
             },
         });
     }
 
-    async submitResponses(token: string, responses: { id_question: number; valor: string }[]) {
+    async submitResponses(token: string, responses: { questionId: number; value: string }[]) {
         const questionnaire = await prisma.questionnaire.findUnique({
             where: { token }
         });
@@ -54,18 +58,18 @@ export class QuestionariService {
         if (!questionnaire) throw new Error('Questionnaire not found');
 
         await prisma.questionnaire.update({
-            where: { id_questionnaire: questionnaire.id_questionnaire },
+            where: { questionnaireId: questionnaire.questionnaireId },
             data: {
-                completa: true,
-                data_completat: new Date(),
+                isCompleted: true,
+                completedAt: new Date(),
             },
         });
 
         return await prisma.questionnaireResponse.createMany({
             data: responses.map((r) => ({
-                id_questionnaire: questionnaire.id_questionnaire,
-                id_question: r.id_question,
-                valor: r.valor,
+                questionnaireId: questionnaire.questionnaireId,
+                questionId: r.questionId,
+                value: r.value,
             })),
         });
     }
@@ -73,7 +77,7 @@ export class QuestionariService {
     async submitAutoconsultaStudent(data: any) {
         return await prisma.studentSelfConsultation.create({
             data: {
-                id_enrollment: data.id_enrollment,
+                enrollmentId: data.enrollmentId,
                 puntualitat_tasques: data.puntualitat_tasques,
                 respecte_material: data.respecte_material,
                 interes_aprenentatge: data.interes_aprenentatge,

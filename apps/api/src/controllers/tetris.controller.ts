@@ -1,20 +1,21 @@
 import { Request, Response } from 'express';
-import { runTetris } from '../services/tetris.service.js';
+import { TetrisService } from '../services/tetris.service.js';
 import { ROLES } from '@iter/shared';
+
+const tetrisService = new TetrisService();
 
 export const triggerTetris = async (req: Request, res: Response) => {
   const { role } = req.user!;
 
-  if (role !== ROLES.ADMIN) {
+  if (role !== ROLES.ADMIN && role.name !== ROLES.ADMIN) {
     return res.status(403).json({ error: 'Only admins can trigger the assignment process.' });
   }
 
   try {
-    const result = await runTetris();
+    const result = await tetrisService.processVacancies();
     res.json({
       message: 'Tetris assignment completed successfully.',
-      stats: result.stats,
-      assignmentsCreated: result.createdAssignments.length
+      resolved: result.resolved
     });
   } catch (error) {
     console.error('Tetris Error:', error);

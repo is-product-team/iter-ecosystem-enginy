@@ -21,34 +21,34 @@ export const getEnrollmentEvaluation = async (req: Request, res: Response) => {
 
 export const upsertEvaluation = async (req: Request, res: Response) => {
     try {
-        let { id_enrollment, id_student, id_assignment, observations, competencies, attendancePercentage, lateCount } = req.body;
+        let { enrollmentId, studentId, assignmentId, observations, competencies, attendancePercentage, lateCount } = req.body;
 
-        if (!id_enrollment) {
-            if (id_student && id_assignment) {
+        if (!enrollmentId) {
+            if (studentId && assignmentId) {
                 const inscripcio = await prisma.enrollment.findFirst({
                     where: {
-                        id_student: parseInt(id_student),
-                        id_assignment: parseInt(id_assignment)
+                        studentId: parseInt(studentId),
+                        assignmentId: parseInt(assignmentId)
                     }
                 });
 
                 if (inscripcio) {
-                    id_enrollment = inscripcio.id_enrollment;
+                    enrollmentId = inscripcio.enrollmentId;
                 } else {
                     return res.status(404).json({ error: 'Enrollment not found for this student and assignment.' });
                 }
             } else {
-                return res.status(400).json({ error: 'Required id_enrollment OR (id_student + id_assignment).' });
+                return res.status(400).json({ error: 'Required enrollmentId OR (studentId + assignmentId).' });
             }
         }
 
-        if (!id_assignment) {
-            return res.status(400).json({ error: 'id_assignment is required.' });
+        if (!assignmentId) {
+            return res.status(400).json({ error: 'assignmentId is required.' });
         }
 
         const dataToUpsert = {
-            id_enrollment: parseInt(id_enrollment),
-            id_assignment: parseInt(id_assignment),
+            enrollmentId: parseInt(enrollmentId),
+            assignmentId: parseInt(assignmentId),
             observations: observations || '',
             competences: competencies || [], // Mapped to competences
             attendancePercentage: attendancePercentage || 100, 
@@ -97,8 +97,8 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
         const enrollmentRecord = await prisma.enrollment.findFirst({
             where: {
-                id_student: parseInt(studentId),
-                id_assignment: parseInt(assignmentId)
+                studentId: parseInt(studentId),
+                assignmentId: parseInt(assignmentId)
             }
         });
 
@@ -107,13 +107,13 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
         if (enrollmentRecord) {
             const existingAttendance = await prisma.attendance.findFirst({
                 where: {
-                    id_enrollment: enrollmentRecord.id_enrollment,
+                    enrollmentId: enrollmentRecord.enrollmentId,
                     sessionNumber: parseInt(sessionId)
                 }
             });
 
             const dataToSave = {
-                id_enrollment: enrollmentRecord.id_enrollment,
+                enrollmentId: enrollmentRecord.enrollmentId,
                 sessionNumber: parseInt(sessionId),
                 sessionDate: new Date(),
                 status: nlpResult.attendanceStatus || (existingAttendance ? (existingAttendance as any).status : 'PRESENT'),
@@ -122,7 +122,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
             if (existingAttendance) {
                 attendanceRecord = await prisma.attendance.update({
-                    where: { id_attendance: existingAttendance.id_attendance },
+                    where: { attendanceId: existingAttendance.attendanceId },
                     data: {
                         status: dataToSave.status,
                         observations: dataToSave.observations,
@@ -144,14 +144,14 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
             if (competence) {
                 let docentEval = await prisma.evaluation.findUnique({
-                    where: { id_enrollment: enrollmentRecord.id_enrollment }
+                    where: { enrollmentId: enrollmentRecord.enrollmentId }
                 });
 
                 if (!docentEval) {
                     docentEval = await prisma.evaluation.create({
                         data: {
-                            id_enrollment: enrollmentRecord.id_enrollment,
-                            id_assignment: enrollmentRecord.id_assignment,
+                            enrollmentId: enrollmentRecord.enrollmentId,
+                            assignmentId: enrollmentRecord.assignmentId,
                             attendancePercentage: 100,
                             lateCount: 0,
                             observations: 'Initialized by Voice Assistant'
@@ -161,8 +161,8 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
                 competenceEval = await prisma.competenceEvaluation.create({
                     data: {
-                        id_evaluation_teacher: docentEval.id_evaluation_teacher,
-                        id_competence: competence.id_competence,
+                        evaluationId: docentEval.evaluationId,
+                        competenceId: competence.competenceId,
                         score: nlpResult.competenceUpdate.score
                     }
                 });

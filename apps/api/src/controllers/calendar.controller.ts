@@ -11,10 +11,10 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
   let professorId: number | null = null;
   if (user.role === ROLES.TEACHER) {
     const professor = await prisma.teacher.findUnique({
-      where: { id_user: user.userId }
+      where: { userId: user.userId }
     });
     if (professor) {
-      professorId = professor.id_teacher;
+      professorId = professor.teacherId;
     }
   }
 
@@ -49,7 +49,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
       })
       : user.role === ROLES.COORDINATOR
         ? prisma.assignment.findMany({
-          where: { ...assignmentDateFilter, id_center: user.centreId! },
+          where: { ...assignmentDateFilter, centerId: user.centreId! },
           include: {
             workshop: true,
             sessions: {
@@ -68,8 +68,8 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
             where: {
               ...assignmentDateFilter,
               OR: [
-                { teachers: { some: { id_user: user.userId } } },
-                { sessions: { some: { staff: { some: { id_user: user.userId } } } } }
+                { teachers: { some: { userId: user.userId } } },
+                { sessions: { some: { staff: { some: { userId: user.userId } } } } }
               ]
             },
             include: {
@@ -96,7 +96,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
     const date = e.date ? new Date(e.date) : null;
     if (date && !isNaN(date.getTime())) {
       events.push({
-        id: `milestone-${e.id_event}`,
+        id: `milestone-${e.eventId}`,
         title: e.title,
         date: date.toISOString(),
         type: e.type,
@@ -113,13 +113,13 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
       const endDate = new Date(a.data_fi);
       if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
         events.push({
-          id: `assign-${a.id_assignment}`,
+          id: `assign-${a.assignmentId}`,
           title: user.role === ROLES.COORDINATOR ? `Workshop: ${a.workshop?.title}` : `${a.workshop?.title}`,
           date: startDate.toISOString(),
           endDate: endDate.toISOString(),
           type: 'assignment',
           metadata: {
-            id_assignment: a.id_assignment,
+            assignmentId: a.assignmentId,
             centre: a.center?.nom,
             adreca: a.center?.adreca
           }
@@ -129,18 +129,18 @@ async function fetchEventsForUser(user: { userId: number, role: string, centreId
 
     if (a.sessions) {
       a.sessions.forEach((s: any) => {
-        const isSessionStaff = s.staff?.some((sp: any) => sp.id_user === user.userId);
+        const isSessionStaff = s.staff?.some((sp: any) => sp.userId === user.userId);
         if (user.role === ROLES.TEACHER && !isSessionStaff) return;
 
         const sessionDate = s.data_session ? new Date(s.data_session) : null;
         if (sessionDate && !isNaN(sessionDate.getTime())) {
           events.push({
-            id: `session-${s.id_session}`,
+            id: `session-${s.sessionId}`,
             title: `SESSIÓ: ${a.workshop?.title || 'Workshop'}`,
             date: sessionDate.toISOString(),
             type: 'session',
             metadata: {
-              id_assignment: a.id_assignment,
+              assignmentId: a.assignmentId,
               hora: `${s.hora_inici || '09:00'} - ${s.hora_fi || '13:00'}`,
               centre: a.center?.name || 'Centre Iter'
             }
@@ -184,9 +184,9 @@ export const getCalendarICS = async (req: Request, res: Response) => {
     }
 
     const events = await fetchEventsForUser({
-      userId: user.id_user,
+      userId: user.userId,
       role: user.role.roleName,
-      centreId: user.id_center
+      centreId: user.centerId
     });
 
     // Map to ICS format

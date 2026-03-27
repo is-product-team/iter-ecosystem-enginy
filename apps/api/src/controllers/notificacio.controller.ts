@@ -9,13 +9,13 @@ export const getNotificationns = async (req: Request, res: Response) => {
     const where: any = {
       OR: [
         // 1. Notificationnes globales (sin usuario ni centro específico)
-        { id_user: null, id_center: null },
+        { userId: null, centerId: null },
 
         // 2. Notificationnes para mi usuario específico
-        ...(userId ? [{ id_user: userId }] : []),
+        ...(userId ? [{ userId: userId }] : []),
 
         // 3. Notificationnes para mi centro
-        ...(centreId ? [{ id_center: centreId }] : [])
+        ...(centreId ? [{ centerId: centreId }] : [])
       ]
     };
 
@@ -40,7 +40,7 @@ export const markAsRead = async (req: Request, res: Response) => {
 
   try {
     const updated = await prisma.notification.update({
-      where: { id_notification: parseInt(id as string) },
+      where: { notificationId: parseInt(id as string) },
       data: { isRead: true }
     });
 
@@ -57,7 +57,7 @@ export const deleteNotification = async (req: Request, res: Response) => {
 
   try {
     await prisma.notification.delete({
-      where: { id_notification: parseInt(id as string) }
+      where: { notificationId: parseInt(id as string) }
     });
 
     res.json({ success: true });
@@ -69,18 +69,18 @@ export const deleteNotification = async (req: Request, res: Response) => {
 
 // Helper: Crear notificación interna (Se usará desde otros controladores)
 export const createNotificationInterna = async (data: {
-  id_user?: number;
-  id_center?: number;
+  userId?: number;
+  centerId?: number;
   title: string;
   message: string;
-  type: 'PETICIO' | 'FASE' | 'SISTEMA';
+  type: 'REQUEST' | 'PHASE' | 'SYSTEM';
   importance?: 'INFO' | 'WARNING' | 'URGENT';
 }) => {
   try {
     const notif = await prisma.notification.create({
       data: {
-        id_user: data.id_user,
-        id_center: data.id_center,
+        userId: data.userId,
+        centerId: data.centerId,
         title: data.title,
         message: data.message,
         type: data.type,

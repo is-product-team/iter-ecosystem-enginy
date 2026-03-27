@@ -78,12 +78,12 @@ export class ReminderService {
         const usersToNotify = Array.from(new Set([...staffUsers, ...teachers]));
 
         for (const user of usersToNotify) {
-          const reminderId = `rem-session-${session.id_session}-${user.id_user}`;
+          const reminderId = `rem-session-${session.sessionId}-${user.userId}`;
 
           // Check if notification already exists to avoid spamming
           const existing = await prisma.notification.findFirst({
             where: {
-              id_user: user.id_user,
+              userId: user.userId,
               title: { startsWith: 'Recordatori: ' },
               message: { contains: session.assignment.workshop.title }
             }
@@ -91,11 +91,11 @@ export class ReminderService {
 
           if (!existing) {
             await createNotificationInterna({
-              id_user: user.id_user,
-              title: `Recordatori: Sessió de Taller`,
-              message: `Tens una sessió del taller "${session.assignment.workshop.title}" programada per avui a les ${session.hora_inici || 'la seva hora habitual'}.`,
-              tipus: 'SISTEMA',
-              importancia: 'INFO'
+              userId: user.userId,
+              title: `Reminder: Workshop Session`,
+              message: `You have a session for the workshop "${session.assignment.workshop.title}" scheduled for today at ${session.startTime || 'its usual time'}.`,
+              type: 'SYSTEM',
+              importance: 'INFO'
             });
           }
         }
@@ -113,24 +113,24 @@ export class ReminderService {
 
       for (const milestone of upcomingMilestones) {
         // Global milestones notify all relevant users? 
-        // For now, let's just create a global notification (id_user and id_center null)
+        // For now, let's just create a global notification (userId and centerId null)
         const existing = await prisma.notification.findFirst({
-          where: {
-            id_user: null,
-            id_center: null,
-            title: milestone.title
-          }
-        });
-
-        if (!existing) {
-          await createNotificationInterna({
-            title: `Fita Pròxima: ${milestone.title}`,
-            message: `Recorda: La fita "${milestone.title}" està programada per a les properes 24 hores.`,
-            tipus: 'FASE',
-            importancia: 'WARNING'
+            where: {
+              userId: null,
+              centerId: null,
+              title: milestone.title
+            }
           });
+  
+          if (!existing) {
+            await createNotificationInterna({
+              title: `Upcoming Milestone: ${milestone.title}`,
+              message: `Remember: The milestone "${milestone.title}" is scheduled for the next 24 hours.`,
+              type: 'PHASE',
+              importance: 'WARNING'
+            });
+          }
         }
-      }
 
     } catch (error) {
       console.error('❌ ReminderService Error:', error);

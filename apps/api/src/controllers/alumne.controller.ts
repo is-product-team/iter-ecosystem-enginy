@@ -24,7 +24,7 @@ export const createStudent = async (req: Request, res: Response) => {
   try {
     const student = await studentRepository.create({
       ...req.body,
-      center_origin: centreId ? { connect: { id_center: centreId } } : undefined
+      center_origin: centreId ? { connect: { centerId: centreId } } : undefined
     });
     res.status(201).json(student);
   } catch (error) {
@@ -36,7 +36,7 @@ export const createStudent = async (req: Request, res: Response) => {
 export const updateStudent = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const { id_student, ...updateData } = req.body;
+    const { studentId, ...updateData } = req.body;
     const student = await studentRepository.update(parseInt(String(id)), updateData);
     res.json(student);
   } catch (error) {

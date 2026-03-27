@@ -6,14 +6,14 @@ export function mapUserResponse(prismaUser: any) {
   if (!prismaUser) return null;
 
   return {
-    id: prismaUser.id_user,
-    id_user: prismaUser.id_user,
+    id: prismaUser.userId,
+    userId: prismaUser.userId,
     email: prismaUser.email,
     fullName: prismaUser.fullName,
     photoUrl: prismaUser.photoUrl,
-    id_center: prismaUser.id_center,
+    centerId: prismaUser.centerId,
     center: prismaUser.center ? {
-      id_center: prismaUser.center.id_center,
+      centerId: prismaUser.center.centerId,
       nom_rol: prismaUser.role.roleName
     } : null,
     sync_token: prismaUser.sync_token

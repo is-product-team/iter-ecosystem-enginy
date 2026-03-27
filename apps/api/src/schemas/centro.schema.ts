@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createCentreSchema = z.object({
   body: z.object({
-    codi_center: z.string().min(3, 'Codi de centre obligatori'),
+    centerCode: z.string().min(3, 'Codi de centre obligatori'),
     nom: z.string().min(3, 'Nom obligatori'),
     adreca: z.string().optional(),
     telefon_contacte: z.string().optional(),

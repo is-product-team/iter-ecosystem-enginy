@@ -8,31 +8,31 @@ datasource db {
 }
 
 // ==========================================
-// 1. CATÀLEG Y ESTRUCTURA
+// 1. CATALOG AND STRUCTURE
 // ==========================================
 
 model Sector {
-  id_sector  Int        @id @default(autoincrement())
-  name       String     @unique @map("nom")
+  sectorId    Int        @id @default(autoincrement()) @map("id_sector")
+  name        String     @unique @map("nom")
   description String?    @map("descripcio") @db.Text
-  workshops  Workshop[]
+  workshops   Workshop[]
 
   @@map("sectors")
 }
 
 model Workshop {
-  id_workshop    Int          @id @default(autoincrement())
-  title          String       @map("titol")
-  description    String       @default("") @map("descripcio")
-  durationHours  Int          @map("durada_h")
-  maxPlaces      Int          @default(25) @map("places_maximes")
-  modality       Modalitat @map("modalitat")
-  icon           String    @default("🧩") @map("icona")
-  id_sector      Int
-  sector         Sector    @relation(fields: [id_sector], references: [id_sector])
-  executionDays  Json      @default("[]") @map("dies_execucio")
-  requests       Request[]
-  assignments    Assignment[]
+  workshopId    Int          @id @default(autoincrement()) @map("id_workshop")
+  title         String       @map("titol")
+  description   String       @default("") @map("descripcio")
+  durationHours Int          @map("durada_h")
+  maxPlaces     Int          @default(25) @map("places_maximes")
+  modality      Modalitat    @map("modalitat")
+  icon          String       @default("🧩") @map("icona")
+  sectorId      Int          @map("id_sector")
+  sector        Sector       @relation(fields: [sectorId], references: [sectorId])
+  executionDays Json         @default("[]") @map("dies_execucio")
+  requests      Request[]
+  assignments   Assignment[]
 
   @@map("tallers")
 }
@@ -44,16 +44,16 @@ enum Modalitat {
 }
 
 // ==========================================
-// 2. IDENTITAT (USUARIS I CENTRES)
+// 2. IDENTITY (USERS AND CENTERS)
 // ==========================================
 
 model Center {
-  id_center        Int     @id @default(autoincrement())
-  centerCode      String  @unique @map("codi_center")
-  name            String  @map("nom")
-  address         String? @map("adreca")
-  contactPhone    String? @map("telefon_contacte")
-  contactEmail    String? @map("email_contacte")
+  centerId     Int     @id @default(autoincrement()) @map("id_center")
+  centerCode   String  @unique @map("codi_center")
+  name         String  @map("nom")
+  address      String? @map("adreca")
+  contactPhone String? @map("telefon_contacte")
+  contactEmail String? @map("email_contacte")
 
   users       User[]
   requests    Request[]
@@ -66,25 +66,25 @@ model Center {
 }
 
 model Role {
-  id_role   Int    @id @default(autoincrement())
-  roleName  String @unique @map("nom_role")
-  users     User[]
+  roleId   Int    @id @default(autoincrement()) @map("id_role")
+  roleName String @unique @map("nom_role")
+  users    User[]
 
   @@map("rols")
 }
 
 model User {
-  id_user       Int     @id @default(autoincrement())
-  fullName      String  @map("nom_complet")
-  email         String  @unique
-  passwordHash  String  @map("password_hash")
-  photoUrl      String? @map("url_foto")
-  phone         String? @map("telefon")
-  id_role       Int
-  role          Role    @relation(fields: [id_role], references: [id_role])
-  id_center     Int?
-  center        Center? @relation(fields: [id_center], references: [id_center])
-  sync_token    String? @unique
+  userId       Int     @id @default(autoincrement()) @map("id_user")
+  fullName     String  @map("nom_complet")
+  email        String  @unique
+  passwordHash String  @map("password_hash")
+  photoUrl     String? @map("url_foto")
+  phone        String? @map("telefon")
+  roleId       Int     @map("id_role")
+  role         Role    @relation(fields: [roleId], references: [roleId])
+  centerId     Int?    @map("id_center")
+  center       Center? @relation(fields: [centerId], references: [centerId])
+  sync_token   String? @unique
 
   assignments      AssignmentTeacher[]
   session_teachers SessionTeacher[]
@@ -95,34 +95,34 @@ model User {
 }
 
 model Teacher {
-  id_teacher Int    @id @default(autoincrement())
-  name       String @map("nom")
-  contact    String @map("contacte")
-  id_center  Int
-  center     Center @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
-  id_user    Int    @unique
-  user       User   @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  teacherId Int    @id @default(autoincrement()) @map("id_teacher")
+  name      String @map("nom")
+  contact   String @map("contacte")
+  centerId  Int    @map("id_center")
+  center    Center @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
+  userId    Int    @unique @map("id_user")
+  user      User   @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@map("professors")
 }
 
 // ==========================================
-// 3. OPERATIVA (PETICIONS I ASSIGNACIONS)
+// 3. OPERATIVE (REQUESTS AND ASSIGNMENTS)
 // ==========================================
 
 model Request {
-  id_request    Int           @id @default(autoincrement())
-  id_center     Int
-  center        Center        @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
-  id_workshop   Int
-  workshop      Workshop      @relation(fields: [id_workshop], references: [id_workshop], onDelete: Cascade)
+  requestId     Int           @id @default(autoincrement()) @map("id_request")
+  centerId      Int           @map("id_center")
+  center        Center        @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
+  workshopId    Int           @map("id_workshop")
+  workshop      Workshop      @relation(fields: [workshopId], references: [workshopId], onDelete: Cascade)
   studentsAprox Int?          @map("alumnes_aprox")
   comments      String?       @map("comentaris") @db.Text
   createdAt     DateTime      @map("data_request") @default(now())
   status        RequestStatus @default(PENDING) @map("estat")
   modality      Modalitat?    @map("modalitat")
 
-  // Profesores solicitados (opcional)
+  // Requested teachers (optional)
   prof1_id Int?
   prof2_id Int?
 
@@ -133,23 +133,23 @@ model Request {
 }
 
 enum RequestStatus {
-  PENDING   @map("Pendent")
-  APPROVED  @map("Aprovada")
-  REJECTED  @map("Rebutjada")
+  PENDING  @map("Pendent")
+  APPROVED @map("Aprovada")
+  REJECTED @map("Rebutjada")
 }
 
 model Assignment {
-  id_assignment Int              @id @default(autoincrement())
-  id_request    Int?             @unique
-  request       Request?         @relation(fields: [id_request], references: [id_request], onDelete: SetNull)
-  id_center     Int
-  center        Center           @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
-  id_workshop   Int
-  workshop      Workshop         @relation(fields: [id_workshop], references: [id_workshop], onDelete: Cascade)
-  startDate     DateTime?        @map("data_inici") @db.Date
-  endDate       DateTime?        @map("data_fi") @db.Date
-  status        AssignmentStatus @default(PUBLISHED) @map("estat")
-  group         Int              @default(1) @map("grup")
+  assignmentId Int              @id @default(autoincrement()) @map("id_assignment")
+  requestId    Int?             @unique @map("id_request")
+  request      Request?         @relation(fields: [requestId], references: [requestId], onDelete: SetNull)
+  centerId     Int              @map("id_center")
+  center       Center           @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
+  workshopId   Int              @map("id_workshop")
+  workshop     Workshop         @relation(fields: [workshopId], references: [workshopId], onDelete: Cascade)
+  startDate    DateTime?        @map("data_inici") @db.Date
+  endDate      DateTime?        @map("data_fi") @db.Date
+  status       AssignmentStatus @default(PUBLISHED) @map("estat")
+  group        Int              @default(1) @map("grup")
 
   teachers       AssignmentTeacher[]
   questionnaires Questionnaire[]
@@ -164,47 +164,47 @@ model Assignment {
 }
 
 model AssignmentTeacher {
-  id_assignment Int
-  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  id_user       Int
-  user          User       @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
-  isPrincipal   Boolean    @default(false) @map("es_principal")
+  assignmentId Int        @map("id_assignment")
+  assignment   Assignment @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
+  userId       Int        @map("id_user")
+  user         User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  isPrincipal  Boolean    @default(false) @map("es_principal")
 
-  @@id([id_assignment, id_user])
+  @@id([assignmentId, userId])
   @@map("assignacio_professors")
 }
 
 model AssignmentChecklist {
-  id_checklist   Int        @id @default(autoincrement())
-  id_assignment  Int
-  assignment     Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  stepName       String     @map("pas_nom")
-  isCompleted    Boolean    @default(false) @map("completat")
-  url_evidencia  String?
-  completedAt    DateTime?  @map("data_completat")
+  checklistId  Int        @id @default(autoincrement()) @map("id_checklist")
+  assignmentId Int        @map("id_assignment")
+  assignment   Assignment @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
+  stepName     String     @map("pas_nom")
+  isCompleted  Boolean    @default(false) @map("completat")
+  evidenceUrl  String?    @map("url_evidencia")
+  completedAt  DateTime?  @map("data_completat")
 
   @@map("checklist_assignacio")
 }
 
 model Session {
-  id_session    Int              @id @default(autoincrement())
-  id_assignment Int
-  assignment    Assignment       @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  sessionDate   DateTime         @map("data_session")
-  startTime     String?          @map("hora_inici")
-  endTime       String?          @map("hora_fi")
-  staff         SessionTeacher[]
+  sessionId    Int              @id @default(autoincrement()) @map("id_session")
+  assignmentId Int              @map("id_assignment")
+  assignment   Assignment       @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
+  sessionDate  DateTime         @map("data_session")
+  startTime    String?          @map("hora_inici")
+  endTime      String?          @map("hora_fi")
+  staff        SessionTeacher[]
 
   @@map("sessions")
 }
 
 model SessionTeacher {
-  id_session Int
-  session    Session @relation(fields: [id_session], references: [id_session], onDelete: Cascade)
-  id_user    Int
-  user       User    @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  sessionId Int     @map("id_session")
+  session   Session @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  userId    Int     @map("id_user")
+  user      User    @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@id([id_session, id_user])
+  @@id([sessionId, userId])
   @@map("sessio_professors")
 }
 
@@ -222,18 +222,18 @@ enum AssignmentStatus {
 }
 
 // ==========================================
-// 4. ALUMNAT I SEGUIMENT
+// 4. STUDENTS AND TRACKING
 // ==========================================
 
 model Student {
-  id_student       Int     @id @default(autoincrement())
-  idalu            String  @unique
-  fullName         String  @map("nom")
-  lastName         String  @map("cognoms")
-  grade            String? @map("curs")
-  photoUrl         String? @map("url_foto")
-  originCenterId   Int?    @map("id_center_origin")
-  center_origin    Center? @relation("CenterOrigin", fields: [originCenterId], references: [id_center])
+  studentId      Int     @id @default(autoincrement()) @map("id_student")
+  idalu          String  @unique
+  fullName       String  @map("nom")
+  lastName       String  @map("cognoms")
+  grade          String? @map("curs")
+  photoUrl       String? @map("url_foto")
+  originCenterId Int?    @map("id_center_origin")
+  center_origin  Center? @relation("CenterOrigin", fields: [originCenterId], references: [centerId])
 
   enrollments Enrollment[]
   Certificate Certificate[]
@@ -242,13 +242,13 @@ model Student {
 }
 
 model Enrollment {
-  id_enrollment Int        @id @default(autoincrement())
-  id_assignment Int
-  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  id_student    Int
-  student       Student    @relation(fields: [id_student], references: [id_student], onDelete: Cascade)
+  enrollmentId Int        @id @default(autoincrement()) @map("id_enrollment")
+  assignmentId Int        @map("id_assignment")
+  assignment   Assignment @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
+  studentId    Int        @map("id_student")
+  student      Student    @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
 
-  // Documentació i validació (JSON per flexibilitat)
+  // Documentation and validation (JSON for flexibility)
   docs_status Json? // { acord_pedagogic: true, url: '...', validat: true }
 
   attendance        Attendance[]
@@ -259,9 +259,9 @@ model Enrollment {
 }
 
 model Attendance {
-  id_attendance Int              @id @default(autoincrement())
-  id_enrollment Int
-  enrollment    Enrollment       @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
+  attendanceId  Int              @id @default(autoincrement()) @map("id_attendance")
+  enrollmentId  Int              @map("id_enrollment")
+  enrollment    Enrollment       @relation(fields: [enrollmentId], references: [enrollmentId], onDelete: Cascade)
   sessionNumber Int              @map("numero_sessio")
   sessionDate   DateTime         @map("data_session") @db.Date
   status        AttendanceStatus @default(PRESENT) @map("estat")
@@ -271,39 +271,39 @@ model Attendance {
 }
 
 model Certificate {
-  id_student    Int
-  id_assignment Int
-  student       Student    @relation(fields: [id_student], references: [id_student], onDelete: Cascade)
-  assignment    Assignment @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  issuedAt      DateTime   @default(now()) @map("data_emissio")
+  studentId    Int        @map("id_student")
+  assignmentId Int        @map("id_assignment")
+  student      Student    @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
+  assignment   Assignment @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
+  issuedAt     DateTime   @default(now()) @map("data_emissio")
 
-  @@id([id_student, id_assignment])
+  @@id([studentId, assignmentId])
   @@map("certificats")
 }
 
 enum AttendanceStatus {
-  PRESENT            @map("Present")
-  JUSTIFIED_ABSENCE  @map("Absència Justificada")
-  ABSENT             @map("Absència")
-  LATE               @map("Retard")
+  PRESENT           @map("Present")
+  JUSTIFIED_ABSENCE @map("Absència Justificada")
+  ABSENT            @map("Absència")
+  LATE              @map("Retard")
 }
 
 // ==========================================
-// 5. EVALUACIÓ I QUALITAT (UNIFICADA)
+// 5. EVALUATION AND QUALITY (UNIFIED)
 // ==========================================
 
 model Evaluation {
-  id_evaluation Int         @id @default(autoincrement()) @map("id_evaluation_teacher")
-  id_assignment Int
-  assignment    Assignment  @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  id_enrollment Int?        @unique
-  enrollment    Enrollment? @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
+  evaluationId Int         @id @default(autoincrement()) @map("id_evaluation_teacher")
+  assignmentId Int         @map("id_assignment")
+  assignment   Assignment  @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
+  enrollmentId Int?        @unique @map("id_enrollment")
+  enrollment   Enrollment? @relation(fields: [enrollmentId], references: [enrollmentId], onDelete: Cascade)
 
   attendancePercentage Float?  @map("percentatge_asistencia")
   lateCount            Int?    @map("numero_retards")
   observations         String? @map("observacions") @db.Text
 
-  responses Json?    @map("respostes") // Respostes dinàmiques
+  responses Json?    @map("respostes") // Dynamic responses
   sentAt    DateTime @default(now()) @map("data_enviament")
 
   type        EvaluationType?        @map("tipus")
@@ -313,22 +313,22 @@ model Evaluation {
 }
 
 model Competence {
-  id_competence Int                    @id @default(autoincrement()) @map("id_competencia")
-  name          String                 @map("nom")
-  type          String                 @map("tipus")
-  evaluations   CompetenceEvaluation[]
+  competenceId Int                    @id @default(autoincrement()) @map("id_competencia")
+  name         String                 @map("nom")
+  type         String                 @map("tipus")
+  evaluations  CompetenceEvaluation[]
 
   @@map("competencies")
 }
 
 model CompetenceEvaluation {
-  id_evaluation Int
-  evaluation    Evaluation @relation(fields: [id_evaluation], references: [id_evaluation], onDelete: Cascade)
-  id_competence Int
-  competence    Competence @relation(fields: [id_competence], references: [id_competence], onDelete: Cascade)
-  score         Int        @map("puntuacio")
+  evaluationId Int        @map("id_evaluation")
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [evaluationId], onDelete: Cascade)
+  competenceId Int        @map("id_competence")
+  competence   Competence @relation(fields: [competenceId], references: [competenceId], onDelete: Cascade)
+  score        Int        @map("puntuacio")
 
-  @@id([id_evaluation, id_competence])
+  @@id([evaluationId, competenceId])
   @@map("avaluacio_competencial")
 }
 
@@ -340,11 +340,11 @@ enum EvaluationType {
 }
 
 // ==========================================
-// 6. CONFIGURACIÓ SISTEMA
+// 6. SYSTEM CONFIGURATION
 // ==========================================
 
 model Phase {
-  id_phase    Int             @id @default(autoincrement())
+  phaseId     Int             @id @default(autoincrement()) @map("id_phase")
   name        String          @unique @map("nom")
   description String?         @map("descripcio")
   startDate   DateTime        @map("data_inici")
@@ -357,9 +357,9 @@ model Phase {
 }
 
 model CalendarEvent {
-  id_event    Int      @id @default(autoincrement())
-  id_phase    Int
-  phase       Phase    @relation(fields: [id_phase], references: [id_phase], onDelete: Cascade)
+  eventId     Int      @id @default(autoincrement()) @map("id_event")
+  phaseId     Int      @map("id_phase")
+  phase       Phase    @relation(fields: [phaseId], references: [phaseId], onDelete: Cascade)
   title       String   @map("titol")
   description String?  @map("descripcio")
   date        DateTime @map("data")
@@ -369,23 +369,23 @@ model CalendarEvent {
 }
 
 model Notification {
-  id_notification Int      @id @default(autoincrement()) @map("id_notificacio")
-  id_user         Int?
-  id_center       Int?
-  title           String   @map("titol")
-  message         String   @map("missatge") @db.Text
-  createdAt       DateTime @default(now()) @map("data_creacio")
-  isRead          Boolean  @default(false) @map("llegida")
-  type            String? @map("tipus") // PETICIO, FASE, SISTEMA
-  importance      String? @map("importancia") // INFO, WARNING, URGENT
+  notificationId Int      @id @default(autoincrement()) @map("id_notificacio")
+  userId         Int?     @map("id_user")
+  centerId       Int?     @map("id_center")
+  title          String   @map("titol")
+  message        String   @map("missatge") @db.Text
+  createdAt      DateTime @default(now()) @map("data_creacio")
+  isRead         Boolean  @default(false) @map("llegida")
+  type           String?  @map("tipus") // REQUEST, PHASE, SYSTEM
+  importance     String?  @map("importancia") // INFO, WARNING, URGENT
 
   @@map("notificacions")
 }
 
 model Issue {
-  id_issue    Int      @id @default(autoincrement())
-  id_center   Int
-  center      Center   @relation(fields: [id_center], references: [id_center], onDelete: Cascade)
+  issueId     Int      @id @default(autoincrement()) @map("id_issue")
+  centerId    Int      @map("id_center")
+  center      Center   @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
   description String   @map("descripcio") @db.Text
   createdAt   DateTime @default(now()) @map("data_creacio")
 
@@ -393,10 +393,10 @@ model Issue {
 }
 
 enum QuestionnaireTarget {
-  ALUMNE
-  CENTRE
-  DOCENT
-  PROFESSOR
+  STUDENT
+  CENTER
+  TEACHER
+  ADMIN
 }
 
 enum ResponseType {
@@ -407,59 +407,59 @@ enum ResponseType {
 }
 
 enum SubmissionStatus {
-  SENT       @map("Enviat")
-  RESPONDED  @map("Respost")
-  PENDING    @map("Pendent")
+  SENT      @map("Enviat")
+  RESPONDED @map("Respost")
+  PENDING   @map("Pendent")
 }
 
 model Questionnaire {
-  id_questionnaire Int                     @id @default(autoincrement())
-  id_assignment    Int
-  assignment       Assignment              @relation(fields: [id_assignment], references: [id_assignment], onDelete: Cascade)
-  target           QuestionnaireTarget     @map("destinatari")
-  token            String                  @unique
-  isCompleted      Boolean                 @default(false) @map("completa")
-  completedAt      DateTime?               @map("data_completat")
-  responses        QuestionnaireResponse[]
+  questionnaireId Int                     @id @default(autoincrement()) @map("id_questionnaire")
+  assignmentId    Int                     @map("id_assignment")
+  assignment      Assignment              @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
+  target          QuestionnaireTarget     @map("destinatari")
+  token           String                  @unique
+  isCompleted     Boolean                 @default(false) @map("completa")
+  completedAt     DateTime?               @map("data_completat")
+  responses       QuestionnaireResponse[]
 
   @@map("questionaris")
 }
 
 model QuestionnaireModel {
-  id_model    Int                 @id @default(autoincrement())
-  name        String              @map("nom")
-  target      QuestionnaireTarget @map("destinatari")
-  questionsJson Json?             @map("preguntes")
-  questions   Question[]
+  modelId       Int                 @id @default(autoincrement()) @map("id_model")
+  name          String              @map("nom")
+  target        QuestionnaireTarget @map("destinatari")
+  questionsJson Json?               @map("preguntes")
+  questions     Question[]
 
   @@map("models_questionari")
 }
 
 model Question {
-  id_question Int                @id @default(autoincrement())
-  id_model    Int
-  model       QuestionnaireModel @relation(fields: [id_model], references: [id_model], onDelete: Cascade)
-  text        String
-  type        ResponseType       @map("tipus")
-  options     Json?              @map("opcions") // For choice questions
+  questionId Int                @id @default(autoincrement()) @map("id_question")
+  modelId    Int                @map("id_model")
+  model      QuestionnaireModel @relation(fields: [modelId], references: [modelId], onDelete: Cascade)
+  text       String
+  type       ResponseType       @map("tipus")
+  options    Json?              @map("opcions") // For choice questions
 
   @@map("preguntes")
 }
 
 model QuestionnaireResponse {
-  id_response      Int           @id @default(autoincrement()) @map("id_response")
-  id_questionnaire Int
-  questionnaire    Questionnaire @relation(fields: [id_questionnaire], references: [id_questionnaire], onDelete: Cascade)
-  id_question      Int
-  value            String        @db.Text @map("valor")
+  responseId      Int           @id @default(autoincrement()) @map("id_response")
+  questionnaireId Int           @map("id_questionnaire")
+  questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [questionnaireId], onDelete: Cascade)
+  questionId      Int           @map("id_question")
+  value           String        @db.Text @map("valor")
 
   @@map("respostes_questionari")
 }
 
 model AuditLog {
-  id_log    Int      @id @default(autoincrement())
-  id_user   Int
-  user      User     @relation(fields: [id_user], references: [id_user])
+  logId     Int      @id @default(autoincrement()) @map("id_log")
+  userId    Int      @map("id_user")
+  user      User     @relation(fields: [userId], references: [userId])
   action    String   @map("accio")
   details   Json?    @map("detalls")
   createdAt DateTime @default(now()) @map("data_hora")
@@ -468,9 +468,9 @@ model AuditLog {
 }
 
 model StudentSelfConsultation {
-  id_self_consultation Int        @id @default(autoincrement())
-  id_enrollment        Int        @unique
-  enrollment           Enrollment @relation(fields: [id_enrollment], references: [id_enrollment], onDelete: Cascade)
+  selfConsultationId Int        @id @default(autoincrement()) @map("id_self_consultation")
+  enrollmentId       Int        @unique @map("id_enrollment")
+  enrollment         Enrollment @relation(fields: [enrollmentId], references: [enrollmentId], onDelete: Cascade)
 
   puntualitat_tasques   Int
   respecte_material     Int

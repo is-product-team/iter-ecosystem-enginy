@@ -35,11 +35,11 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
   const user = req.user!;
 
   if (user.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Accés denegat: Només els administradors poden modificar les fases.' });
+    return res.status(403).json({ error: 'Access denied: Only administrators can modify phases.' });
   }
 
   const updatedPhase = await prisma.phase.update({
-    where: { id_phase: parseInt(id as string) },
+    where: { phaseId: parseInt(id as string) },
     data: {
       name,
       description,
@@ -51,16 +51,16 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
 
   if (isActive === true) {
     await prisma.phase.updateMany({
-      where: { id_phase: { not: parseInt(id as string) } },
+      where: { phaseId: { not: parseInt(id as string) } },
       data: { isActive: false }
     });
 
     // Notificar a todos los centros del inicio de la nueva fase
     await createNotificationInterna({
-      titol: `Nova Phase: ${updatedPhase.name}`,
-      missatge: `S'ha iniciat la fase de "${updatedPhase.name}". Consulta el calendari per a més detalls.`,
-      tipus: 'FASE',
-      importancia: 'URGENT'
+      title: `New Phase: ${updatedPhase.name}`,
+      message: `The phase "${updatedPhase.name}" has started. Check the calendar for details.`,
+      type: 'PHASE',
+      importance: 'URGENT'
     });
   }
 

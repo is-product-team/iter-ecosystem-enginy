@@ -16,9 +16,9 @@ async function test() {
 
         if (user) {
             console.log('User found:', {
-                id: user.id_user,
+                id: user.userId,
                 email: user.email,
-                role: user.role?.nom_role,
+                role: user.role?.roleName,
                 center: user.center ? user.center.name : 'None'
             });
 

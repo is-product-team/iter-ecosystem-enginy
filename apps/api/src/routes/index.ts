@@ -10,7 +10,7 @@ import assignacioRoutes from './assignacio.routes.js';
 import alumneRoutes from './alumne.routes.js';
 import professorRoutes from './professor.routes.js';
 import calendarRoutes from './calendar.routes.js';
-import faseRoutes from './fase.routes.js';
+import phaseRoutes from './phase.routes.js';
 import statsRoutes from './stats.routes.js';
 import sectorRoutes from './sector.routes.js';
 import assistenciaRoutes from './assistencia.routes.js';
@@ -46,7 +46,7 @@ router.use('/attendance', assistenciaRoutes);
 
 // Rutas de Calendario
 router.use('/calendar', calendarRoutes);
-router.use('/fases', faseRoutes);
+router.use('/phases', phaseRoutes);
 
 // Rutas de Estadísticas
 router.use('/stats', statsRoutes);

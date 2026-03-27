@@ -3,7 +3,7 @@ import { REQUEST_STATUSES } from '@iter/shared';
 
 export const createPeticioSchema = z.object({
   body: z.object({
-    id_workshop: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()),
+    workshopId: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()),
     studentsAprox: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),
     comments: z.string().optional().nullable(),
     prof1_id: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()).optional().nullable(),

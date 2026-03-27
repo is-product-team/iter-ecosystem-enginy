@@ -29,11 +29,11 @@ const CreateCenterModal = ({
   React.useEffect(() => {
     if (visible) {
       if (initialData) {
-        setCodiCenter(initialData.codi_center);
-        setName(initialData.nom);
-        setAddress(initialData.adreca || "");
-        setPhoneContact(initialData.telefon_contacte || "");
-        setEmailContact(initialData.email_contacte || "");
+        setCodiCenter(initialData.centerCode);
+        setName(initialData.name);
+        setAddress(initialData.address || "");
+        setPhoneContact(initialData.phone || "");
+        setEmailContact(initialData.email || "");
       } else {
         // Reset form
         setCodiCenter("");
@@ -54,18 +54,18 @@ const CreateCenterModal = ({
     setLoading(true);
     setError(null);
 
-    const centerData: Omit<Center, "id_center"> = {
-      codi_center: codiCenter,
-      nom: name,
-      adreca: address,
-      telefon_contacte: phoneContact,
-      email_contacte: emailContact,
+    const centerData: Omit<Center, "centerId"> = {
+      centerCode: codiCenter,
+      name: name,
+      address: address,
+      phone: phoneContact,
+      email: emailContact,
     };
 
     try {
       let result;
       if (initialData) {
-        result = await centerService.update(initialData.id_center, centerData);
+        result = await centerService.update(initialData.centerId, centerData);
       } else {
         result = await centerService.create(centerData);
       }

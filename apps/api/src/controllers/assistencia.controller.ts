@@ -6,11 +6,11 @@ import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
  * Registra o actualiza la asistencia de un alumno en una sesión.
  */
 export const registerAttendance = async (req: Request, res: Response) => {
-  const { assistencia, id_assignment } = req.body;
+  const { assistencia, assignmentId } = req.body;
 
   try {
-    if (!Array.isArray(assistencia) || !id_assignment) {
-      return res.status(400).json({ error: 'Format de dades incorrecte. S\'espera array d\'assistencia i id_assignment.' });
+    if (!Array.isArray(assistencia) || !assignmentId) {
+      return res.status(400).json({ error: 'Format de dades incorrecte. S\'espera array d\'assistencia i assignmentId.' });
     }
 
     const today = new Date();
@@ -19,11 +19,11 @@ export const registerAttendance = async (req: Request, res: Response) => {
     // Determines session number (defaults to 1 if not strictly scheduled)
     const sessionMatch = await prisma.session.findFirst({
       where: {
-        id_assignment: parseInt(id_assignment),
+        assignmentId: parseInt(assignmentId),
         sessionDate: today
       }
     });
-    const sessionNum = sessionMatch ? sessionMatch.id_session : 1;
+    const sessionNum = sessionMatch ? sessionMatch.sessionId : 1;
 
     // Helper to map mobile status (UPPERCASE) to Prisma Enum (uppercase English)
     const mapStatus = (status: string) => {
@@ -37,13 +37,13 @@ export const registerAttendance = async (req: Request, res: Response) => {
 
     const results = await Promise.all(assistencia.map(async (item: any) => {
       // Resolve student ID
-      const idStudentInt = parseInt(item.id_student);
+      const idStudentInt = parseInt(item.studentId);
 
       // Find Enrollment (Enrollment)
       const validEnrollment = await prisma.enrollment.findFirst({
         where: {
-          id_assignment: parseInt(id_assignment),
-          id_student: idStudentInt
+          assignmentId: parseInt(assignmentId),
+          studentId: idStudentInt
         }
       });
 
@@ -54,14 +54,14 @@ export const registerAttendance = async (req: Request, res: Response) => {
       // Check for existing attendance today
       const existing = await prisma.attendance.findFirst({
         where: {
-          id_enrollment: validEnrollment.id_enrollment,
+          enrollmentId: validEnrollment.enrollmentId,
           sessionDate: today
         }
       });
 
       if (existing) {
         return prisma.attendance.update({
-          where: { id_attendance: existing.id_attendance },
+          where: { attendanceId: existing.attendanceId },
           data: {
             status: prismaStatus as any,
             observations: item.observacions
@@ -70,7 +70,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
       } else {
         return prisma.attendance.create({
           data: {
-            id_enrollment: validEnrollment.id_enrollment,
+            enrollmentId: validEnrollment.enrollmentId,
             sessionNumber: sessionNum,
             sessionDate: today,
             status: prismaStatus as any,
@@ -97,7 +97,7 @@ export const getAttendanceByAssignment = async (req: Request, res: Response) => 
     const assistencies = await prisma.attendance.findMany({
       where: {
         enrollment: {
-          id_assignment: parseInt(idAssignment as string)
+          assignmentId: parseInt(idAssignment as string)
         }
       },
       include: {

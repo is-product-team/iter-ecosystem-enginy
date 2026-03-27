@@ -14,7 +14,7 @@ export const getTeachers = async (req: Request, res: Response) => {
       if (!centreId) {
         return res.json([]); // No center assigned, no access
       }
-      where.id_center = parseInt(centreId.toString());
+      where.centerId = parseInt(centreId.toString());
     }
 
     const teachers = await prisma.teacher.findMany({
@@ -23,7 +23,7 @@ export const getTeachers = async (req: Request, res: Response) => {
         center: true,
         user: {
           select: {
-            id_user: true,
+            userId: true,
             email: true,
             photoUrl: true
           }
@@ -41,7 +41,7 @@ export const createTeacher = async (req: Request, res: Response) => {
   const { nom, contacte, password } = req.body;
 
   try {
-    const finalCenterId = centreId ? centreId : req.body.id_center;
+    const finalCenterId = centreId ? centreId : req.body.centerId;
 
     if (!finalCenterId) {
       return res.status(400).json({ error: 'ID de centre requerit.' });
@@ -65,8 +65,8 @@ export const createTeacher = async (req: Request, res: Response) => {
           fullName: nom,
           email: contacte, // Usamos el contacto como email principal
           passwordHash: passwordHash,
-          id_role: rolProfe.id_role,
-          id_center: finalCenterId
+          roleId: rolProfe.roleId,
+          centerId: finalCenterId
         }
       });
 
@@ -75,8 +75,8 @@ export const createTeacher = async (req: Request, res: Response) => {
         data: {
           name: nom,
           contact: contacte,
-          id_center: finalCenterId,
-          id_user: usuari.id_user
+          centerId: finalCenterId,
+          userId: usuari.userId
         }
       });
 
@@ -97,7 +97,7 @@ export const updateTeacher = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const professor = await prisma.teacher.update({
-      where: { id_teacher: parseInt(id as string) },
+      where: { teacherId: parseInt(id as string) },
       data: req.body
     });
     res.json(professor);
@@ -110,7 +110,7 @@ export const deleteTeacher = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await prisma.teacher.delete({
-      where: { id_teacher: parseInt(id as string) }
+      where: { teacherId: parseInt(id as string) }
     });
     res.json({ message: 'Profesor eliminado' });
   } catch (_error) {
@@ -129,7 +129,7 @@ export const getTeacherAssignments = async (req: Request, res: Response) => {
 
     const assignments = await prisma.assignment.findMany({
       where: {
-        teachers: { some: { id_user: userId } }
+        teachers: { some: { userId: userId } }
       },
       include: {
         workshop: true,
@@ -138,7 +138,7 @@ export const getTeacherAssignments = async (req: Request, res: Response) => {
           include: {
             user: {
               select: {
-                id_user: true,
+                userId: true,
                 fullName: true,
                 email: true
               }
@@ -169,11 +169,11 @@ export const getTeachersByCenter = async (req: Request, res: Response) => {
     }
 
     const teachers = await prisma.teacher.findMany({
-      where: { id_center: parseInt(idCenter as string) },
+      where: { centerId: parseInt(idCenter as string) },
       include: {
         user: {
           select: {
-            id_user: true,
+            userId: true,
             email: true,
             fullName: true,
             photoUrl: true

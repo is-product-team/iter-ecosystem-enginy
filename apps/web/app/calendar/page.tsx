@@ -103,7 +103,7 @@ export default function CalendarPage() {
             onEventClick={(e) => {
               // Si tiene id_assignment, navegar al detalle
               if (e.metadata?.id_assignment) {
-                const baseUrl = user?.rol.nom_rol === ROLES.ADMIN ? '/admin/assignacions' : '/centro/assignacions';
+                const baseUrl = user?.role.name === ROLES.ADMIN ? '/admin/assignments' : '/center/assignments';
                 window.location.href = `${baseUrl}/${e.metadata.id_assignment}`;
               }
             }}

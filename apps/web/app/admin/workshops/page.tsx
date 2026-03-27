@@ -27,7 +27,7 @@ export default function WorkshopAdminPage() {
   const router = useRouter();
   
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.ADMIN)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
       router.push('/login');
     }
   }, [user, authLoading, router]);
@@ -86,7 +86,7 @@ export default function WorkshopAdminPage() {
   useEffect(() => {
     let isMounted = true;
     const init = async () => {
-      if (user && user.rol.nom_rol === ROLES.ADMIN) {
+      if (user && user.role.name === ROLES.ADMIN) {
         await fetchWorkshops();
       }
       if (isMounted) setLoading(false);
@@ -160,7 +160,7 @@ export default function WorkshopAdminPage() {
     });
   };
 
-  if (authLoading || !user || user.rol.nom_rol !== 'ADMIN') {
+  if (authLoading || !user || user.role.name !== 'ADMIN') {
     return <Loading fullScreen message="Verifying administrator permissions..." />;
   }
 

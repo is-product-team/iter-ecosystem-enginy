@@ -32,7 +32,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
 
   useEffect(() => {
     const currentUser = getUser();
-    if (!currentUser || currentUser.rol.nom_rol !== ROLES.COORDINATOR) {
+    if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
       router.push('/login');
       return;
     }

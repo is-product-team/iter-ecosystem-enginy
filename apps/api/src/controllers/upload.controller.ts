@@ -27,11 +27,11 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
     let targetName = 'profile';
 
     if (type === 'student') {
-      const alumne = await prisma.student.findUnique({ where: { id_student: targetId } });
+      const alumne = await prisma.student.findUnique({ where: { studentId: targetId } });
       if (!alumne) return res.status(404).json({ error: 'Student no trobat.' });
       targetName = sanitizeFileName(`${alumne.fullName}_${alumne.lastName}`);
     } else if (type === 'user') {
-      const usuari = await prisma.user.findUnique({ where: { id_user: targetId } });
+      const usuari = await prisma.user.findUnique({ where: { userId: targetId } });
       if (!usuari) return res.status(404).json({ error: 'User no trobat.' });
       targetName = sanitizeFileName(usuari.fullName);
     } else {
@@ -53,17 +53,17 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
 
     if (type === 'student') {
       await prisma.student.update({
-        where: { id_student: targetId },
+        where: { studentId: targetId },
         data: { photoUrl: url }
       });
     } else {
       await prisma.user.update({
-        where: { id_user: targetId },
+        where: { userId: targetId },
         data: { photoUrl: url }
       });
     }
 
-    res.json({ success: true, url_foto: url });
+    res.json({ success: true, photoUrl: url });
   } catch (error) {
     console.error("Error al pujar foto de perfil:", error);
     res.status(500).json({ error: 'Error al processar la pujada de la foto.' });

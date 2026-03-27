@@ -43,7 +43,7 @@ export default function AdminStatsPage() {
   };
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== 'ADMIN')) {
+    if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
       router.push('/login');
       return;
     }
@@ -59,8 +59,8 @@ export default function AdminStatsPage() {
 
   return (
     <DashboardLayout
-      title="Dashboard Analític"
-      subtitle="Visualització de dades de gestió del programa"
+      title="Analytical Dashboard"
+      subtitle="Program management data visualization"
     >
       <div className="space-y-8 animate-in fade-in duration-700">
 
@@ -73,11 +73,11 @@ export default function AdminStatsPage() {
                 SECURE DATA HUB ACTIVE
               </div>
             </div>
-            <h2 className="text-xl font-black uppercase tracking-tight text-consorci-darkBlue">Estadístiques de Gestió</h2>
+            <h2 className="text-xl font-black uppercase tracking-tight text-consorci-darkBlue">Management Statistics</h2>
           </div>
           <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
             <div className="text-right">
-              <div className="text-[10px] font-black text-text-muted uppercase mb-0.5 tracking-tighter">Total Peticions</div>
+              <div className="text-[10px] font-black text-text-muted uppercase mb-0.5 tracking-tighter">Total Requests</div>
               <div className="text-3xl font-black leading-none text-consorci-darkBlue">
                 {statusStats.reduce((acc, s) => acc + s.total, 0)}
               </div>
@@ -93,7 +93,7 @@ export default function AdminStatsPage() {
             <div className="p-6 border-b border-border-subtle flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <PieChartIcon className="w-4 h-4 text-consorci-actionBlue" />
-                <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Estat de Peticions</h3>
+                <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Request Status</h3>
               </div>
               <TrendingUp className="w-4 h-4 text-green-500 opacity-50 group-hover:opacity-100 transition-opacity" />
             </div>
@@ -102,7 +102,7 @@ export default function AdminStatsPage() {
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {statusStats.map((s, idx) => (
                   <div key={idx} className="flex items-center justify-between bg-background-subtle p-2 border-l-2 border-consorci-darkBlue dark:border-consorci-lightBlue">
-                    <span className="text-[9px] font-bold text-text-secondary uppercase">{s.estat}</span>
+                    <span className="text-[9px] font-bold text-text-secondary uppercase">{s.status}</span>
                     <span className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue">{s.total}</span>
                   </div>
                 ))}
@@ -114,7 +114,7 @@ export default function AdminStatsPage() {
           <div className="lg:col-span-2 flex flex-col bg-background-surface border border-border-subtle shadow-sm transition-all hover:shadow-md hover:border-consorci-lightBlue/30">
             <div className="p-6 border-b border-border-subtle flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-consorci-actionBlue" />
-              <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Demanda Global de Tallers</h3>
+              <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Global Workshop Demand</h3>
             </div>
             <div className="p-6 flex-1">
               <WorkshopPopularity data={popularStats} />

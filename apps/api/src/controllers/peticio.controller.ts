@@ -25,16 +25,16 @@ export const getRequestns = async (req: Request, res: Response) => {
       if (role === ROLES.TEACHER) {
         const assignments = await prisma.assignment.findMany({
           where: {
-            teachers: { some: { id_user: userId } }
+            teachers: { some: { userId: userId } }
           },
           select: {
-            id_workshop: true
+            workshopId: true
           }
         });
-        const workshopIds = assignments.map(a => a.id_workshop);
-        where.id_workshop = { in: workshopIds };
+        const workshopIds = assignments.map(a => a.workshopId);
+        where.workshopId = { in: workshopIds };
       } else { // COORDINATOR
-        where.id_center = parseInt(centreId.toString());
+        where.centerId = parseInt(centreId.toString());
       }
     }
 
@@ -72,7 +72,7 @@ export const getRequestns = async (req: Request, res: Response) => {
 // POST: Crear solicitud
 export const createRequest = async (req: Request, res: Response) => {
   const {
-    id_workshop,
+    workshopId,
     studentsAprox,
     comments,
     prof1_id,
@@ -81,11 +81,11 @@ export const createRequest = async (req: Request, res: Response) => {
   } = req.body;
   const { centreId } = req.user!;
 
-  if (!id_workshop || !centreId || !prof1_id || !prof2_id) {
-    return res.status(400).json({ error: 'Falten camps obligatoris (id_workshop, centreId, prof1_id, prof2_id)' });
+  if (!workshopId || !centreId || !prof1_id || !prof2_id) {
+    return res.status(400).json({ error: 'Falten camps obligatoris (workshopId, centreId, prof1_id, prof2_id)' });
   }
 
-  // --- VERIFICACIÓN DE FASE ---
+  // --- VERIFICACIÓN DE PHASE ---
   const phaseStatus = await isPhaseActive(PHASES.APPLICATION);
   if (!phaseStatus.isActive) {
     let errorMessage = 'El període de sol·licitud de tallers no està actiu.';
@@ -106,7 +106,7 @@ export const createRequest = async (req: Request, res: Response) => {
     // Comprobar límite total de 12 alumnos para el centro en Modalidad C
     const requestsC = await prisma.request.findMany({
       where: {
-        id_center: centreId,
+        centerId: centreId,
         modality: 'C'
       }
     });
@@ -122,8 +122,8 @@ export const createRequest = async (req: Request, res: Response) => {
   try {
     const existingRequest = await prisma.request.findFirst({
       where: {
-        id_center: centreId,
-        id_workshop: parseInt(id_workshop)
+        centerId: centreId,
+        workshopId: parseInt(workshopId)
       }
     });
 
@@ -133,8 +133,8 @@ export const createRequest = async (req: Request, res: Response) => {
 
     const nuevaRequest = await prisma.request.create({
       data: {
-        id_center: parseInt(centreId),
-        id_workshop: parseInt(id_workshop),
+        centerId: parseInt(centreId),
+        workshopId: parseInt(workshopId),
         studentsAprox: parseInt(studentsAprox),
         comments: comments,
         status: REQUEST_STATUSES.PENDING,
@@ -169,7 +169,7 @@ export const updateRequest = async (req: Request, res: Response) => {
   try {
     const peticioId = parseInt(id as string);
     const existingRequest = await prisma.request.findUnique({
-      where: { id_request: peticioId }
+      where: { requestId: peticioId }
     });
 
     if (!existingRequest) {
@@ -177,7 +177,7 @@ export const updateRequest = async (req: Request, res: Response) => {
     }
 
     // Verificar permisos: Coordinador solo edita las suyas
-    if (role !== ROLES.ADMIN && existingRequest.id_center !== centreId) {
+    if (role !== ROLES.ADMIN && existingRequest.centerId !== centreId) {
       return res.status(403).json({ error: 'No tens permís per editar aquesta petició.' });
     }
 
@@ -186,7 +186,7 @@ export const updateRequest = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Només es poden editar requests pendents.' });
     }
 
-    // --- VERIFICACIÓN DE FASE ---
+    // --- VERIFICACIÓN DE PHASE ---
     // Si NO es admin, verificamos la fase. Los admins pueden editar siempre.
     if (role !== ROLES.ADMIN) {
       const phaseStatus = await isPhaseActive(PHASES.APPLICATION);
@@ -211,9 +211,9 @@ export const updateRequest = async (req: Request, res: Response) => {
       // Comprobar límite total de 12 alumnos (excluyendo la cantidad actual de esta petición)
       const requestsC = await prisma.request.findMany({
         where: {
-          id_center: existingRequest.id_center,
+          centerId: existingRequest.centerId,
           modality: 'C',
-          id_request: { not: peticioId } // Excluir la actual
+          requestId: { not: peticioId } // Excluir la actual
         }
       });
 
@@ -226,7 +226,7 @@ export const updateRequest = async (req: Request, res: Response) => {
     }
 
     const updatedRequest = await prisma.request.update({
-      where: { id_request: peticioId },
+      where: { requestId: peticioId },
       data: {
         studentsAprox: studentsAprox ? parseInt(studentsAprox) : undefined,
         comments,
@@ -252,16 +252,16 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
 
   try {
     const updated = await prisma.request.update({
-      where: { id_request: parseInt(id as string) },
+      where: { requestId: parseInt(id as string) },
       data: { status: status as RequestStatus },
       include: { workshop: true }
     });
 
     await createNotificationInterna({
-      id_center: updated.id_center,
+      centerId: updated.centerId,
       title: `Sol·licitud ${updated.status === RequestStatus.APPROVED ? 'Aprovada' : 'Rebutjada'}`,
       message: `La teva sol·licitud per al taller "${updated.workshop.title}" ha estat ${updated.status.toLowerCase()}.`,
-      type: 'PETICIO',
+      type: 'REQUEST',
       importancia: updated.status === RequestStatus.APPROVED ? 'INFO' : 'WARNING'
     });
 

@@ -3,12 +3,12 @@ import { BaseRepository } from './base.repository.js';
 
 export class EvaluationRepository extends BaseRepository<Evaluation, Prisma.EvaluationCreateInput, Prisma.EvaluationUpdateInput> {
   constructor() {
-    super('evaluation', 'id_evaluation_teacher');
+    super('evaluation', 'evaluationId');
   }
 
   override async findById(id: number): Promise<Evaluation | null> {
     return this.prisma.evaluation.findUnique({
-      where: { id_evaluation_teacher: id },
+      where: { evaluationId: id },
       include: {
         assignment: { include: { workshop: true, center: true } },
         enrollment: { include: { student: true } }
@@ -19,7 +19,7 @@ export class EvaluationRepository extends BaseRepository<Evaluation, Prisma.Eval
   async findByAssignment(assignmentId: number, type?: EvaluationType): Promise<Evaluation[]> {
     return this.model.findMany({
       where: {
-        id_assignment: assignmentId,
+        assignmentId: assignmentId,
         tipus: type
       },
       include: { enrollment: { include: { student: true } } },
@@ -30,7 +30,7 @@ export class EvaluationRepository extends BaseRepository<Evaluation, Prisma.Eval
   // Búsqueda por alumno para autoconsultas
   async findByEnrollment(enrollmentId: number): Promise<Evaluation[]> {
     return this.model.findMany({
-      where: { id_enrollment: enrollmentId }
+      where: { enrollmentId: enrollmentId }
     });
   }
 }
