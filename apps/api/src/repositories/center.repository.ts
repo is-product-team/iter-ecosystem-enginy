@@ -3,15 +3,15 @@ import { BaseRepository } from './base.repository.js';
 
 export class CenterRepository extends BaseRepository<Center, Prisma.CenterCreateInput, Prisma.CenterUpdateInput> {
   constructor() {
-    super('center', 'id_center');
+    super('center', 'centerId');
   }
 
-  // Sobrescribimos findById para usar id_center
+  // Sobrescribimos findById para usar centerId
   override async findById(id: number): Promise<Center | null> {
     return this.prisma.center.findUnique({
-      where: { id_center: id },
+      where: { centerId: id },
       include: {
-        users: { select: { id_user: true, fullName: true, email: true, role: true } },
+        users: { select: { userId: true, fullName: true, email: true, role: true } },
         assignments: { include: { workshop: true } }
       }
     });

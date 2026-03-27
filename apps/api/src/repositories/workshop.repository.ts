@@ -3,13 +3,13 @@ import { BaseRepository } from './base.repository.js';
 
 export class WorkshopRepository extends BaseRepository<Workshop, Prisma.WorkshopCreateInput, Prisma.WorkshopUpdateInput> {
   constructor() {
-    super('workshop', 'id_workshop');
+    super('workshop', 'workshopId');
   }
 
-  // Sobrescribimos findById para usar id_workshop
+  // Sobrescribimos findById para usar workshopId
   override async findById(id: number): Promise<Workshop | null> {
     return this.prisma.workshop.findUnique({
-      where: { id_workshop: id },
+      where: { workshopId: id },
       include: { sector: true }
     });
   }
@@ -23,7 +23,7 @@ export class WorkshopRepository extends BaseRepository<Workshop, Prisma.Workshop
 
   async findBySector(sectorId: number): Promise<Workshop[]> {
     return this.model.findMany({
-      where: { id_sector: sectorId },
+      where: { sectorId: sectorId },
       include: { sector: true }
     });
   }

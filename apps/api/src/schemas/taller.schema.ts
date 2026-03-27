@@ -7,7 +7,7 @@ export const createTallerSchema = z.object({
     durationHours: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().positive()),
     maxPlaces: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().positive()),
     modality: z.enum(['A', 'B', 'C']),
-    id_sector: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()),
+    sectorId: z.union([z.number(), z.string().transform((val) => parseInt(val))]).pipe(z.number().int().positive()),
     executionDays: z.array(z.object({
         dayOfWeek: z.number(),
         startTime: z.string(),

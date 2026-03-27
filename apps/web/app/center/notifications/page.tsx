@@ -105,8 +105,8 @@ export default function NotificationsPage() {
 
   return (
     <DashboardLayout
-      title={user?.rol.nom_rol === 'ADMIN' ? "System Alerts Control" : "Alerts and Notifications"}
-      subtitle={user?.rol.nom_rol === 'ADMIN' ? "Global communication and alert management for all users." : "Stay up to date with phase changes, request resolutions, and official communications."}
+      title={user?.role.name === 'ADMIN' ? "System Alerts Control" : "Alerts and Notifications"}
+      subtitle={user?.role.name === 'ADMIN' ? "Global communication and alert management for all users." : "Stay up to date with phase changes, request resolutions, and official communications."}
     >
       <div className="w-full pb-12">
         {loading ? (

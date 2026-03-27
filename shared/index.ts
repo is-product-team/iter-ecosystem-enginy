@@ -10,8 +10,8 @@ export type * from '@prisma/client';
 // Define exact roles expected by the Database
 export const ROLES = {
   ADMIN: 'ADMIN',
-  COORDINATOR: 'COORDINADOR',
-  TEACHER: 'PROFESSOR'
+  COORDINATOR: 'COORDINATOR',
+  TEACHER: 'TEACHER'
 } as const;
 
 export type RoleTag = typeof ROLES[keyof typeof ROLES];
@@ -51,10 +51,10 @@ export const CALENDARI = {
 
 // Official phase names for consistency in DB and UI
 export const PHASES = {
-  APPLICATION: 'Sol·licitud i Inscripció',
-  PLANNING: 'Planificació i Assignació',
-  EXECUTION: 'Execució i Seguiment',
-  CLOSURE: 'Tancament i Avaluació'
+  APPLICATION: 'Application',
+  PLANNING: 'Planning',
+  EXECUTION: 'Execution',
+  CLOSURE: 'Closure'
 } as const;
 
 export const PHASES_TIMELINE = [
@@ -85,16 +85,16 @@ export const WorkshopSchema = z.object({
 
 export const StudentSchema = z.object({
   idalu: z.string().min(3),
-  name: z.string().min(1),
+  fullName: z.string().min(1),
   lastName: z.string().min(1),
   grade: z.string().optional(),
-  id_center_origin: z.number().int().optional().nullable()
+  originCenterId: z.number().int().optional().nullable()
 });
 
 export const RequestSchema = z.object({
-  id_center: z.number().int(),
-  id_workshop: z.number().int(),
-  studentsAprox: z.number().int().min(1).max(100),
+  centerId: z.number().int(),
+  workshopId: z.number().int(),
+  approxStudents: z.number().int().min(1).max(100),
   comments: z.string().optional()
 });
 

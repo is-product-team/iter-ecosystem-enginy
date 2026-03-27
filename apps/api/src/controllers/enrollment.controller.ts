@@ -29,7 +29,7 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
     })).filter(s => s.name && s.idalu);
 
     const assignacio = await prisma.assignment.findUnique({
-      where: { id_assignment: parseInt(idAssignment as string) },
+      where: { assignmentId: parseInt(idAssignment as string) },
       include: { center: true }
     });
 
@@ -60,21 +60,21 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
       const inscripcio = await prisma.enrollment.upsert({
         where: {
           // We don't have a unique key for inscripcio, so we manually check
-          id_enrollment: -1 // dummy
+          enrollmentId: -1 // dummy
         },
         update: {},
         create: {
-          id_assignment: assignacio.id_assignment,
-          id_student: alumne.id_student
+          assignmentId: assignacio.assignmentId,
+          studentId: alumne.studentId
         }
       }).catch(async () => {
         // Manual check for existing
         const existing = await prisma.enrollment.findFirst({
-          where: { id_assignment: assignacio.id_assignment, id_student: alumne.id_student }
+          where: { assignmentId: assignacio.assignmentId, studentId: alumne.studentId }
         });
         if (!existing) {
           return prisma.enrollment.create({
-            data: { id_assignment: assignacio.id_assignment, id_student: alumne.id_student }
+            data: { assignmentId: assignacio.assignmentId, studentId: alumne.studentId }
           });
         }
         return existing;
@@ -86,7 +86,7 @@ export const enrollStudentsViaExcel = async (req: Request, res: Response) => {
     // Update checklist
     await prisma.assignmentChecklist.updateMany({
       where: {
-        id_assignment: assignacio.id_assignment,
+        assignmentId: assignacio.assignmentId,
         stepName: { contains: 'Registro Nominal' }
       },
       data: {

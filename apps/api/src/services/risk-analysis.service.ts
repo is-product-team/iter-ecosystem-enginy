@@ -20,7 +20,7 @@ export class RiskAnalysisService {
         // 1. Fetch Attendance (Last 3 sessions)
         const recentAttendance = await prisma.attendance.findMany({
             where: {
-                enrollment: { id_student: studentId }
+                enrollment: { studentId: studentId }
             },
             orderBy: { sessionDate: 'desc' },
             take: 3
@@ -56,9 +56,9 @@ export class RiskAnalysisService {
         const lowEvaluations = await prisma.competenceEvaluation.count({
             where: {
                 evaluation: {
-                    enrollment: { id_student: studentId }
+                    enrollment: { studentId: studentId }
                 },
-                puntuacio: { lt: 3 }
+                score: { lt: 3 }
             }
         });
 
@@ -87,18 +87,18 @@ export class RiskAnalysisService {
     private async triggerAlert(studentId: number, score: number, factors: string[]) {
         // Find Student Info
         const student = await prisma.student.findUnique({
-            where: { id_student: studentId },
+            where: { studentId: studentId },
             include: { center_origin: true }
         });
 
         if (!student || !student.center_origin) return;
 
         await createNotificationInterna({
-            id_center: student.center_origin.id_center,
-            title: `⚠️ Alerta de Riesgo: ${student.name} ${student.lastName}`,
-            message: `El alumno presenta un riesgo de abandono del ${score}%. Factores: ${factors.join(', ')}. Se recomienda intervención.`,
-            tipus: 'SISTEMA',
-            importancia: 'URGENT'
+            centerId: student.center_origin.centerId,
+            title: `⚠️ Risk Alert: ${student.fullName} ${student.lastName}`,
+            message: `The student shows a dropout risk of ${score}%. Factors: ${factors.join(', ')}. Intervention is recommended.`,
+            type: 'SYSTEM',
+            importance: 'URGENT'
         });
     }
 }

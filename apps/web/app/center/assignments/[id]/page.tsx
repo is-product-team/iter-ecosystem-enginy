@@ -115,10 +115,10 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
   );
 
   const filteredStudents = allStudents.filter(a => {
-    const matchesSearch = a.name.toLowerCase().includes(searchStudent.toLowerCase()) || 
-                          a.surnames.toLowerCase().includes(searchStudent.toLowerCase()) ||
+    const matchesSearch = a.fullName.toLowerCase().includes(searchStudent.toLowerCase()) || 
+                          a.lastName.toLowerCase().includes(searchStudent.toLowerCase()) ||
                           a.idalu.toLowerCase().includes(searchStudent.toLowerCase());
-    const matchesCourse = filterCourse === "All courses" || a.course === filterCourse;
+    const matchesCourse = filterCourse === "All courses" || a.grade === filterCourse;
     return matchesSearch && matchesCourse;
   });
 
@@ -128,7 +128,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     currentPage * itemsPerPage
   );
 
-  const uniqueCourses = Array.from(new Set(allStudents.map(a => a.course))).filter(Boolean).sort();
+  const uniqueCourses = Array.from(new Set(allStudents.map(a => a.grade))).filter(Boolean).sort();
 
 
   return (
@@ -189,7 +189,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                   <div className="flex items-center gap-6 min-w-[280px]">
                     <Avatar 
                       url={ins.student.photoUrl} 
-                      name={`${ins.student.name} ${ins.student.surnames}`} 
+                      name={`${ins.student.fullName} ${ins.student.lastName}`} 
                       id={ins.student.id_student} 
                       type="student" 
                       size="lg"
@@ -197,10 +197,10 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                     />
                     <div>
                       <p className="text-base font-black text-[#00426B] uppercase tracking-tight leading-none">
-                        {ins.student.name} {ins.student.surnames}
+                        {ins.student.fullName} {ins.student.lastName}
                       </p>
                       <p className="text-[10px] font-bold text-[#4197CB] uppercase tracking-widest mt-2 bg-blue-50 px-2 py-0.5 inline-block border border-blue-100">
-                        {ins.student.course} • {ins.student.idalu}
+                        {ins.student.grade} • {ins.student.idalu}
                       </p>
                     </div>
                   </div>
@@ -401,18 +401,18 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                               <div className="flex items-center gap-3">
                                 <Avatar 
                                   url={a.photoUrl} 
-                                  name={`${a.name} ${a.surnames}`} 
+                                  name={`${a.fullName} ${a.lastName}`} 
                                   id={a.id_student} 
                                   type="student" 
                                   size="sm"
                                   className={isAlreadyAdded ? 'ring-2 ring-green-500' : ''}
                                 />
-                                <div className="text-xs font-black text-[#00426B] uppercase tracking-tight">{a.name} {a.surnames}</div>
+                                <div className="text-xs font-black text-[#00426B] uppercase tracking-tight">{a.fullName} {a.lastName}</div>
                               </div>
                             </td>
                             <td className="px-6 py-4 font-mono text-[9px] text-gray-400">{a.idalu}</td>
                             <td className="px-6 py-4">
-                              <span className="text-[9px] font-black text-[#00426B] uppercase">{a.course}</span>
+                              <span className="text-[9px] font-black text-[#00426B] uppercase">{a.grade}</span>
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex justify-end items-center gap-2">

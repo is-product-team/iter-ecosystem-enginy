@@ -4,7 +4,7 @@ import { BaseRepository } from './base.repository.js';
 export class UserRepository extends BaseRepository<User, Prisma.UserCreateInput, Prisma.UserUpdateInput> {
   constructor() {
     // Definimos el modelo y su clave primaria
-    super('user', 'id_user');
+    super('user', 'userId');
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -16,7 +16,7 @@ export class UserRepository extends BaseRepository<User, Prisma.UserCreateInput,
 
   async findWithDetails(id: number): Promise<User | null> {
     return this.prisma.user.findUnique({
-      where: { id_user: id },
+      where: { userId: id },
       include: { role: true, center: true }
     });
   }

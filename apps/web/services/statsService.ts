@@ -1,25 +1,25 @@
 import getApi from "./api";
 
 export interface StatusStat {
-  estat: string;
+  status: string;
   total: number;
-  last_update: string;
+  lastUpdate: string;
 }
 
 export interface PopularStat {
-  _id: string; // Títol del taller
-  total_solicitudes: number;
-  alumnes_totals: number;
+  _id: string; // Workshop title
+  totalRequests: number;
+  totalStudents: number;
 }
 
 export interface ActivityLog {
   id_log: number;
-  tipus_accio: string;
-  id_user?: number;
-  data_hora: string;
-  descripcio: string;
-  usuari?: {
-    nom: string;
+  actionType: string;
+  userId?: number;
+  timestamp: string;
+  description: string;
+  user?: {
+    fullName: string;
     email: string;
   };
 }

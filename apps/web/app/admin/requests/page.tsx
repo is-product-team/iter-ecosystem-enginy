@@ -56,12 +56,12 @@ export default function AdminRequestsPage() {
       const [fetchedWorkshops, fetchedRequests, fetchedPhases, fetchedCenters] = await Promise.all([
         workshopService.getAll(),
         requestService.getAll(),
-        apiInstance.get('/fases'),
+        apiInstance.get('/phases'),
         centerService.getAll()
       ]);
       setWorkshops(fetchedWorkshops);
       setRequests(fetchedRequests);
-      _setPhases(fetchedPhases.data.data);
+      _setPhases(fetchedPhases.data);
       setCenters(fetchedCenters);
     } catch (err) {
       console.error(err);
@@ -72,7 +72,7 @@ export default function AdminRequestsPage() {
   };
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== 'ADMIN')) {
+    if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
       router.push('/login');
       return;
     }
@@ -179,7 +179,7 @@ export default function AdminRequestsPage() {
   // Filtered Requests based on Center Selection
   const filteredRequests = useMemo(() => {
     return requests.filter(r => {
-      const matchesCenter = !selectedCenterId || r.id_center === parseInt(selectedCenterId);
+      const matchesCenter = !selectedCenterId || r.centerId === parseInt(selectedCenterId);
       return matchesCenter;
     });
   }, [requests, selectedCenterId]);
@@ -261,7 +261,7 @@ export default function AdminRequestsPage() {
               >
                 <option value="">All centers</option>
                 {centers.map(c => (
-                  <option key={c.id_center} value={c.id_center}>{c.nom}</option>
+                  <option key={c.centerId} value={c.centerId}>{c.name}</option>
                 ))}
               </select>
             </div>

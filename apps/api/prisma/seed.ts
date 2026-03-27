@@ -15,7 +15,7 @@ const prisma = new PrismaClient();
  */
 
 async function seedInfrastructure() {
-  console.log('🏗️  Configurant infraestructura base (Rols i Sectors)...');
+  console.log('🏗️  Configuring base infrastructure (Roles and Sectors)...');
 
   const roles = await Promise.all(
     Object.values(ROLES).map((roleName) =>
@@ -33,7 +33,7 @@ async function seedInfrastructure() {
     TEACHER: roles.find((r) => r.roleName === ROLES.TEACHER)!,
   };
 
-  const sectors = ['Transformació Digital', 'Creació Artística', 'Industrial i Logística'];
+  const sectors = ['Digital Transformation', 'Artistic Creation', 'Industrial and Logistics'];
   const createdSectors = await Promise.all(
     sectors.map((name) =>
       prisma.sector.upsert({
@@ -47,79 +47,79 @@ async function seedInfrastructure() {
   return {
     roles: rolesMap,
     sectors: {
-      tecnologic: createdSectors.find((s) => s.name === 'Transformació Digital')!,
-      creatiu: createdSectors.find((s) => s.name === 'Creació Artística')!,
-      industrial: createdSectors.find((s) => s.name === 'Industrial i Logística')!,
+      tech: createdSectors.find((s) => s.name === 'Digital Transformation')!,
+      creative: createdSectors.find((s) => s.name === 'Artistic Creation')!,
+      industrial: createdSectors.find((s) => s.name === 'Industrial and Logistics')!,
     },
   };
 }
 
 async function seedUsers(roles: any, passDefault: string) {
-  console.log('👥  Generant usuaris i centres de prova...');
+  console.log('👥  Generating users and sample centers...');
 
-  // 1. Admin Global
+  // 1. Global Admin
   await prisma.user.upsert({
     where: { email: 'admin@admin.com' },
     update: {},
     create: {
-      fullName: 'Administrador Global',
+      fullName: 'Global Administrator',
       email: 'admin@admin.com',
       passwordHash: passDefault,
-      id_role: roles.ADMIN.id_role,
+      roleId: roles.ADMIN.roleId,
     },
   });
 
-  // 2. Centres
-  const centresData = [
+  // 2. Centers
+  const centersData = [
     {
-      codi: '08014231',
-      nom: 'Institut Joan Brossa',
+      code: '08014231',
+      name: 'Institut Joan Brossa',
       email: 'a8014231@xtec.cat',
-      adreca: 'Carrer de la Mare de Déu del Port, 397',
-      tel: '934 32 30 54',
+      address: 'Carrer de la Mare de Déu del Port, 397',
+      phone: '934 32 30 54',
       coordEmail: 'coordinacion@brossa.cat',
-      coordNom: 'Coord. Joan Brossa',
+      coordName: 'Coord. Joan Brossa',
     },
     {
-      codi: '08013147',
-      nom: 'Institut Pau Claris',
+      code: '08013147',
+      name: 'Institut Pau Claris',
       email: 'a8013147@xtec.cat',
-      adreca: 'Passeig de Lluís Companys, 18',
-      tel: '932 68 02 11',
+      address: 'Passeig de Lluís Companys, 18',
+      phone: '932 68 02 11',
       coordEmail: 'coordinacion@pauclaris.cat',
-      coordNom: 'Coord. Pau Claris',
+      coordName: 'Coord. Pau Claris',
     },
   ];
 
-  const centres = [];
-  for (const c of centresData) {
-    const centre = await prisma.center.upsert({
-      where: { centerCode: c.codi },
-      update: { name: c.nom },
+  const centers = [];
+  for (const c of centersData) {
+    const center = await prisma.center.upsert({
+      where: { centerCode: c.code },
+      update: { name: c.name },
       create: {
-        centerCode: c.codi,
-        name: c.nom,
+        centerCode: c.code,
+        name: c.name,
         contactEmail: c.email,
-        address: c.adreca,
-        contactPhone: c.tel,
+        address: c.address,
+        contactPhone: c.phone,
       },
     });
-    centres.push(centre);
+    centers.push(center);
 
     await prisma.user.upsert({
       where: { email: c.coordEmail },
       update: { passwordHash: passDefault },
       create: {
-        fullName: c.coordNom,
+        fullName: c.coordName,
         email: c.coordEmail,
         passwordHash: passDefault,
-        id_role: roles.COORDINATOR.id_role,
-        id_center: centre.id_center,
+        roleId: roles.COORDINATOR.roleId,
+        centerId: center.centerId,
       },
     });
   }
 
-  // 3. Professors
+  // 3. Teachers
   const brossaProfs = ['Laura Martínez', 'Jordi Soler'];
   const clarisProfs = ['Anna Ferrer', 'Marc Dalmau'];
 
@@ -132,14 +132,19 @@ async function seedUsers(roles: any, passDefault: string) {
         fullName: name,
         email,
         passwordHash: passDefault,
-        id_role: roles.TEACHER.id_role,
-        id_center: centres[0].id_center,
+        roleId: roles.TEACHER.roleId,
+        centerId: centers[0].centerId,
       },
     });
     await prisma.teacher.upsert({
-      where: { id_user: user.id_user },
+      where: { userId: user.userId },
       update: {},
-      create: { name: name, contact: email, id_center: centres[0].id_center, id_user: user.id_user },
+      create: { 
+        name: name, 
+        contact: email, 
+        centerId: centers[0].centerId, 
+        userId: user.userId 
+      },
     });
   }
 
@@ -152,64 +157,69 @@ async function seedUsers(roles: any, passDefault: string) {
         fullName: name,
         email,
         passwordHash: passDefault,
-        id_role: roles.TEACHER.id_role,
-        id_center: centres[1].id_center,
+        roleId: roles.TEACHER.roleId,
+        centerId: centers[1].centerId,
       },
     });
     await prisma.teacher.upsert({
-      where: { id_user: user.id_user },
+      where: { userId: user.userId },
       update: {},
-      create: { name: name, contact: email, id_center: centres[1].id_center, id_user: user.id_user },
+      create: { 
+        name: name, 
+        contact: email, 
+        centerId: centers[1].centerId, 
+        userId: user.userId 
+      },
     });
   }
 
-  return centres;
+  return centers;
 }
 
-async function seedTallers(sectors: any) {
-  console.log('📚  Generant catàleg de tallers...');
-  const tallers = [
-    { titol: 'Robòtica i IoT', sectorId: sectors.tecnologic.id_sector, modality: Modalitat.A, icona: 'ROBOT' },
-    { titol: 'Cinema Digital', sectorId: sectors.creatiu.id_sector, modality: Modalitat.B, icona: 'FILM' },
-    { titol: 'Impressió 3D', sectorId: sectors.industrial.id_sector, modality: Modalitat.A, icona: 'TOOLS' },
-    { titol: 'Desenvolupament Web', sectorId: sectors.tecnologic.id_sector, modality: Modalitat.C, icona: 'CODE' },
+async function seedWorkshops(sectors: any) {
+  console.log('📚  Generating workshop catalog...');
+  const workshops = [
+    { title: 'Robotics and IoT', sectorId: sectors.tech.sectorId, modality: Modalitat.A, icon: 'ROBOT' },
+    { title: 'Digital Cinema', sectorId: sectors.creative.sectorId, modality: Modalitat.B, icon: 'FILM' },
+    { title: '3D Printing', sectorId: sectors.industrial.sectorId, modality: Modalitat.A, icon: 'TOOLS' },
+    { title: 'Web Development', sectorId: sectors.tech.sectorId, modality: Modalitat.C, icon: 'CODE' },
   ];
 
-  for (const t of tallers) {
-    await prisma.workshop.create({ // For simplicity and sample data, we use create or we could check existence by title
+  for (const w of workshops) {
+    await prisma.workshop.create({ 
       data: {
-        title: t.titol,
-        modality: t.modalitat,
-        id_sector: t.sectorId,
+        title: w.title,
+        modality: w.modality,
+        sectorId: w.sectorId,
         durationHours: 3,
         maxPlaces: 20,
-        icon: t.icona,
-        description: `Exploració pràctica de ${t.titol}.`,
+        icon: w.icon,
+        description: `Practical exploration of ${w.title}.`,
       },
     });
   }
 }
 
-async function seedFases() {
-  console.log('🗓️   Configurant fases del programa...');
+async function seedPhases() {
+  console.log('🗓️   Configuring program phases...');
   const now = new Date();
   const currentYear = now.getFullYear();
 
-  const fasesData = [
+  const phasesData = [
     { name: PHASES.APPLICATION, order: 1, isActive: true },
     { name: PHASES.PLANNING, order: 2, isActive: false },
     { name: PHASES.EXECUTION, order: 3, isActive: false },
     { name: PHASES.CLOSURE, order: 4, isActive: false },
   ];
 
-  for (const fase of fasesData) {
+  for (const phase of phasesData) {
     await prisma.phase.upsert({
-      where: { name: fase.name },
-      update: { order: fase.order, isActive: fase.isActive },
+      where: { name: phase.name },
+      update: { order: phase.order, isActive: phase.isActive },
       create: {
-        name: fase.name,
-        order: fase.order,
-        isActive: fase.isActive,
+        name: phase.name,
+        order: phase.order,
+        isActive: phase.isActive,
         startDate: new Date(`${currentYear}-09-01`),
         endDate: new Date(`${currentYear + 1}-06-30`),
       },
@@ -218,10 +228,7 @@ async function seedFases() {
 }
 
 async function main() {
-  console.log('🌱  Iniciant procés de seeding...');
-
-  // En desenvolupament, de vegades volem netejar, però el seeding professional prefereix upsert.
-  // Si realment volem netejar: await prisma.$executeRaw`TRUNCATE TABLE ...`
+  console.log('🌱  Starting seeding process...');
 
   const infra = await seedInfrastructure();
 
@@ -229,15 +236,15 @@ async function main() {
   const passDefault = await bcrypt.hash('Iter@1234', salt);
 
   await seedUsers(infra.roles, passDefault);
-  await seedTallers(infra.sectors);
-  await seedFases();
+  await seedWorkshops(infra.sectors);
+  await seedPhases();
 
-  console.log('✅  Seeding completat amb èxit.');
+  console.log('✅  Seeding completed successfully.');
 }
 
 main()
   .catch((e) => {
-    console.error('❌  Error en el seed:', e);
+    console.error('❌  Seeding error:', e);
     process.exit(1);
   })
   .finally(async () => {

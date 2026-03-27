@@ -93,11 +93,11 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
       return res.json({ processed: 1, results: [result] });
     } else {
       const studentsWithAttendance = await prisma.attendance.findMany({
-        select: { enrollment: { select: { id_student: true } } },
-        distinct: ['id_enrollment']
+        select: { enrollment: { select: { studentId: true } } },
+        distinct: ['enrollmentId']
       });
 
-      const uniqueIds = [...new Set(studentsWithAttendance.map((a: any) => a.enrollment.id_student))];
+      const uniqueIds = [...new Set(studentsWithAttendance.map((a: any) => a.enrollment.studentId))];
 
       const results = [];
       for (const id of uniqueIds) {
@@ -138,9 +138,9 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
       const isComplete = hasTeachers && hasStudents && allDocsOk;
 
       return {
-        id_assignment: a.id_assignment,
+        assignmentId: a.assignmentId,
         center: a.center.name,
-        workshop_id: a.id_workshop,
+        workshop_id: a.workshopId,
         estat: a.estat,
         completat: isComplete,
         detalls: {

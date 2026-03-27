@@ -10,7 +10,7 @@ export const generateEnquestes = async (req: Request, res: Response) => {
 
     try {
         const assignacio = await prisma.assignment.findUnique({
-            where: { id_assignment: parseInt(idAssignment) },
+            where: { assignmentId: parseInt(idAssignment) },
             include: {
                 enrollments: { include: { student: true } },
                 teachers: { include: { user: true } },
@@ -26,7 +26,7 @@ export const generateEnquestes = async (req: Request, res: Response) => {
         // Alumnos
         for (const enrollment of assignacio.enrollments) {
             questionnairesData.push({
-                id_assignment: assignacio.id_assignment,
+                assignmentId: assignacio.assignmentId,
                 destinatari: QuestionnaireTarget.ALUMNE,
                 token: uuidv4(),
                 completa: false
@@ -36,7 +36,7 @@ export const generateEnquestes = async (req: Request, res: Response) => {
         // Profesores
         for (const teacher of assignacio.teachers) {
             questionnairesData.push({
-                id_assignment: assignacio.id_assignment,
+                assignmentId: assignacio.assignmentId,
                 target: QuestionnaireTarget.PROFESSOR,
                 token: uuidv4(),
                 isCompleted: false
@@ -45,7 +45,7 @@ export const generateEnquestes = async (req: Request, res: Response) => {
 
         // Centro (1 por asignación)
         questionnairesData.push({
-            id_assignment: assignacio.id_assignment,
+            assignmentId: assignacio.assignmentId,
             target: QuestionnaireTarget.CENTRE,
             token: uuidv4(),
             isCompleted: false
@@ -110,7 +110,7 @@ export const submitEnquesta = async (req: Request, res: Response) => {
 
         // 1. Marcar como completada en Postgres
         await prisma.questionnaire.update({
-            where: { id_questionnaire: enquesta.id_questionnaire },
+            where: { questionnaireId: enquesta.questionnaireId },
             data: { 
                 responses: responses as any,
                 isCompleted: true,

@@ -33,7 +33,7 @@ describe('AutoAssignmentService', () => {
     it('should split capacity evenly among centers (Fair Share)', async () => {
       // Mock Workshop with capacity 10
       prismaMock.workshop.findUnique.mockResolvedValue({
-        id_workshop: 1,
+        workshopId: 1,
         titol: 'Taller Test',
         places_maximes: 10,
         dies_execucio: []
@@ -42,16 +42,16 @@ describe('AutoAssignmentService', () => {
       // Mock 2 Petitions (Center A demands 8, Center B demands 6) -> Total 14 > 10
       const mockPetitions = [
         {
-          id_request: 101,
-          id_center: 1,
-          id_workshop: 1,
+          requestId: 101,
+          centerId: 1,
+          workshopId: 1,
           data_request: new Date('2024-03-01T10:00:00Z'),
           alumnes_aprox: 8
         },
         {
-          id_request: 102,
-          id_center: 2,
-          id_workshop: 1,
+          requestId: 102,
+          centerId: 2,
+          workshopId: 1,
           data_request: new Date('2024-03-01T11:00:00Z'),
           alumnes_aprox: 6
         }
@@ -59,7 +59,7 @@ describe('AutoAssignmentService', () => {
 
       prismaMock.request.findMany.mockResolvedValue(mockPetitions as any);
       prismaMock.assignment.findMany.mockResolvedValue([]); // No current assignments
-      prismaMock.assignment.create.mockResolvedValue({ id_assignment: 1 } as any);
+      prismaMock.assignment.create.mockResolvedValue({ assignmentId: 1 } as any);
 
       const result = await service.generateAssignments();
 
@@ -71,7 +71,7 @@ describe('AutoAssignmentService', () => {
     it('should assign remainders by priority (Earliest Timestamp)', async () => {
       // Mock Workshop with capacity 5
       prismaMock.workshop.findUnique.mockResolvedValue({
-        id_workshop: 1,
+        workshopId: 1,
         titol: 'Taller Test',
         places_maximes: 5,
         dies_execucio: []
@@ -84,16 +84,16 @@ describe('AutoAssignmentService', () => {
       // Center B gets 2.
       const mockPetitions = [
         {
-          id_request: 101,
-          id_center: 1,
-          id_workshop: 1,
+          requestId: 101,
+          centerId: 1,
+          workshopId: 1,
           data_request: new Date('2024-03-01T09:00:00Z'), // Earlier
           alumnes_aprox: 3
         },
         {
-          id_request: 102,
-          id_center: 2,
-          id_workshop: 1,
+          requestId: 102,
+          centerId: 2,
+          workshopId: 1,
           data_request: new Date('2024-03-01T10:00:00Z'),
           alumnes_aprox: 3
         }
@@ -101,7 +101,7 @@ describe('AutoAssignmentService', () => {
 
       prismaMock.request.findMany.mockResolvedValue(mockPetitions as any);
       prismaMock.assignment.findMany.mockResolvedValue([]);
-      prismaMock.assignment.create.mockResolvedValue({ id_assignment: 1 } as any);
+      prismaMock.assignment.create.mockResolvedValue({ assignmentId: 1 } as any);
 
       await service.generateAssignments();
 

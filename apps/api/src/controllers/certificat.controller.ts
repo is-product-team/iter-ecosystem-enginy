@@ -8,7 +8,7 @@ export const generateCertificates = async (req: Request, res: Response) => {
 
     try {
         const assignacio = await prisma.assignment.findUnique({
-            where: { id_assignment: id },
+            where: { assignmentId: id },
             include: {
                 enrollments: {
                     include: {
@@ -34,15 +34,15 @@ export const generateCertificates = async (req: Request, res: Response) => {
             if (percentage >= 80) {
                 await prisma.certificate.upsert({
                     where: {
-                        id_student_id_assignment: {
-                            id_student: inscripcio.id_student,
-                            id_assignment: id
+                        studentId_assignmentId: {
+                            studentId: inscripcio.studentId,
+                            assignmentId: id
                         }
                     },
                     update: {},
                     create: {
-                        id_student: inscripcio.id_student,
-                        id_assignment: id,
+                        studentId: inscripcio.studentId,
+                        assignmentId: id,
                         data_emissio: new Date()
                     }
                 });
@@ -67,7 +67,7 @@ export const getMyCertificates = async (req: Request, res: Response) => {
 
     try {
         const where: any = {};
-        if (alumneId) where.id_student = parseInt(alumneId as string);
+        if (alumneId) where.studentId = parseInt(alumneId as string);
 
         const certificats = await prisma.certificate.findMany({
             where,

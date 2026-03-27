@@ -4,9 +4,9 @@ export class EvaluationService {
     /**
      * Obtiene la evaluación docente de una inscripción específica.
      */
-    async getEvaluationByEnrollment(id_enrollment: number) {
+    async getEvaluationByEnrollment(enrollmentId: number) {
         return await prisma.evaluation.findUnique({
-            where: { id_enrollment },
+            where: { enrollmentId },
             include: {
                 competences: {
                     include: {
@@ -21,16 +21,16 @@ export class EvaluationService {
      * Crea o actualiza una evaluación docente.
      */
     async upsertEvaluation(data: {
-        id_enrollment: number;
-        id_assignment: number;
+        enrollmentId: number;
+        assignmentId: number;
         attendancePercentage: number;
         lateCount: number;
         observations?: string;
-        competences: { id_competence: number; score: number }[];
+        competences: { competenceId: number; score: number }[];
     }) {
         const {
-            id_enrollment,
-            id_assignment,
+            enrollmentId,
+            assignmentId,
             attendancePercentage,
             lateCount,
             observations,
@@ -39,15 +39,15 @@ export class EvaluationService {
 
         // 1. Crear o actualizar la evaluación docente principal
         const avaluacioDocent = await prisma.evaluation.upsert({
-            where: { id_enrollment },
+            where: { enrollmentId },
             update: {
                 attendancePercentage,
                 lateCount,
                 observations,
             },
             create: {
-                id_enrollment,
-                id_assignment,
+                enrollmentId,
+                assignmentId,
                 attendancePercentage,
                 lateCount,
                 observations: data.observations,
@@ -56,14 +56,14 @@ export class EvaluationService {
 
         // 2. Eliminar competencias previas si existen (para re-crearlas)
         await prisma.competenceEvaluation.deleteMany({
-            where: { id_evaluation_teacher: avaluacioDocent.id_evaluation_teacher },
+            where: { evaluationId: avaluacioDocent.evaluationId },
         });
 
         // 3. Crear las nuevas puntuaciones de competencias
         const competencesCreated = await prisma.competenceEvaluation.createMany({
             data: competences.map((c) => ({
-                id_evaluation_teacher: avaluacioDocent.id_evaluation_teacher,
-                id_competence: c.id_competence,
+                evaluationId: avaluacioDocent.evaluationId,
+                competenceId: c.competenceId,
                 score: c.score,
             })),
         });
