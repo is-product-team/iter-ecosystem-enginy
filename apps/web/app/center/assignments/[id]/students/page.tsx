@@ -46,7 +46,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   useEffect(() => {
     const currentUser = getUser();
-    const roleName = currentUser?.rol.nom_rol;
+    const roleName = currentUser?.role.name;
     
     if (!currentUser || roleName !== ROLES.COORDINATOR) {
       router.push('/login');
@@ -150,11 +150,11 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   const filteredStudents = students.filter(a => {
     const matchesSearch = !searchQuery || 
-      a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.surnames.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.idalu.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCourse = selectedCourse === "All courses" || a.course === selectedCourse;
+    const matchesCourse = selectedCourse === "All courses" || a.grade === selectedCourse;
     
     return matchesSearch && matchesCourse;
   });
@@ -169,7 +169,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
     currentPage * itemsPerPage
   );
 
-  const uniqueCourses = Array.from(new Set(students.map(a => a.course))).filter(Boolean).sort();
+  const uniqueCourses = Array.from(new Set(students.map(a => a.grade))).filter(Boolean).sort();
 
   if (loading && !assignment) return <Loading fullScreen message="Loading assignment data..." />;
 
@@ -297,10 +297,10 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-4">
                             <div className={`w-10 h-10 flex items-center justify-center text-xs font-black transition-colors ${isSelected ? 'bg-[#00426B] text-white' : 'bg-[#EAEFF2] text-[#00426B]'}`}>
-                              {student.name.charAt(0)}{student.surnames.charAt(0)}
+                              {student.fullName.charAt(0)}{student.lastName.charAt(0)}
                             </div>
                             <div className={`text-sm font-black uppercase tracking-tight ${isSelected ? 'text-[#00426B]' : 'text-gray-700'}`}>
-                              {student.name} {student.surnames}
+                              {student.fullName} {student.lastName}
                             </div>
                           </div>
                         </td>
@@ -309,7 +309,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
                         </td>
                         <td className="px-6 py-5">
                           <span className="px-2 py-0.5 bg-[#EAEFF2] text-[#00426B] text-[10px] font-black uppercase tracking-widest border border-[#EAEFF2]">
-                            {student.course}
+                            {student.grade}
                           </span>
                         </td>
                       </tr>

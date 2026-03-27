@@ -37,7 +37,7 @@ export default function RequestsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.COORDINATOR)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
       router.push('/login');
       return;
     }

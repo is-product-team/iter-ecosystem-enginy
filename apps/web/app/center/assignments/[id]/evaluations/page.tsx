@@ -19,7 +19,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
 
     useEffect(() => {
         const currentUser = getUser();
-        if (!currentUser || (currentUser.rol.nom_rol !== ROLES.COORDINATOR && currentUser.rol.nom_rol !== ROLES.ADMIN)) {
+        if (!currentUser || (currentUser.role.name !== ROLES.COORDINATOR && currentUser.role.name !== ROLES.ADMIN)) {
             router.push('/login');
             return;
         }
@@ -77,11 +77,11 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                                 >
                                     <div className="flex items-center gap-6">
                                         <div className="w-12 h-12 bg-blue-900 flex items-center justify-center font-black italic text-sm text-white shadow-lg">
-                                            {ins.student?.name?.charAt(0)}{ins.student?.surnames?.charAt(0)}
+                                            {ins.student?.fullName?.charAt(0)}{ins.student?.lastName?.charAt(0)}
                                         </div>
                                         <div>
                                             <p className="font-bold text-gray-900">
-                                                {ins.student?.name} {ins.student?.surnames}
+                                                {ins.student?.fullName} {ins.student?.lastName}
                                             </p>
                                             <p className="text-[10px] font-black uppercase tracking-tighter text-gray-400">
                                                 IDALU: {ins.student?.idalu}

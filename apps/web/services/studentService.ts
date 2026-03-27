@@ -2,12 +2,12 @@ import getApi from "./api";
 
 export interface Student {
   id_student: number;
-  name: string;
-  surnames: string;
+  fullName: string;
+  lastName: string;
   idalu: string;
-  course: string;
-  id_center_origin?: number;
-  url_foto?: string | null;
+  grade: string;
+  originCenterId?: number;
+  photoUrl?: string | null;
 }
 
 const studentService = {

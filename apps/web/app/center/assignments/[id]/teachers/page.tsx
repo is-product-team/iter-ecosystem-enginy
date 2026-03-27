@@ -23,7 +23,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
 
   useEffect(() => {
     const currentUser = getUser();
-    if (!currentUser || currentUser.rol.nom_rol !== ROLES.COORDINATOR) {
+    if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
       router.push('/login');
       return;
     }
@@ -36,7 +36,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
         // Fetch phases first for gating
         const resFases = await api.get("/phases");
         const phasesData = resFases.data.data;
-        const isPlanning = phasesData.find((f: { nom: string, activa: boolean }) => f.nom === PHASES.PLANNING)?.activa;
+        const isPlanning = phasesData.find((f: { name: string, active: boolean }) => f.name === PHASES.PLANNING)?.active;
         
         if (!isPlanning) {
           toast.error('The teacher designation period is not active.');
@@ -57,7 +57,7 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
         setProf2Id(found.teacher2?.id_user?.toString() || '');
         
         // Fetch all teachers from center
-        const resProfs = await teacherService.getByCenter(currentUser.id_center || 0);
+        const resProfs = await teacherService.getByCenter(currentUser.centerId || 0);
         setTeachers(resProfs || []);
       } catch (error) {
         console.error("Error fetching designation data:", error);
@@ -85,8 +85,8 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
       const api = getApi();
       
       await api.patch(`/assignments/checklist/designate-teachers/${id}`, {
-        teacher1_id: parseInt(prof1Id),
-        teacher2_id: parseInt(prof2Id)
+        teacher1Id: parseInt(prof1Id),
+        teacher2Id: parseInt(prof2Id)
       });
       
       toast.success('Teachers designated correctly.');

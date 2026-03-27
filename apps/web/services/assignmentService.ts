@@ -6,17 +6,17 @@ export interface Enrollment {
   id_student: number;
   student: {
     id_student: number;
-    name: string;
-    surnames: string;
-    course: string;
+    fullName: string;
+    lastName: string;
+    grade: string;
     idalu: string;
-    url_foto?: string | null;
+    photoUrl?: string | null;
   };
-  url_pedagogical_agreement?: string | null;
+  pedagogicalAgreementUrl?: string | null;
   validated_pedagogical_agreement: boolean;
-  url_mobility_authorization?: string | null;
+  mobilityAuthorizationUrl?: string | null;
   validated_mobility_authorization: boolean;
-  url_image_rights?: string | null;
+  imageRightsUrl?: string | null;
   validated_image_rights: boolean;
   teacher_evaluation?: boolean;
 }
@@ -40,11 +40,11 @@ export interface Assignment {
 
 interface BackendStudent {
   id_student: number;
-  nom: string;
-  cognoms: string;
-  curs: string;
+  fullName: string;
+  lastName: string;
+  grade: string;
   idalu: string;
-  url_foto?: string | null;
+  photoUrl?: string | null;
 }
 
 interface BackendEnrollment {
@@ -68,14 +68,14 @@ interface BackendAssignment {
   id_request: number | null;
   id_center: number;
   id_workshop: number;
-  data_inici: string | null;
-  data_fi: string | null;
-  estat: string;
-  taller?: { titol: string; modalitat: string; places_maximes: number };
-  centre?: { nom: string };
-  peticio?: { alumnes_aprox: number };
-  prof1?: { id_user: number; nom: string };
-  prof2?: { id_user: number; nom: string };
+  startDate: string | null;
+  endDate: string | null;
+  status: string;
+  workshop?: { title: string; modality: string; maxPlaces: number };
+  center?: { name: string };
+  request?: { approxStudents: number };
+  teacher1?: { id_user: number; name: string };
+  teacher2?: { id_user: number; name: string };
   enrollments?: BackendEnrollment[];
   checklist?: unknown[];
 }
@@ -93,35 +93,35 @@ const assignmentService = {
         id_request: a.id_request,
         id_center: a.id_center,
         id_workshop: a.id_workshop,
-        startDate: a.data_inici,
-        endDate: a.data_fi,
-        status: a.estat,
-        workshop: a.taller ? { 
-          title: a.taller.titol,
-          modality: a.taller.modalitat,
-          maxSeats: a.taller.places_maximes
+        startDate: a.startDate,
+        endDate: a.endDate,
+        status: a.status,
+        workshop: a.workshop ? { 
+          title: a.workshop.title,
+          modality: a.workshop.modality,
+          maxSeats: a.workshop.maxPlaces
         } : undefined,
-        center: a.centre ? { name: a.centre.nom } : undefined,
-        request: a.peticio ? { approxStudents: a.peticio.alumnes_aprox } : undefined,
-        teacher1: a.prof1 ? { id_user: a.prof1.id_user, name: a.prof1.nom } : undefined,
-        teacher2: a.prof2 ? { id_user: a.prof2.id_user, name: a.prof2.nom } : undefined,
+        center: a.center ? { name: a.center.name } : undefined,
+        request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
+        teacher1: a.teacher1 ? { id_user: a.teacher1.id_user, name: a.teacher1.name } : undefined,
+        teacher2: a.teacher2 ? { id_user: a.teacher2.id_user, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
           id_enrollment: i.id_enrollment,
           id_assignment: i.id_assignment,
           id_student: i.id_student,
           student: {
             id_student: i.student.id_student,
-            name: i.student.nom,
-            surnames: i.student.cognoms,
-            course: i.student.curs,
+            fullName: i.student.fullName,
+            lastName: i.student.lastName,
+            grade: i.student.grade,
             idalu: i.student.idalu,
-            url_foto: i.student.url_foto,
+            photoUrl: i.student.photoUrl,
           },
-          url_pedagogical_agreement: i.docs_status?.acord_pedagogic,
+          pedagogicalAgreementUrl: i.docs_status?.acord_pedagogic,
           validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
-          url_mobility_authorization: i.docs_status?.autoritzacio_mobilitat,
+          mobilityAuthorizationUrl: i.docs_status?.autoritzacio_mobilitat,
           validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
-          url_image_rights: i.docs_status?.drets_imatge,
+          imageRightsUrl: i.docs_status?.drets_imatge,
           validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
           teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
         })),
@@ -147,15 +147,15 @@ const assignmentService = {
         id_request: a.id_request,
         id_center: a.id_center,
         id_workshop: a.id_workshop,
-        startDate: a.data_inici,
-        endDate: a.data_fi,
-        status: a.estat,
-        workshop: a.taller ? { 
-          title: a.taller.titol,
-          modality: a.taller.modalitat,
-          maxSeats: a.taller.places_maximes
+        startDate: a.startDate,
+        endDate: a.endDate,
+        status: a.status,
+        workshop: a.workshop ? { 
+          title: a.workshop.title,
+          modality: a.workshop.modality,
+          maxSeats: a.workshop.maxPlaces
         } : undefined,
-        center: a.centre ? { name: a.centre.nom } : undefined,
+        center: a.center ? { name: a.center.name } : undefined,
         checklist: a.checklist,
       };
     } catch (error) {
@@ -204,35 +204,35 @@ const assignmentService = {
         id_request: a.id_request,
         id_center: a.id_center,
         id_workshop: a.id_workshop,
-        startDate: a.data_inici,
-        endDate: a.data_fi,
-        status: a.estat,
-        workshop: a.taller ? { 
-          title: a.taller.titol,
-          modality: a.taller.modalitat,
-          maxSeats: a.taller.places_maximes
+        startDate: a.startDate,
+        endDate: a.endDate,
+        status: a.status,
+        workshop: a.workshop ? { 
+          title: a.workshop.title,
+          modality: a.workshop.modality,
+          maxSeats: a.workshop.maxPlaces
         } : undefined,
-        center: a.centre ? { name: a.centre.nom } : undefined,
-        request: a.peticio ? { approxStudents: a.peticio.alumnes_aprox } : undefined,
-        teacher1: a.prof1 ? { id_user: a.prof1.id_user, name: a.prof1.nom } : undefined,
-        teacher2: a.prof2 ? { id_user: a.prof2.id_user, name: a.prof2.nom } : undefined,
+        center: a.center ? { name: a.center.name } : undefined,
+        request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
+        teacher1: a.teacher1 ? { id_user: a.teacher1.id_user, name: a.teacher1.name } : undefined,
+        teacher2: a.teacher2 ? { id_user: a.teacher2.id_user, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
           id_enrollment: i.id_enrollment,
           id_assignment: i.id_assignment,
           id_student: i.id_student,
           student: {
             id_student: i.student.id_student,
-            name: i.student.nom,
-            surnames: i.student.cognoms,
-            course: i.student.curs,
+            fullName: i.student.fullName,
+            lastName: i.student.lastName,
+            grade: i.student.grade,
             idalu: i.student.idalu,
-            url_foto: i.student.url_foto,
+            photoUrl: i.student.photoUrl,
           },
-          url_pedagogical_agreement: i.docs_status?.acord_pedagogic,
+          pedagogicalAgreementUrl: i.docs_status?.acord_pedagogic,
           validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
-          url_mobility_authorization: i.docs_status?.autoritzacio_mobilitat,
+          mobilityAuthorizationUrl: i.docs_status?.autoritzacio_mobilitat,
           validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
-          url_image_rights: i.docs_status?.drets_imatge,
+          imageRightsUrl: i.docs_status?.drets_imatge,
           validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
           teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
         })),
@@ -257,35 +257,35 @@ const assignmentService = {
         id_request: a.id_request,
         id_center: a.id_center,
         id_workshop: a.id_workshop,
-        startDate: a.data_inici,
-        endDate: a.data_fi,
-        status: a.estat,
-        workshop: a.taller ? { 
-          title: a.taller.titol,
-          modality: a.taller.modalitat,
-          maxSeats: a.taller.places_maximes
+        startDate: a.startDate,
+        endDate: a.endDate,
+        status: a.status,
+        workshop: a.workshop ? { 
+          title: a.workshop.title,
+          modality: a.workshop.modality,
+          maxSeats: a.workshop.maxPlaces
         } : undefined,
-        center: a.centre ? { name: a.centre.nom } : undefined,
-        request: a.peticio ? { approxStudents: a.peticio.alumnes_aprox } : undefined,
-        teacher1: a.prof1 ? { id_user: a.prof1.id_user, name: a.prof1.nom } : undefined,
-        teacher2: a.prof2 ? { id_user: a.prof2.id_user, name: a.prof2.nom } : undefined,
+        center: a.center ? { name: a.center.name } : undefined,
+        request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
+        teacher1: a.teacher1 ? { id_user: a.teacher1.id_user, name: a.teacher1.name } : undefined,
+        teacher2: a.teacher2 ? { id_user: a.teacher2.id_user, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
           id_enrollment: i.id_enrollment,
           id_assignment: i.id_assignment,
           id_student: i.id_student,
           student: {
             id_student: i.student.id_student,
-            name: i.student.nom,
-            surnames: i.student.cognoms,
-            course: i.student.curs,
+            fullName: i.student.fullName,
+            lastName: i.student.lastName,
+            grade: i.student.grade,
             idalu: i.student.idalu,
-            url_foto: i.student.url_foto,
+            photoUrl: i.student.photoUrl,
           },
-          url_pedagogical_agreement: i.docs_status?.acord_pedagogic,
+          pedagogicalAgreementUrl: i.docs_status?.acord_pedagogic,
           validated_pedagogical_agreement: i.docs_status?.validat_acord_pedagogic ?? false,
-          url_mobility_authorization: i.docs_status?.autoritzacio_mobilitat,
+          mobilityAuthorizationUrl: i.docs_status?.autoritzacio_mobilitat,
           validated_mobility_authorization: i.docs_status?.validat_autoritzacio_mobilitat ?? false,
-          url_image_rights: i.docs_status?.drets_imatge,
+          imageRightsUrl: i.docs_status?.drets_imatge,
           validated_image_rights: i.docs_status?.validat_drets_imatge ?? false,
           teacher_evaluation: (i.evaluations?.length ?? 0) > 0,
         })),

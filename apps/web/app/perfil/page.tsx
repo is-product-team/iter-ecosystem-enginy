@@ -163,13 +163,13 @@ export default function ProfilePage() {
             {/* Avatar */}
             <div className="absolute -top-12 left-8">
               <Avatar
-                url={user.url_foto}
-                name={user.nom_complet}
+                url={user.photoUrl}
+                name={user.fullName}
                 id={user.id_user}
                 type="usuari"
                 size="xl"
                 className="ring-4 ring-white shadow-xl"
-                isCoordinator={user.rol.nom_rol === ROLES.COORDINATOR}
+                isCoordinator={user.role.name === ROLES.COORDINATOR}
                 email={user.email}
               />
             </div>
@@ -178,10 +178,10 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                   <h3 className="text-3xl font-black text-text-primary leading-tight">
-                    {user.nom_complet}
+                    {user.fullName}
                   </h3>
                   <p className="text-consorci-actionBlue font-bold tracking-tight uppercase text-xs mt-1">
-                    {user.rol.nom_rol} {user.center?.nom ? `• ${user.center.nom}` : ''}
+                    {user.role.name} {user.center?.name ? `• ${user.center.name}` : ''}
                   </p>
                 </div>
 
@@ -210,7 +210,7 @@ export default function ProfilePage() {
                   <div>
                     <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-2">Referent Center</label>
                     <div className="p-4 border-2 border-dashed border-border-subtle bg-background-subtle/30">
-                      <p className="text-sm font-bold text-text-primary">{user.center?.nom || 'No center assigned'}</p>
+                      <p className="text-sm font-bold text-text-primary">{user.center?.name || 'No center assigned'}</p>
                       <p className="text-xs text-text-muted mt-1">Used for workshop management and requests.</p>
                     </div>
                   </div>

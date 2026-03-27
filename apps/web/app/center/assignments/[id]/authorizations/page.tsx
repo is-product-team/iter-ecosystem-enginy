@@ -20,7 +20,7 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
 
   useEffect(() => {
     const currentUser = getUser();
-    if (!currentUser || currentUser.rol.nom_rol !== ROLES.COORDINATOR) {
+    if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
       router.push('/login');
       return;
     }
@@ -45,7 +45,7 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
     try {
       const api = getApi();
       await api.post(`/assignments/${id}/compliance`, {
-        idStudent: idInscripcio,
+        enrollmentId: idInscripcio,
         [field]: value
       });
       

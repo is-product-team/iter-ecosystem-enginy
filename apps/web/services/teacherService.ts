@@ -4,25 +4,25 @@ export interface Teacher {
   id_teacher: number;
   name: string;
   contact: string;
-  id_center?: number;
+  centerId?: number;
   user?: {
     id_user: number;
     email: string;
-    nom_complet?: string;
-    url_foto?: string | null;
+    fullName?: string;
+    photoUrl?: string | null;
   };
 }
 
 interface BackendTeacher {
-  id_professor: number;
-  nom: string;
-  contacte: string;
+  id_teacher: number;
+  name: string;
+  contact: string;
   id_center: number;
   user?: {
     id_user: number;
     email: string;
-    nom_complet: string;
-    url_foto: string | null;
+    fullName: string;
+    photoUrl: string | null;
   };
 }
 
@@ -31,15 +31,15 @@ const teacherService = {
     const api = getApi();
     const response = await api.get<BackendTeacher[]>("/teachers");
     return response.data.map((t: BackendTeacher) => ({
-      id_teacher: t.id_professor,
-      name: t.nom,
-      contact: t.contacte,
-      id_center: t.id_center,
+      id_teacher: t.id_teacher,
+      name: t.name,
+      contact: t.contact,
+      centerId: t.id_center,
       user: t.user ? {
         id_user: t.user.id_user,
         email: t.user.email,
-        nom_complet: t.user.nom_complet,
-        url_foto: t.user.url_foto
+        fullName: t.user.fullName,
+        photoUrl: t.user.photoUrl
       } : undefined
     }));
   },
@@ -47,15 +47,15 @@ const teacherService = {
     const api = getApi();
     const response = await api.get<BackendTeacher[]>(`/teachers/centre/${idCenter}`);
     return response.data.map((t: BackendTeacher) => ({
-      id_teacher: t.id_professor,
-      name: t.nom,
-      contact: t.contacte,
-      id_center: t.id_center,
+      id_teacher: t.id_teacher,
+      name: t.name,
+      contact: t.contact,
+      centerId: t.id_center,
       user: t.user ? {
         id_user: t.user.id_user,
         email: t.user.email,
-        nom_complet: t.user.nom_complet,
-        url_foto: t.user.url_foto
+        fullName: t.user.fullName,
+        photoUrl: t.user.photoUrl
       } : undefined
     }));
   },

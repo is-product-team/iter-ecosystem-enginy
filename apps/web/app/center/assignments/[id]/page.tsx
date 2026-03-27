@@ -32,7 +32,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
   useEffect(() => {
     const currentUser = getUser();
-    if (!currentUser || currentUser.rol.nom_rol !== ROLES.COORDINATOR) {
+    if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
       router.push('/login');
       return;
     }
@@ -188,7 +188,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                   {/* Student Info */}
                   <div className="flex items-center gap-6 min-w-[280px]">
                     <Avatar 
-                      url={ins.student.url_foto} 
+                      url={ins.student.photoUrl} 
                       name={`${ins.student.name} ${ins.student.surnames}`} 
                       id={ins.student.id_student} 
                       type="student" 
@@ -208,28 +208,28 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                   {/* Documents */}
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                     <DocumentUpload 
-                      idAssignacio={parseInt(id)}
-                      idInscripcio={ins.id_enrollment}
+                      assignmentId={parseInt(id)}
+                      enrollmentId={ins.id_enrollment}
                       documentType="pedagogical_agreement"
-                      initialUrl={ins.url_pedagogical_agreement}
+                      initialUrl={ins.pedagogicalAgreementUrl}
                       isValidated={ins.validated_pedagogical_agreement}
                       label="Pedagogical Agreement"
                       onUploadSuccess={() => {}}
                     />
                     <DocumentUpload 
-                      idAssignacio={parseInt(id)}
-                      idInscripcio={ins.id_enrollment}
+                      assignmentId={parseInt(id)}
+                      enrollmentId={ins.id_enrollment}
                       documentType="mobility_authorization"
-                      initialUrl={ins.url_mobility_authorization}
+                      initialUrl={ins.mobilityAuthorizationUrl}
                       isValidated={ins.validated_mobility_authorization}
                       label="Mobility Auth"
                       onUploadSuccess={() => {}}
                     />
                     <DocumentUpload 
-                      idAssignacio={parseInt(id)}
-                      idInscripcio={ins.id_enrollment}
+                      assignmentId={parseInt(id)}
+                      enrollmentId={ins.id_enrollment}
                       documentType="image_rights"
-                      initialUrl={ins.url_image_rights}
+                      initialUrl={ins.imageRightsUrl}
                       isValidated={ins.validated_image_rights}
                       label="Image Rights"
                       onUploadSuccess={() => {}}
@@ -400,7 +400,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
                                 <Avatar 
-                                  url={a.url_foto} 
+                                  url={a.photoUrl} 
                                   name={`${a.name} ${a.surnames}`} 
                                   id={a.id_student} 
                                   type="student" 

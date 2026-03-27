@@ -43,7 +43,7 @@ export default function AssignmentsPage() {
       const currentUser = getUser();
       if (!isMounted) return;
 
-      if (!currentUser || currentUser.rol.nom_rol !== ROLES.COORDINATOR) {
+      if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
         router.push('/login');
         return;
       }
@@ -51,10 +51,10 @@ export default function AssignmentsPage() {
       setUser(currentUser);
 
       // Fetch assignments
-      if (currentUser.id_center) {
+      if (currentUser.centerId) {
         try {
           const [resAssig, resPhases] = await Promise.all([
-            assignmentService.getByCenter(currentUser.id_center),
+            assignmentService.getByCenter(currentUser.centerId),
             phaseService.getAll()
           ]);
           if (isMounted) {
@@ -234,7 +234,7 @@ export default function AssignmentsPage() {
                   if (!input.value) return;
                   const api = getApi();
                   await api.post('/assignments/incidents', {
-                    id_center: user.id_center,
+                    centerId: user.centerId,
                     description: input.value
                   });
                   input.value = '';
