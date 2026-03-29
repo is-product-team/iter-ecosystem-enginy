@@ -24,21 +24,21 @@ export async function extractTextFromPdf(file: File): Promise<string> {
 }
 
 /**
- * Heurísticas para clasificar el tipo de documento basándose en su contenido textual.
+ * Heuristics to classify document type based on textual content.
  */
-export function classifyDocumentType(text: string): 'acord_pedagogic' | 'autoritzacio_mobilitat' | 'drets_imatge' | 'unknown' {
+export function classifyDocumentType(text: string): 'pedagogical_agreement' | 'mobility_authorization' | 'image_rights' | 'unknown' {
   const t = text.toLowerCase();
   
   if (t.includes('acord pedagògic') || t.includes('acuerdo pedagógico')) {
-    return 'acord_pedagogic';
+    return 'pedagogical_agreement';
   }
   
   if (t.includes('autorització de mobilitat') || t.includes('mobilitat autònoma')) {
-    return 'autoritzacio_mobilitat';
+    return 'mobility_authorization';
   }
   
   if (t.includes("drets d'imatge") || t.includes('derechos de imagen')) {
-    return 'drets_imatge';
+    return 'image_rights';
   }
   
   return 'unknown';

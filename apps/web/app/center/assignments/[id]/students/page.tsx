@@ -60,7 +60,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
         // Fetch phases first for gating
         const phasesData = await phaseService.getAll();
-        const isPlanning = phasesData.find((f: Phase) => f.name === PHASES.PLANNING)?.active;
+        const isPlanning = phasesData.find((f: Phase) => f.name === PHASES.PLANNING)?.isActive;
 
         if (!isPlanning) {
           toast.error('The nominal registration period is not active.');
@@ -74,7 +74,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
         // Pre-populate selectedIds from existing enrollments
         if (found.enrollments) {
-          setSelectedIds(found.enrollments.map((i: Enrollment) => i.id_student));
+          setSelectedIds(found.enrollments.map((i: Enrollment) => i.studentId));
         }
 
         // Fetch all students from center (controller handles scoping)
@@ -93,7 +93,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
   const toggleStudent = (idStudent: number) => {
     setSelectedIds(prev => {
       const isSelected = prev.includes(idStudent);
-      const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxSeats || 20;
+      const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxPlaces || 20;
 
       if (!isSelected && prev.length >= maxSeats) {
         toast.warning(`Limit of ${maxSeats} seats reached.`);
@@ -108,7 +108,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxSeats || 20;
+      const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxPlaces || 20;
       const available = maxSeats - selectedIds.length;
       
       if (available <= 0) {
@@ -120,8 +120,8 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       let count = 0;
       
       for (const student of filteredStudents) {
-        if (!selectedIds.includes(student.id_student)) {
-          toAdd.push(student.id_student);
+        if (!selectedIds.includes(student.studentId)) {
+          toAdd.push(student.studentId);
           count++;
           if (count >= available) break;
         }
@@ -130,7 +130,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
       setSelectedIds(prev => [...prev, ...toAdd]);
     } else {
       // Unselect all in CURRENT filtered view
-      const filteredIds = filteredStudents.map(a => a.id_student);
+      const filteredIds = filteredStudents.map(a => a.studentId);
       setSelectedIds(prev => prev.filter(id => !filteredIds.includes(id)));
     }
   };
@@ -173,7 +173,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   if (loading && !assignment) return <Loading fullScreen message="Loading assignment data..." />;
 
-  const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxSeats || 20;
+  const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxPlaces || 20;
   const isFull = selectedIds.length === maxSeats;
 
   const headerActions = (
@@ -282,11 +282,11 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
                   </tr>
                 ) : (
                   paginatedStudents.map(student => {
-                    const isSelected = selectedIds.includes(student.id_student);
+                    const isSelected = selectedIds.includes(student.studentId);
                     return (
                       <tr 
-                        key={student.id_student} 
-                        onClick={() => toggleStudent(student.id_student)}
+                        key={student.studentId} 
+                        onClick={() => toggleStudent(student.studentId)}
                         className={`transition-colors cursor-pointer group ${isSelected ? 'bg-blue-50/30' : 'hover:bg-gray-50'}`}
                       >
                         <td className="px-8 py-5">

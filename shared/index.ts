@@ -105,7 +105,7 @@ export const AssignmentChecklistSchema = z.object({
 
 export const CenterAttendanceSchema = z.object({
   enrollmentId: z.number().int(),
-  status: z.enum(['PRESENT', 'ABSENCE_JUSTIFIED', 'ABSENCE', 'LATE']),
+  status: z.enum(['PRESENT', 'JUSTIFIED_ABSENCE', 'ABSENT', 'LATE']),
   observations: z.string().optional().nullable()
 });
 

@@ -20,7 +20,7 @@ describe('NLPService', () => {
     });
   });
 
-  it('should detect "ABSENCE" status from keywords', () => {
+  it('should detect "ABSENT" status from keywords', () => {
     const texts = [
       'No ha venido a clase',
       'Falta injustificada',
@@ -28,7 +28,7 @@ describe('NLPService', () => {
     ];
     texts.forEach(text => {
       const result = service.processText(text);
-      expect(result.attendanceStatus).toBe('ABSENCE');
+      expect(result.attendanceStatus).toBe('ABSENT');
     });
   });
 

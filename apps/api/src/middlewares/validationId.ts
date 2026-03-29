@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 
-// Este middleware corta la petición si el ID está mal, protegiendo al controlador
+// This middleware stops the request if the ID is invalid, protecting the controller
 const validateId = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   
   if (!id || isNaN(Number(id))) {
-    return res.status(400).json({ error: "El ID debe ser numérico" });
+    return res.status(400).json({ error: "The ID must be numeric" });
   }
   
-  // Si todo está bien, pasa al siguiente paso (el controlador)
+  // If everything is fine, proceed to the next step (the controller)
   next();
 };
 

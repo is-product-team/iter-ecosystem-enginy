@@ -40,7 +40,7 @@ export default function CenterDashboard() {
 
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find(f => f.name === phaseName);
-    return phase ? phase.active : false;
+    return phase ? phase.isActive : false;
   };
 
   if (authLoading || !user) {
@@ -75,7 +75,7 @@ export default function CenterDashboard() {
                 <div key={phase.phaseId} className="relative flex flex-col items-center text-center flex-1 group">
                   {/* Square with number */}
                   <div
-                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border-2 transition-all ${phase.active
+                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border-2 transition-all ${phase.isActive
                       ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
                       : 'bg-background-surface text-text-muted border-border-subtle'
                       }`}
@@ -86,11 +86,11 @@ export default function CenterDashboard() {
                   </div>
 
                   {/* Name and Date */}
-                  <h4 className={`font-black text-[10px] uppercase tracking-[0.1em] mb-4 min-h-[3em] flex items-center justify-center ${phase.active ? 'text-consorci-darkBlue' : 'text-text-muted'}`}>
+                  <h4 className={`font-black text-[10px] uppercase tracking-[0.1em] mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue' : 'text-text-muted'}`}>
                     {phase.name}
                   </h4>
 
-                  <div className={`text-[10px] font-bold px-4 py-2 border-2 ${phase.active ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
+                  <div className={`text-[10px] font-bold px-4 py-2 border-2 ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
                     {new Date(phase.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }).toUpperCase()}
                   </div>
                 </div>

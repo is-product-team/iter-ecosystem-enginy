@@ -50,9 +50,9 @@ export default function DocumentUpload({
 
       // Extraemos la URL desde el campo JSON 'docs_status' de la respuesta (modelo Enrollment)
       const docsStatus = res.data.docs_status || {};
-      const fieldKey = documentType === 'pedagogical_agreement' ? 'acord_pedagogic' :
-                       documentType === 'mobility_authorization' ? 'autoritzacio_mobilitat' :
-                       'drets_imatge';
+      const fieldKey = documentType === 'pedagogical_agreement' ? 'pedagogicalAgreementUrl' :
+                       documentType === 'mobility_authorization' ? 'mobilityAuthorizationUrl' :
+                       'imageRightsUrl';
       
       const newUrl = docsStatus[fieldKey];
 
@@ -93,14 +93,14 @@ export default function DocumentUpload({
       const text = await extractTextFromPdf(file);
       const detectedType = classifyDocumentType(text);
 
-      // Mapeo entre el tipo esperado por props y el detectado por IA (heurísticas de texto)
-      const expectedInIAPipeline = documentType === 'pedagogical_agreement' ? 'acord_pedagogic' : 
-                                   documentType === 'mobility_authorization' ? 'autoritzacio_mobilitat' : 
-                                   documentType === 'image_rights' ? 'drets_imatge' : 'unknown';
+      // Mapping between the type expected by props and the one detected by AI (text heuristics)
+      const expectedInIAPipeline = documentType === 'pedagogical_agreement' ? 'pedagogical_agreement' : 
+                                   documentType === 'mobility_authorization' ? 'mobility_authorization' : 
+                                   documentType === 'image_rights' ? 'image_rights' : 'unknown';
 
-      // Validación 1: El contenido del texto debe coincidir con el tipo de "slot" de subida
+      // Validation 1: Text content must match the upload slot type
       if (detectedType !== 'unknown' && detectedType !== expectedInIAPipeline) {
-        toast.error(`IA detecta un tipus diferent: ${detectedType}.`);
+        toast.error(`AI detects a different type: ${detectedType}.`);
         setOverrideMode(true);
         setPendingFile(file);
         return;

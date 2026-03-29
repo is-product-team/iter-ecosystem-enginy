@@ -7,10 +7,10 @@ const sanitizeFileName = (str: string) => {
   return str
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Treure accents
-    .replace(/[^a-z0-9]/g, "_")    // Només lletres i números
-    .replace(/_+/g, "_")           // Treure guions baixos consecutius
-    .replace(/(^_|_$)/g, "");      // Treure guions baixos a l'inici o final
+    .replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/[^a-z0-9]/g, "_")    // Only letters and numbers
+    .replace(/_+/g, "_")           // Remove consecutive underscores
+    .replace(/(^_|_$)/g, "");      // Remove leading/trailing underscores
 };
 
 export const uploadProfilePicture = async (req: Request, res: Response) => {
@@ -18,7 +18,7 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
   const id = req.params.id as string;
   
   if (!req.file) {
-    return res.status(400).json({ error: 'No s\'ha pujat cap fitxer.' });
+    return res.status(400).json({ error: 'No file uploaded.' });
   }
 
   try {
@@ -27,19 +27,19 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
     let targetName = 'profile';
 
     if (type === 'student') {
-      const alumne = await prisma.student.findUnique({ where: { studentId: targetId } });
-      if (!alumne) return res.status(404).json({ error: 'Student no trobat.' });
-      targetName = sanitizeFileName(`${alumne.fullName}_${alumne.lastName}`);
+      const student = await prisma.student.findUnique({ where: { studentId: targetId } });
+      if (!student) return res.status(404).json({ error: 'Student not found.' });
+      targetName = sanitizeFileName(`${student.fullName}_${student.lastName}`);
     } else if (type === 'user') {
-      const usuari = await prisma.user.findUnique({ where: { userId: targetId } });
-      if (!usuari) return res.status(404).json({ error: 'User no trobat.' });
-      targetName = sanitizeFileName(usuari.fullName);
+      const user = await prisma.user.findUnique({ where: { userId: targetId } });
+      if (!user) return res.status(404).json({ error: 'User not found.' });
+      targetName = sanitizeFileName(user.fullName);
     } else {
-      return res.status(400).json({ error: 'Tipus de perfil no vàlid.' });
+      return res.status(400).json({ error: 'Invalid profile type.' });
     }
 
     const fileExt = path.extname(req.file.originalname);
-    fileName = `foto_${type}_${targetId}_${targetName}_${Date.now()}${fileExt}`;
+    fileName = `photo_${type}_${targetId}_${targetName}_${Date.now()}${fileExt}`;
     const profileDir = path.join('uploads', 'profile');
     const filePath = path.join(profileDir, fileName);
 
@@ -65,7 +65,7 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
 
     res.json({ success: true, photoUrl: url });
   } catch (error) {
-    console.error("Error al pujar foto de perfil:", error);
-    res.status(500).json({ error: 'Error al processar la pujada de la foto.' });
+    console.error("Error uploading profile photo:", error);
+    res.status(500).json({ error: 'Error processing the photo upload.' });
   }
 };

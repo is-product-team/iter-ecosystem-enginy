@@ -11,7 +11,7 @@ export const validateData = (schema: ZodSchema) => {
       });
       return next();
     } catch (error) {
-      // El error será capturado por el Global Error Handler
+      // The error will be captured by the Global Error Handler
       return next(error);
     }
   };

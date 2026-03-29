@@ -139,9 +139,9 @@ export default function DashboardScreen() {
         type: 'assignment',
         description: assignment.workshop.description || t('Common.no_description'),
         metadata: {
-            hora: new Date(assignment.startDate).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(assignment.startDate).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }), 
-            centre: assignment.center.name,
-            adreca: assignment.center.address,
+            time: new Date(assignment.startDate).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(assignment.startDate).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }), 
+            center: assignment.center.name,
+            address: assignment.center.address,
             assignmentId: assignment.assignmentId,
             isEvaluation: isEvalPhase,
             isEvaluated: evaluated

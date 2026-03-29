@@ -38,9 +38,9 @@ describe('Auth Security Integration', () => {
       const mockUser = {
         userId: 1,
         email: 'test@example.com',
-        password_hash: await bcrypt.hash('password123', 10),
-        nom_complet: 'Test User',
-        role: { nom_role: 'ADMIN' },
+        passwordHash: await bcrypt.hash('password123', 10),
+        fullName: 'Test User',
+        role: { roleName: 'ADMIN' },
       };
 
       (userRepository.findByEmail as any).mockResolvedValue(mockUser);
@@ -65,9 +65,9 @@ describe('Auth Security Integration', () => {
       const mockUser = {
         userId: 1,
         email: 'test2@example.com',
-        password_hash: await bcrypt.hash('password123', 10),
-        nom_complet: 'Test User',
-        role: { nom_role: 'ADMIN' },
+        passwordHash: await bcrypt.hash('password123', 10),
+        fullName: 'Test User',
+        role: { roleName: 'ADMIN' },
       };
       (userRepository.findByEmail as any).mockResolvedValue(mockUser);
 

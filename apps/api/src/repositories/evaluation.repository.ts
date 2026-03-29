@@ -20,14 +20,14 @@ export class EvaluationRepository extends BaseRepository<Evaluation, Prisma.Eval
     return this.model.findMany({
       where: {
         assignmentId: assignmentId,
-        tipus: type
+        type: type
       },
       include: { enrollment: { include: { student: true } } },
-      orderBy: { data_enviament: 'desc' }
+      orderBy: { sentAt: 'desc' }
     });
   }
 
-  // Búsqueda por alumno para autoconsultas
+  // Search by enrollment for self-consultations
   async findByEnrollment(enrollmentId: number): Promise<Evaluation[]> {
     return this.model.findMany({
       where: { enrollmentId: enrollmentId }

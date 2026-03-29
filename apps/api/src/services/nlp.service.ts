@@ -1,6 +1,6 @@
 
 export interface NLPAnalysisResult {
-    attendanceStatus?: 'PRESENT' | 'LATE' | 'ABSENCE' | 'ABSENCE_JUSTIFIED';
+    attendanceStatus?: 'PRESENT' | 'LATE' | 'ABSENT' | 'JUSTIFIED_ABSENCE';
     competenceUpdate?: {
         competenceName: string; // 'Transversal' usually
         score: number;
@@ -24,9 +24,9 @@ export class NLPService {
         if (lowerText.includes('tarde') || lowerText.includes('retraso') || lowerText.includes('retard')) {
             result.attendanceStatus = 'LATE';
         } else if (lowerText.includes('falta') || lowerText.includes('no ha venido') || lowerText.includes('absent')) {
-            result.attendanceStatus = 'ABSENCE';
+            result.attendanceStatus = 'ABSENT';
         } else if (lowerText.includes('justificad')) {
-            result.attendanceStatus = 'ABSENCE_JUSTIFIED';
+            result.attendanceStatus = 'JUSTIFIED_ABSENCE';
         } else if (lowerText.includes('puntual') || lowerText.includes('a tiempo')) {
             result.attendanceStatus = 'PRESENT';
         }

@@ -102,17 +102,17 @@ export default function RequestsPage() {
   }, [selectedWorkshopId]);
 
   const handleEdit = (request: Request) => {
-    setEditingRequestId(request.id_request);
+    setEditingRequestId(request.requestId);
     // Find the workshop ID string (assuming it matches)
     const workshop = workshops.find(w => parseInt(w._id) === request.workshopId);
     if (workshop) {
       setSelectedWorkshopId(workshop._id);
     }
 
-    setApproxStudents(request.approxStudents || '');
+    setApproxStudents(request.studentsAprox || '');
     setComments(request.comments || '');
-    setTeacher1Id(request.teacher1Id ? request.teacher1Id.toString() : '');
-    setTeacher2Id(request.teacher2Id ? request.teacher2Id.toString() : '');
+    setTeacher1Id(request.prof1Id ? request.prof1Id.toString() : '');
+    setTeacher2Id(request.prof2Id ? request.prof2Id.toString() : '');
     setError(null);
   };
 
@@ -155,19 +155,19 @@ export default function RequestsPage() {
       if (editingRequestId) {
         // Update
         await requestService.update(editingRequestId, {
-          approxStudents: Number(approxStudents),
+          studentsAprox: Number(approxStudents),
           comments,
-          teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
-          teacher2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
+          prof1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
+          prof2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
         });
       } else {
         // Create
         await requestService.create({
           workshopId: parseInt(selectedWorkshopId),
-          approxStudents: Number(approxStudents),
+          studentsAprox: Number(approxStudents),
           comments,
-          teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
-          teacher2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
+          prof1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
+          prof2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
           modality: selectedWorkshop.modality
         });
       }

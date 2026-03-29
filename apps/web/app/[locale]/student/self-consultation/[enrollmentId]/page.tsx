@@ -5,30 +5,30 @@ import { useRouter } from 'next/navigation';
 import { evaluationService } from '@/services/evaluationService';
 import { toast } from 'sonner';
 
-export default function StudentSelfEvaluationPage({ params }: { params: Promise<{ inscripcioId: string }> }) {
-    const { inscripcioId } = use(params);
+export default function StudentSelfEvaluationPage({ params }: { params: Promise<{ enrollmentId: string }> }) {
+    const { enrollmentId } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
     const [form, setForm] = useState({
-        punctuality_tasks: 'Always',
-        respect_material: 'Always',
-        interest_learning: 'High',
-        autonomy_resolution: 'Often',
-        valuation_experience: 8,
-        valuation_teacher: 8,
-        vocational_impact: 'CONSIDERING',
-        personal_improvements: '',
-        key_learnings: ''
+        taskPunctuality: 'Always',
+        respectForMaterial: 'Always',
+        learningInterest: 'High',
+        resolutionAutonomy: 'Often',
+        experienceRating: 8,
+        teacherRating: 8,
+        vocationalImpact: 'CONSIDERING',
+        personalImprovements: '',
+        keyLearnings: ''
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await evaluationService.submitAutoconsulta({
-                id_inscripcio: parseInt(inscripcioId),
+            await evaluationService.submitSelfConsultation({
+                enrollmentId: parseInt(enrollmentId),
                 ...form
             });
             setSubmitted(true);
@@ -76,7 +76,7 @@ export default function StudentSelfEvaluationPage({ params }: { params: Promise<
                                 <label className="block text-sm font-bold text-text-primary">Have you been punctual in the delivery of tasks?</label>
                                 <div className="grid grid-cols-4 gap-2">
                                     {freqOptions.map(opt => (
-                                        <button key={opt} type="button" onClick={() => setForm({ ...form, punctuality_tasks: opt })} className={`py-4 text-[10px] font-black uppercase border-2 transition-all ${form.punctuality_tasks === opt ? 'bg-consorci-darkBlue border-consorci-darkBlue text-white' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>{opt}</button>
+                                        <button key={opt} type="button" onClick={() => setForm({ ...form, taskPunctuality: opt })} className={`py-4 text-[10px] font-black uppercase border-2 transition-all ${form.taskPunctuality === opt ? 'bg-consorci-darkBlue border-consorci-darkBlue text-white' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>{opt}</button>
                                     ))}
                                 </div>
                             </div>
@@ -85,7 +85,7 @@ export default function StudentSelfEvaluationPage({ params }: { params: Promise<
                                 <label className="block text-sm font-bold text-text-primary">Have you respected the material and facilities?</label>
                                 <div className="grid grid-cols-4 gap-2">
                                     {freqOptions.map(opt => (
-                                        <button key={opt} type="button" onClick={() => setForm({ ...form, respect_material: opt })} className={`py-4 text-[10px] font-black uppercase border-2 transition-all ${form.respect_material === opt ? 'bg-consorci-darkBlue border-consorci-darkBlue text-white' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>{opt}</button>
+                                        <button key={opt} type="button" onClick={() => setForm({ ...form, respectForMaterial: opt })} className={`py-4 text-[10px] font-black uppercase border-2 transition-all ${form.respectForMaterial === opt ? 'bg-consorci-darkBlue border-consorci-darkBlue text-white' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>{opt}</button>
                                     ))}
                                 </div>
                             </div>
@@ -94,7 +94,7 @@ export default function StudentSelfEvaluationPage({ params }: { params: Promise<
                                 <label className="block text-sm font-bold text-text-primary">What interest have you shown in learning?</label>
                                 <div className="grid grid-cols-4 gap-2">
                                     {interestOptions.map(opt => (
-                                        <button key={opt} type="button" onClick={() => setForm({ ...form, interest_learning: opt })} className={`py-4 text-[10px] font-black uppercase border-2 transition-all ${form.interest_learning === opt ? 'bg-consorci-darkBlue border-consorci-darkBlue text-white' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>{opt}</button>
+                                        <button key={opt} type="button" onClick={() => setForm({ ...form, learningInterest: opt })} className={`py-4 text-[10px] font-black uppercase border-2 transition-all ${form.learningInterest === opt ? 'bg-consorci-darkBlue border-consorci-darkBlue text-white' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>{opt}</button>
                                     ))}
                                 </div>
                             </div>
@@ -103,7 +103,7 @@ export default function StudentSelfEvaluationPage({ params }: { params: Promise<
                                 <label className="block text-sm font-bold text-text-primary">Have you felt autonomous in solving problems?</label>
                                 <div className="grid grid-cols-4 gap-2">
                                     {freqOptions.map(opt => (
-                                        <button key={opt} type="button" onClick={() => setForm({ ...form, autonomy_resolution: opt })} className={`py-4 text-[10px] font-black uppercase border-2 transition-all ${form.autonomy_resolution === opt ? 'bg-consorci-darkBlue border-consorci-darkBlue text-white' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>{opt}</button>
+                                        <button key={opt} type="button" onClick={() => setForm({ ...form, resolutionAutonomy: opt })} className={`py-4 text-[10px] font-black uppercase border-2 transition-all ${form.resolutionAutonomy === opt ? 'bg-consorci-darkBlue border-consorci-darkBlue text-white' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>{opt}</button>
                                     ))}
                                 </div>
                             </div>
@@ -116,13 +116,13 @@ export default function StudentSelfEvaluationPage({ params }: { params: Promise<
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div className="space-y-4">
                                 <label className="block text-sm font-bold text-text-primary">Overall experience (1-10)</label>
-                                <input type="range" min="1" max="10" step="1" value={form.valuation_experience} onChange={(e) => setForm({ ...form, valuation_experience: parseInt(e.target.value) })} className="w-full accent-consorci-darkBlue" />
-                                <div className="flex justify-between text-[10px] font-black text-text-muted uppercase"><span>Poor</span><span className="text-2xl text-consorci-darkBlue dark:text-consorci-lightBlue">{form.valuation_experience}</span><span>Excellent</span></div>
+                                <input type="range" min="1" max="10" step="1" value={form.experienceRating} onChange={(e) => setForm({ ...form, experienceRating: parseInt(e.target.value) })} className="w-full accent-consorci-darkBlue" />
+                                <div className="flex justify-between text-[10px] font-black text-text-muted uppercase"><span>Poor</span><span className="text-2xl text-consorci-darkBlue dark:text-consorci-lightBlue">{form.experienceRating}</span><span>Excellent</span></div>
                             </div>
                             <div className="space-y-4">
                                 <label className="block text-sm font-bold text-text-primary">Teacher quality (1-10)</label>
-                                <input type="range" min="1" max="10" step="1" value={form.valuation_teacher} onChange={(e) => setForm({ ...form, valuation_teacher: parseInt(e.target.value) })} className="w-full accent-consorci-darkBlue" />
-                                <div className="flex justify-between text-[10px] font-black text-text-muted uppercase"><span>Poor</span><span className="text-2xl text-consorci-darkBlue dark:text-consorci-lightBlue">{form.valuation_teacher}</span><span>Excellent</span></div>
+                                <input type="range" min="1" max="10" step="1" value={form.teacherRating} onChange={(e) => setForm({ ...form, teacherRating: parseInt(e.target.value) })} className="w-full accent-consorci-darkBlue" />
+                                <div className="flex justify-between text-[10px] font-black text-text-muted uppercase"><span>Poor</span><span className="text-2xl text-consorci-darkBlue dark:text-consorci-lightBlue">{form.teacherRating}</span><span>Excellent</span></div>
                             </div>
                         </div>
                     </div>
@@ -134,7 +134,7 @@ export default function StudentSelfEvaluationPage({ params }: { params: Promise<
                             <label className="block text-sm font-bold text-text-primary">Has it helped you decide on your professional future?</label>
                             <div className="flex flex-col gap-4">
                                 {['YES', 'NO', 'CONSIDERING'].map(opt => (
-                                    <button key={opt} type="button" onClick={() => setForm({ ...form, vocational_impact: opt })} className={`p-4 text-xs font-bold border-2 text-left transition-all ${form.vocational_impact === opt ? 'bg-background-subtle border-consorci-darkBlue text-consorci-darkBlue dark:text-consorci-lightBlue' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>
+                                    <button key={opt} type="button" onClick={() => setForm({ ...form, vocationalImpact: opt })} className={`p-4 text-xs font-bold border-2 text-left transition-all ${form.vocationalImpact === opt ? 'bg-background-subtle border-consorci-darkBlue text-consorci-darkBlue dark:text-consorci-lightBlue' : 'bg-background-surface border-border-subtle text-text-muted hover:border-consorci-lightBlue'}`}>
                                         {opt === 'YES' ? 'Yes, it has cleared my mind.' : opt === 'NO' ? 'No, I already had it clear or it\'s not for me.' : 'I am considering it right now.'}
                                     </button>
                                 ))}
@@ -147,11 +147,11 @@ export default function StudentSelfEvaluationPage({ params }: { params: Promise<
                         <h3 className="text-xs font-black uppercase tracking-widest text-text-muted mb-10 border-b border-border-subtle pb-4">Open Feedback</h3>
                         <div className="space-y-4">
                             <label className="block text-sm font-bold text-text-primary">What would you change or improve from the workshop?</label>
-                            <textarea value={form.personal_improvements} onChange={(e) => setForm({ ...form, personal_improvements: e.target.value })} className="w-full h-32 border-2 border-border-subtle bg-background-surface text-text-primary p-6 outline-none focus:border-consorci-darkBlue text-sm italic" placeholder="Your opinion..." />
+                            <textarea value={form.personalImprovements} onChange={(e) => setForm({ ...form, personalImprovements: e.target.value })} className="w-full h-32 border-2 border-border-subtle bg-background-surface text-text-primary p-6 outline-none focus:border-consorci-darkBlue text-sm italic" placeholder="Your opinion..." />
                         </div>
                         <div className="space-y-4">
                             <label className="block text-sm font-bold text-text-primary">What are your 3 key learnings?</label>
-                            <textarea value={form.key_learnings} onChange={(e) => setForm({ ...form, key_learnings: e.target.value })} className="w-full h-32 border-2 border-border-subtle bg-background-surface text-text-primary p-6 outline-none focus:border-consorci-darkBlue text-sm italic" placeholder="1. ... 2. ... 3. ..." />
+                            <textarea value={form.keyLearnings} onChange={(e) => setForm({ ...form, keyLearnings: e.target.value })} className="w-full h-32 border-2 border-border-subtle bg-background-surface text-text-primary p-6 outline-none focus:border-consorci-darkBlue text-sm italic" placeholder="1. ... 2. ... 3. ..." />
                         </div>
                     </div>
 

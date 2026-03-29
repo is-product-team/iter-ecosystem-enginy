@@ -72,7 +72,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                         ) : (
                             assignment.enrollments.map((ins: Enrollment) => (
                                 <div
-                                    key={ins.id_enrollment}
+                                    key={ins.enrollmentId}
                                     className="px-8 py-6 flex justify-between items-center hover:bg-gray-50 transition-colors"
                                 >
                                     <div className="flex items-center gap-6">
@@ -91,17 +91,17 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
 
                                     <div className="flex items-center gap-6">
                                         <div className="hidden md:block text-right">
-                                            {ins.teacher_evaluation ? (
+                                            {ins.hasTeacherEvaluation ? (
                                                 <span className="text-[10px] font-black uppercase px-3 py-1 bg-green-100 text-green-700">Completed</span>
                                             ) : (
                                                 <span className="text-[10px] font-black uppercase px-3 py-1 bg-orange-100 text-orange-700">Pending</span>
                                             )}
                                         </div>
                                         <button
-                                            onClick={() => router.push(`/center/assignments/${id}/evaluations/${ins.id_enrollment}`)}
+                                            onClick={() => router.push(`/center/assignments/${id}/evaluations/${ins.enrollmentId}`)}
                                             className="bg-black hover:bg-blue-900 text-white px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95"
                                         >
-                                            {ins.teacher_evaluation ? 'View / Edit' : 'Evaluate'}
+                                            {ins.hasTeacherEvaluation ? 'View / Edit' : 'Evaluate'}
                                         </button>
                                     </div>
                                 </div>

@@ -166,7 +166,7 @@ export default function ProfilePage() {
                 url={user.photoUrl}
                 name={user.fullName}
                 id={user.userId}
-                type="usuari"
+                type="user"
                 size="xl"
                 className="ring-4 ring-white shadow-xl"
                 isCoordinator={user.role.name === ROLES.COORDINATOR}

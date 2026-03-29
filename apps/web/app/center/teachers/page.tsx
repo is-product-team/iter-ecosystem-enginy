@@ -186,7 +186,7 @@ export default function TeachersCRUD() {
                             url={p.user?.photoUrl}
                             name={p.name}
                             id={p.user?.userId || p.teacherId}
-                            type="usuari"
+                            type="user"
                             size="md"
                             email={p.user?.email}
                           />
@@ -259,7 +259,7 @@ export default function TeachersCRUD() {
                     url={editingTeacher.user?.photoUrl}
                     name={editingTeacher.name}
                     id={editingTeacher.user?.userId || editingTeacher.teacherId}
-                    type="usuari"
+                    type="user"
                     size="xl"
                     className="shadow-xl ring-4 ring-white"
                   />
@@ -273,7 +273,7 @@ export default function TeachersCRUD() {
                         if (e.target.files?.[0] && editingTeacher.user?.userId) {
                           const file = e.target.files[0];
                           const formData = new FormData();
-                          formData.append('foto', file);
+                          formData.append('photo', file);
                           try {
                             const api = getApi();
                             const res = await api.post(`/upload/profile/user/${editingTeacher.user.userId}`, formData, {
@@ -284,7 +284,7 @@ export default function TeachersCRUD() {
                             // Update local state for immediate feedback
                             setEditingTeacher({
                               ...editingTeacher,
-                              user: { ...editingTeacher.user, url_foto: res.data.url_foto }
+                              user: { ...editingTeacher.user, photoUrl: res.data.photoUrl }
                             } as Teacher);
                           } catch (err) {
                             toast.error("Error uploading photo.");

@@ -30,7 +30,7 @@
 
 ## 5. Validation & Testing
 
-- [ ] 5.1 Run `npm run lint` and `npm run type-check` across the entire monorepo to find any missed references.
-- [ ] 5.2 Verify that the API starts and responds correctly to the new English-named endpoints.
-- [ ] 5.3 Verify that the Excel import still works with Catalan headers.
-- [ ] 5.4 Manually verify the Web and Mobile apps for any UI regressions or linguistic inconsistencies.
+- [x] 5.1 Run `npm run lint` and `npm run type-check` across the entire monorepo to find any missed references.
+- [x] 5.2 Verify that the API starts and responds correctly to the new English-named endpoints.
+- [x] 5.3 Verify that the Excel import still works with Catalan headers.
+- [x] 5.4 Manually verify the Web and Mobile apps for any UI regressions or linguistic inconsistencies.

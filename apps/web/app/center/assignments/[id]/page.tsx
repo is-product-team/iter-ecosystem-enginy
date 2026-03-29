@@ -107,9 +107,9 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
   if (loading || !assignment) return <Loading fullScreen message="Loading workshop details..." />;
 
   const allDocumentsValidated = assignment.enrollments && assignment.enrollments.length > 0 && assignment.enrollments.every((ins: Enrollment) => 
-    ins.validatedPedagogicalAgreement && 
-    ins.validatedMobilityAuthorization && 
-    ins.validatedImageRights
+    ins.isPedagogicalAgreementValidated && 
+    ins.isMobilityAuthorizationValidated && 
+    ins.isImageRightsValidated
   );
 
   const filteredStudents = allStudents.filter(a => {
@@ -210,7 +210,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       enrollmentId={ins.enrollmentId}
                       documentType="pedagogical_agreement"
                       initialUrl={ins.pedagogicalAgreementUrl}
-                      isValidated={ins.validatedPedagogicalAgreement}
+                      isValidated={ins.isPedagogicalAgreementValidated}
                       label="Pedagogical Agreement"
                       onUploadSuccess={() => {}}
                     />
@@ -219,7 +219,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       enrollmentId={ins.enrollmentId}
                       documentType="mobility_authorization"
                       initialUrl={ins.mobilityAuthorizationUrl}
-                      isValidated={ins.validatedMobilityAuthorization}
+                      isValidated={ins.isMobilityAuthorizationValidated}
                       label="Mobility Auth"
                       onUploadSuccess={() => {}}
                     />
@@ -228,7 +228,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       enrollmentId={ins.enrollmentId}
                       documentType="image_rights"
                       initialUrl={ins.imageRightsUrl}
-                      isValidated={ins.validatedImageRights}
+                      isValidated={ins.isImageRightsValidated}
                       label="Image Rights"
                       onUploadSuccess={() => {}}
                     />

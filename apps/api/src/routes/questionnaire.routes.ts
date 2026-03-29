@@ -5,7 +5,7 @@ import {
     getModel,
     trackSubmission,
     submitResponses,
-    submitAutoconsulta,
+    submitSelfConsultation,
     getReports
 } from '../controllers/questionnaire.controller.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';

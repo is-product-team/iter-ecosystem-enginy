@@ -686,7 +686,7 @@ export const validateEnrollmentDocument = async (req: Request, res: Response) =>
     return res.status(403).json({ error: 'Only admins can validate documents.' });
   }
 
-  const permittedFields = ['validatedPedagogicalAgreement', 'validatedMobilityAuthorization', 'validatedImageRights'];
+  const permittedFields = ['isPedagogicalAgreementValidated', 'isMobilityAuthorizationValidated', 'isImageRightsValidated'];
   if (!permittedFields.includes(field)) {
     return res.status(400).json({ error: 'Invalid validation field.' });
   }
@@ -731,7 +731,7 @@ async function logStatusChange(assignmentId: number, oldState: string, newState:
 
 // POST: Update Compliance Documents (Center)
 export const updateComplianceDocuments = async (req: Request, res: Response) => {
-  const { enrollmentId, validatedPedagogicalAgreement, validatedMobilityAuthorization, validatedImageRights } = req.body;
+  const { enrollmentId, isPedagogicalAgreementValidated, isMobilityAuthorizationValidated, isImageRightsValidated } = req.body;
 
   try {
     const enrollment = await prisma.enrollment.findUnique({ where: { enrollmentId: parseInt(enrollmentId as string) } });
@@ -746,9 +746,9 @@ export const updateComplianceDocuments = async (req: Request, res: Response) => 
       data: {
         docsStatus: {
           ...docsStatus,
-          validatedPedagogicalAgreement: validatedPedagogicalAgreement !== undefined ? !!validatedPedagogicalAgreement : docsStatus.validatedPedagogicalAgreement,
-          validatedMobilityAuthorization: validatedMobilityAuthorization !== undefined ? !!validatedMobilityAuthorization : docsStatus.validatedMobilityAuthorization,
-          validatedImageRights: validatedImageRights !== undefined ? !!validatedImageRights : docsStatus.validatedImageRights
+          isPedagogicalAgreementValidated: isPedagogicalAgreementValidated !== undefined ? !!isPedagogicalAgreementValidated : docsStatus.isPedagogicalAgreementValidated,
+          isMobilityAuthorizationValidated: isMobilityAuthorizationValidated !== undefined ? !!isMobilityAuthorizationValidated : docsStatus.isMobilityAuthorizationValidated,
+          isImageRightsValidated: isImageRightsValidated !== undefined ? !!isImageRightsValidated : docsStatus.isImageRightsValidated
         }
       }
     });
