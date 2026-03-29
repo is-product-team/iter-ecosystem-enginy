@@ -23,15 +23,15 @@ export default function DocumentUpload({
   label,
   onUploadSuccess
 }: DocumentUploadProps) {
-  // --- Estados de carga y validación ---
-  const [uploading, setUploading] = useState(false); // Indica si la subida HTTP al backend está en curso
-  const [currentUrl, setCurrentUrl] = useState(initialUrl); // URL actual del documento subido
-  const [validatingAI, setValidatingAI] = useState(false); // Indica si el pipeline de IA (TensorFlow/PDF.js) está trabajando
-  const [overrideMode, setOverrideMode] = useState(false); // Se activa si la IA rechaza el doc, permitiendo subida manual
-  const [pendingFile, setPendingFile] = useState<File | null>(null); // Almacena el archivo que falló la validación para el "Forzado"
+  // --- Upload and Validation States ---
+  const [uploading, setUploading] = useState(false); // Indicates if the HTTP upload to backend is in progress
+  const [currentUrl, setCurrentUrl] = useState(initialUrl); // Current URL of the uploaded document
+  const [validatingAI, setValidatingAI] = useState(false); // Indicates if the AI pipeline (TensorFlow/PDF.js) is working
+  const [overrideMode, setOverrideMode] = useState(false); // Activated if AI rejects the doc, allowing manual upload
+  const [pendingFile, setPendingFile] = useState<File | null>(null); // Stores the file that failed validation for "Forced" upload
 
   /**
-   * Realiza la subida física del archivo al servidor una vez validado (o forzado).
+   * Performs the physical file upload to the server once validated (or forced).
    */
   const handleValidUpload = async (file: File) => {
     const formData = new FormData();
@@ -48,7 +48,7 @@ export default function DocumentUpload({
         },
       });
 
-      // Extraemos la URL desde el campo JSON 'docs_status' de la respuesta (modelo Enrollment)
+      // Extract the URL from the 'docs_status' JSON field of the response (Enrollment model)
       const docsStatus = res.data.docs_status || {};
       const fieldKey = documentType === 'pedagogical_agreement' ? 'pedagogicalAgreementUrl' :
                        documentType === 'mobility_authorization' ? 'mobilityAuthorizationUrl' :
@@ -60,7 +60,7 @@ export default function DocumentUpload({
       if (newUrl) onUploadSuccess(newUrl);
       toast.success(`${label} uploaded successfully.`);
       
-      // Limpiamos estados de error/bloqueo tras éxito
+      // Clear error/blocking states after success
       setOverrideMode(false);
       setPendingFile(null);
     } catch (error) {
@@ -72,13 +72,13 @@ export default function DocumentUpload({
   };
 
   /**
-   * Orquestador de la validación por IA al seleccionar un archivo.
+   * Orchestrates AI validation when a file is selected.
    */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validación básica de formato
+    // Basic format validation
     if (file.type !== 'application/pdf') {
       toast.error('Only PDF files are allowed.');
       return;
@@ -88,7 +88,7 @@ export default function DocumentUpload({
       setValidatingAI(true);
       setOverrideMode(false);
       
-      // Carga dinámica de utilidades para no penalizar el bundle inicial
+      // Dynamic loading of utilities to avoid penalizing the initial bundle
       const { extractTextFromPdf, classifyDocumentType } = await import('@/lib/pdfUtils');
       const text = await extractTextFromPdf(file);
       const detectedType = classifyDocumentType(text);
@@ -106,26 +106,26 @@ export default function DocumentUpload({
         return;
       }
 
-      // Validación 2: Si es Acord Pedagògic, usamos Visión Artificial (TF.js) para buscar firmas
+      // Validation 2: If it's a Pedagogical Agreement, use Computer Vision (TF.js) to look for signatures
       if (documentType === 'pedagogical_agreement') {
         const { signatureDetector } = await import('@/lib/visionUtils');
-        await signatureDetector.loadModel(); // Carga modelo YOLOv8 si no está en memoria
+        await signatureDetector.loadModel(); // Load YOLOv8 model if not in memory
         const croppedCanvas = await signatureDetector.getBottomThirdOfLastPage(file);
-        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // Buscamos 3 firmas
+        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // We look for 3 signatures
 
         if (!hasSignatures) {
-          toast.error('IA no ha detectat les signatures obligatòries.');
+          toast.error('AI has not detected the required signatures.');
           setOverrideMode(true);
           setPendingFile(file);
           return;
         }
       }
 
-      // Si pasa todos los filtros, procedemos a la subida real
+      // If it passes all filters, proceed to real upload
       await handleValidUpload(file);
     } catch (err) {
       console.error("AI Validation Error:", err);
-      toast.error('Error processant IA. Pots forçar la pujada.');
+      toast.error('Error processing AI. You can force the upload.');
       setOverrideMode(true);
       setPendingFile(file);
     } finally {

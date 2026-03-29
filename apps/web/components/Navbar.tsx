@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import notificationService from '@/services/notificationService';
@@ -11,7 +10,6 @@ import { useEffect, useState } from 'react';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
-  const locale = useLocale();
   const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -38,16 +36,16 @@ const Navbar: React.FC = () => {
   const isCoordinator = user.role.name === ROLES.COORDINATOR;
 
   const getHomePath = () => {
-    if (isAdmin) return `/${locale}/admin`;
-    if (isCoordinator) return `/${locale}/center`;
-    return `/${locale}`;
+    if (isAdmin) return `/admin`;
+    if (isCoordinator) return `/center`;
+    return `/`;
   };
 
   const navLinks = [
     { label: 'Home', path: getHomePath(), show: true },
-    { label: 'Notifications', path: `/${locale}/center/notifications`, show: true, isNotifications: true },
-    { label: 'Calendar', path: `/${locale}/calendar`, show: true },
-    { label: 'Profile', path: `/${locale}/profile`, show: true },
+    { label: 'Notifications', path: `/center/notifications`, show: true, isNotifications: true },
+    { label: 'Calendar', path: `/calendar`, show: true },
+    { label: 'Profile', path: `/profile`, show: true },
   ];
 
   return (

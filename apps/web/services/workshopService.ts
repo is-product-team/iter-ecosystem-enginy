@@ -30,6 +30,8 @@ interface BackendWorkshop {
   executionDays?: { dayOfWeek: number; startTime: string; endTime: string }[];
   sector?: { name: string };
   sectorId?: number;
+  location?: string;
+  imageUrl?: string;
 }
 
 const workshopService = {
@@ -49,16 +51,17 @@ const workshopService = {
         sectorId: t.sectorId,
         modality: t.modality,
         term: "1st",
-        icon: t.icon || "🧩",
+        // Map emoji to ID if necessary, or use the string ID directly
+        icon: t.icon === "🧩" ? "PUZZLE" : (t.icon || "PUZZLE"),
         technicalDetails: {
           description: t.description || "",
           durationHours: t.durationHours || 0,
           maxPlaces: t.maxPlaces || 0,
-          defaultLocation: "Ca n'Olivella",
+          defaultLocation: t.location || "To be defined",
         },
         assignedReferents: [],
         executionDays: t.executionDays || [],
-        image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop",
+        image: t.imageUrl || "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop",
       }));
     } catch (error) {
       console.error("Error in workshopService.getAll:", error);
@@ -89,13 +92,13 @@ const workshopService = {
         sector: t.sector?.name || "General",
         sectorId: t.sectorId,
         modality: t.modality,
-        icon: t.icon || "🧩",
+        icon: t.icon || "PUZZLE",
         term: "1st",
         technicalDetails: {
           description: t.description || "",
           durationHours: t.durationHours || 0,
           maxPlaces: t.maxPlaces || 0,
-          defaultLocation: "Ca n'Olivella",
+          defaultLocation: t.location || "To be defined",
         },
         assignedReferents: [],
         executionDays: t.executionDays || [],
@@ -132,12 +135,12 @@ const workshopService = {
         sectorId: t.sectorId,
         modality: t.modality,
         term: "1st",
-        icon: t.icon || "🧩",
+        icon: t.icon || "PUZZLE",
         technicalDetails: {
           description: t.description || "",
           durationHours: t.durationHours || 0,
           maxPlaces: t.maxPlaces || 0,
-          defaultLocation: "Ca n'Olivella",
+          defaultLocation: t.location || "To be defined",
         },
         assignedReferents: [],
         executionDays: t.executionDays || [],

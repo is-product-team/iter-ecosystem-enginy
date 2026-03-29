@@ -97,16 +97,16 @@ export default function AdminQuestionnairesPage() {
                     itemName="questionnaires"
                 />
 
-                {/* Sección de ayuda */}
+                {/* Help section */}
                 <div className="mt-16 bg-blue-50 p-8 border-l-4 border-blue-900">
                     <div className="flex gap-4">
                         <div className="w-10 h-10 bg-blue-900 text-white flex items-center justify-center rounded-full shrink-0">
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
                         <div>
-                            <h4 className="text-sm font-black text-blue-900 uppercase tracking-tighter mb-2">Com funcionen els qüestionaris?</h4>
+                            <h4 className="text-sm font-black text-blue-900 uppercase tracking-tighter mb-2">How do questionnaires work?</h4>
                             <p className="text-xs text-blue-800/80 leading-relaxed font-bold italic uppercase tracking-tighter">
-                                Els qüestionaris dinàmics es poden enviar als participants un cop finalitzada la fase d&apos;execució. Les dades obtingues alimenten automàticament el Dashboard d&apos;Avaluació per als administradors del Consorcí.
+                                Dynamic questionnaires can be sent to participants once the execution phase is finished. The data obtained automatically feeds the Evaluation Dashboard for Consortium administrators.
                             </p>
                         </div>
                     </div>

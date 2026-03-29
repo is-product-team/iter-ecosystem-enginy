@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
-import { ca } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 export interface CalendarEvent {
   id: string;
@@ -31,7 +31,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const monthName = format(currentDate, 'MMMM', { locale: ca });
+  const monthName = format(currentDate, 'MMMM', { locale: enUS });
   const year = currentDate.getFullYear();
 
   // Notify parent on range change
@@ -232,7 +232,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
             DAY DETAIL
           </h3>
           <p className="text-2xl font-black text-text-primary uppercase tracking-tighter">
-            {format(selectedDate, "eeee, d 'de' MMMM", { locale: ca })}
+            {format(selectedDate, "eeee, MMMM do", { locale: enUS })}
           </p>
         </div>
 

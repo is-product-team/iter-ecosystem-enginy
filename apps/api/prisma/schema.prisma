@@ -12,7 +12,7 @@ datasource db {
 // ==========================================
 
 model Sector {
-  sectorId    Int        @id @default(autoincrement()) @map("sectorId")
+  sectorId    Int        @id @default(autoincrement()) @map("id_sector")
   name        String     @unique @map("nom")
   description String?    @map("descripcio") @db.Text
   workshops   Workshop[]
@@ -21,14 +21,14 @@ model Sector {
 }
 
 model Workshop {
-  workshopId    Int          @id @default(autoincrement()) @map("workshopId")
+  workshopId    Int          @id @default(autoincrement()) @map("id_workshop")
   title         String       @map("titol")
   description   String       @default("") @map("descripcio")
   durationHours Int          @map("durada_h")
   maxPlaces     Int          @default(25) @map("places_maximes")
   modality      Modality     @map("modalitat")
   icon          String       @default("🧩") @map("icona")
-  sectorId      Int          @map("sectorId")
+  sectorId      Int          @map("id_sector")
   sector        Sector       @relation(fields: [sectorId], references: [sectorId])
   executionDays Json         @default("[]") @map("dies_execucio")
   requests      Request[]
@@ -50,7 +50,7 @@ enum Modality {
 // ==========================================
 
 model Center {
-  centerId     Int     @id @default(autoincrement()) @map("centerId")
+  centerId     Int     @id @default(autoincrement()) @map("id_center")
   centerCode   String  @unique @map("codi_center")
   name         String  @map("nom")
   address      String? @map("adreca")
@@ -68,7 +68,7 @@ model Center {
 }
 
 model Role {
-  roleId   Int    @id @default(autoincrement()) @map("roleId")
+  roleId   Int    @id @default(autoincrement()) @map("id_role")
   roleName String @unique @map("nom_role")
   users    User[]
 
@@ -76,15 +76,15 @@ model Role {
 }
 
 model User {
-  userId       Int     @id @default(autoincrement()) @map("userId")
+  userId       Int     @id @default(autoincrement()) @map("id_user")
   fullName     String  @map("nom_complet")
   email        String  @unique
   passwordHash String  @map("password_hash")
   photoUrl     String? @map("url_foto")
   phone        String? @map("telefon")
-  roleId       Int     @map("roleId")
+  roleId       Int     @map("id_role")
   role         Role    @relation(fields: [roleId], references: [roleId])
-  centerId     Int?    @map("centerId")
+  centerId     Int?    @map("id_center")
   center       Center? @relation(fields: [centerId], references: [centerId])
   syncToken    String? @unique @map("sync_token")
 
@@ -97,12 +97,12 @@ model User {
 }
 
 model Teacher {
-  teacherId Int    @id @default(autoincrement()) @map("teacherId")
+  teacherId Int    @id @default(autoincrement()) @map("id_teacher")
   name      String @map("nom")
   contact   String @map("contacte")
-  centerId  Int    @map("centerId")
+  centerId  Int    @map("id_center")
   center    Center @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
-  userId    Int    @unique @map("userId")
+  userId    Int    @unique @map("id_user")
   user      User   @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@map("professors")
@@ -114,9 +114,9 @@ model Teacher {
 
 model Request {
   requestId     Int           @id @default(autoincrement()) @map("id_request")
-  centerId      Int           @map("centerId")
+  centerId      Int           @map("id_center")
   center        Center        @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
-  workshopId    Int           @map("workshopId")
+  workshopId    Int           @map("id_workshop")
   workshop      Workshop      @relation(fields: [workshopId], references: [workshopId], onDelete: Cascade)
   studentsAprox Int?          @map("alumnes_aprox")
   comments      String?       @map("comentaris") @db.Text
@@ -144,9 +144,9 @@ model Assignment {
   assignmentId Int              @id @default(autoincrement()) @map("id_assignment")
   requestId    Int?             @unique @map("id_request")
   request      Request?         @relation(fields: [requestId], references: [requestId], onDelete: SetNull)
-  centerId     Int              @map("centerId")
+  centerId     Int              @map("id_center")
   center       Center           @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
-  workshopId   Int              @map("workshopId")
+  workshopId   Int              @map("id_workshop")
   workshop     Workshop         @relation(fields: [workshopId], references: [workshopId], onDelete: Cascade)
   startDate    DateTime?        @map("data_inici") @db.Date
   endDate      DateTime?        @map("data_fi") @db.Date
@@ -168,7 +168,7 @@ model Assignment {
 model AssignmentTeacher {
   assignmentId Int        @map("id_assignment")
   assignment   Assignment @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
-  userId       Int        @map("userId")
+  userId       Int        @map("id_user")
   user         User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
   isPrincipal  Boolean    @default(false) @map("es_principal")
 
@@ -203,7 +203,7 @@ model Session {
 model SessionTeacher {
   sessionId Int     @map("id_session")
   session   Session @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
-  userId    Int     @map("userId")
+  userId    Int     @map("id_user")
   user      User    @relation(fields: [userId], references: [userId], onDelete: Cascade, map: "session_teacher_user_fkey")
 
   @@id([sessionId, userId])
@@ -234,7 +234,7 @@ model Student {
   lastName       String  @map("cognoms")
   grade          String? @map("curs")
   photoUrl       String? @map("url_foto")
-  originCenterId Int?    @map("centerId_origin")
+  originCenterId Int?    @map("id_center_origin")
   centerOrigin   Center? @relation("CenterOrigin", fields: [originCenterId], references: [centerId])
 
   enrollments  Enrollment[]
@@ -265,7 +265,7 @@ model Attendance {
   enrollmentId  Int              @map("id_enrollment")
   enrollment    Enrollment       @relation(fields: [enrollmentId], references: [enrollmentId], onDelete: Cascade)
   sessionNumber Int              @map("numero_sessio")
-  sessionDate   DateTime         @map("data_session") @db.Date
+  sessionDate   DateTime         @map("data_sessio") @db.Date
   status        AttendanceStatus @default(PRESENT) @map("estat")
   observations  String?          @map("observacions") @db.Text
 
@@ -324,9 +324,9 @@ model Competence {
 }
 
 model CompetenceEvaluation {
-  evaluationId Int        @map("id_evaluation")
+  evaluationId Int        @map("id_evaluation_teacher")
   evaluation   Evaluation @relation(fields: [evaluationId], references: [evaluationId], onDelete: Cascade)
-  competenceId Int        @map("competenceId")
+  competenceId Int        @map("id_competencia")
   competence   Competence @relation(fields: [competenceId], references: [competenceId], onDelete: Cascade)
   score        Int        @map("puntuacio")
 
@@ -346,7 +346,7 @@ enum EvaluationType {
 // ==========================================
 
 model Phase {
-  phaseId     Int             @id @default(autoincrement()) @map("phaseId")
+  phaseId     Int             @id @default(autoincrement()) @map("id_phase")
   name        String          @unique @map("nom")
   description String?         @map("descripcio")
   startDate   DateTime        @map("data_inici")
@@ -360,7 +360,7 @@ model Phase {
 
 model CalendarEvent {
   eventId     Int      @id @default(autoincrement()) @map("id_event")
-  phaseId     Int      @map("phaseId")
+  phaseId     Int      @map("id_phase")
   phase       Phase    @relation(fields: [phaseId], references: [phaseId], onDelete: Cascade)
   title       String   @map("titol")
   description String?  @map("descripcio")
@@ -372,8 +372,8 @@ model CalendarEvent {
 
 model Notification {
   notificationId Int      @id @default(autoincrement()) @map("id_notificacio")
-  userId         Int?     @map("userId")
-  centerId       Int?     @map("centerId")
+  userId         Int?     @map("id_user")
+  centerId       Int?     @map("id_center")
   title          String   @map("titol")
   message        String   @map("missatge") @db.Text
   createdAt      DateTime @default(now()) @map("data_creacio")
@@ -386,7 +386,7 @@ model Notification {
 
 model Issue {
   issueId     Int      @id @default(autoincrement()) @map("id_issue")
-  centerId    Int      @map("centerId")
+  centerId    Int      @map("id_center")
   center      Center   @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
   description String   @map("descripcio") @db.Text
   createdAt   DateTime @default(now()) @map("data_creacio")
@@ -395,9 +395,9 @@ model Issue {
 }
 
 enum QuestionnaireTarget {
-  STUDENT @map("STUDENT")
-  CENTER  @map("CENTER")
-  TEACHER @map("TEACHER")
+  STUDENT @map("ALUMNE")
+  CENTER  @map("CENTRE")
+  TEACHER @map("DOCENT")
   ADMIN   @map("ADMIN")
 }
 
@@ -415,7 +415,7 @@ enum SubmissionStatus {
 }
 
 model Questionnaire {
-  questionnaireId Int                     @id @default(autoincrement()) @map("quiestionIdnaire")
+  questionnaireId Int                     @id @default(autoincrement()) @map("id_questionnaire")
   assignmentId    Int                     @map("id_assignment")
   assignment      Assignment              @relation(fields: [assignmentId], references: [assignmentId], onDelete: Cascade)
   target          QuestionnaireTarget     @map("destinatari")
@@ -438,7 +438,7 @@ model QuestionnaireModel {
 }
 
 model Question {
-  questionId Int                @id @default(autoincrement()) @map("quiestionId")
+  questionId Int                @id @default(autoincrement()) @map("id_question")
   modelId    Int                @map("id_model")
   model      QuestionnaireModel @relation(fields: [modelId], references: [modelId], onDelete: Cascade)
   text       String
@@ -450,9 +450,9 @@ model Question {
 
 model QuestionnaireResponse {
   responseId      Int           @id @default(autoincrement()) @map("id_response")
-  questionnaireId Int           @map("quiestionIdnaire")
+  questionnaireId Int           @map("id_questionnaire")
   questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [questionnaireId], onDelete: Cascade)
-  questionId      Int           @map("quiestionId")
+  questionId      Int           @map("id_question")
   value           String        @db.Text @map("valor")
 
   @@map("respostes_questionari")
@@ -460,7 +460,7 @@ model QuestionnaireResponse {
 
 model AuditLog {
   logId     Int      @id @default(autoincrement()) @map("id_log")
-  userId    Int      @map("userId")
+  userId    Int      @map("id_user")
   user      User     @relation(fields: [userId], references: [userId])
   action    String   @map("accio")
   details   Json?    @map("detalls")

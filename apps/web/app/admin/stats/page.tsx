@@ -36,7 +36,7 @@ export default function AdminStatsPage() {
       setPopularStats(popularData);
     } catch (err) {
       console.error("Error fetching stats:", err);
-      toast.error('Error al carregar les estadístiques.');
+      toast.error('Error loading statistics.');
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ export default function AdminStatsPage() {
   }, [user, authLoading, router]);
 
   if (authLoading || !user || loading) {
-    return <Loading fullScreen message="Generant analítica professional..." />;
+    return <Loading fullScreen message="Generating professional analytics..." />;
   }
 
   return (

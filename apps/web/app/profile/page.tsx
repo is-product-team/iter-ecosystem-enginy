@@ -57,7 +57,7 @@ function CalendarSyncSection() {
   return (
     <div className="space-y-4">
       <label className="block text-[10px] font-black text-consorci-darkBlue uppercase tracking-widest">
-        Sincronització de Calendari (iCal)
+        Calendar Synchronization (iCal)
       </label>
       <div className="p-6 bg-consorci-darkBlue/5 border-2 border-consorci-darkBlue/10 rounded-sm">
         <div className="flex items-start gap-4 mb-6">
@@ -65,9 +65,9 @@ function CalendarSyncSection() {
             <CalendarIcon size={24} />
           </div>
           <div>
-            <h4 className="text-sm font-black text-text-primary uppercase tracking-tight">Sincronitza amb Google/Apple</h4>
+            <h4 className="text-sm font-black text-text-primary uppercase tracking-tight">Sync with Google/Apple</h4>
             <p className="text-[10px] text-text-muted font-bold leading-relaxed mt-1">
-              Subscriu-te des del teu sistema favorit per veure totes les fites i sessions automàticament.
+              Subscribe from your favorite system to see all milestones and sessions automatically.
             </p>
           </div>
         </div>
@@ -81,7 +81,7 @@ function CalendarSyncSection() {
             className="w-full py-3 bg-consorci-darkBlue text-white text-[10px] font-black uppercase tracking-widest hover:bg-consorci-actionBlue transition-all flex items-center justify-center gap-2"
           >
             {regenerating ? <RefreshCw className="animate-spin w-4 h-4" /> : <RefreshCw size={16} />}
-            Activar Sincronització
+            Activate Synchronization
           </button>
         ) : (
           <div className="space-y-4">
@@ -97,14 +97,14 @@ function CalendarSyncSection() {
               </button>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[9px] font-bold text-text-muted italic">Sincronització activa ✓</span>
+              <span className="text-[9px] font-bold text-text-muted italic">Synchronization active ✓</span>
               <button
                 onClick={generateToken}
                 disabled={regenerating}
                 className="text-[9px] font-black text-consorci-pinkRed uppercase tracking-widest hover:underline flex items-center gap-1"
               >
                 {regenerating && <RefreshCw className="animate-spin w-3 h-3" />}
-                Regenerar Link
+                Regenerate Link
               </button>
             </div>
           </div>
@@ -112,15 +112,15 @@ function CalendarSyncSection() {
       </div>
 
       <div className="p-4 border border-border-subtle bg-background-subtle/50 space-y-3">
-        <p className="text-[9px] font-black text-text-muted uppercase tracking-widest">Preferències de Notificació</p>
+        <p className="text-[9px] font-black text-text-muted uppercase tracking-widest">Notification Preferences</p>
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold text-text-primary">Avisos de Sessió (24h abans)</span>
+          <span className="text-[11px] font-bold text-text-primary">Session Alerts (24h before)</span>
           <div className="w-10 h-5 bg-consorci-darkBlue rounded-full relative px-1 flex items-center">
             <div className="w-3.5 h-3.5 bg-white rounded-full absolute right-1"></div>
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold text-text-primary">Canvis en Dates de Fases</span>
+          <span className="text-[11px] font-bold text-text-primary">Phase Date Changes</span>
           <div className="w-10 h-5 bg-consorci-darkBlue rounded-full relative px-1 flex items-center">
             <div className="w-3.5 h-3.5 bg-white rounded-full absolute right-1"></div>
           </div>
@@ -152,7 +152,7 @@ export default function ProfilePage() {
   return (
     <DashboardLayout
       title="My Profile"
-      subtitle="Manage your personal information and academy preferences."
+      subtitle="Manage your personal information and platform preferences."
     >
       <div className="w-full">
         <div className="bg-background-surface shadow-sm border border-border-subtle overflow-hidden">
@@ -267,7 +267,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  {/* Sincronització de Calendari */}
+                  {/* Calendar Synchronization */}
                   <CalendarSyncSection />
 
 

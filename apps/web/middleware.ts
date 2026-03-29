@@ -2,20 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Detect localized paths that are not currently supported by folder structure
-  const localePattern = /^\/(es|ca)(\/|$)/i;
-  
-  if (localePattern.test(pathname)) {
-    // Remove the locale prefix and redirect to the flat route
-    const newPathname = pathname.replace(localePattern, '/');
-    const url = request.nextUrl.clone();
-    url.pathname = newPathname || '/';
-    
-    return NextResponse.redirect(url, { status: 307 });
-  }
-
+  // Basic middleware - could be expanded for Auth protection if needed
   return NextResponse.next();
 }
 

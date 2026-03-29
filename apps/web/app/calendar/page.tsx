@@ -43,10 +43,10 @@ export default function CalendarPage() {
       const phasesData = phasesRes.data.data;
       const getPhaseColor = (name: string) => {
         const n = name.toLowerCase();
-        if (n.includes("sol·licitud") || n.includes("inscripció") || n.includes("application")) return "calendar-event-card event-phase-inscription";
-        if (n.includes("planificació") || n.includes("assignació") || n.includes("planning")) return "calendar-event-card event-phase-planning";
-        if (n.includes("execució") || n.includes("seguiment") || n.includes("execution")) return "calendar-event-card event-phase-execution";
-        if (n.includes("tancament") || n.includes("avaluació") || n.includes("closure")) return "calendar-event-card event-phase-evaluation";
+        if (n.includes("sol·licitud") || n.includes("inscripció") || n.includes("application") || n.includes("registration")) return "calendar-event-card event-phase-inscription";
+        if (n.includes("planificació") || n.includes("assignació") || n.includes("planning") || n.includes("assignment")) return "calendar-event-card event-phase-planning";
+        if (n.includes("execució") || n.includes("seguiment") || n.includes("execution") || n.includes("monitoring")) return "calendar-event-card event-phase-execution";
+        if (n.includes("tancament") || n.includes("avaluació") || n.includes("closure") || n.includes("evaluation")) return "calendar-event-card event-phase-evaluation";
         return "calendar-event-card event-milestone";
       };
 
@@ -69,19 +69,19 @@ export default function CalendarPage() {
     }
   }, [user]);
 
-  if (authLoading) return <Loading fullScreen message="Sincronitzant el teu calendari..." />;
+  if (authLoading) return <Loading fullScreen message="Syncing your calendar..." />;
 
   return (
     <DashboardLayout
-      title="Calendari Iter"
-      subtitle="Visualitza totes les fites, tallers i terminis en un calendari dinàmic."
+      title="Iter Calendar"
+      subtitle="Visualize all milestones, workshops, and deadlines in a dynamic calendar."
     >
       <div className="w-full relative">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 rounded-full animate-pulse ${activeFase ? 'bg-consorci-pinkRed' : 'bg-gray-300'}`}></div>
             <div className="text-[11px] font-black text-text-primary uppercase tracking-widest">
-              {activeFase ? `Fase Actual: ${activeFase.name}` : "Carregant fases..."}
+              {activeFase ? `Current Phase: ${activeFase.name}` : "Loading phases..."}
             </div>
           </div>
           <button
@@ -91,7 +91,7 @@ export default function CalendarPage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Llegenda de Colors
+            Color Legend
           </button>
         </div>
 
@@ -110,7 +110,6 @@ export default function CalendarPage() {
           />
         </div>
 
-        {/* Legend Overlay (Same as before but with better styling) */}
         {isLegendOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-consorci-darkBlue/40 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-background-surface border-4 border-consorci-darkBlue w-full max-w-sm p-10 shadow-[0_0_50px_rgba(0,0,0,0.3)] relative">
@@ -124,44 +123,44 @@ export default function CalendarPage() {
               </button>
 
               <h3 className="text-xl font-black text-text-primary uppercase tracking-tighter border-b-4 border-consorci-darkBlue pb-4 mb-8">
-                Llegenda de Colors
+                Color Legend
               </h3>
 
               <div className="space-y-6">
                 <div className="flex items-center gap-4 group cursor-default">
                   <div className="w-6 h-6 bg-consorci-lightBlue shadow-inner"></div>
                   <div>
-                    <span className="block text-[11px] font-black text-text-primary uppercase tracking-widest group-hover:text-consorci-lightBlue transition-colors">Assignació</span>
-                    <span className="text-[10px] text-text-muted font-bold">Reserva de taller al centre.</span>
+                    <span className="block text-[11px] font-black text-text-primary uppercase tracking-widest group-hover:text-consorci-lightBlue transition-colors">Assignment</span>
+                    <span className="text-[10px] text-text-muted font-bold">Workshop reservation at the center.</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4 group cursor-default">
                   <div className="w-6 h-6 bg-consorci-yellow shadow-inner"></div>
                   <div>
-                    <span className="block text-[11px] font-black text-text-primary uppercase tracking-widest group-hover:text-consorci-yellow transition-colors">Sessió de Taller</span>
-                    <span className="text-[10px] text-text-muted font-bold">Trobada amb els alumnes.</span>
+                    <span className="block text-[11px] font-black text-text-primary uppercase tracking-widest group-hover:text-consorci-yellow transition-colors">Workshop Session</span>
+                    <span className="text-[10px] text-text-muted font-bold">Meeting with students.</span>
                   </div>
                 </div>
 
                 <div className="pt-6 border-t-2 border-border-subtle">
-                  <span className="block text-[9px] font-black text-text-muted uppercase tracking-[0.3em] mb-6">Fases del Programa</span>
+                  <span className="block text-[9px] font-black text-text-muted uppercase tracking-[0.3em] mb-6">Program Phases</span>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-consorci-darkBlue"></div>
-                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Inscripció</span>
+                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Registration</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-consorci-actionBlue"></div>
-                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Planificació</span>
+                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Planning</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-consorci-pinkRed"></div>
-                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Execució</span>
+                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Execution</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 bg-consorci-beige"></div>
-                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Avaluaicó</span>
+                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Evaluation</span>
                     </div>
                   </div>
                 </div>
@@ -171,7 +170,7 @@ export default function CalendarPage() {
                 onClick={() => setIsLegendOpen(false)}
                 className="w-full mt-10 py-4 bg-consorci-darkBlue text-white text-[11px] font-black uppercase tracking-[0.2em] hover:bg-consorci-actionBlue transition-all shadow-lg active:scale-95"
               >
-                D&apos;acord
+                Okay
               </button>
             </div>
           </div>
