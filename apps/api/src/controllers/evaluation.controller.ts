@@ -14,7 +14,7 @@ export const getEnrollmentEvaluation = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Evaluation not found' });
         }
         res.json(evaluation);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error fetching evaluation' });
     }
 };
@@ -67,7 +67,7 @@ export const getCompetencies = async (req: Request, res: Response) => {
     try {
         const competencies = await evaluationService.getCompetencies();
         res.json(competencies);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error fetching competencies' });
     }
 };
@@ -80,7 +80,7 @@ export const analyzeObservations = async (req: Request, res: Response) => {
     try {
         const analysis = await evaluationService.analyzeObservationsAI(text);
         res.json(analysis);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error analyzing observations' });
     }
 };

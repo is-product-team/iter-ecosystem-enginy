@@ -14,7 +14,7 @@ export const getStudents = async (req: Request, res: Response) => {
       return res.json([]);
     }
     res.json(students);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining students' });
   }
 };
@@ -36,10 +36,10 @@ export const createStudent = async (req: Request, res: Response) => {
 export const updateStudent = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const { studentId, ...updateData } = req.body;
+    const { studentId: _, ...updateData } = req.body;
     const student = await studentRepository.update(parseInt(String(id)), updateData);
     res.json(student);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error updating student' });
   }
 };
@@ -49,7 +49,7 @@ export const deleteStudent = async (req: Request, res: Response) => {
   try {
     await studentRepository.delete(parseInt(String(id)));
     res.json({ message: 'Student deleted' });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error deleting student' });
   }
 };

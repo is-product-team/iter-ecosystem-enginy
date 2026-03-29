@@ -19,14 +19,6 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
   const [_user, setUser] = useState<User | null>(null);
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
-  const [allStudents, setAllStudents] = useState<Student[]>([]);
-  const [viewMode, setViewMode] = useState<ViewMode>('workshop');
-  
-  // Selection view states
-  const [searchStudent, setSearchStudent] = useState("");
-  const [filterCourse, setFilterCourse] = useState("All courses");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
   
   const router = useRouter();
 
@@ -40,13 +32,8 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
     const fetchData = async () => {
       try {
-        const [resAssig, resStudents] = await Promise.all([
-          assignmentService.getById(parseInt(id)),
-          studentService.getAll()
-        ]);
-        
+        const resAssig = await assignmentService.getById(parseInt(id));
         setAssignment(resAssig);
-        setAllStudents(resStudents || []);
       } catch (_error) {
         toast.error('Error loading data.');
         router.push('/center/assignments');
@@ -57,29 +44,6 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
     fetchData();
   }, [id, router]);
-
-  const handleAddStudent = async (studentId: number) => {
-    try {
-      if (!assignment) return;
-      const currentIds = assignment.enrollments?.map((i: Enrollment) => i.studentId) || [];
-      if (currentIds.includes(studentId)) {
-        toast.warning("This student is already enrolled.");
-        return;
-      }
-
-      const maxSeats = assignment.request?.approxStudents || assignment.workshop?.maxPlaces || 20;
-      if (currentIds.length >= maxSeats) {
-        toast.error(`Limit of ${maxSeats} seats reached.`);
-        return;
-      }
-
-      const updated = await assignmentService.updateEnrollments(parseInt(id), [...currentIds, studentId]);
-      setAssignment(updated);
-      toast.success('Student added successfully.');
-    } catch (error) {
-      toast.error('Error adding student.');
-    }
-  };
 
   const handleRemoveStudent = async (studentId: number) => {
     try {
@@ -111,23 +75,6 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     ins.isMobilityAuthorizationValidated && 
     ins.isImageRightsValidated
   );
-
-  const filteredStudents = allStudents.filter(a => {
-    const matchesSearch = a.fullName.toLowerCase().includes(searchStudent.toLowerCase()) || 
-                          a.lastName.toLowerCase().includes(searchStudent.toLowerCase()) ||
-                          a.idalu.toLowerCase().includes(searchStudent.toLowerCase());
-    const matchesCourse = filterCourse === "All courses" || a.grade === filterCourse;
-    return matchesSearch && matchesCourse;
-  });
-
-  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-  const paginatedStudents = filteredStudents.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const uniqueCourses = Array.from(new Set(allStudents.map(a => a.grade))).filter(Boolean).sort();
-
 
   return (
     <DashboardLayout 
@@ -266,3 +213,41 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
         </section>
         
         {/* ACTION: FINALIZE REGISTRATION */}
+        {assignment.status !== 'IN_PROGRESS' && assignment.status !== 'COMPLETED' && (
+          <div className={`p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm border ${
+            allDocumentsValidated ? 'bg-green-50 border-green-100' : 'bg-blue-50 border-blue-100'
+          }`}>
+            <div>
+              <h4 className={`text-lg font-black uppercase ${allDocumentsValidated ? 'text-green-700' : 'text-[#00426B]'}`}>
+                {allDocumentsValidated ? '✓ Everything ready to start' : 'Confirm Documentation'}
+              </h4>
+              <p className="text-xs text-gray-600 mt-1 max-w-xl">
+                {allDocumentsValidated 
+                  ? "All documentation has been validated. You can now confirm the final registration to activate the workshop." 
+                  : "Once all documentation is validated, you can confirm the final registration."
+                }
+              </p>
+            </div>
+            {allDocumentsValidated && (
+              <button 
+                onClick={async () => {
+                  if(!confirm("Confirm registration?")) return;
+                  try {
+                    await assignmentService.confirmRegistration(parseInt(id));
+                    toast.success("Registration confirmed!");
+                    window.location.reload();
+                  } catch(_e) {
+                    toast.error("Error confirming.");
+                  }
+                }}
+                className="px-8 py-4 bg-green-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl"
+              >
+                Confirm and Generate Sessions
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </DashboardLayout>
+  );
+}

@@ -10,6 +10,7 @@ import Loading from "@/components/Loading";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
+import workshopService, { Workshop } from "@/services/workshopService";
 
 export default function WorkshopAdminPage() {
   const { user, loading: authLoading } = useAuth();

@@ -25,7 +25,7 @@ export const getCenters = async (req: Request, res: Response) => {
         totalPages: Math.ceil(total / take),
       },
     });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining centers' });
   }
 };
@@ -39,7 +39,7 @@ export const getCenterById = async (req: Request, res: Response) => {
     });
     if (!center) return res.status(404).json({ error: 'Center not found' });
     res.json(center);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining center' });
   }
 };
@@ -51,7 +51,7 @@ export const createCenter = async (req: Request, res: Response) => {
       data: req.body
     });
     res.json(newCenter);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error creating center' });
   }
 };
@@ -65,7 +65,7 @@ export const updateCenter = async (req: Request, res: Response) => {
       data: req.body
     });
     res.json(updated);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error updating center' });
   }
 };
@@ -78,7 +78,7 @@ export const deleteCenter = async (req: Request, res: Response) => {
       where: { centerId: parseInt(id as string) }
     });
     res.status(204).send();
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error deleting center' });
   }
 };

@@ -99,7 +99,7 @@ export default function RequestsPage() {
       setComments('');
       setError(null);
     }
-  }, [selectedWorkshopId]);
+  }, [selectedWorkshopId, editingRequestId]);
 
   const handleEdit = (request: Request) => {
     setEditingRequestId(request.requestId);

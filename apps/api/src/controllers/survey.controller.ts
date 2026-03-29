@@ -24,7 +24,7 @@ export const generateSurveys = async (req: Request, res: Response) => {
         const questionnairesData: Prisma.QuestionnaireCreateManyInput[] = [];
 
         // Students
-        for (const enrollment of assignment.enrollments) {
+        for (const _enrollment of assignment.enrollments) {
             questionnairesData.push({
                 assignmentId: assignment.assignmentId,
                 target: QuestionnaireTarget.STUDENT,
@@ -34,7 +34,7 @@ export const generateSurveys = async (req: Request, res: Response) => {
         }
 
         // Teachers
-        for (const teacher of assignment.teachers) {
+        for (const _teacher of assignment.teachers) {
             questionnairesData.push({
                 assignmentId: assignment.assignmentId,
                 target: QuestionnaireTarget.TEACHER,
@@ -101,7 +101,7 @@ export const getSurveyByToken = async (req: Request, res: Response) => {
 // POST: Submit survey response
 export const submitSurvey = async (req: Request, res: Response) => {
     const { token } = req.params;
-    const { responses } = req.body;
+    const { responses: _responses } = req.body;
 
     try {
         const survey = await prisma.questionnaire.findUnique({ where: { token: token as string } });

@@ -8,7 +8,7 @@ export const getSyncToken = async (req: Request, res: Response) => {
       select: { syncToken: true }
     });
     res.json({ syncToken: user?.syncToken });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error fetching sync token' });
   }
 };
@@ -21,7 +21,7 @@ export const generateSyncToken = async (req: Request, res: Response) => {
       data: { syncToken: newToken }
     });
     res.json({ syncToken: newToken });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error generating sync token' });
   }
 };

@@ -8,13 +8,13 @@ import { generateICS, ICSEvent } from '../utils/ics.js';
  */
 async function fetchEventsForUser(user: { userId: number, role: string, centerId?: number | null }, start?: string, end?: string) {
   // 1. Get the teacher associated with the user (if teacher role)
-  let teacherId: number | null = null;
+  let _teacherId: number | null = null;
   if (user.role === ROLES.TEACHER) {
     const teacher = await prisma.teacher.findUnique({
       where: { userId: user.userId }
     });
     if (teacher) {
-      teacherId = teacher.teacherId;
+      _teacherId = teacher.teacherId;
     }
   }
 

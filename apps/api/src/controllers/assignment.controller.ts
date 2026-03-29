@@ -44,7 +44,7 @@ export const getAssignments = async (req: Request, res: Response) => {
       }
     });
     res.json(assignments);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignments' });
   }
 };
@@ -93,7 +93,7 @@ export const getAssignmentById = async (req: Request, res: Response) => {
     }
 
     res.json(assignment);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignment details' });
   }
 };
@@ -137,7 +137,7 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
       }
     });
     res.json(assignments);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignments' });
   }
 };
@@ -161,7 +161,7 @@ export const getStudents = async (req: Request, res: Response) => {
       evaluated: i.evaluations.length > 0 // true if exists, false otherwise
     }));
     res.json(students);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining students' });
   }
 };
@@ -174,7 +174,7 @@ export const getChecklist = async (req: Request, res: Response) => {
       where: { assignmentId: parseInt(assignmentId as string) }
     });
     res.json(checklist);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining the checklist' });
   }
 };
@@ -200,7 +200,7 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
       }
     });
     res.json(updated);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error updating the checklist' });
   }
 };
@@ -221,7 +221,7 @@ export const getIssuesByCenter = async (req: Request, res: Response) => {
       orderBy: { createdAt: 'desc' }
     });
     res.json(issues);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining issues' });
   }
 };
@@ -359,7 +359,7 @@ export const publishAssignments = async (req: Request, res: Response) => {
     });
 
     res.json({ message: `${result.count} assignments published correctly.` });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error publishing assignments.' });
   }
 };
@@ -493,7 +493,7 @@ export const designateTeachers = async (req: Request, res: Response) => {
 // POST: Validate Center Data (Admin)
 export const validateCenterData = async (req: Request, res: Response) => {
   const { assignmentId } = req.params;
-  const { approved, feedback } = req.body;
+  const { approved, feedback: _feedback } = req.body;
   const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'Unauthorized' });
@@ -512,7 +512,7 @@ export const validateCenterData = async (req: Request, res: Response) => {
     }
 
     res.json({ message: `Assignment ${approved ? 'validated' : 'rejected'} correctly.` });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error validating data.' });
   }
 };
@@ -557,7 +557,7 @@ export const sendDocumentNotification = async (req: Request, res: Response) => {
 
 // POST: Generate Automatic Assignments (AI)
 export const generateAutomaticAssignments = async (req: Request, res: Response) => {
-  const { role } = req.user!;
+  const { role: _role } = req.user!;
 
   try {
     const service = new AutoAssignmentService();
@@ -616,7 +616,7 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
 
         // Iterate by weeks from startDate to endDate
         const currentPointer = new Date(startDate);
-        let i = 0; // Initialize session number counter
+        let _i = 0; // Initialize session number counter
         while (currentPointer <= endDate) {
           for (const slot of schedule) {
             const sessionDate = new Date(currentPointer);
@@ -637,7 +637,7 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
                   endTime: slot.endTime
                 }
               });
-              i++; // Increment session number
+              _i++; // Increment session number
             }
           }
           // Advance to next week
@@ -857,7 +857,7 @@ export const getSessions = async (req: Request, res: Response) => {
       orderBy: { sessionDate: 'asc' }
     });
     res.json(sessions);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error obtaining sessions' });
   }
 };
@@ -893,7 +893,7 @@ export const addTeachingStaff = async (req: Request, res: Response) => {
       }
     });
     res.status(201).json(relation);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error adding teacher to the team' });
   }
 };
@@ -911,7 +911,7 @@ export const removeTeachingStaff = async (req: Request, res: Response) => {
       }
     });
     res.status(204).send();
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error removing teacher from the team' });
   }
 };

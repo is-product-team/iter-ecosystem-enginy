@@ -47,7 +47,7 @@ export default function StudentsCRUD() {
       return;
     }
     if (user) loadStudents();
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
 
   const loadStudents = async () => {
     try {
