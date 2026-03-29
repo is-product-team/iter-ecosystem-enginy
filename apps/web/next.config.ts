@@ -10,4 +10,6 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@iter/shared"],
 };
 
+const withNextIntl = createNextIntlPlugin();
+
 export default withNextIntl(nextConfig);

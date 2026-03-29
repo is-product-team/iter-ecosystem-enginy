@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES } from "@iter/shared";
 import DashboardLayout from "@/components/DashboardLayout";
-import Calendar, { CalendarEvent } from "../../components/ui/Calendar";
+import Calendar, { CalendarEvent } from "@/components/ui/Calendar";
 import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 import { format } from "date-fns";
