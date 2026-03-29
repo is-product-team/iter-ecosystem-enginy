@@ -36,11 +36,11 @@ describe('Auth Security Integration', () => {
   describe('POST /auth/login - Cookie Security', () => {
     it('should return a Set-Cookie header with the token on successful login', async () => {
       const mockUser = {
-        id_user: 1,
+        userId: 1,
         email: 'test@example.com',
-        password_hash: await bcrypt.hash('password123', 10),
-        nom_complet: 'Test User',
-        role: { nom_role: 'ADMIN' },
+        passwordHash: await bcrypt.hash('password123', 10),
+        fullName: 'Test User',
+        role: { roleName: 'ADMIN' },
       };
 
       (userRepository.findByEmail as any).mockResolvedValue(mockUser);
@@ -61,13 +61,13 @@ describe('Auth Security Integration', () => {
       // Since express-rate-limit uses IP, and supertest might reuse or mock it, 
       // we just want to ensure the middleware is active.
       // In a real test environment, we might need to manipulate the store.
-      
+
       const mockUser = {
-        id_user: 1,
+        userId: 1,
         email: 'test2@example.com',
-        password_hash: await bcrypt.hash('password123', 10),
-        nom_complet: 'Test User',
-        role: { nom_role: 'ADMIN' },
+        passwordHash: await bcrypt.hash('password123', 10),
+        fullName: 'Test User',
+        role: { roleName: 'ADMIN' },
       };
       (userRepository.findByEmail as any).mockResolvedValue(mockUser);
 

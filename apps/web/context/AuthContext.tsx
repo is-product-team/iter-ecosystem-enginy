@@ -18,6 +18,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
+    // Migration helper: clear legacy user data
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user');
+      if (userStr && userStr.includes('nom_complet')) {
+        localStorage.removeItem('user');
+        window.location.reload();
+        return;
+      }
+    }
+
     const currentUser = getAuthUser();
     Promise.resolve().then(() => {
       if (currentUser) {

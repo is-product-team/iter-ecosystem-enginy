@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
-import { runTetris } from '../services/tetris.service.js';
+import { TetrisService } from '../services/tetris.service.js';
 import { ROLES } from '@iter/shared';
+
+const tetrisService = new TetrisService();
 
 export const triggerTetris = async (req: Request, res: Response) => {
   const { role } = req.user!;
@@ -10,11 +12,10 @@ export const triggerTetris = async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await runTetris();
+    const result = await tetrisService.processVacancies();
     res.json({
       message: 'Tetris assignment completed successfully.',
-      stats: result.stats,
-      assignmentsCreated: result.createdAssignments.length
+      resolved: result.resolved
     });
   } catch (error) {
     console.error('Tetris Error:', error);

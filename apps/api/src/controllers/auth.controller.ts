@@ -4,34 +4,35 @@ import jwt from 'jsonwebtoken';
 import { userRepository } from '../repositories/user.repository.js';
 import { env } from '../config/env.js';
 import { mapUserResponse } from '../utils/user-mapper.js';
+import prisma from '../lib/prisma.js';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    // 1. Usamos el repositorio para buscar al usuario
+    // 1. Use the repository to find the user
     const user = await userRepository.findByEmail(email);
 
     if (!user) {
-      return res.status(401).json({ error: 'Credencials invàlides' });
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // 2. Verificar password
-    console.log(`[Auth] Intento de login para: ${email}`);
-    const validPassword = await bcrypt.compare(password, user.password_hash);
+    // 2. Verify password
+    console.log(`[Auth] Login attempt for: ${email}`);
+    const validPassword = await bcrypt.compare(password, user.passwordHash);
 
     if (!validPassword) {
-      console.warn(`[Auth] Password incorrecto para: ${email}`);
-      return res.status(401).json({ error: 'Credencials invàlides' });
+      console.warn(`[Auth] Incorrect password for: ${email}`);
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // 3. Generar JWT
+    // 3. Generate JWT
     const token = jwt.sign(
       {
-        userId: user.id_user,
+        userId: user.userId,
         email: user.email,
-        role: (user as any).role.nom_role,
-        centreId: user.id_center
+        role: (user as any).role.roleName,
+        centerId: user.centerId
       },
       env.JWT_SECRET,
       { expiresIn: '24h' }
@@ -46,33 +47,53 @@ export const login = async (req: Request, res: Response) => {
     });
 
     res.json({
-      token, // Mantener para compatibilidad móvil (Bearer)
+      token, // Maintain for mobile compatibility (Bearer)
       user: mapUserResponse(user)
     });
   } catch (error) {
-    console.error('Error en login:', error);
-    res.status(500).json({ error: 'Error en el servidor' });
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const register = async (req: Request, res: Response) => {
+  const { email, password, fullName, roleId, centerId } = req.body;
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        fullName,
+        roleId: parseInt(roleId),
+        centerId: centerId ? parseInt(centerId) : null
+      },
+      include: { role: true, center: true }
+    });
+
+    res.status(201).json(mapUserResponse(user));
+  } catch (error) {
+    console.error('Error during register:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
 export const logout = async (req: Request, res: Response) => {
   res.clearCookie('token');
-  res.json({ message: 'Sessió tancada correctament' });
-};
-
-export const register = async (req: Request, res: Response) => {
-  // ... (register logic remains same or can be updated if needed)
-  // For now focusing on Login
+  res.json({ message: 'Session closed successfully' });
 };
 
 export const getMe = async (req: Request, res: Response) => {
   try {
     const user = await userRepository.findWithDetails((req as any).user.userId);
-    if (!user) return res.status(404).json({ error: 'Usuari no trobat' });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
     res.json(mapUserResponse(user));
   } catch (error) {
-    console.error('Error en getMe:', error);
-    res.status(500).json({ error: 'Error al obtenir dades' });
+    console.error('Error in getMe:', error);
+    res.status(500).json({ error: 'Failed to retrieve user data' });
   }
 };

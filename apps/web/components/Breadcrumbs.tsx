@@ -21,7 +21,7 @@ const Breadcrumbs: React.FC = () => {
     requests: 'Requests',
     phases: 'Phases',
     calendar: 'Calendar',
-    perfil: 'Profile',
+    profile: 'Profile',
     students: 'Students',
     teachers: 'Teachers',
     assignments: 'Assignments',

@@ -1,13 +1,13 @@
 import getApi from "./api";
 
 export interface Sector {
-  id_sector: number;
-  nom: string;
+  sectorId: number;
+  name: string;
 }
 
 const sectorService = {
   /**
-   * Obtiene todos los sectores desde el backend.
+   * Gets all sectors from the backend.
    */
   getAll: async (): Promise<Sector[]> => {
     const api = getApi();
@@ -15,7 +15,7 @@ const sectorService = {
       const response = await api.get<Sector[]>("/sectors");
       return response.data;
     } catch (error) {
-      console.error("Error en sectorService.getAll:", error);
+      console.error("Error in sectorService.getAll:", error);
       throw error;
     }
   },

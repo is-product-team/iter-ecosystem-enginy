@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
+import '../i18n'; // Initialize i18n
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { 
@@ -13,6 +14,7 @@ import {
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'nativewind';
 
+// @ts-ignore
 import "../global.css";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

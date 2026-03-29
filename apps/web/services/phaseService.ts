@@ -1,12 +1,12 @@
 import getApi from "./api";
 
 export interface Phase {
-  id_phase: number;
+  phaseId: number;
   name: string;
   description: string;
   startDate: string;
   endDate: string;
-  active: boolean;
+  isActive: boolean;
   order: number;
 }
 
@@ -14,17 +14,17 @@ const phaseService = {
   getAll: async (): Promise<Phase[]> => {
     const api = getApi();
     try {
-      const response = await api.get("/fases");
+      const response = await api.get("/phases");
       // The API returns data in the 'data' field of the response body
       const rawData = response.data.data || [];
-      return rawData.map((f: { id_fase: number, nom: string, descripcio: string, data_inici: string, data_fi: string, activa: boolean, ordre: number }) => ({
-        id_phase: f.id_fase,
-        name: f.nom,
-        description: f.descripcio,
-        startDate: f.data_inici,
-        endDate: f.data_fi,
-        active: f.activa,
-        order: f.ordre
+      return rawData.map((f: any) => ({
+        phaseId: f.phaseId,
+        name: f.name,
+        description: f.description,
+        startDate: f.startDate,
+        endDate: f.endDate,
+        isActive: f.isActive,
+        order: f.order
       }));
     } catch (error) {
       console.error("Error in phaseService.getAll:", error);

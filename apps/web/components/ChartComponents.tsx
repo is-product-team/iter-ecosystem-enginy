@@ -10,11 +10,11 @@ import { REQUEST_STATUSES } from '@iter/shared';
  
 // --- COMPONENTS ---
  
-export const StatusDistribution = ({ data }: { data: { estat: string, total: number }[] }) => {
-    // Ensure we have the three categories even if they are zero
+export const StatusDistribution = ({ data }: { data: { status: string, total: number }[] }) => {
+    // Ensure we have the statuses even if they are zero
     const categories = Object.values(REQUEST_STATUSES);
     const chartData = categories.map(cat => {
-        const found = data.find(d => d.estat === cat);
+        const found = data.find(d => d.status === cat);
         return {
             name: cat,
             total: found ? found.total : 0
@@ -52,11 +52,11 @@ export const StatusDistribution = ({ data }: { data: { estat: string, total: num
     );
 };
 
-export const WorkshopPopularity = ({ data }: { data: { _id: string, alumnes_totals: number }[] }) => {
+export const WorkshopPopularity = ({ data }: { data: { _id: string, totalStudents: number }[] }) => {
     // Transform data: Use d._id directly as the name (backend provides title or fallback)
     const chartData = data.map(d => ({
         name: d._id,
-        alumnes: d.alumnes_totals
+        students: d.totalStudents
     }));
 
     return (
@@ -81,12 +81,12 @@ export const WorkshopPopularity = ({ data }: { data: { _id: string, alumnes_tota
                     <Legend wrapperStyle={{ fontSize: '10px', fontWeight: 'black', textTransform: 'uppercase', paddingTop: '20px' }} />
                     <Line
                         type="monotone"
-                        dataKey="alumnes"
+                        dataKey="students"
                         stroke="#0775AB"
                         strokeWidth={3}
                         dot={{ r: 6, fill: '#00426B', strokeWidth: 2, stroke: '#fff' }}
                         activeDot={{ r: 8, fill: '#0775AB' }}
-                        name="Nombre de Participants"
+                        name="Number of Participants"
                     />
                 </LineChart>
             </ResponsiveContainer>

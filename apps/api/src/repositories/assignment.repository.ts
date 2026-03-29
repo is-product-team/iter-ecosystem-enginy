@@ -3,12 +3,12 @@ import { BaseRepository } from './base.repository.js';
 
 export class AssignmentRepository extends BaseRepository<Assignment, Prisma.AssignmentCreateInput, Prisma.AssignmentUpdateInput> {
   constructor() {
-    super('assignment', 'id_assignment');
+    super('assignment', 'assignmentId');
   }
 
   override async findById(id: number): Promise<Assignment | null> {
     return this.prisma.assignment.findUnique({
-      where: { id_assignment: id },
+      where: { assignmentId: id },
       include: {
         workshop: true,
         center: true,
@@ -22,20 +22,20 @@ export class AssignmentRepository extends BaseRepository<Assignment, Prisma.Assi
 
   async findByCenter(centerId: number): Promise<Assignment[]> {
     return this.prisma.assignment.findMany({
-      where: { id_center: centerId },
+      where: { centerId: centerId },
       include: {
         workshop: true,
         center: true,
         teachers: { include: { user: true } }
       },
-      orderBy: { data_inici: 'asc' }
+      orderBy: { startDate: 'asc' }
     });
   }
 
   async findAllDetailed(role: string, centerId?: number): Promise<Assignment[]> {
     const where: Prisma.AssignmentWhereInput = {};
     if (role !== 'ADMIN' && centerId) {
-      where.id_center = centerId;
+      where.centerId = centerId;
     }
 
     return this.prisma.assignment.findMany({
@@ -45,7 +45,7 @@ export class AssignmentRepository extends BaseRepository<Assignment, Prisma.Assi
         center: true,
         teachers: { include: { user: true } }
       },
-      orderBy: { id_assignment: 'desc' }
+      orderBy: { assignmentId: 'desc' }
     });
   }
 }

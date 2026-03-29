@@ -20,7 +20,7 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
 
   useEffect(() => {
     const currentUser = getUser();
-    if (!currentUser || currentUser.rol.nom_rol !== ROLES.COORDINATOR) {
+    if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
       router.push('/login');
       return;
     }
@@ -45,7 +45,7 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
     try {
       const api = getApi();
       await api.post(`/assignments/${id}/compliance`, {
-        idStudent: idInscripcio,
+        enrollmentId: idInscripcio,
         [field]: value
       });
       
@@ -55,7 +55,7 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
         return {
           ...prev,
           enrollments: prev.enrollments?.map((ins) => 
-            ins.id_enrollment === idInscripcio ? { ...ins, [field]: value } : ins
+            ins.enrollmentId === idInscripcio ? { ...ins, [field]: value } : ins
           )
         };
       });
@@ -101,33 +101,33 @@ export default function AuthorizationsPage({ params }: { params: Promise<{ id: s
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {assignment.enrollments?.map((ins: Enrollment) => (
-                  <tr key={ins.id_enrollment} className="hover:bg-gray-50 transition-colors">
+                  <tr key={ins.enrollmentId} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="text-sm font-bold text-consorci-darkBlue uppercase tracking-tight">
-                        {ins.student?.name} {ins.student?.surnames}
+                        {ins.student?.fullName}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <input 
                         type="checkbox" 
-                        checked={!!ins.validated_pedagogical_agreement} 
-                        onChange={(e) => handleToggleCompliance(ins.id_enrollment, 'validated_pedagogical_agreement', e.target.checked)}
+                        checked={!!ins.isPedagogicalAgreementValidated} 
+                        onChange={(e) => handleToggleCompliance(ins.enrollmentId, 'isPedagogicalAgreementValidated', e.target.checked)}
                         className="w-5 h-5 border-2 border-gray-200 text-consorci-darkBlue focus:ring-0"
                       />
                     </td>
                     <td className="px-6 py-4 text-center">
                       <input 
                         type="checkbox" 
-                        checked={!!ins.validated_image_rights} 
-                        onChange={(e) => handleToggleCompliance(ins.id_enrollment, 'validated_image_rights', e.target.checked)}
+                        checked={!!ins.isImageRightsValidated} 
+                        onChange={(e) => handleToggleCompliance(ins.enrollmentId, 'isImageRightsValidated', e.target.checked)}
                         className="w-5 h-5 border-2 border-gray-200 text-consorci-darkBlue focus:ring-0"
                       />
                     </td>
                     <td className="px-6 py-4 text-center">
                       <input 
                         type="checkbox" 
-                        checked={!!ins.validated_mobility_authorization} 
-                        onChange={(e) => handleToggleCompliance(ins.id_enrollment, 'validated_mobility_authorization', e.target.checked)}
+                        checked={!!ins.isMobilityAuthorizationValidated} 
+                        onChange={(e) => handleToggleCompliance(ins.enrollmentId, 'isMobilityAuthorizationValidated', e.target.checked)}
                         className="w-5 h-5 border-2 border-gray-200 text-consorci-darkBlue focus:ring-0"
                       />
                     </td>

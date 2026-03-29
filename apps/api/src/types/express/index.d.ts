@@ -4,7 +4,7 @@ declare global {
       user?: {
         userId: number;
         role: string;
-        centreId?: number;
+        centerId?: number;
       };
     }
   }

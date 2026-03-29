@@ -1,8 +1,10 @@
 import { Stack } from 'expo-router';
 import { useColorScheme } from 'nativewind';
+import { useTranslation } from 'react-i18next';
 import { THEME } from '@iter/shared';
 
 export default function ProfessorStackLayout() {
+  const { t } = useTranslation();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -19,9 +21,9 @@ export default function ProfessorStackLayout() {
       headerShadowVisible: false,
     }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="sesion/[id]" options={{ title: 'Sesión' }} />
-      <Stack.Screen name="evaluacion/[id]" options={{ title: 'Evaluación' }} />
-      <Stack.Screen name="questionari/[id]" options={{ title: 'Valoració Taller' }} />
+      <Stack.Screen name="session/[id]" options={{ title: t('Routes.session') }} />
+      <Stack.Screen name="evaluation/[id]" options={{ title: t('Routes.evaluation') }} />
+      <Stack.Screen name="questionnaire/[id]" options={{ title: t('Routes.questionnaire') }} />
     </Stack>
   );
 }

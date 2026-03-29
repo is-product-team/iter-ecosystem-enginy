@@ -21,7 +21,7 @@ export default function Index() {
             token = await SecureStore.getItemAsync('token');
             userData = await SecureStore.getItemAsync('user');
           } catch (ssError) {
-            console.warn("⚠️ [Auth] Error llegint SecureStore:", ssError);
+            console.warn("⚠️ [Auth] Error reading SecureStore:", ssError);
             token = null;
             userData = null;
           }
@@ -30,21 +30,21 @@ export default function Index() {
         if (token && userData) {
           try {
             const user = JSON.parse(userData);
-            if (user.rol?.nom_rol === 'PROFESSOR') {
+            if (user.role?.roleName === 'PROFESSOR') {
               setHasToken(true);
             } else {
-              console.warn("⚠️ [Auth] Rol no permès en mòbil:", user.rol?.nom_rol);
+              console.warn("⚠️ [Auth] Role not permitted on mobile:", user.role?.roleName);
               setHasToken(false);
             }
           } catch (e) {
-            console.error("⚠️ [Auth] Error parsejant usuari:", e);
+            console.error("⚠️ [Auth] Error parsing user:", e);
             setHasToken(false);
           }
         } else {
           setHasToken(false);
         }
       } catch (error) {
-        console.error("⚠️ [Auth] Error crític en checkAuth:", error);
+        console.error("⚠️ [Auth] Critical error in checkAuth:", error);
         setHasToken(false);
       } finally {
         setIsLoading(false);

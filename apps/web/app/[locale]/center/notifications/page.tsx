@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import notificationService, { Notificacio } from '@/services/notificationService';
+import notificationService, { Notification } from '@/services/notificationService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function NotificationsPage() {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState<Notificacio[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Dialog states
@@ -47,7 +47,7 @@ export default function NotificationsPage() {
   const markRead = async (id: number) => {
     try {
       await notificationService.markAsRead(id);
-      setNotifications(prev => prev.map(n => n.id_notificacio === id ? { ...n, llegida: true } : n));
+      setNotifications(prev => prev.map(n => n.notificationId === id ? { ...n, isRead: true } : n));
     } catch (error) {
       console.error("Error marking as read", error);
     }
@@ -62,7 +62,7 @@ export default function NotificationsPage() {
       onConfirm: async () => {
         try {
           await notificationService.delete(id);
-          setNotifications(prev => prev.filter(n => n.id_notificacio !== id));
+          setNotifications(prev => prev.filter(n => n.notificationId !== id));
           toast.success("Alert deleted.");
         } catch (_error) {
           toast.error("Error deleting alert.");
@@ -80,15 +80,15 @@ export default function NotificationsPage() {
     }
   };
 
-  const getTypeIcon = (tipus: string) => {
-    switch (tipus) {
-      case 'PETICIO':
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'REQUEST':
         return (
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         );
-      case 'FASE':
+      case 'PHASE':
         return (
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -105,8 +105,8 @@ export default function NotificationsPage() {
 
   return (
     <DashboardLayout
-      title={user?.rol.nom_rol === 'ADMIN' ? "System Alerts Control" : "Alerts and Notifications"}
-      subtitle={user?.rol.nom_rol === 'ADMIN' ? "Global communication and alert management for all users." : "Stay up to date with phase changes, request resolutions, and official communications."}
+      title={user?.role.name === 'ADMIN' ? "System Alerts Control" : "Alerts and Notifications"}
+      subtitle={user?.role.name === 'ADMIN' ? "Global communication and alert management for all users." : "Stay up to date with phase changes, request resolutions, and official communications."}
     >
       <div className="w-full pb-12">
         {loading ? (
@@ -115,46 +115,46 @@ export default function NotificationsPage() {
           <div className="flex flex-col border border-border-subtle bg-background-subtle/30">
             {notifications.map((notif, _index) => (
               <div
-                key={notif.id_notificacio}
-                className={`p-6 border-b border-border-subtle last:border-b-0 transition-colors hover:bg-background-surface relative ${notif.llegida ? 'bg-transparent' : 'bg-background-surface'}`}
+                key={notif.notificationId}
+                className={`p-6 border-b border-border-subtle last:border-b-0 transition-colors hover:bg-background-surface relative ${notif.isRead ? 'bg-transparent' : 'bg-background-surface'}`}
               >
-                {!notif.llegida && (
+                {!notif.isRead && (
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-consorci-darkBlue" />
                 )}
 
                 <div className="flex justify-between items-start gap-6">
                   <div className="flex gap-6 flex-1">
-                    <div className={`shrink-0 w-12 h-12 flex items-center justify-center border border-border-subtle ${notif.llegida ? 'bg-background-subtle text-text-muted' : 'bg-background-surface text-consorci-darkBlue ring-1 ring-border-subtle'}`}>
-                      {getTypeIcon(notif.tipus)}
+                    <div className={`shrink-0 w-12 h-12 flex items-center justify-center border border-border-subtle ${notif.isRead ? 'bg-background-subtle text-text-muted' : 'bg-background-surface text-consorci-darkBlue ring-1 ring-border-subtle'}`}>
+                      {getTypeIcon(notif.type || '')}
                     </div>
 
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
-                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider border ${getImportanceStyles(notif.importancia)}`}>
-                          {notif.importancia}
+                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider border ${getImportanceStyles(notif.importance || '')}`}>
+                          {notif.importance}
                         </span>
-                        <h3 className={`font-black tracking-tight leading-tight ${notif.llegida ? 'text-text-muted' : 'text-text-primary text-lg'}`}>
-                          {notif.titol}
+                        <h3 className={`font-black tracking-tight leading-tight ${notif.isRead ? 'text-text-muted' : 'text-text-primary text-lg'}`}>
+                          {notif.title}
                         </h3>
                       </div>
 
-                      <p className={`text-sm leading-relaxed mb-4 ${notif.llegida ? 'text-text-muted' : 'text-text-secondary'}`}>
-                        {notif.missatge}
+                      <p className={`text-sm leading-relaxed mb-4 ${notif.isRead ? 'text-text-muted' : 'text-text-secondary'}`}>
+                        {notif.message}
                       </p>
 
                       <div className="text-[10px] font-black text-text-muted uppercase tracking-widest flex items-center gap-2">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        {new Date(notif.data_creacio).toLocaleString()}
+                        {new Date(notif.createdAt).toLocaleString()}
                       </div>
                     </div>
                   </div>
 
                   <div className="flex gap-2">
-                      {!notif.llegida && (
+                      {!notif.isRead && (
                         <button
-                          onClick={() => markRead(notif.id_notificacio)}
+                          onClick={() => markRead(notif.notificationId)}
                           className="p-2 bg-background-subtle hover:bg-consorci-darkBlue hover:text-white border border-border-subtle transition-all active:scale-90"
                           title="Mark as read"
                         >
@@ -164,7 +164,7 @@ export default function NotificationsPage() {
                         </button>
                       )}
                       <button
-                        onClick={() => deleteNotif(notif.id_notificacio)}
+                        onClick={() => deleteNotif(notif.notificationId)}
                         className="p-2 bg-background-subtle hover:bg-red-50 hover:text-red-600 border border-border-subtle transition-all active:scale-90"
                         title="Delete"
                       >

@@ -1,18 +1,19 @@
 import { RoleTag } from '@iter/shared';
 
 export interface User {
-  id_user: number;
-  nom_complet: string;
+  userId: number;
+  fullName: string;
   email: string;
-  url_foto?: string | null;
-  id_center?: number | null;
+  photoUrl?: string | null;
+  phone?: string | null;
+  centerId?: number | null;
   center?: {
-    id_center: number;
-    nom: string;
-    codi_center?: string;
+    centerId: number;
+    name: string;
+    centerCode?: string;
   };
-  rol: {
-    nom_rol: RoleTag;
+  role: {
+    name: RoleTag;
   };
 }
 
@@ -40,7 +41,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
   }
 
   const data = await res.json();
-  
+
   // Store user in localStorage, but cookie handles the token
   if (typeof window !== 'undefined') {
     localStorage.setItem('user', JSON.stringify(data.user));
@@ -65,7 +66,7 @@ export function getUser(): User | null {
       try {
         const user = JSON.parse(userStr);
         // Basic validation: ensure the user has a valid role structure
-        if (!user || !user.rol || typeof user.rol.nom_rol !== 'string') {
+        if (!user || !user.role || typeof user.role.name !== 'string') {
           console.warn("Malformed user data in localStorage, clearing session.");
           localStorage.removeItem('user');
           localStorage.removeItem('token');

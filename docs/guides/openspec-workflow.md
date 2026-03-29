@@ -12,28 +12,28 @@ We use a 4-phase cycle to manage all changes safely and predictably.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Explore: /opsx-explore
+    [*] --> Explore: /opsx:explore
     Explore --> Propose: Idea Crystallized
-    Propose --> Apply: /opsx-propose (Tasks Created)
-    Apply --> Implementation: /opsx-apply
+    Propose --> Apply: /opsx:propose (Tasks Created)
+    Apply --> Implementation: /opsx:apply
     Implementation --> Implementation: Task Loop
     Implementation --> Archive: All Tasks [x]
-    Archive --> [*]: /opsx-archive
+    Archive --> [*]: /opsx:archive
 ```
 
-### Phase 1: Exploration (`/opsx-explore`)
+### Phase 1: Exploration (`/opsx:explore`)
 - **Thinking Partner**: Analyze the codebase and existing specs.
 - **Outcome**: A solid technical direction.
 
-### Phase 2: Proposal (`/opsx-propose`)
+### Phase 2: Proposal (`/opsx:propose`)
 - **Change Management**: Automatically creates a dedicated change directory.
 - **Artifacts**: `proposal.md`, `design.md`, `tasks.md`.
 
-### Phase 3: Implementation (`/opsx-apply`)
+### Phase 3: Implementation (`/opsx:apply`)
 - **Execution**: The AI works through the task checklist.
 - **Verification**: Immediate feedback on code changes.
 
-### Phase 4: Archival (`/opsx-archive`)
+### Phase 4: Archival (`/opsx:archive`)
 - **Knowledge Synchronization**: Updates global specs and archives the change.
 
 ## 3. Best Practices

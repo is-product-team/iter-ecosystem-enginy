@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
-import { ca } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 export interface CalendarEvent {
   id: string;
@@ -12,9 +12,9 @@ export interface CalendarEvent {
   type: 'milestone' | 'deadline' | 'assignment' | 'session';
   description?: string;
   metadata?: {
-    hora?: string;
-    centre?: string;
-    id_assignacio?: number;
+    hour?: string;
+    center?: string;
+    assignmentId?: number;
     [key: string]: unknown;
   };
   colorClass?: string;
@@ -31,7 +31,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const monthName = format(currentDate, 'MMMM', { locale: ca });
+  const monthName = format(currentDate, 'MMMM', { locale: enUS });
   const year = currentDate.getFullYear();
 
   // Notify parent on range change
@@ -116,7 +116,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
               </svg>
             </button>
             <button onClick={() => setCurrentDate(new Date())} className="px-6 h-10 bg-background-surface border border-border-subtle text-[10px] font-bold uppercase tracking-widest text-text-primary">
-              Avui
+              Today
             </button>
             <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center hover:bg-background-surface transition-colors text-text-muted">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -128,7 +128,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
 
         {/* Weekdays */}
         <div className="grid grid-cols-7 border-b border-border-subtle bg-background-subtle">
-          {['dl', 'dt', 'dc', 'dj', 'dv', 'ds', 'dg'].map(d => (
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
             <div key={d} className="py-4 text-center">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">{d}</span>
             </div>
@@ -229,10 +229,10 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
       <div className="w-full xl:w-[400px] bg-background-surface flex flex-col">
         <div className="p-8 border-b border-border-subtle">
           <h3 className="text-[10px] font-black text-text-muted uppercase tracking-[0.3em] mb-4">
-            DETALL DEL DIA
+            DAY DETAIL
           </h3>
           <p className="text-2xl font-black text-text-primary uppercase tracking-tighter">
-            {format(selectedDate, "eeee, d 'de' MMMM", { locale: ca })}
+            {format(selectedDate, "eeee, MMMM do", { locale: enUS })}
           </p>
         </div>
 
@@ -242,7 +242,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
               <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-xs font-bold uppercase tracking-widest italic">Sense activitat</p>
+              <p className="text-xs font-bold uppercase tracking-widest italic">No activity</p>
             </div>
           ) : (
             selectedDayEvents.map(event => (
@@ -258,17 +258,17 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
                 <h4 className="text-base font-black text-text-primary uppercase tracking-tight group-hover:text-consorci-lightBlue transition-colors leading-tight">
                   {event.title}
                 </h4>
-                {event.metadata?.hora && (
+                {event.metadata?.hour && (
                   <div className="mt-4 flex items-center gap-2 text-[11px] font-black text-consorci-lightBlue uppercase tracking-widest">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    {event.metadata.hora}
+                    {event.metadata.hour}
                   </div>
                 )}
-                {event.metadata?.centre && (
+                {event.metadata?.center && (
                   <div className="mt-1 text-[10px] font-bold text-text-muted uppercase truncate">
-                    📍 {event.metadata.centre}
+                    📍 {event.metadata.center}
                   </div>
                 )}
               </div>

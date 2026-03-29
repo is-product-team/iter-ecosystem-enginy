@@ -8,16 +8,16 @@ import { RiskAnalysisService } from '../services/risk-analysis.service.js';
 export const getStatsByStatus = async (req: Request, res: Response) => {
   try {
     const counts = await prisma.request.groupBy({
-      by: ['estat'],
+      by: ['status'],
       _count: {
-        _all: true
+        status: true
       }
     });
 
     const stats = counts.map((c: any) => ({
-      estat: c.estat.toLowerCase(),
-      total: c._count._all,
-      last_update: new Date()
+      status: c.status.toLowerCase(),
+      total: c._count.status,
+      lastUpdate: new Date()
     }));
 
     res.json(stats);
@@ -31,18 +31,18 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
  */
 export const getPopularWorkshops = async (req: Request, res: Response) => {
   try {
-    const tallers = await prisma.workshop.findMany({
+    const workshops = await prisma.workshop.findMany({
       include: {
         requests: true
       },
       take: 10
     });
 
-    const stats = tallers.map((t: any) => ({
-      _id: t.titol,
-      total_solicitudes: t.requests.length,
-      alumnes_totals: t.requests.reduce((acc: number, p: any) => acc + (p.alumnes_aprox || 0), 0)
-    })).sort((a: any, b: any) => b.total_solicitudes - a.total_solicitudes);
+    const stats = workshops.map((t: any) => ({
+      title: t.title,
+      totalRequests: t.requests.length,
+      totalStudents: t.requests.reduce((acc: number, p: any) => acc + (p.studentsAprox || 0), 0)
+    })).sort((a: any, b: any) => b.totalRequests - a.totalRequests);
 
     res.json(stats);
   } catch (_error) {
@@ -56,7 +56,7 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
 export const getRecentActivity = async (req: Request, res: Response) => {
   try {
     const logs = await prisma.auditLog.findMany({
-      orderBy: { data_hora: 'desc' },
+      orderBy: { createdAt: 'desc' },
       take: 10,
       include: { user: true }
     });
@@ -73,7 +73,7 @@ export const cleanupLogs = async (req: Request, res: Response) => {
   try {
     const result = await prisma.auditLog.deleteMany({
       where: {
-        data_hora: { lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+        createdAt: { lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
       }
     });
     res.json({ success: true, deletedCount: result.count });
@@ -93,11 +93,11 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
       return res.json({ processed: 1, results: [result] });
     } else {
       const studentsWithAttendance = await prisma.attendance.findMany({
-        select: { enrollment: { select: { id_student: true } } },
-        distinct: ['id_enrollment']
+        select: { enrollment: { select: { studentId: true } } },
+        distinct: ['enrollmentId']
       });
 
-      const uniqueIds = [...new Set(studentsWithAttendance.map((a: any) => a.enrollment.id_student))];
+      const uniqueIds = [...new Set(studentsWithAttendance.map((a: any) => a.enrollment.studentId))];
 
       const results = [];
       for (const id of uniqueIds) {
@@ -113,12 +113,12 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
   }
 };
 
-// GET: Estadístiques de monitorització de la Phase 2
+// GET: Phase 2 monitoring statistics
 export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
   try {
-    const assignacions = await prisma.assignment.findMany({
+    const assignments = await prisma.assignment.findMany({
       where: {
-        estat: { in: ['PUBLISHED', 'DATA_ENTRY', 'DATA_SUBMITTED', 'VALIDATED'] }
+        status: { in: ['PUBLISHED', 'DATA_ENTRY', 'DATA_SUBMITTED', 'VALIDATED'] }
       },
       include: {
         center: true,
@@ -128,25 +128,25 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
       }
     });
 
-    const monitoring = assignacions.map((a: any) => {
+    const monitoring = assignments.map((a: any) => {
       const hasTeachers = a.teachers.length >= 2;
       const hasStudents = a.enrollments.length > 0;
       const allDocsOk = a.enrollments.every((i: any) => {
-        const docs = (i.docs_status as any) || {};
-        return docs.acord_pedagogic && docs.autoritzacio_mobilitat && docs.registre_ceb_confirmat;
+        const docs = (i.docsStatus as any) || {};
+        return docs.pedagogicalAgreement && docs.mobilityAuthorization && docs.cebRegistrationConfirmed;
       });
       const isComplete = hasTeachers && hasStudents && allDocsOk;
 
       return {
-        id_assignment: a.id_assignment,
-        center: a.center.nom,
-        workshop_id: a.id_workshop,
-        estat: a.estat,
-        completat: isComplete,
-        detalls: {
+        assignmentId: a.assignmentId,
+        center: a.center.name,
+        workshopId: a.workshopId,
+        status: a.status,
+        isComplete: isComplete,
+        details: {
           teachers: hasTeachers,
           students: hasStudents,
-          documentacio: allDocsOk
+          documentation: allDocsOk
         }
       };
     });
@@ -154,6 +154,6 @@ export const getPhase2MonitoringStats = async (req: Request, res: Response) => {
     res.json(monitoring);
   } catch (_error) {
     console.error("Error monitoring Phase 2:", _error);
-    res.status(500).json({ error: 'Error al obtenir estadístiques de monitorització.' });
+    res.status(500).json({ error: 'Error getting monitoring statistics.' });
   }
 };

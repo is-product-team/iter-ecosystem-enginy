@@ -56,12 +56,12 @@ export default function AdminRequestsPage() {
       const [fetchedWorkshops, fetchedRequests, fetchedPhases, fetchedCenters] = await Promise.all([
         workshopService.getAll(),
         requestService.getAll(),
-        apiInstance.get('/fases'),
+        apiInstance.get('/phases'),
         centerService.getAll()
       ]);
       setWorkshops(fetchedWorkshops);
       setRequests(fetchedRequests);
-      _setPhases(fetchedPhases.data.data);
+      _setPhases(fetchedPhases.data);
       setCenters(fetchedCenters);
     } catch (err) {
       console.error(err);
@@ -72,7 +72,7 @@ export default function AdminRequestsPage() {
   };
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== 'ADMIN')) {
+    if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
       router.push('/login');
       return;
     }
@@ -82,15 +82,15 @@ export default function AdminRequestsPage() {
     }
   }, [user, authLoading, router]);
 
-  const handleApprove = (idRequest: number) => {
+  const handleApprove = (requestId: number) => {
     setConfirmConfig({
       isOpen: true,
       title: 'Approve Request',
       message: 'Are you sure you want to approve this request and generate the assignment immediately?',
       onConfirm: async () => {
         try {
-          await requestService.updateStatus(idRequest, REQUEST_STATUSES.APPROVED);
-          await assignmentService.createFromRequest(idRequest);
+          await requestService.updateStatus(requestId, REQUEST_STATUSES.APPROVED);
+          await assignmentService.createFromRequest(requestId);
           await fetchData();
           toast.success('Request approved and assignment generated successfully.');
         } catch (err) {
@@ -101,7 +101,7 @@ export default function AdminRequestsPage() {
     });
   };
 
-  const handleReject = async (idRequest: number) => {
+  const handleReject = async (requestId: number) => {
     setConfirmConfig({
       isOpen: true,
       title: 'Reject Request',
@@ -109,7 +109,7 @@ export default function AdminRequestsPage() {
       isDestructive: true,
       onConfirm: async () => {
         try {
-          await requestService.updateStatus(idRequest, REQUEST_STATUSES.REJECTED);
+          await requestService.updateStatus(requestId, REQUEST_STATUSES.REJECTED);
           await fetchData();
           toast.success('Request rejected.');
         } catch (err) {
@@ -152,7 +152,7 @@ export default function AdminRequestsPage() {
   const handleEditClick = (request: Request) => {
     setEditingRequest(request);
     setEditFormData({
-      approxStudents: request.approxStudents || 0,
+      approxStudents: request.studentsAprox || 0,
       comments: request.comments || ''
     });
     setIsEditModalOpen(true);
@@ -163,8 +163,8 @@ export default function AdminRequestsPage() {
     if (!editingRequest) return;
 
     try {
-      await requestService.update(editingRequest.id_request, {
-        approxStudents: editFormData.approxStudents,
+      await requestService.update(editingRequest.requestId, {
+        studentsAprox: editFormData.approxStudents,
         comments: editFormData.comments
       });
       toast.success('Request updated successfully.');
@@ -179,7 +179,7 @@ export default function AdminRequestsPage() {
   // Filtered Requests based on Center Selection
   const filteredRequests = useMemo(() => {
     return requests.filter(r => {
-      const matchesCenter = !selectedCenterId || r.id_center === parseInt(selectedCenterId);
+      const matchesCenter = !selectedCenterId || r.centerId === parseInt(selectedCenterId);
       return matchesCenter;
     });
   }, [requests, selectedCenterId]);
@@ -188,8 +188,8 @@ export default function AdminRequestsPage() {
   const workshopRequests = useMemo(() => {
     const map: Record<number, Request[]> = {};
     filteredRequests.forEach(r => {
-      if (!map[r.id_workshop]) map[r.id_workshop] = [];
-      map[r.id_workshop].push(r);
+      if (!map[r.workshopId]) map[r.workshopId] = [];
+      map[r.workshopId].push(r);
     });
     return map;
   }, [filteredRequests]);
@@ -261,7 +261,7 @@ export default function AdminRequestsPage() {
               >
                 <option value="">All centers</option>
                 {centers.map(c => (
-                  <option key={c.id_center} value={c.id_center}>{c.nom}</option>
+                  <option key={c.centerId} value={c.centerId}>{c.name}</option>
                 ))}
               </select>
             </div>
@@ -339,17 +339,17 @@ export default function AdminRequestsPage() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {currentRequests.map(r => (
-                        <tr key={r.id_request} className="hover:bg-gray-50/50 transition-colors">
+                        <tr key={r.requestId} className="hover:bg-gray-50/50 transition-colors">
                           <td className="px-6 py-4">
                             <div className="text-sm font-bold text-[#00426B]">{r.center?.name}</div>
-                            <div className="text-[10px] font-bold text-gray-400">{new Date(r.requestDate).toLocaleDateString()}</div>
+                            <div className="text-[10px] font-bold text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</div>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1Id ? `Teacher ${r.teacher1Id}` : '-'}</div>
-                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2Id ? `Teacher ${r.teacher2Id}` : '-'}</div>
+                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1?.name || (r.prof1Id ? `Teacher ${r.prof1Id}` : '-')}</div>
+                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2?.name || (r.prof2Id ? `Teacher ${r.prof2Id}` : '-')}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <span className="bg-gray-100 px-2 py-1 text-xs font-black text-[#00426B]">{r.approxStudents}</span>
+                            <span className="bg-gray-100 px-2 py-1 text-xs font-black text-[#00426B]">{r.studentsAprox}</span>
                           </td>
                           <td className="px-6 py-4">
                             <span className={`text-[9px] font-black uppercase px-2 py-1 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200 text-orange-600 bg-orange-50' :
@@ -377,14 +377,14 @@ export default function AdminRequestsPage() {
                                 </button>
                                 {r.status === REQUEST_STATUSES.PENDING && (
                                   <button
-                                    onClick={() => handleApprove(r.id_request)}
+                                    onClick={() => handleApprove(r.requestId)}
                                     className="px-3 py-1.5 bg-[#00426B] text-white text-[9px] font-black uppercase tracking-widest hover:bg-[#0775AB]"
                                   >
                                     Approve
                                   </button>
                                 )}
                                 <button
-                                  onClick={() => handleReject(r.id_request)}
+                                  onClick={() => handleReject(r.requestId)}
                                   className="px-3 py-1.5 border border-red-200 text-red-600 text-[9px] font-black uppercase tracking-widest hover:bg-red-50"
                                 >
                                   Reject

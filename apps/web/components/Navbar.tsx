@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
       const fetchUnread = async () => {
         try {
           const list = await notificationService.getAll();
-          setUnreadCount(list.filter(n => !n.llegida).length);
+          setUnreadCount(list.filter(n => !n.isRead).length);
         } catch (error) {
           console.error("Error fetching notifications for navbar", error);
         }
@@ -32,20 +32,20 @@ const Navbar: React.FC = () => {
 
   if (!user) return null;
 
-  const isAdmin = user.rol.nom_rol === ROLES.ADMIN;
-  const isCoordinator = user.rol.nom_rol === ROLES.COORDINATOR;
+  const isAdmin = user.role.name === ROLES.ADMIN;
+  const isCoordinator = user.role.name === ROLES.COORDINATOR;
 
-  const getInicioPath = () => {
-    if (isAdmin) return '/admin';
-    if (isCoordinator) return '/center';
-    return '/';
+  const getHomePath = () => {
+    if (isAdmin) return `/admin`;
+    if (isCoordinator) return `/center`;
+    return `/`;
   };
 
   const navLinks = [
-    { label: 'Home', path: getInicioPath(), show: true },
-    { label: 'Notifications', path: '/center/notifications', show: true, isNotifications: true },
-    { label: 'Calendar', path: '/calendar', show: true },
-    { label: 'Profile', path: '/perfil', show: true },
+    { label: 'Home', path: getHomePath(), show: true },
+    { label: 'Notifications', path: `/center/notifications`, show: true, isNotifications: true },
+    { label: 'Calendar', path: `/calendar`, show: true },
+    { label: 'Profile', path: `/profile`, show: true },
   ];
 
   return (
@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
       <div className="max-w-[1440px] mx-auto container-responsive">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href={getInicioPath()} className="flex items-center">
+            <Link href={getHomePath()} className="flex items-center">
               <Image 
                 src="/logo.png" 
                 alt="Iter Logo" 
@@ -99,11 +99,14 @@ const Navbar: React.FC = () => {
 
             <div className="flex items-center border-l border-border-subtle pl-8 h-8 my-auto gap-6">
               <div className="flex flex-col items-end">
+                <span className="text-consorci-darkBlue text-[11px] font-black uppercase tracking-widest mb-0.5">
+                  {user.fullName}
+                </span>
                 <span className="text-text-primary text-[10px] font-bold uppercase tracking-widest">
-                  {user.center?.nom || 'Educational center'}
+                  {user.center?.name || 'Educational center'}
                 </span>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 truncate max-w-[180px]">
-                  {user.rol?.nom_rol} {user.center?.codi_center ? `• ${user.center.codi_center}` : ''}
+                  {user.role?.name} {user.center?.centerCode ? `• ${user.center.centerCode}` : ''}
                 </span>
               </div>
               <button

@@ -5,8 +5,8 @@ import getApi from '@/services/api';
 import { toast } from 'sonner';
 
 interface DocumentUploadProps {
-  idAssignacio: number;
-  idInscripcio: number;
+  assignmentId: number;
+  enrollmentId: number;
   documentType: 'pedagogical_agreement' | 'mobility_authorization' | 'image_rights';
   initialUrl?: string | null;
   isValidated?: boolean;
@@ -15,44 +15,44 @@ interface DocumentUploadProps {
 }
 
 export default function DocumentUpload({
-  idAssignacio,
-  idInscripcio,
+  assignmentId,
+  enrollmentId,
   documentType,
   initialUrl,
   isValidated,
   label,
   onUploadSuccess
 }: DocumentUploadProps) {
-  // --- Estados de carga y validación ---
-  const [uploading, setUploading] = useState(false); // Indica si la subida HTTP al backend está en curso
-  const [currentUrl, setCurrentUrl] = useState(initialUrl); // URL actual del documento subido
-  const [validatingAI, setValidatingAI] = useState(false); // Indica si el pipeline de IA (TensorFlow/PDF.js) está trabajando
-  const [overrideMode, setOverrideMode] = useState(false); // Se activa si la IA rechaza el doc, permitiendo subida manual
-  const [pendingFile, setPendingFile] = useState<File | null>(null); // Almacena el archivo que falló la validación para el "Forzado"
+  // --- Upload and Validation States ---
+  const [uploading, setUploading] = useState(false); // Indicates if the HTTP upload to backend is in progress
+  const [currentUrl, setCurrentUrl] = useState(initialUrl); // Current URL of the uploaded document
+  const [validatingAI, setValidatingAI] = useState(false); // Indicates if the AI pipeline (TensorFlow/PDF.js) is working
+  const [overrideMode, setOverrideMode] = useState(false); // Activated if AI rejects the doc, allowing manual upload
+  const [pendingFile, setPendingFile] = useState<File | null>(null); // Stores the file that failed validation for "Forced" upload
 
   /**
-   * Realiza la subida física del archivo al servidor una vez validado (o forzado).
+   * Performs the physical file upload to the server once validated (or forced).
    */
   const handleValidUpload = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('idInscripcio', idInscripcio.toString());
+    formData.append('idEnrollment', enrollmentId.toString());
     formData.append('documentType', documentType);
 
     try {
       setUploading(true);
       const api = getApi();
-      const res = await api.post(`/assignments/${idAssignacio}/student-document`, formData, {
+      const res = await api.post(`/assignments/${assignmentId}/student-document`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      // Extraemos la URL desde el campo JSON 'docs_status' de la respuesta (modelo Enrollment)
+      // Extract the URL from the 'docs_status' JSON field of the response (Enrollment model)
       const docsStatus = res.data.docs_status || {};
-      const fieldKey = documentType === 'pedagogical_agreement' ? 'acord_pedagogic' :
-                       documentType === 'mobility_authorization' ? 'autoritzacio_mobilitat' :
-                       'drets_imatge';
+      const fieldKey = documentType === 'pedagogical_agreement' ? 'pedagogicalAgreementUrl' :
+                       documentType === 'mobility_authorization' ? 'mobilityAuthorizationUrl' :
+                       'imageRightsUrl';
       
       const newUrl = docsStatus[fieldKey];
 
@@ -60,7 +60,7 @@ export default function DocumentUpload({
       if (newUrl) onUploadSuccess(newUrl);
       toast.success(`${label} uploaded successfully.`);
       
-      // Limpiamos estados de error/bloqueo tras éxito
+      // Clear error/blocking states after success
       setOverrideMode(false);
       setPendingFile(null);
     } catch (error) {
@@ -72,13 +72,13 @@ export default function DocumentUpload({
   };
 
   /**
-   * Orquestador de la validación por IA al seleccionar un archivo.
+   * Orchestrates AI validation when a file is selected.
    */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validación básica de formato
+    // Basic format validation
     if (file.type !== 'application/pdf') {
       toast.error('Only PDF files are allowed.');
       return;
@@ -88,44 +88,44 @@ export default function DocumentUpload({
       setValidatingAI(true);
       setOverrideMode(false);
       
-      // Carga dinámica de utilidades para no penalizar el bundle inicial
+      // Dynamic loading of utilities to avoid penalizing the initial bundle
       const { extractTextFromPdf, classifyDocumentType } = await import('@/lib/pdfUtils');
       const text = await extractTextFromPdf(file);
       const detectedType = classifyDocumentType(text);
 
-      // Mapeo entre el tipo esperado por props y el detectado por IA (heurísticas de texto)
-      const expectedInIAPipeline = documentType === 'pedagogical_agreement' ? 'acord_pedagogic' : 
-                                   documentType === 'mobility_authorization' ? 'autoritzacio_mobilitat' : 
-                                   documentType === 'image_rights' ? 'drets_imatge' : 'unknown';
+      // Mapping between the type expected by props and the one detected by AI (text heuristics)
+      const expectedInIAPipeline = documentType === 'pedagogical_agreement' ? 'pedagogical_agreement' : 
+                                   documentType === 'mobility_authorization' ? 'mobility_authorization' : 
+                                   documentType === 'image_rights' ? 'image_rights' : 'unknown';
 
-      // Validación 1: El contenido del texto debe coincidir con el tipo de "slot" de subida
+      // Validation 1: Text content must match the upload slot type
       if (detectedType !== 'unknown' && detectedType !== expectedInIAPipeline) {
-        toast.error(`IA detecta un tipus diferent: ${detectedType}.`);
+        toast.error(`AI detects a different type: ${detectedType}.`);
         setOverrideMode(true);
         setPendingFile(file);
         return;
       }
 
-      // Validación 2: Si es Acord Pedagògic, usamos Visión Artificial (TF.js) para buscar firmas
+      // Validation 2: If it's a Pedagogical Agreement, use Computer Vision (TF.js) to look for signatures
       if (documentType === 'pedagogical_agreement') {
         const { signatureDetector } = await import('@/lib/visionUtils');
-        await signatureDetector.loadModel(); // Carga modelo YOLOv8 si no está en memoria
+        await signatureDetector.loadModel(); // Load YOLOv8 model if not in memory
         const croppedCanvas = await signatureDetector.getBottomThirdOfLastPage(file);
-        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // Buscamos 3 firmas
+        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // We look for 3 signatures
 
         if (!hasSignatures) {
-          toast.error('IA no ha detectat les signatures obligatòries.');
+          toast.error('AI has not detected the required signatures.');
           setOverrideMode(true);
           setPendingFile(file);
           return;
         }
       }
 
-      // Si pasa todos los filtros, procedemos a la subida real
+      // If it passes all filters, proceed to real upload
       await handleValidUpload(file);
     } catch (err) {
       console.error("AI Validation Error:", err);
-      toast.error('Error processant IA. Pots forçar la pujada.');
+      toast.error('Error processing AI. You can force the upload.');
       setOverrideMode(true);
       setPendingFile(file);
     } finally {
@@ -163,14 +163,14 @@ export default function DocumentUpload({
               onClick={() => handleValidUpload(pendingFile)}
               className="px-3 py-1 text-[8px] font-bold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition-all uppercase"
             >
-              Forçar Pujada Manual
+              Force Manual Upload
             </button>
           )}
           
           <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${
             uploading || validatingAI ? 'bg-gray-50 border-gray-100 text-gray-300' : 'border-[#00426B] text-[#00426B] hover:bg-blue-50'
           }`}>
-            {uploading ? 'PUJANT...' : validatingAI ? 'VALIDANT (IA)...' : currentUrl ? 'CANVIAR' : 'ADJUNTAR'}
+            {uploading ? 'UPLOADING...' : validatingAI ? 'VALIDATING (AI)...' : currentUrl ? 'CHANGE' : 'ATTACH'}
             <input
               type="file"
               className="hidden"

@@ -14,45 +14,45 @@ export const getEnrollmentEvaluation = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Evaluation not found' });
         }
         res.json(evaluation);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error fetching evaluation' });
     }
 };
 
 export const upsertEvaluation = async (req: Request, res: Response) => {
     try {
-        let { id_enrollment, id_student, id_assignment, observacions, competencies, percentatge_asistencia, numero_retards } = req.body;
+        let { enrollmentId, studentId, assignmentId, observations, competencies, attendancePercentage, lateCount } = req.body;
 
-        if (!id_enrollment) {
-            if (id_student && id_assignment) {
-                const inscripcio = await prisma.enrollment.findFirst({
+        if (!enrollmentId) {
+            if (studentId && assignmentId) {
+                const enrollment = await prisma.enrollment.findFirst({
                     where: {
-                        id_student: parseInt(id_student),
-                        id_assignment: parseInt(id_assignment)
+                        studentId: parseInt(studentId),
+                        assignmentId: parseInt(assignmentId)
                     }
                 });
 
-                if (inscripcio) {
-                    id_enrollment = inscripcio.id_enrollment;
+                if (enrollment) {
+                    enrollmentId = enrollment.enrollmentId;
                 } else {
                     return res.status(404).json({ error: 'Enrollment not found for this student and assignment.' });
                 }
             } else {
-                return res.status(400).json({ error: 'Required id_enrollment OR (id_student + id_assignment).' });
+                return res.status(400).json({ error: 'Required enrollmentId OR (studentId + assignmentId).' });
             }
         }
 
-        if (!id_assignment) {
-            return res.status(400).json({ error: 'id_assignment is required.' });
+        if (!assignmentId) {
+            return res.status(400).json({ error: 'assignmentId is required.' });
         }
 
         const dataToUpsert = {
-            id_enrollment: parseInt(id_enrollment),
-            id_assignment: parseInt(id_assignment),
-            observacions: observacions || '',
+            enrollmentId: parseInt(enrollmentId),
+            assignmentId: parseInt(assignmentId),
+            observations: observations || '',
             competences: competencies || [], // Mapped to competences
-            percentatge_asistencia: percentatge_asistencia || 100, 
-            numero_retards: numero_retards || 0
+            attendancePercentage: attendancePercentage || 100, 
+            lateCount: lateCount || 0
         };
 
         const result = await evaluationService.upsertEvaluation(dataToUpsert as any);
@@ -67,7 +67,7 @@ export const getCompetencies = async (req: Request, res: Response) => {
     try {
         const competencies = await evaluationService.getCompetencies();
         res.json(competencies);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error fetching competencies' });
     }
 };
@@ -80,7 +80,7 @@ export const analyzeObservations = async (req: Request, res: Response) => {
     try {
         const analysis = await evaluationService.analyzeObservationsAI(text);
         res.json(analysis);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: 'Error analyzing observations' });
     }
 };
@@ -97,8 +97,8 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
         const enrollmentRecord = await prisma.enrollment.findFirst({
             where: {
-                id_student: parseInt(studentId),
-                id_assignment: parseInt(assignmentId)
+                studentId: parseInt(studentId),
+                assignmentId: parseInt(assignmentId)
             }
         });
 
@@ -107,26 +107,26 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
         if (enrollmentRecord) {
             const existingAttendance = await prisma.attendance.findFirst({
                 where: {
-                    id_enrollment: enrollmentRecord.id_enrollment,
-                    numero_sessio: parseInt(sessionId)
+                    enrollmentId: enrollmentRecord.enrollmentId,
+                    sessionNumber: parseInt(sessionId)
                 }
             });
 
             const dataToSave = {
-                id_enrollment: enrollmentRecord.id_enrollment,
-                numero_sessio: parseInt(sessionId),
-                data_session: new Date(),
-                estat: nlpResult.attendanceStatus || (existingAttendance ? existingAttendance.estat : 'Present'),
-                observacions: text
+                enrollmentId: enrollmentRecord.enrollmentId,
+                sessionNumber: parseInt(sessionId),
+                sessionDate: new Date(),
+                status: nlpResult.attendanceStatus || (existingAttendance ? existingAttendance.status : 'PRESENT'),
+                observations: text
             };
 
             if (existingAttendance) {
                 attendanceRecord = await prisma.attendance.update({
-                    where: { id_attendance: existingAttendance.id_attendance },
+                    where: { attendanceId: existingAttendance.attendanceId },
                     data: {
-                        estat: dataToSave.estat,
-                        observacions: dataToSave.observacions,
-                        data_session: new Date()
+                        status: dataToSave.status,
+                        observations: dataToSave.observations,
+                        sessionDate: new Date()
                     }
                 });
             } else {
@@ -139,31 +139,31 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
         let competenceEval = null;
         if (nlpResult.competenceUpdate && enrollmentRecord) {
             const competence = await prisma.competence.findFirst({
-                where: { tipus: 'Transversal' }
+                where: { type: 'Transversal' }
             });
 
             if (competence) {
-                let docentEval = await prisma.evaluation.findUnique({
-                    where: { id_enrollment: enrollmentRecord.id_enrollment }
+                let teacherEval = await prisma.evaluation.findUnique({
+                    where: { enrollmentId: enrollmentRecord.enrollmentId }
                 });
 
-                if (!docentEval) {
-                    docentEval = await prisma.evaluation.create({
+                if (!teacherEval) {
+                    teacherEval = await prisma.evaluation.create({
                         data: {
-                            id_enrollment: enrollmentRecord.id_enrollment,
-                            id_assignment: enrollmentRecord.id_assignment,
-                            percentatge_asistencia: 100,
-                            numero_retards: 0,
-                            observacions: 'Initialized by Voice Assistant'
+                            enrollmentId: enrollmentRecord.enrollmentId,
+                            assignmentId: enrollmentRecord.assignmentId,
+                            attendancePercentage: 100,
+                            lateCount: 0,
+                            observations: 'Initialized by Voice Assistant'
                         }
                     });
                 }
 
                 competenceEval = await prisma.competenceEvaluation.create({
                     data: {
-                        id_evaluation_teacher: docentEval.id_evaluation_teacher,
-                        id_competence: competence.id_competence,
-                        puntuacio: nlpResult.competenceUpdate.score
+                        evaluationId: teacherEval.evaluationId,
+                        competenceId: competence.competenceId,
+                        score: nlpResult.competenceUpdate.score
                     }
                 });
             }

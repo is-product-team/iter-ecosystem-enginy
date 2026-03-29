@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile
       target: runner-web
       args:
-        - NEXT_PUBLIC_API_URL=https://projects.kore29.com/iter/api
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://projects.kore29.com/iter/api}
     container_name: iter_web
     restart: always
     env_file:

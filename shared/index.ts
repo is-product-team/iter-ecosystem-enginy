@@ -3,24 +3,24 @@ import { THEME } from './theme';
 
 export { THEME };
 
-// Exportar tipos de Prisma para que estén disponibles en todo el monorepo
-// Nota: Requiere que la API haya ejecutado "npx prisma generate"
+// Export Prisma types to be available in the whole monorepo
+// Note: Requires API to run "npx prisma generate"
 export type * from '@prisma/client';
 
 // Define exact roles expected by the Database
 export const ROLES = {
   ADMIN: 'ADMIN',
-  COORDINATOR: 'COORDINADOR',
-  TEACHER: 'PROFESSOR'
+  COORDINATOR: 'COORDINATOR',
+  TEACHER: 'TEACHER'
 } as const;
 
 export type RoleTag = typeof ROLES[keyof typeof ROLES];
 
 // Define request statuses - Aligned with Prisma Enum 'RequestStatus'
 export const REQUEST_STATUSES = {
-  PENDING: 'Pendent',
-  APPROVED: 'Aprovada',
-  REJECTED: 'Rebutjada'
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
 } as const;
 
 export type RequestStatus = typeof REQUEST_STATUSES[keyof typeof REQUEST_STATUSES];
@@ -41,72 +41,72 @@ export const ASSIGNMENT_STATUSES = {
 
 export type AssignmentStatusTag = typeof ASSIGNMENT_STATUSES[keyof typeof ASSIGNMENT_STATUSES];
 
-// Calendario Programa Iter (Curso 25-26 aprox)
-export const CALENDARI = {
-  REUNION_PRESENTACION: '2025-09-30',
-  LIMITE_DEMANDA: '2025-10-10',
-  COMUNICACION_ASIGNACIONES: '2025-10-20',
-  GESTION_VACANTES: '2025-11-01',
+// Iter Program Calendar (Approx Course 25-26)
+export const CALENDAR = {
+  PRESENTATION_MEETING: '2025-09-30',
+  DEMAND_LIMIT: '2025-10-10',
+  ASSIGNMENT_COMMUNICATION: '2025-10-20',
+  VACANCY_MANAGEMENT: '2025-11-01',
 } as const;
 
 // Official phase names for consistency in DB and UI
 export const PHASES = {
-  APPLICATION: 'Sol·licitud i Inscripció',
-  PLANNING: 'Planificació i Assignació',
-  EXECUTION: 'Execució i Seguiment',
-  CLOSURE: 'Tancament i Avaluació'
+  APPLICATION: 'Application',
+  PLANNING: 'Planning',
+  EXECUTION: 'Execution',
+  CLOSURE: 'Closure'
 } as const;
 
 export const PHASES_TIMELINE = [
-  { id: 'PRESENTATION', name: PHASES.APPLICATION, data: CALENDARI.REUNION_PRESENTACION },
-  { id: 'DEMAND', name: 'Enviament de Demanda', data: CALENDARI.LIMITE_DEMANDA },
-  { id: 'ASSIGNMENT', name: PHASES.PLANNING, data: CALENDARI.COMUNICACION_ASIGNACIONES },
-  { id: 'VACANTS', name: 'Gestió de Vacants i Incidències', data: CALENDARI.GESTION_VACANTES },
-  { id: 'VALIDATION', name: PHASES.CLOSURE, data: null }
+  { id: 'PRESENTATION', name: PHASES.APPLICATION, date: CALENDAR.PRESENTATION_MEETING },
+  { id: 'DEMAND', name: 'Demand Submission', date: CALENDAR.DEMAND_LIMIT },
+  { id: 'ASSIGNMENT', name: PHASES.PLANNING, date: CALENDAR.ASSIGNMENT_COMMUNICATION },
+  { id: 'VACANTS', name: 'Vacancy & Issue Management', date: CALENDAR.VACANCY_MANAGEMENT },
+  { id: 'VALIDATION', name: PHASES.CLOSURE, date: null }
 ] as const;
 
 // Utility functions
-export const esEmailValido = (email: string): boolean => {
+export const isEmailValid = (email: string): boolean => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
 };
 
 // Zod Schemas for Validation
 export const WorkshopSchema = z.object({
-  titol: z.string().min(3).max(100),
-  descripcio: z.string().optional(),
-  durada_h: z.number().int().min(1).max(100),
-  places_maximes: z.number().int().min(1).max(50),
-  modalitat: z.enum(['A', 'B', 'C']),
-  icona: z.string().optional(),
-  id_sector: z.number().int(),
-  dies_execucio: z.array(z.any()).optional()
+  title: z.string().min(3).max(100),
+  description: z.string().optional(),
+  durationHours: z.number().int().min(1).max(100),
+  maxPlaces: z.number().int().min(1).max(50),
+  modality: z.enum(['A', 'B', 'C']),
+  icon: z.string().optional(),
+  sectorId: z.number().int(),
+  executionDays: z.array(z.any()).optional()
 });
 
 export const StudentSchema = z.object({
   idalu: z.string().min(3),
-  nom: z.string().min(1),
-  cognoms: z.string().min(1),
-  curs: z.string().optional(),
-  id_center_origin: z.number().int().optional().nullable()
+  fullName: z.string().min(1),
+  lastName: z.string().min(1),
+  grade: z.string().optional(),
+  originCenterId: z.number().int().optional().nullable()
 });
 
 export const RequestSchema = z.object({
-  id_center: z.number().int(),
-  id_workshop: z.number().int(),
-  alumnes_aprox: z.number().int().min(1).max(100),
-  comentaris: z.string().optional()
+  centerId: z.number().int(),
+  workshopId: z.number().int(),
+  approxStudents: z.number().int().min(1).max(100),
+  comments: z.string().optional()
 });
 
 export const AssignmentChecklistSchema = z.object({
-  completat: z.boolean(),
-  url_evidencia: z.string().optional().nullable()
+  isCompleted: z.boolean(),
+  evidenceUrl: z.string().optional().nullable()
 });
 
 export const CenterAttendanceSchema = z.object({
-  id_enrollment: z.number().int(),
-  estat: z.enum(['Present', 'Absència Justificada', 'Absència', 'Retard']),
-  observacions: z.string().optional().nullable()
+  enrollmentId: z.number().int(),
+  status: z.enum(['PRESENT', 'JUSTIFIED_ABSENCE', 'ABSENT', 'LATE']),
+  observations: z.string().optional().nullable()
 });
 
 export type WorkshopInput = z.infer<typeof WorkshopSchema>;

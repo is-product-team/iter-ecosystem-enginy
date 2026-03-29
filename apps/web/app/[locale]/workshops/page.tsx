@@ -3,31 +3,21 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { THEME, ROLES } from "@iter/shared";
-import workshopService, { Workshop } from "../../../services/workshopService";
+import WorkshopIcon from "../../../components/WorkshopIcon";
 import DashboardLayout from "../../../components/DashboardLayout";
 import CreateWorkshopModal from "../../../components/CreateWorkshopModal";
 import Loading from "@/components/Loading";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
-
-const SVG_ICONS: Record<string, React.ReactNode> = {
-  PUZZLE: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />,
-  ROBOT: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />,
-  CODE: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />,
-  PAINT: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />,
-  FILM: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />,
-  TOOLS: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />,
-  LEAF: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />,
-  GEAR: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-};
+import workshopService, { Workshop } from "@/services/workshopService";
 
 export default function WorkshopAdminPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.ADMIN)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
       router.push('/login');
     }
   }, [user, authLoading, router]);
@@ -86,7 +76,7 @@ export default function WorkshopAdminPage() {
   useEffect(() => {
     let isMounted = true;
     const init = async () => {
-      if (user && user.rol.nom_rol === ROLES.ADMIN) {
+      if (user && user.role.name === ROLES.ADMIN) {
         await fetchWorkshops();
       }
       if (isMounted) setLoading(false);
@@ -160,7 +150,7 @@ export default function WorkshopAdminPage() {
     });
   };
 
-  if (authLoading || !user || user.rol.nom_rol !== 'ADMIN') {
+  if (authLoading || !user || user.role.name !== 'ADMIN') {
     return <Loading fullScreen message="Verifying administrator permissions..." />;
   }
 
@@ -269,9 +259,7 @@ export default function WorkshopAdminPage() {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            {SVG_ICONS[workshop.icon || "PUZZLE"] || SVG_ICONS.PUZZLE}
-                          </svg>
+                          <WorkshopIcon iconName={workshop.icon} className="w-5 h-5" />
                         </div>
                         <div>
                           <div className="text-sm font-bold text-text-primary uppercase tracking-tight">{workshop.title}</div>

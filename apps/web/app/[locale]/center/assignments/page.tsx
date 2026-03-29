@@ -43,7 +43,7 @@ export default function AssignmentsPage() {
       const currentUser = getUser();
       if (!isMounted) return;
 
-      if (!currentUser || currentUser.rol.nom_rol !== ROLES.COORDINATOR) {
+      if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
         router.push('/login');
         return;
       }
@@ -51,10 +51,10 @@ export default function AssignmentsPage() {
       setUser(currentUser);
 
       // Fetch assignments
-      if (currentUser.id_center) {
+      if (currentUser.centerId) {
         try {
           const [resAssig, resPhases] = await Promise.all([
-            assignmentService.getByCenter(currentUser.id_center),
+            assignmentService.getByCenter(currentUser.centerId),
             phaseService.getAll()
           ]);
           if (isMounted) {
@@ -77,7 +77,7 @@ export default function AssignmentsPage() {
 
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find(f => f.name === phaseName);
-    return phase ? phase.active : false;
+    return phase ? phase.isActive : false;
   };
 
   const filteredAssignments = assignments.filter(a => {
@@ -161,13 +161,14 @@ export default function AssignmentsPage() {
                 <tr className="bg-gray-50 border-b-2 border-gray-100">
                   <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Assigned Workshop</th>
                   <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Center</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">More Info</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Planning</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Status</th>
                   <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {paginatedAssignments.map(a => (
-                  <tr key={a.id_assignment} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
+                  <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
                     <td className="px-10 py-10">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black uppercase tracking-widest text-[#4197CB] mb-2">WORKSHOP IDENTIFIER</span>
@@ -182,9 +183,18 @@ export default function AssignmentsPage() {
                         Start: {a.startDate ? new Date(a.startDate).toLocaleDateString() : '—'}
                       </div>
                     </td>
+                    <td className="px-10 py-10">
+                      <span className={`text-[10px] font-black uppercase px-3 py-1 border-2 ${
+                        a.status === 'VALIDATED' ? 'border-green-100 bg-green-50 text-green-700' :
+                        a.status === 'DATA_ENTRY' ? 'border-orange-100 bg-orange-50 text-orange-700' :
+                        'border-gray-100 text-gray-400'
+                      }`}>
+                        {a.status}
+                      </span>
+                    </td>
                     <td className="px-10 py-10 text-right">
                       <button
-                        onClick={() => router.push(`/center/assignments/${a.id_assignment}`)}
+                        onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
                         className="btn-primary py-2 px-6 text-[10px]"
                       >
                         Manage
@@ -234,7 +244,7 @@ export default function AssignmentsPage() {
                   if (!input.value) return;
                   const api = getApi();
                   await api.post('/assignments/incidents', {
-                    id_center: user.id_center,
+                    centerId: user.centerId,
                     description: input.value
                   });
                   input.value = '';

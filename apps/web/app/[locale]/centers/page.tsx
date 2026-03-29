@@ -19,7 +19,7 @@ export default function CentersScreen() {
   const router = useRouter();
   
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.ADMIN)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
       router.push('/login');
     }
   }, [user, authLoading, router]);
@@ -62,7 +62,7 @@ export default function CentersScreen() {
   }, []);
 
   useEffect(() => {
-    if (user && user.rol.nom_rol === ROLES.ADMIN) {
+    if (user && user.role.name === ROLES.ADMIN) {
       fetchCenters();
     }
   }, [fetchCenters, user]);
@@ -70,8 +70,8 @@ export default function CentersScreen() {
   const filteredCenters = useMemo(() => {
     return centers.filter((center) => {
       const matchesSearch = !searchQuery || 
-        center.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        center.codi_center.toLowerCase().includes(searchQuery.toLowerCase());
+        center.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        center.centerCode.toLowerCase().includes(searchQuery.toLowerCase());
 
       return matchesSearch;
     });
@@ -85,9 +85,9 @@ export default function CentersScreen() {
 
   const handleCenterSaved = (saved: Center) => {
     setCenters((prev) => {
-      const exists = prev.find((c) => c.id_center === saved.id_center);
+      const exists = prev.find((c) => c.centerId === saved.centerId);
       if (exists) {
-        return prev.map((c) => (c.id_center === saved.id_center ? saved : c));
+        return prev.map((c) => (c.centerId === saved.centerId ? saved : c));
       }
       return [saved, ...prev];
     });
@@ -109,7 +109,7 @@ export default function CentersScreen() {
       onConfirm: async () => {
         try {
           await centerService.delete(id);
-          setCenters((prev) => prev.filter((c) => c.id_center !== id));
+          setCenters((prev) => prev.filter((c) => c.centerId !== id));
           toast.success("Center deleted successfully.");
         } catch (err) {
           toast.error("Error deleting center.");
@@ -119,7 +119,7 @@ export default function CentersScreen() {
     });
   };
 
-  if (authLoading || !user || user.rol.nom_rol !== ROLES.ADMIN) {
+  if (authLoading || !user || user.role.name !== ROLES.ADMIN) {
     return <Loading fullScreen message="Verifying administrator permissions..." />;
   }
 
@@ -214,7 +214,7 @@ export default function CentersScreen() {
               </thead>
               <tbody className="divide-y divide-border-subtle">
                 {paginatedCenters.map((center) => (
-                  <tr key={center.id_center} className="hover:bg-background-subtle transition-colors group">
+                  <tr key={center.centerId} className="hover:bg-background-subtle transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors">
@@ -223,19 +223,19 @@ export default function CentersScreen() {
                           </svg>
                         </div>
                         <div>
-                          <div className="text-sm font-black text-text-primary uppercase tracking-tight">{center.nom}</div>
-                          <div className="text-[10px] font-bold text-text-muted uppercase tracking-tighter mt-0.5">CODE: {center.codi_center}</div>
+                          <div className="text-sm font-black text-text-primary uppercase tracking-tight">{center.name}</div>
+                          <div className="text-[10px] font-bold text-text-muted uppercase tracking-tighter mt-0.5">CODE: {center.centerCode}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
-                      {center.adreca || "No address"}
+                      {center.address || "No address"}
                     </td>
                     <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
-                      {center.email_contacte || "N/A"}
+                      {center.contactEmail || "N/A"}
                     </td>
                     <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
-                      {center.telefon_contacte || "N/A"}
+                      {center.contactPhone || "N/A"}
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">
@@ -246,7 +246,7 @@ export default function CentersScreen() {
                           Edit
                         </button>
                         <button 
-                          onClick={() => handleDelete(center.id_center)}
+                          onClick={() => handleDelete(center.centerId)}
                           className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
                         >
                           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

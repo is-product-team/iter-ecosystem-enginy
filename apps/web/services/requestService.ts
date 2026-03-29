@@ -1,16 +1,16 @@
 import getApi from "./api";
 
 export interface Request {
-  id_request: number;
-  id_center: number;
-  id_workshop: number;
-  approxStudents: number | null;
+  requestId: number;
+  centerId: number;
+  workshopId: number;
+  studentsAprox: number | null;
   comments: string | null;
-  requestDate: string;
+  createdAt: string;
   status: string;
   modality?: string;
-  teacher1Id?: number;
-  teacher2Id?: number;
+  prof1Id?: number;
+  prof2Id?: number;
   studentIds?: number[];
   workshop?: {
     title: string;
@@ -25,27 +25,27 @@ export interface Request {
 }
 
 interface BackendRequest {
-  id_request: number;
-  id_center: number;
-  id_workshop: number;
-  alumnes_aprox: number | null;
-  comentaris: string | null;
-  data_request: string;
-  estat: string;
-  modalitat: string;
-  prof1_id?: number;
-  prof2_id?: number;
-  ids_alumnes?: number[];
+  requestId: number;
+  centerId: number;
+  workshopId: number;
+  studentsAprox: number | null;
+  comments: string | null;
+  createdAt: string;
+  status: string;
+  modality: string;
+  prof1Id?: number;
+  prof2Id?: number;
+  studentIds?: number[];
   workshop?: {
-    titol: string;
-    sector?: { nom: string };
-    modalitat: string;
+    title: string;
+    sector?: { name: string };
+    modality: string;
   };
   center?: {
-    nom: string;
+    name: string;
   };
-  prof1?: { nom: string };
-  prof2?: { nom: string };
+  teacher1?: { name: string };
+  teacher2?: { name: string };
 }
 
 const requestService = {
@@ -57,27 +57,27 @@ const requestService = {
     try {
       const response = await api.get<{ data: BackendRequest[], meta: unknown }>("/requests?limit=0");
       return response.data.data.map((r: BackendRequest) => ({
-        id_request: r.id_request,
-        id_center: r.id_center,
-        id_workshop: r.id_workshop,
-        approxStudents: r.alumnes_aprox,
-        comments: r.comentaris,
-        requestDate: r.data_request,
-        status: r.estat,
-        modality: r.modalitat,
-        teacher1Id: r.prof1_id,
-        teacher2Id: r.prof2_id,
-        studentIds: r.ids_alumnes,
+        requestId: r.requestId,
+        centerId: r.centerId,
+        workshopId: r.workshopId,
+        studentsAprox: r.studentsAprox,
+        comments: r.comments,
+        createdAt: r.createdAt,
+        status: r.status,
+        modality: r.modality,
+        prof1Id: r.prof1Id,
+        prof2Id: r.prof2Id,
+        studentIds: r.studentIds,
         workshop: r.workshop ? {
-          title: r.workshop.titol,
-          sector: r.workshop.sector?.nom || "General",
-          modality: r.workshop.modalitat,
+          title: r.workshop.title,
+          sector: r.workshop.sector?.name || "General",
+          modality: r.workshop.modality,
         } : undefined,
         center: r.center ? {
-          name: r.center.nom,
+          name: r.center.name,
         } : undefined,
-        teacher1: r.prof1 ? { name: r.prof1.nom } : undefined,
-        teacher2: r.prof2 ? { name: r.prof2.nom } : undefined,
+        teacher1: r.teacher1 ? { name: r.teacher1.name } : undefined,
+        teacher2: r.teacher2 ? { name: r.teacher2.name } : undefined,
       }));
     } catch (error) {
       console.error("Error in requestService.getAll:", error);
@@ -89,37 +89,37 @@ const requestService = {
    * Creates a new request.
    */
   create: async (data: {
-    id_workshop: number;
-    approxStudents: number;
+    workshopId: number;
+    studentsAprox: number;
     comments?: string;
-    teacher1Id?: number;
-    teacher2Id?: number;
+    prof1Id?: number;
+    prof2Id?: number;
     modality?: string;
   }): Promise<Request> => {
     const api = getApi();
     try {
       const payload = {
-        id_workshop: data.id_workshop,
-        alumnes_aprox: data.approxStudents,
-        comentaris: data.comments,
-        prof1_id: data.teacher1Id,
-        prof2_id: data.teacher2Id,
-        modalitat: data.modality,
+        workshopId: data.workshopId,
+        studentsAprox: data.studentsAprox,
+        comments: data.comments,
+        prof1Id: data.prof1Id,
+        prof2Id: data.prof2Id,
+        modality: data.modality,
       };
       const response = await api.post<BackendRequest>("/requests", payload);
       const r = response.data;
       return {
-        id_request: r.id_request,
-        id_center: r.id_center,
-        id_workshop: r.id_workshop,
-        approxStudents: r.alumnes_aprox,
-        comments: r.comentaris,
-        requestDate: r.data_request,
-        status: r.estat,
-        modality: r.modalitat,
-        teacher1Id: r.prof1_id,
-        teacher2Id: r.prof2_id,
-        studentIds: r.ids_alumnes,
+        requestId: r.requestId,
+        centerId: r.centerId,
+        workshopId: r.workshopId,
+        studentsAprox: r.studentsAprox,
+        comments: r.comments,
+        createdAt: r.createdAt,
+        status: r.status,
+        modality: r.modality,
+        prof1Id: r.prof1Id,
+        prof2Id: r.prof2Id,
+        studentIds: r.studentIds,
       };
     } catch (error) {
       console.error("Error in requestService.create:", error);
@@ -131,34 +131,34 @@ const requestService = {
   /**
    * Updates an existing request.
    */
-  update: async (id: number, data: {
-    approxStudents?: number;
+  update: async (requestId: number, data: {
+    studentsAprox?: number;
     comments?: string;
-    teacher1Id?: number;
-    teacher2Id?: number;
+    prof1Id?: number;
+    prof2Id?: number;
   }): Promise<Request> => {
     const api = getApi();
     try {
       const payload = {
-        alumnes_aprox: data.approxStudents,
-        comentaris: data.comments,
-        prof1_id: data.teacher1Id,
-        prof2_id: data.teacher2Id,
+        studentsAprox: data.studentsAprox,
+        comments: data.comments,
+        prof1Id: data.prof1Id,
+        prof2Id: data.prof2Id,
       };
-      const response = await api.put<BackendRequest>(`/requests/${id}`, payload);
+      const response = await api.put<BackendRequest>(`/requests/${requestId}`, payload);
       const r = response.data;
       return {
-        id_request: r.id_request,
-        id_center: r.id_center,
-        id_workshop: r.id_workshop,
-        approxStudents: r.alumnes_aprox,
-        comments: r.comentaris,
-        requestDate: r.data_request,
-        status: r.estat,
-        modality: r.modalitat,
-        teacher1Id: r.prof1_id,
-        teacher2Id: r.prof2_id,
-        studentIds: r.ids_alumnes,
+        requestId: r.requestId,
+        centerId: r.centerId,
+        workshopId: r.workshopId,
+        studentsAprox: r.studentsAprox,
+        comments: r.comments,
+        createdAt: r.createdAt,
+        status: r.status,
+        modality: r.modality,
+        prof1Id: r.prof1Id,
+        prof2Id: r.prof2Id,
+        studentIds: r.studentIds,
       };
     } catch (error) {
       console.error("Error in requestService.update:", error);
@@ -170,23 +170,23 @@ const requestService = {
   /**
    * Updates the status of a request.
    */
-  updateStatus: async (id: number, status: string): Promise<Request> => {
+  updateStatus: async (requestId: number, status: string): Promise<Request> => {
     const api = getApi();
     try {
-      const response = await api.patch<BackendRequest>(`/requests/${id}/status`, { estat: status });
+      const response = await api.patch<BackendRequest>(`/requests/${requestId}/status`, { status });
       const r = response.data;
       return {
-        id_request: r.id_request,
-        id_center: r.id_center,
-        id_workshop: r.id_workshop,
-        approxStudents: r.alumnes_aprox,
-        comments: r.comentaris,
-        requestDate: r.data_request,
-        status: r.estat,
-        modality: r.modalitat,
-        teacher1Id: r.prof1_id,
-        teacher2Id: r.prof2_id,
-        studentIds: r.ids_alumnes,
+        requestId: r.requestId,
+        centerId: r.centerId,
+        workshopId: r.workshopId,
+        studentsAprox: r.studentsAprox,
+        comments: r.comments,
+        createdAt: r.createdAt,
+        status: r.status,
+        modality: r.modality,
+        prof1Id: r.prof1Id,
+        prof2Id: r.prof2Id,
+        studentIds: r.studentIds,
       };
     } catch (error) {
       console.error("Error in requestService.updateStatus:", error);

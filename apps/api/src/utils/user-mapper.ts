@@ -1,34 +1,24 @@
 /**
- * Mappers to ensure API responses match the frontend Expected structures (MVP legacy names)
+ * Mappers to ensure API responses match the frontend expected structures (English Standard)
  */
 
 export function mapUserResponse(prismaUser: any) {
   if (!prismaUser) return null;
 
   return {
-    id: prismaUser.id_user,
-    id_user: prismaUser.id_user,
-    id_usuari: prismaUser.id_user,
+    userId: prismaUser.userId,
     email: prismaUser.email,
-    nom_complet: prismaUser.nom_complet,
-    url_foto: prismaUser.url_foto,
-    id_center: prismaUser.id_center,
-    id_centre: prismaUser.id_center,
+    fullName: prismaUser.fullName,
+    photoUrl: prismaUser.photoUrl,
+    centerId: prismaUser.centerId,
+    role: {
+      roleId: prismaUser.role?.roleId,
+      roleName: prismaUser.role?.roleName
+    },
     center: prismaUser.center ? {
-      id_center: prismaUser.center.id_center,
-      id_centre: prismaUser.center.id_center,
-      nom: prismaUser.center.nom,
-      codi_center: prismaUser.center.codi_center
+      centerId: prismaUser.center.centerId,
+      name: prismaUser.center.name
     } : null,
-    centre: prismaUser.center ? {
-      id_center: prismaUser.center.id_center,
-      id_centre: prismaUser.center.id_center,
-      nom: prismaUser.center.nom,
-      codi_center: prismaUser.center.codi_center
-    } : null,
-    rol: prismaUser.role ? {
-      nom_rol: prismaUser.role.nom_role
-    } : null,
-    sync_token: prismaUser.sync_token
+    syncToken: prismaUser.syncToken
   };
 }

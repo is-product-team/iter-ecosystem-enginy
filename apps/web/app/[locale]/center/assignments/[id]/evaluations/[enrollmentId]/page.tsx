@@ -14,7 +14,7 @@ import { Enrollment } from '@/services/assignmentService';
 import ConfirmDialog from '@/components/ConfirmDialog';
 
 interface Competence {
-    id_competence: number;
+    competenceId: number;
     name: string;
     description: string;
     type: 'TECNICA' | 'TRANSVERSAL';
@@ -35,12 +35,12 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
         attendancePercentage: 100,
         delayCount: 0,
         observations: '',
-        competencies: [] as { id_competence: number; score: number }[]
+        competencies: [] as { competenceId: number; score: number }[]
     });
 
     // Voice State
     const [isListening, setIsListening] = useState(false);
-    
+
     // Dialog states
     const [confirmConfig, setConfirmConfig] = useState<{
         isOpen: boolean;
@@ -52,12 +52,12 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
         isOpen: false,
         title: '',
         message: '',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
 
     useEffect(() => {
         const currentUser = getUser();
-        if (!currentUser || (currentUser.rol.nom_rol !== ROLES.COORDINATOR && currentUser.rol.nom_rol !== ROLES.ADMIN)) {
+        if (!currentUser || (currentUser.role.name !== ROLES.COORDINATOR && currentUser.role.name !== ROLES.ADMIN)) {
             router.push('/login');
             return;
         }
@@ -79,7 +79,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                     return;
                 }
 
-                const ins = assignment.enrollments?.find((i: Enrollment) => i.id_enrollment === parseInt(enrollmentId));
+                const ins = assignment.enrollments?.find((i: Enrollment) => i.enrollmentId === parseInt(enrollmentId));
                 if (!ins) {
                     toast.error('Enrollment not found.');
                     router.push(`/center/assignments/${id}/evaluations`);
@@ -92,11 +92,11 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                 if (resEval.data) {
                     const evalData = resEval.data;
                     setForm({
-                        attendancePercentage: evalData.attendance_percentage || 100,
-                        delayCount: evalData.delay_count || 0,
+                        attendancePercentage: evalData.attendancePercentage || 100,
+                        delayCount: evalData.lateCount || 0,
                         observations: evalData.observations || '',
-                        competencies: evalData.competencies?.map((c: { id_competence: number; score: number }) => ({
-                            id_competence: c.id_competence,
+                        competencies: evalData.competencies?.map((c: { competenceId: number; score: number }) => ({
+                            competenceId: c.competenceId,
                             score: c.score
                         })) || []
                     });
@@ -104,9 +104,9 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                     // Initialize competencies with 3 (sufficient)
                     setForm(prev => ({
                         ...prev,
-                        competencies: resComp.data.map((c: Competence) => ({ 
-                            id_competence: c.id_competence, 
-                            score: 3 
+                        competencies: resComp.data.map((c: Competence) => ({
+                            competenceId: c.competenceId,
+                            score: 3
                         }))
                     }));
                 }
@@ -121,11 +121,11 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
         fetchData();
     }, [id, enrollmentId, router]);
 
-    const handleRatingChange = (id_competence: number, score: number) => {
+    const handleRatingChange = (competenceId: number, score: number) => {
         setForm(prev => ({
             ...prev,
             competencies: prev.competencies.map(c =>
-                c.id_competence === id_competence ? { ...c, score } : c
+                c.competenceId === competenceId ? { ...c, score } : c
             )
         }));
     };
@@ -136,7 +136,6 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
             return;
         }
 
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.lang = 'ca-ES';
@@ -164,7 +163,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                 title: 'AI Analysis',
                 message: `AI suggests an average score of ${suggestedScore}. Summary: ${summary}\nDo you want to set the entire evaluation to this level?`,
                 onConfirm: () => {
-                   setForm(prev => ({
+                    setForm(prev => ({
                         ...prev,
                         competencies: prev.competencies.map(c => ({ ...c, score: suggestedScore }))
                     }));
@@ -184,8 +183,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
         try {
             await evaluationService.upsertEvaluation({
                 enrollmentId: parseInt(enrollmentId),
-                attendance_percentage: form.attendancePercentage,
-                delay_count: form.delayCount,
+                attendancePercentage: form.attendancePercentage,
+                lateCount: form.delayCount,
                 observations: form.observations,
                 competencies: form.competencies
             });
@@ -208,7 +207,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
     return (
         <DashboardLayout
             title={`Student Evaluation`}
-            subtitle={`${enrollment.student?.name} ${enrollment.student?.surnames}`}
+            subtitle={`${enrollment.student?.fullName} ${enrollment.student?.lastName}`}
         >
             <div className="w-full pb-20">
                 <button
@@ -220,7 +219,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                 </button>
 
                 <form onSubmit={handleSubmit} className="space-y-12">
-                    {/* Secció Seguiment */}
+                    {/* Monitoring Section */}
                     <section className="bg-white p-8 border shadow-sm">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-8">Monitoring and Attendance</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -247,7 +246,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                         </div>
                     </section>
 
-                    {/* Secció Competències */}
+                    {/* Competences Section */}
                     <section className="bg-white p-8 border shadow-sm">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-8">Competence Evaluation (Scale 1-5)</h3>
 
@@ -258,7 +257,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                                 </h4>
                                 <div className="space-y-6">
                                     {competenciesT.map(c => (
-                                        <div key={c.id_competence} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                                        <div key={c.competenceId} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 transition-colors">
                                             <div className="mb-4 md:mb-0">
                                                 <p className="font-bold text-gray-900">{c.name}</p>
                                                 <p className="text-[10px] text-gray-400 max-w-sm">{c.description}</p>
@@ -268,8 +267,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                                                     <button
                                                         key={v}
                                                         type="button"
-                                                        onClick={() => handleRatingChange(c.id_competence, v)}
-                                                        className={`w-10 h-10 border-2 font-black transition-all ${form.competencies.find(comp => comp.id_competence === c.id_competence)?.score === v
+                                                        onClick={() => handleRatingChange(c.competenceId, v)}
+                                                        className={`w-10 h-10 border-2 font-black transition-all ${form.competencies.find(comp => comp.competenceId === c.competenceId)?.score === v
                                                             ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
                                                             : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
                                                             }`}
@@ -289,7 +288,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                                 </h4>
                                 <div className="space-y-6">
                                     {competenciesG.map(c => (
-                                        <div key={c.id_competence} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                                        <div key={c.competenceId} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 transition-colors">
                                             <div className="mb-4 md:mb-0">
                                                 <p className="font-bold text-gray-900">{c.name}</p>
                                                 <p className="text-[10px] text-gray-400 max-w-sm">{c.description}</p>
@@ -299,8 +298,8 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                                                     <button
                                                         key={v}
                                                         type="button"
-                                                        onClick={() => handleRatingChange(c.id_competence, v)}
-                                                        className={`w-10 h-10 border-2 font-black transition-all ${form.competencies.find(comp => comp.id_competence === c.id_competence)?.score === v
+                                                        onClick={() => handleRatingChange(c.competenceId, v)}
+                                                        className={`w-10 h-10 border-2 font-black transition-all ${form.competencies.find(comp => comp.competenceId === c.competenceId)?.score === v
                                                             ? 'bg-blue-900 border-blue-900 text-white shadow-md scale-110'
                                                             : 'bg-white border-gray-200 text-gray-300 hover:border-blue-200'
                                                             }`}
@@ -316,7 +315,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                         </div>
                     </section>
 
-                    {/* Secció Observacions i IA */}
+                    {/* Observations and AI Section */}
                     <section className="bg-white p-8 border shadow-sm">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Observations</h3>
@@ -349,7 +348,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                         />
                     </section>
 
-                    {/* Footer d'accions */}
+                    {/* Action Footer */}
                     <div className="flex gap-4">
                         <button
                             type="submit"
@@ -368,7 +367,7 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                     </div>
                 </form>
             </div>
-            <ConfirmDialog 
+            <ConfirmDialog
                 isOpen={confirmConfig.isOpen}
                 title={confirmConfig.title}
                 message={confirmConfig.message}

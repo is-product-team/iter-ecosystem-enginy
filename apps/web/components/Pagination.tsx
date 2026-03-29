@@ -22,7 +22,7 @@ const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className="bg-[#F8FAFC] border-t border-gray-100 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
       <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-        Mostrant <span className="text-[#00426B]">{currentItemsCount}</span> de <span className="text-[#00426B]">{totalItems}</span> {itemName}
+        Showing <span className="text-[#00426B]">{currentItemsCount}</span> of <span className="text-[#00426B]">{totalItems}</span> {itemName}
       </div>
       <div className="flex items-center gap-2">
         <button 
@@ -32,10 +32,10 @@ const Pagination: React.FC<PaginationProps> = ({
             ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
             : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
         >
-          Anterior
+          Previous
         </button>
         <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-bold text-[#00426B] tracking-[0.2em]">
-          Pàgina {currentPage} de {totalPages}
+          Page {currentPage} of {totalPages}
         </div>
         <button 
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
@@ -44,7 +44,7 @@ const Pagination: React.FC<PaginationProps> = ({
             ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
             : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
         >
-          Següent
+          Next
         </button>
       </div>
     </div>

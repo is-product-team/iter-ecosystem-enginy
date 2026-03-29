@@ -1,0 +1,116 @@
+{
+  "Common": {
+    "loading": "Cargando...",
+    "cancel": "Cancelar",
+    "ok": "Aceptar",
+    "back": "Volver",
+    "success": "Éxito",
+    "error": "Error",
+    "branding": "Consorci d'Educació de Barcelona"
+  },
+  "Auth": {
+    "logout": {
+      "title": "Cerrar Sesión",
+      "message": "¿Estás seguro de que quieres cerrar tu sesión actual?",
+      "confirm": "Cerrar Sesión"
+    },
+    "login": {
+      "title": "Inicio de\nSesión",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "fill_all_fields": "Por favor, rellena todos los campos.",
+      "exclusive_use_error": "Esta aplicación es de uso exclusivo para profesores. Los administradores y coordinadores deben usar la plataforma web.",
+      "error_title": "Error de Login",
+      "error_generic": "Error al iniciar sesión. Revisa tus credenciales.",
+      "forgot_password": "He olvidado la contraseña",
+      "access_restricted": "Acceso Restringido",
+      "go_to_web": "Ir a la Plataforma Web",
+      "submit": "Entrar"
+    }
+  },
+  "Profile": {
+    "tagline": "Espacio Personal",
+    "title": "Mi Perfil",
+    "role_professor": "Profesorado",
+    "role_admin": "Administrador",
+    "preferences": "Preferencias",
+    "notifications": "Notificaciones Push",
+    "appearance": "Apariencia",
+    "appearance_options": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
+    "security": "Seguridad y Contraseña",
+    "help": "Soporte y Ayuda"
+  },
+  "Routes": {
+    "session": "Sesión",
+    "evaluation": "Evaluación",
+    "questionnaire": "Valoración Taller"
+  },
+  "Session": {
+    "title": "Lista de alumnos",
+    "attendance_instruction": "Marca la asistencia de los alumnos. Pulsa sobre el estado para cambiarlo.",
+    "observations_label": "Observaciones Generales",
+    "observations_placeholder": "Escribe aquí cualquier incidencia o comentario sobre la sesión...",
+    "evaluated": "Evaluado",
+    "evaluate_competencies": "Evaluar Competencias",
+    "attendance_registered": "Asistencia Registrada",
+    "finish_and_send": "Finalizar y Enviar",
+    "error_loading_students": "No se ha podido cargar la lista de alumnos.",
+    "attendance_sent_success": "Asistencia enviada correctamente a los coordinadores.",
+    "submit_attendance_error": "No se ha podido enviar la asistencia.",
+    "status_present": "Presente",
+    "status_absent": "Ausente",
+    "status_retard": "Retraso"
+  },
+  "Dashboard": {
+    "welcome": "Hola, {{name}}",
+    "current_phase": "Fase Actual",
+    "pending_tasks": "Tareas Pendientes",
+    "next_session": "Próxima Sesión",
+    "evaluate_workshop": "Evaluar Taller",
+    "evaluated_workshop": "Taller Valorado",
+    "manage_session": "Gestionar Sesión",
+    "view_details": "Ver Detalles",
+    "no_upcoming_workshops": "No tienes talleres próximos",
+    "active": "Activo",
+    "loading_data": "Cargando datos",
+    "evaluate_finished_workshop": "Evaluar taller finalizado",
+    "in_progress": "En Curso"
+  },
+  "Evaluation": {
+    "title": "Evaluación Competencial",
+    "technical_competencies": "Competencias Técnicas",
+    "transversal_competencies": "Competencias Transversales",
+    "observations_label": "Observaciones",
+    "observations_placeholder": "Añade comentarios cualitativos sobre la evolución del alumno...",
+    "save_button": "Guardar Evaluación",
+    "incomplete_error": "Incompleto",
+    "incomplete_message": "Por favor, puntúa todas las competencias.",
+    "save_success_title": "Guardado",
+    "save_success_message": "Evaluación guardada correctamente",
+    "load_error": "No se han podido cargar los datos."
+  },
+  "Questionnaire": {
+    "title": "Valoración del Taller",
+    "instruction": "Por favor, valora los siguientes aspectos del taller realizado.",
+    "placeholder": "Escribe tu respuesta...",
+    "submit_button": "Enviar Valoración",
+    "incomplete_error": "Incompleto",
+    "incomplete_message": "Por favor, responde todas las preguntas de valoración.",
+    "thanks_title": "Gracias",
+    "thanks_message": "Tu valoración se ha enviado correctamente.",
+    "model_not_found": "No se ha encontrado el modelo de cuestionario.",
+    "load_error": "No se ha podido cargar el cuestionario.",
+    "submit_error": "No se ha podido enviar el cuestionario."
+  },
+  "Notifications": {
+    "tagline": "Comunicaciones",
+    "title": "Avisos Oficiales",
+    "mark_read": "Marcar como leído",
+    "delete": "Eliminar",
+    "empty": "No hay avisos nuevos"
+  }
+}

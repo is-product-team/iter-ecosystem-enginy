@@ -16,14 +16,14 @@ async function test() {
 
         if (user) {
             console.log('User found:', {
-                id: user.id_user,
+                id: user.userId,
                 email: user.email,
-                role: user.role?.nom_role,
-                center: user.center ? user.center.nom : 'None'
+                role: user.role?.roleName,
+                center: user.center ? user.center.name : 'None'
             });
 
             console.log('--- Testing Password Comparison ---');
-            const valid = await bcrypt.compare('Iter@1234', user.password_hash);
+            const valid = await bcrypt.compare('Iter@1234', user.passwordHash);
             console.log('Password valid:', valid);
         } else {
             console.log('User NOT found: admin@admin.com');

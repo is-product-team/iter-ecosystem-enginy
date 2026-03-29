@@ -19,7 +19,7 @@ export default function StudentsCRUD() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [formData, setFormData] = useState({ name: '', surnames: '', idalu: '', course: '' });
+  const [formData, setFormData] = useState({ fullName: '', lastName: '', idalu: '', grade: '' });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("All courses");
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,12 +42,12 @@ export default function StudentsCRUD() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.COORDINATOR)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
       router.push('/login');
       return;
     }
     if (user) loadStudents();
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
 
   const loadStudents = async () => {
     try {
@@ -62,11 +62,11 @@ export default function StudentsCRUD() {
 
   const filteredStudents = students.filter(a => {
     const matchesSearch = !searchQuery || 
-      a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.surnames.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.idalu.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCourse = selectedCourse === "All courses" || a.course === selectedCourse;
+    const matchesCourse = selectedCourse === "All courses" || a.grade === selectedCourse;
     
     return matchesSearch && matchesCourse;
   });
@@ -81,13 +81,13 @@ export default function StudentsCRUD() {
     currentPage * itemsPerPage
   );
 
-  const uniqueCourses = Array.from(new Set(students.map(a => a.course))).filter(Boolean).sort();
+  const uniqueCourses = Array.from(new Set(students.map(a => a.grade))).filter(Boolean).sort();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingStudent) {
-        await studentService.update(editingStudent.id_student, formData);
+        await studentService.update(editingStudent.studentId, formData);
         toast.success("Student updated successfully.");
       } else {
         await studentService.create(formData);
@@ -95,7 +95,7 @@ export default function StudentsCRUD() {
       }
       setIsModalOpen(false);
       setEditingStudent(null);
-      setFormData({ name: '', surnames: '', idalu: '', course: '' });
+      setFormData({ fullName: '', lastName: '', idalu: '', grade: '' });
       loadStudents();
     } catch (err: unknown) {
       toast.error((err as Error).message || "Error saving student.");
@@ -104,7 +104,7 @@ export default function StudentsCRUD() {
 
   const handleEdit = (student: Student) => {
     setEditingStudent(student);
-    setFormData({ name: student.name, surnames: student.surnames, idalu: student.idalu, course: student.course });
+    setFormData({ fullName: student.fullName, lastName: student.lastName, idalu: student.idalu, grade: student.grade });
     setIsModalOpen(true);
   };
 
@@ -129,7 +129,7 @@ export default function StudentsCRUD() {
 
   const headerActions = (
     <button 
-      onClick={() => { setEditingStudent(null); setFormData({ name: '', surnames: '', idalu: '', course: '' }); setIsModalOpen(true); }}
+      onClick={() => { setEditingStudent(null); setFormData({ fullName: '', lastName: '', idalu: '', grade: '' }); setIsModalOpen(true); }}
       className="bg-[#00426B] text-white px-6 py-3 font-black uppercase text-[10px] tracking-widest hover:bg-[#0775AB] transition-all flex items-center gap-2 shadow-lg"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
@@ -201,18 +201,18 @@ export default function StudentsCRUD() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {paginatedStudents.map(a => (
-                  <tr key={a.id_student} className="hover:bg-gray-50 transition-colors group">
+                  <tr key={a.studentId} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
                         <Avatar 
-                          url={a.url_foto} 
-                          name={`${a.name} ${a.surnames}`} 
-                          id={a.id_student} 
-                          type="alumne" 
+                          url={a.photoUrl} 
+                          name={`${a.fullName} ${a.lastName}`} 
+                          id={a.studentId} 
+                          type="student" 
                           size="md"
                         />
                         <div>
-                          <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{a.name} {a.surnames}</div>
+                          <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{a.fullName} {a.lastName}</div>
                         </div>
                       </div>
                     </td>
@@ -221,13 +221,13 @@ export default function StudentsCRUD() {
                     </td>
                     <td className="px-6 py-5">
                       <span className="px-2 py-0.5 bg-[#EAEFF2] text-[#00426B] text-[10px] font-black uppercase tracking-widest border border-[#EAEFF2]">
-                        {a.course}
+                        {a.grade}
                       </span>
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">
                         <button onClick={() => handleEdit(a)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Edit</button>
-                        <button onClick={() => handleDelete(a.id_student)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                        <button onClick={() => handleDelete(a.studentId)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       </div>
@@ -281,10 +281,10 @@ export default function StudentsCRUD() {
               {editingStudent && (
                 <div className="p-8 bg-gray-50/50 border-b border-gray-50 flex flex-col items-center gap-4">
                   <Avatar 
-                    url={editingStudent.url_foto} 
-                    name={`${editingStudent.name} ${editingStudent.surnames}`} 
-                    id={editingStudent.id_student} 
-                    type="alumne" 
+                    url={editingStudent.photoUrl} 
+                    name={`${editingStudent.fullName} ${editingStudent.lastName}`} 
+                    id={editingStudent.studentId} 
+                    type="student" 
                     size="xl"
                     className="shadow-xl ring-4 ring-white"
                   />
@@ -301,12 +301,12 @@ export default function StudentsCRUD() {
                           formData.append('foto', file);
                           try {
                             const api = getApi();
-                            const res = await api.post(`/upload/perfil/alumne/${editingStudent.id_student}`, formData, {
+                            const res = await api.post(`/upload/profile/student/${editingStudent.studentId}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
                             toast.success("Photo updated.");
                             loadStudents();
-                            setEditingStudent({ ...editingStudent, url_foto: res.data.url_foto });
+                            setEditingStudent({ ...editingStudent, photoUrl: res.data.photoUrl });
                           } catch (err: unknown) {
                             toast.error("Error uploading photo.");
                           }
@@ -321,16 +321,16 @@ export default function StudentsCRUD() {
                 <div>
                   <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Student name</label>
                   <input 
-                    type="text" value={formData.name} 
-                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    type="text" value={formData.fullName} 
+                    onChange={e => setFormData({...formData, fullName: e.target.value})}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
                   />
                 </div>
                 <div>
                   <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Surnames</label>
                   <input 
-                    type="text" value={formData.surnames} 
-                    onChange={e => setFormData({...formData, surnames: e.target.value})}
+                    type="text" value={formData.lastName} 
+                    onChange={e => setFormData({...formData, lastName: e.target.value})}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
                   />
                 </div>
@@ -345,8 +345,8 @@ export default function StudentsCRUD() {
                 <div>
                   <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Course / Level (Ex: 4th ESO)</label>
                   <input 
-                    type="text" value={formData.course} 
-                    onChange={e => setFormData({...formData, course: e.target.value})}
+                    type="text" value={formData.grade} 
+                    onChange={e => setFormData({...formData, grade: e.target.value})}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
                   />
                 </div>

@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma.js';
-import { createNotificationInterna } from '../controllers/notificacio.controller.js';
+import { createNotificationInternal } from '../controllers/notification.controller.js';
 
 export interface RiskResult {
     studentId: number;
@@ -17,13 +17,13 @@ export class RiskAnalysisService {
         const factors: string[] = [];
         let riskScore = 0;
 
-        // 1. Fetch Attendance (Last 5 sessions)
+        // 1. Fetch Attendance (Last 3 sessions)
         const recentAttendance = await prisma.attendance.findMany({
             where: {
-                enrollment: { id_student: studentId }
+                enrollment: { studentId: studentId }
             },
-            orderBy: { data_session: 'desc' },
-            take: 5
+            orderBy: { sessionDate: 'desc' },
+            take: 3
         });
 
         // 2. Calculate Attendance Risk
@@ -32,8 +32,11 @@ export class RiskAnalysisService {
             let late = 0;
 
             recentAttendance.forEach((a: any) => {
-                if (a.estat === 'Absencia') absences++;
-                if (a.estat === 'Retard') late++;
+                if (a.status === 'ABSENT' || a.status === 'JUSTIFIED_ABSENCE') {
+                    absences++;
+                    factors.push(`Absent on ${a.sessionDate.toLocaleDateString()}`);
+                }
+                if (a.status === 'LATE') late++;
             });
 
             if (absences >= 2) {
@@ -53,9 +56,9 @@ export class RiskAnalysisService {
         const lowEvaluations = await prisma.competenceEvaluation.count({
             where: {
                 evaluation: {
-                    enrollment: { id_student: studentId }
+                    enrollment: { studentId: studentId }
                 },
-                puntuacio: { lt: 3 }
+                score: { lt: 3 }
             }
         });
 
@@ -84,18 +87,18 @@ export class RiskAnalysisService {
     private async triggerAlert(studentId: number, score: number, factors: string[]) {
         // Find Student Info
         const student = await prisma.student.findUnique({
-            where: { id_student: studentId },
-            include: { center_origin: true }
+            where: { studentId: studentId },
+            include: { centerOrigin: true }
         });
 
-        if (!student || !student.center_origin) return;
+        if (!student || !student.centerOrigin) return;
 
-        await createNotificationInterna({
-            id_center: student.center_origin.id_center,
-            titol: `⚠️ Alerta de Riesgo: ${student.nom} ${student.cognoms}`,
-            missatge: `El alumno presenta un riesgo de abandono del ${score}%. Factores: ${factors.join(', ')}. Se recomienda intervención.`,
-            tipus: 'SISTEMA',
-            importancia: 'URGENT'
+        await createNotificationInternal({
+            centerId: student.centerOrigin.centerId,
+            title: `⚠️ Risk Alert: ${student.fullName} ${student.lastName}`,
+            message: `The student shows a dropout risk of ${score}%. Factors: ${factors.join(', ')}. Intervention is recommended.`,
+            type: 'SYSTEM',
+            importance: 'URGENT'
         });
     }
 }

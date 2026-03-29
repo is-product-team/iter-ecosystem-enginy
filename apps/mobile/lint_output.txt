@@ -1,0 +1,73 @@
+
+> mobile@1.0.0 lint
+> expo lint
+
+env: load .env
+env: export NGROK_AUTHTOKEN EXPO_PUBLIC_API_URL
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/(professor)/(tabs)/_layout.tsx
+   3:10  warning  'THEME' is defined but never used            @typescript-eslint/no-unused-vars
+  10:9   warning  'isDark' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/(professor)/(tabs)/avisos.tsx
+   3:10  warning  'Ionicons' is defined but never used                     @typescript-eslint/no-unused-vars
+  63:9   warning  'getImportanceColor' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  71:9   warning  'getTypeIcon' is assigned a value but never used         @typescript-eslint/no-unused-vars
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/(professor)/(tabs)/index.tsx
+    1:27  warning  'useEffect' is defined but never used                                                                                             @typescript-eslint/no-unused-vars
+    2:52  warning  'Linking' is defined but never used                                                                                               @typescript-eslint/no-unused-vars
+    8:8   warning  'api' is defined but never used                                                                                                   @typescript-eslint/no-unused-vars
+    8:43  warning  'getNotificacions' is defined but never used                                                                                      @typescript-eslint/no-unused-vars
+  115:8   warning  React Hook React.useCallback has a missing dependency: 'checkRoleAndFetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  120:6   warning  React Hook React.useCallback has a missing dependency: 'checkRoleAndFetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  319:7   warning  'hasActiveSession' is assigned a value but never used                                                                             @typescript-eslint/no-unused-vars
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/(professor)/(tabs)/profile.tsx
+  4:10  warning  'THEME' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/(professor)/_layout.tsx
+  4:10  warning  'THEME' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/(professor)/questionnaire/[id].tsx
+   3:10  warning  'Ionicons' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+  19:6   warning  React Hook useEffect has a missing dependency: 'loadQuestionnaire'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/(professor)/session/[id].tsx
+    1:27  warning  'useEffect' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+    7:8   warning  'api' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+    7:15  warning  'getChecklist' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+   20:10  warning  'sessionData' is assigned a value but never used                                                                @typescript-eslint/no-unused-vars
+   20:23  warning  'setSessionData' is assigned a value but never used                                                             @typescript-eslint/no-unused-vars
+   51:16  warning  'err' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+   68:8   warning  React Hook useCallback has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  134:20  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                 react/no-unescaped-entities
+  134:59  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                 react/no-unescaped-entities
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/+not-found.tsx
+  9:53  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/app/login.tsx
+  154:25  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/components/CalendarView.tsx
+   2:71  warning  'Modal' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+   2:78  warning  'TouchableWithoutFeedback' is defined but never used                                                              @typescript-eslint/no-unused-vars
+  25:9   warning  'router' is assigned a value but never used                                                                       @typescript-eslint/no-unused-vars
+  26:9   warning  'insets' is assigned a value but never used                                                                       @typescript-eslint/no-unused-vars
+  64:6   warning  React Hook useMemo has a missing dependency: 'year'. Either include it or remove the dependency array             react-hooks/exhaustive-deps
+  74:66  warning  React Hook useMemo has a missing dependency: 'getEventsForDay'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  85:9   warning  'openMaps' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile/components/WorkshopDetailModal.tsx
+  2:59  warning  'Platform' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 35 problems (4 errors, 31 warnings)
+
+npm error Lifecycle script `lint` failed with error:
+npm error code 1
+npm error path /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile
+npm error workspace mobile@1.0.0
+npm error location /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile
+npm error command failed
+npm error command sh -c expo lint

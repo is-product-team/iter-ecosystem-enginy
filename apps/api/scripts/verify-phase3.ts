@@ -20,7 +20,7 @@ async function main() {
     console.log('\n2. Testing DB Integration (ReadOnly check)');
     try {
         let assignment = await prisma.assignment.findFirst({
-            where: { data_inici: { not: null } }
+            where: { startDate: { not: null } }
         });
 
         // If no assignment exists, create a dummy one for testing
@@ -34,26 +34,26 @@ async function main() {
             if (center && workshop) {
                 assignment = await prisma.assignment.create({
                     data: {
-                        id_center: center.id_center,
-                        id_workshop: workshop.id_workshop,
-                        data_inici: new Date('2026-02-01'),
-                        data_fi: new Date('2026-04-10'),
-                        estat: 'IN_PROGRESS'
+                        centerId: center.centerId,
+                        workshopId: workshop.workshopId,
+                        startDate: new Date('2026-02-01'),
+                        endDate: new Date('2026-04-10'),
+                        status: 'IN_PROGRESS'
                     }
                 });
                 createdDummy = true;
-                console.log(`✅ Created dummy assignment ID: ${assignment.id_assignment}`);
+                console.log(`✅ Created dummy assignment ID: ${assignment.assignmentId}`);
             } else {
                 console.error('❌ Cannot create dummy assignment: No Center or Workshop found in DB.');
             }
         }
 
         if (assignment) {
-            console.log(`Found Assignment ID: ${assignment.id_assignment} starting ${assignment.data_inici}`);
+            console.log(`Found Assignment ID: ${assignment.assignmentId} starting ${assignment.startDate}`);
             const sessionsStatus = await Promise.all(
                 [1, 2, 3].map(async i => ({
                     num: i,
-                    status: await SessionService.getSessionStatus(assignment!.id_assignment, i)
+                    status: await SessionService.getSessionStatus(assignment!.assignmentId, i)
                 }))
             );
             console.log('Session Statuses:', sessionsStatus);
@@ -61,28 +61,28 @@ async function main() {
 
             // Verify Attendance Initialization (Create fake enrollment if needed)
             // Check if there are enrollments
-            const enrollments = await prisma.enrollment.count({ where: { id_assignment: assignment.id_assignment } });
+            const enrollments = await prisma.enrollment.count({ where: { assignmentId: assignment.assignmentId } });
             if (enrollments === 0) {
                 const student = await prisma.student.findFirst();
                 if (student) {
                     await prisma.enrollment.create({
-                        data: { id_assignment: assignment.id_assignment, id_student: student.id_student }
+                        data: { assignmentId: assignment.assignmentId, studentId: student.studentId }
                     });
                     console.log('Created dummy enrollment for testing attendance init.');
                 }
             }
 
             console.log('Testing ensureAttendanceRecords...');
-            await SessionService.ensureAttendanceRecords(assignment.id_assignment, 1, new Date());
-            const statusAfter = await SessionService.getSessionStatus(assignment.id_assignment, 1);
+            await SessionService.ensureAttendanceRecords(assignment.assignmentId, 1, new Date());
+            const statusAfter = await SessionService.getSessionStatus(assignment.assignmentId, 1);
             console.log(`Session 1 Status After Init: ${statusAfter}`);
 
             if (createdDummy) {
                 // Cleanup
                 console.log('Cleaning up dummy data...');
-                await prisma.attendance.deleteMany({ where: { enrollment: { id_assignment: assignment.id_assignment } } });
-                await prisma.enrollment.deleteMany({ where: { id_assignment: assignment.id_assignment } });
-                await prisma.assignment.delete({ where: { id_assignment: assignment.id_assignment } });
+                await prisma.attendance.deleteMany({ where: { enrollment: { assignmentId: assignment.assignmentId } } });
+                await prisma.enrollment.deleteMany({ where: { assignmentId: assignment.assignmentId } });
+                await prisma.assignment.delete({ where: { assignmentId: assignment.assignmentId } });
                 console.log('Cleanup done.');
             }
 

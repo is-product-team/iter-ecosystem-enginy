@@ -24,7 +24,7 @@ export default function TeachersCRUD() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -36,13 +36,13 @@ export default function TeachersCRUD() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.COORDINATOR)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
       router.push('/login');
       return;
     }
@@ -61,7 +61,7 @@ export default function TeachersCRUD() {
   };
 
   const filteredTeachers = teachers.filter(p => {
-    return !searchQuery || 
+    return !searchQuery ||
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.contact.toLowerCase().includes(searchQuery.toLowerCase());
   });
@@ -80,7 +80,7 @@ export default function TeachersCRUD() {
     e.preventDefault();
     try {
       if (editingTeacher) {
-        await teacherService.update(editingTeacher.id_teacher, formData);
+        await teacherService.update(editingTeacher.teacherId, formData);
         toast.success("Teacher updated successfully.");
       } else {
         await teacherService.create(formData);
@@ -120,7 +120,7 @@ export default function TeachersCRUD() {
     });
   };
   const headerActions = (
-    <button 
+    <button
       onClick={() => { setEditingTeacher(null); setFormData({ name: '', contact: '', password: '' }); setIsModalOpen(true); }}
       className="bg-[#00426B] text-white px-6 py-3 font-black uppercase text-[10px] tracking-widest hover:bg-[#0775AB] transition-all flex items-center gap-2 shadow-lg"
     >
@@ -130,8 +130,8 @@ export default function TeachersCRUD() {
   );
 
   return (
-    <DashboardLayout 
-      title="Teacher Management" 
+    <DashboardLayout
+      title="Teacher Management"
       subtitle="Manage the referring teachers of your educational center."
       actions={headerActions}
     >
@@ -140,7 +140,7 @@ export default function TeachersCRUD() {
         <div className="flex-1">
           <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Search by name or contact</label>
           <div className="relative">
-            <input 
+            <input
               type="text"
               placeholder="Ex: Manuel Pérez, manuel@escolaurgell.cat..."
               value={searchQuery}
@@ -154,7 +154,7 @@ export default function TeachersCRUD() {
         </div>
 
         <div className="flex items-end">
-          <button 
+          <button
             onClick={() => setSearchQuery("")}
             className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
           >
@@ -179,14 +179,14 @@ export default function TeachersCRUD() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {paginatedTeachers.map(p => (
-                    <tr key={p.id_teacher} className="hover:bg-gray-50 transition-colors group">
+                    <tr key={p.teacherId} className="hover:bg-gray-50 transition-colors group">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
-                          <Avatar 
-                            url={p.user?.url_foto} 
-                            name={p.name} 
-                            id={p.user?.id_user || p.id_teacher} 
-                            type="usuari" 
+                          <Avatar
+                            url={p.user?.photoUrl}
+                            name={p.name}
+                            id={p.user?.userId || p.teacherId}
+                            type="user"
                             size="md"
                             email={p.user?.email}
                           />
@@ -201,7 +201,7 @@ export default function TeachersCRUD() {
                       <td className="px-6 py-5">
                         <div className="flex justify-end items-center gap-2">
                           <button onClick={() => handleEdit(p)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Edit</button>
-                          <button onClick={() => handleDelete(p.id_teacher)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
+                          <button onClick={() => handleDelete(p.teacherId)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
                         </div>
@@ -244,7 +244,7 @@ export default function TeachersCRUD() {
                   {editingTeacher ? 'Modify teacher data' : 'Enter data for the new teacher'}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-300 hover:text-[#00426B] transition-colors"
               >
@@ -255,41 +255,41 @@ export default function TeachersCRUD() {
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               {editingTeacher && (
                 <div className="p-8 bg-gray-50/50 border-b border-gray-50 flex flex-col items-center gap-4">
-                  <Avatar 
-                    url={editingTeacher.user?.url_foto} 
-                    name={editingTeacher.name} 
-                    id={editingTeacher.user?.id_user || editingTeacher.id_teacher} 
-                    type="usuari" 
+                  <Avatar
+                    url={editingTeacher.user?.photoUrl}
+                    name={editingTeacher.name}
+                    id={editingTeacher.user?.userId || editingTeacher.teacherId}
+                    type="user"
                     size="xl"
                     className="shadow-xl ring-4 ring-white"
                   />
                   <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95">
                     Change Photo
-                    <input 
-                      type="file" 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      className="hidden"
                       accept="image/*"
                       onChange={async (e) => {
-                        if (e.target.files?.[0] && editingTeacher.user?.id_user) {
+                        if (e.target.files?.[0] && editingTeacher.user?.userId) {
                           const file = e.target.files[0];
                           const formData = new FormData();
-                          formData.append('foto', file);
+                          formData.append('photo', file);
                           try {
                             const api = getApi();
-                            const res = await api.post(`/upload/perfil/usuari/${editingTeacher.user.id_user}`, formData, {
+                            const res = await api.post(`/upload/profile/user/${editingTeacher.user.userId}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
                             toast.success("Photo updated.");
                             loadTeachers();
                             // Update local state for immediate feedback
-                            setEditingTeacher({ 
-                              ...editingTeacher, 
-                              user: { ...editingTeacher.user, url_foto: res.data.url_foto } 
+                            setEditingTeacher({
+                              ...editingTeacher,
+                              user: { ...editingTeacher.user, photoUrl: res.data.photoUrl }
                             } as Teacher);
                           } catch (err) {
                             toast.error("Error uploading photo.");
                           }
-                        } else if (!editingTeacher.user?.id_user) {
+                        } else if (!editingTeacher.user?.userId) {
                           toast.error("Cannot upload photo to a teacher without a linked user.");
                         }
                       }}
@@ -297,22 +297,22 @@ export default function TeachersCRUD() {
                   </label>
                 </div>
               )}
-              
+
               <form onSubmit={handleSubmit} id="teacher-form" className="p-8 space-y-6">
                 <div>
                   <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Full name</label>
-                  <input 
-                    type="text" value={formData.name} 
-                    onChange={e => setFormData({...formData, name: e.target.value})}
+                  <input
+                    type="text" value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
                   />
                 </div>
                 <div>
                   <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Contact info (Main Email)</label>
-                  <input 
-                    type="email" value={formData.contact} 
-                    onChange={e => setFormData({...formData, contact: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" 
+                  <input
+                    type="email" value={formData.contact}
+                    onChange={e => setFormData({ ...formData, contact: e.target.value })}
+                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all"
                     placeholder="example@center.cat"
                     required
                   />
@@ -322,20 +322,20 @@ export default function TeachersCRUD() {
                   <div>
                     <label className="text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2 flex justify-between">
                       Password (App Access)
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="text-[#0775AB] hover:underline normal-case font-bold"
                       >
                         {showPassword ? 'Hide' : 'View'}
                       </button>
                     </label>
-                    <input 
-                      type={showPassword ? "text" : "password"} 
-                      value={formData.password} 
-                      onChange={e => setFormData({...formData, password: e.target.value})}
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={e => setFormData({ ...formData, password: e.target.value })}
                       placeholder="Password for the mobile App"
-                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" 
+                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all"
                       required={!editingTeacher}
                     />
                     <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-tight">
@@ -353,7 +353,7 @@ export default function TeachersCRUD() {
           </div>
         </div>
       )}
-      <ConfirmDialog 
+      <ConfirmDialog
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}

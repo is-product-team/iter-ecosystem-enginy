@@ -1,15 +1,18 @@
-import createMiddleware from 'next-intl/middleware';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default createMiddleware({
-  locales: ['ca', 'es'],
-  defaultLocale: 'ca'
-});
+export function middleware(request: NextRequest) {
+  // Basic middleware - could be expanded for Auth protection if needed
+  return NextResponse.next();
+}
 
 export const config = {
-  // Match all pathnames except for
-  // - /api (API routes)
-  // - /_next (Next.js internals)
-  // - /_static (inside /public)
-  // - all root files inside /public (e.g. /favicon.ico)
-  matcher: ['/((?!api|_next|_static|_vercel|[\\w-]+\\.\\w+).*)']
+  matcher: [
+    // Match all request paths except for the ones starting with:
+    // - api (API routes)
+    // - _next/static (static files)
+    // - _next/image (image optimization files)
+    // - favicon.ico, logo.png (static files)
+    '/((?!api|_next/static|_next/image|favicon.ico|logo.png|.*\\.png$).*)',
+  ],
 };

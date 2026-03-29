@@ -26,10 +26,10 @@ const CreateWorkshopModal = ({
   initialData,
 }: CreateWorkshopModalProps) => {
   const [title, setTitle] = useState("");
-  const [idSector, setIdSector] = useState<number | "">("");
+  const [sectorId, setSectorId] = useState<number | "">("");
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [modality, setModality] = useState("A");
-  const [trimestre, setTrimestre] = useState("1st");
+  const [term, setTerm] = useState("1st");
   const [description, setDescription] = useState("");
   const [durationHours, setDurationHours] = useState("");
   const [maxPlaces, setMaxPlaces] = useState("");
@@ -64,9 +64,9 @@ const CreateWorkshopModal = ({
   React.useEffect(() => {
     if (visible && initialData) {
       setTitle(initialData.title);
-      setIdSector(initialData.id_sector || "");
+      setSectorId(initialData.sectorId || "");
       setModality(initialData.modality);
-      setTrimestre(initialData.term);
+      setTerm(initialData.term);
       setIcon(initialData.icon || "PUZZLE");
       setDescription(initialData.technicalDetails?.description || "");
       setDurationHours(initialData.technicalDetails?.durationHours?.toString() || "");
@@ -80,9 +80,9 @@ const CreateWorkshopModal = ({
       }
     } else if (visible) {
       setTitle("");
-      setIdSector("");
+      setSectorId("");
       setModality("A");
-      setTrimestre("1st");
+      setTerm("1st");
       setIcon("PUZZLE");
       setDescription("");
       setDurationHours("");
@@ -113,10 +113,10 @@ const CreateWorkshopModal = ({
 
     const workshopData: Omit<Workshop, "_id"> = {
       title,
-      sector: sectors.find(s => s.id_sector === idSector)?.nom || "General",
-      id_sector: idSector === "" ? undefined : idSector,
+      sector: sectors.find(s => s.sectorId === sectorId)?.name || "General",
+      sectorId: sectorId === "" ? undefined : sectorId,
       modality,
-      term: trimestre,
+      term: term,
       icon,
       technicalDetails: {
         description,
@@ -190,14 +190,14 @@ const CreateWorkshopModal = ({
                   <div>
                     <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Professional Sector</label>
                     <select
-                      value={idSector}
-                      onChange={(e) => setIdSector(Number(e.target.value))}
+                      value={sectorId}
+                      onChange={(e) => setSectorId(Number(e.target.value))}
                       className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
                     >
                       <option value="">Select a sector...</option>
                       {sectors.map((sector) => (
-                        <option key={sector.id_sector} value={sector.id_sector}>
-                          {sector.nom}
+                        <option key={sector.sectorId} value={sector.sectorId}>
+                          {sector.name}
                         </option>
                       ))}
                     </select>

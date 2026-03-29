@@ -1,14 +1,14 @@
-import { Request as Peticio, Prisma } from '@prisma/client';
+import { Request as PrismaRequest, Prisma } from '@prisma/client';
 import { BaseRepository } from './base.repository.js';
 
-export class RequestRepository extends BaseRepository<Request, Prisma.RequestCreateInput, Prisma.RequestUpdateInput> {
+export class RequestRepository extends BaseRepository<PrismaRequest, Prisma.RequestCreateInput, Prisma.RequestUpdateInput> {
   constructor() {
-    super('request', 'id_request');
+    super('request', 'requestId');
   }
 
   override async findById(id: number): Promise<any> {
     return this.prisma.request.findUnique({
-      where: { id_request: id },
+      where: { requestId: id },
       include: {
         center: true,
         workshop: true
@@ -16,18 +16,18 @@ export class RequestRepository extends BaseRepository<Request, Prisma.RequestCre
     });
   }
 
-  async findByCenter(centerId: number): Promise<Peticio[]> {
+  async findByCenter(centerId: number): Promise<PrismaRequest[]> {
     return this.model.findMany({
-      where: { id_center: centerId },
+      where: { centerId: centerId },
       include: { workshop: true },
-      orderBy: { data_request: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
   }
 
-  async findAllDetailed(role: string, centerId?: number): Promise<Peticio[]> {
+  async findAllDetailed(role: string, centerId?: number): Promise<PrismaRequest[]> {
     const where: Prisma.RequestWhereInput = {};
     if (role !== 'ADMIN' && centerId) {
-      where.id_center = centerId;
+      where.centerId = centerId;
     }
 
     return this.model.findMany({
@@ -36,7 +36,7 @@ export class RequestRepository extends BaseRepository<Request, Prisma.RequestCre
         center: true,
         workshop: true
       },
-      orderBy: { data_request: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
   }
 }

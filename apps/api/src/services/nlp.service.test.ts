@@ -8,7 +8,7 @@ describe('NLPService', () => {
     service = new NLPService();
   });
 
-  it('should detect "Retard" status from keywords', () => {
+  it('should detect "LATE" status from keywords', () => {
     const texts = [
       'Ha llegado con retraso',
       'Viene tarde hoy',
@@ -16,11 +16,11 @@ describe('NLPService', () => {
     ];
     texts.forEach(text => {
       const result = service.processText(text);
-      expect(result.attendanceStatus).toBe('Retard');
+      expect(result.attendanceStatus).toBe('LATE');
     });
   });
 
-  it('should detect "Absencia" status from keywords', () => {
+  it('should detect "ABSENT" status from keywords', () => {
     const texts = [
       'No ha venido a clase',
       'Falta injustificada',
@@ -28,7 +28,7 @@ describe('NLPService', () => {
     ];
     texts.forEach(text => {
       const result = service.processText(text);
-      expect(result.attendanceStatus).toBe('Absencia');
+      expect(result.attendanceStatus).toBe('ABSENT');
     });
   });
 

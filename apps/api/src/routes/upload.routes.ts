@@ -14,11 +14,11 @@ const upload = multer({
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
-      cb(new Error('Només es permeten fitxers d\'imatge.'));
+      cb(new Error('Only image files are allowed.'));
     }
   }
 });
 
-router.post('/perfil/:type/:id', authenticateToken, upload.single('foto'), uploadController.uploadProfilePicture);
+router.post('/profile/:type/:id', authenticateToken, upload.single('photo'), uploadController.uploadProfilePicture);
 
 export default router;

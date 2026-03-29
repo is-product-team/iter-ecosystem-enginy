@@ -16,7 +16,7 @@ export default function CenterDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && (!user || user.rol.nom_rol !== ROLES.COORDINATOR)) {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
       router.push('/login');
     }
   }, [user, authLoading, router]);
@@ -33,14 +33,14 @@ export default function CenterDashboard() {
       }
     };
 
-    if (user && user.rol.nom_rol === ROLES.COORDINATOR) {
+    if (user && user.role.name === ROLES.COORDINATOR) {
       fetchPhases();
     }
   }, [user]);
 
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find(f => f.name === phaseName);
-    return phase ? phase.active : false;
+    return phase ? phase.isActive : false;
   };
 
   if (authLoading || !user) {
@@ -53,7 +53,7 @@ export default function CenterDashboard() {
 
   return (
     <DashboardLayout
-      title={`Center Dashboard: ${user.center?.nom || 'Educational'}`}
+      title={`Center Dashboard: ${user.center?.name || 'Educational'}`}
       subtitle="Iter workshop management process."
     >
       {/* Institutional Section Timeline */}
@@ -72,10 +72,10 @@ export default function CenterDashboard() {
               <div className="w-full py-8 text-center uppercase text-[10px] font-bold tracking-widest text-[#00426B]">Loading calendar...</div>
             ) : (
               phases.map((phase) => (
-                <div key={phase.id_phase} className="relative flex flex-col items-center text-center flex-1 group">
+                <div key={phase.phaseId} className="relative flex flex-col items-center text-center flex-1 group">
                   {/* Square with number */}
                   <div
-                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border-2 transition-all ${phase.active
+                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border-2 transition-all ${phase.isActive
                       ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
                       : 'bg-background-surface text-text-muted border-border-subtle'
                       }`}
@@ -86,11 +86,11 @@ export default function CenterDashboard() {
                   </div>
 
                   {/* Name and Date */}
-                  <h4 className={`font-black text-[10px] uppercase tracking-[0.1em] mb-4 min-h-[3em] flex items-center justify-center ${phase.active ? 'text-consorci-darkBlue' : 'text-text-muted'}`}>
+                  <h4 className={`font-black text-[10px] uppercase tracking-[0.1em] mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue' : 'text-text-muted'}`}>
                     {phase.name}
                   </h4>
 
-                  <div className={`text-[10px] font-bold px-4 py-2 border-2 ${phase.active ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
+                  <div className={`text-[10px] font-bold px-4 py-2 border-2 ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
                     {new Date(phase.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }).toUpperCase()}
                   </div>
                 </div>
@@ -149,16 +149,16 @@ export default function CenterDashboard() {
               key={idx}
               onClick={() => item.active && router.push(item.path)}
               className={`group bg-background-surface p-8 md:p-10 border transition-all duration-300 relative overflow-hidden ${item.active
-                  ? 'border-border-subtle cursor-pointer hover:border-consorci-actionBlue hover:shadow-xl'
-                  : 'border-border-subtle opacity-60 cursor-not-allowed'
+                ? 'border-border-subtle cursor-pointer hover:border-consorci-actionBlue hover:shadow-xl'
+                : 'border-border-subtle opacity-60 cursor-not-allowed'
                 }`}
             >
               <div className={`absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${item.active ? 'group-hover:bg-consorci-actionBlue' : ''
                 }`}></div>
 
               <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-border-subtle transition-all duration-300 ${item.active
-                  ? 'bg-background-subtle text-consorci-darkBlue group-hover:bg-consorci-darkBlue group-hover:text-white'
-                  : 'bg-background-subtle text-text-muted'
+                ? 'bg-background-subtle text-consorci-darkBlue group-hover:bg-consorci-darkBlue group-hover:text-white'
+                : 'bg-background-subtle text-text-muted'
                 }`}>
                 <div className={item.active ? 'group-hover:text-white' : ''}>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
