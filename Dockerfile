@@ -15,6 +15,7 @@ RUN turbo prune api --docker
 
 # --- BUILDER WEB ---
 FROM base AS builder-web
+ENV NODE_ENV=production
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY --from=pruner /app/out/json/ .
@@ -27,6 +28,7 @@ RUN npx turbo run build --filter=web
 FROM base AS runner-web
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 WORKDIR /app
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
