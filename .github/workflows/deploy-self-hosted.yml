@@ -57,16 +57,27 @@ jobs:
 
       - name: 🐳 Deploy with Docker Compose
         run: |
-          # Construimos y levantamos los contenedores
-          docker compose -f docker-compose.prod.yml up -d --build
+          # 1. Construir las imágenes actualizadas
+          docker compose -f docker-compose.prod.yml build
 
-          echo "⏳ Esperando 10s para estabilizar..."
-          sleep 10
-
-          echo "--- 🗄️ Ejecutando Migraciones (Prisma Push) ---"
-          # Extraemos la URL y limitamos la memoria de Node para evitar el error 137 (OOM)
+          echo "--- 🗄️ Ejecutando Migraciones (Contenedor Aislado) ---"
+          # Extraemos la URL para pasarla al contenedor independiente
           export DB_URL=$(grep DATABASE_URL apps/api/.env.production | cut -d '=' -f2-)
-          docker exec -e DATABASE_URL="$DB_URL" -e NODE_OPTIONS="--max-old-space-size=512" iter_api npx prisma db push --accept-data-loss
+          
+          # Ejecutamos la migración en un contenedor temporal que usa la red del proxy
+          # Esto evita pelear por RAM con la API principal
+          docker run --rm \
+            --network red_proxy \
+            -e DATABASE_URL="$DB_URL" \
+            -e NODE_OPTIONS="--max-old-space-size=512" \
+            iter-ecosystem-enginy-api \
+            npx prisma db push --accept-data-loss
 
+          # 2. Levantar los servicios de producción
+          docker compose -f docker-compose.prod.yml up -d
+          
+          echo "--- ✅ Estado de los contenedores ---"
+          docker compose -f docker-compose.prod.yml ps
+          
           # Limpieza final de imágenes huérfanas
           docker image prune -f
