@@ -15,7 +15,7 @@ services:
     volumes:
       - ./uploads:/app/uploads
     networks:
-      - global_proxy
+      - red_proxy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/iter/api/health"]
       interval: 30s
@@ -39,7 +39,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
     networks:
-      - global_proxy
+      - red_proxy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
@@ -48,5 +48,5 @@ services:
       start_period: 40s
 
 networks:
-  global_proxy:
+  red_proxy:
     external: true
