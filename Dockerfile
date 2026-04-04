@@ -50,11 +50,13 @@ RUN npx turbo run build --filter=api
 FROM base AS runner-api
 ENV NODE_ENV=production
 WORKDIR /app
-COPY --from=builder-api /app/shared ./shared
+
+# Copiamos solo lo necesario del builder
+# Como RootDir es ../../, el dist contiene la estructura completa (apps/api y shared)
+COPY --from=builder-api /app/apps/api/dist ./
 COPY --from=builder-api /app/node_modules ./node_modules
 COPY --from=builder-api /app/apps/api/package.json ./apps/api/package.json
-COPY --from=builder-api /app/apps/api/dist ./apps/api/dist
-COPY --from=builder-api /app/apps/api/prisma ./prisma
+COPY --from=builder-api /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder-api /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder-api /app/node_modules/@prisma ./node_modules/@prisma
 
@@ -63,4 +65,4 @@ RUN mkdir -p /app/uploads/perfil /app/uploads/documents
 
 USER node
 EXPOSE 3000
-CMD ["node", "apps/api/dist/apps/api/src/index.js"]
+CMD ["node", "apps/api/src/index.js"]

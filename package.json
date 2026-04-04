@@ -1,7 +1,6 @@
 {
   "name": "iter-ecosystem",
   "private": true,
-  "type": "module",
   "version": "1.0.0",
   "description": "Iter Ecosystem Monorepo - Professional Architecture",
   "workspaces": [
