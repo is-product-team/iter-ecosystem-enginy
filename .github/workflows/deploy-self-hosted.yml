@@ -54,8 +54,14 @@ jobs:
 
       - name: 🐳 Deploy with Docker Compose
         run: |
-          # Usamos el archivo de producción que configuramos
+          # Construimos y levantamos los contenedores
           docker compose -f docker-compose.prod.yml up -d --build
-
-          # Limpieza de imágenes huérfanas para ahorrar espacio en el LXC
+          
+          echo "⏳ Esperando 10s para estabilizar..."
+          sleep 10
+          
+          echo "--- 🗄️ Ejecutando Migraciones (Prisma Push) ---"
+          docker exec iter_api npx prisma db push --accept-data-loss
+          
+          # Limpieza final de imágenes huérfanas
           docker image prune -f
