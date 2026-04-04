@@ -64,8 +64,9 @@ jobs:
           sleep 10
 
           echo "--- 🗄️ Ejecutando Migraciones (Prisma Push) ---"
+          # Extraemos la URL y limitamos la memoria de Node para evitar el error 137 (OOM)
           export DB_URL=$(grep DATABASE_URL apps/api/.env.production | cut -d '=' -f2-)
-          docker exec -e DATABASE_URL="$DB_URL" iter_api npx prisma db push --accept-data-loss
+          docker exec -e DATABASE_URL="$DB_URL" -e NODE_OPTIONS="--max-old-space-size=512" iter_api npx prisma db push --accept-data-loss
 
           # Limpieza final de imágenes huérfanas
           docker image prune -f
