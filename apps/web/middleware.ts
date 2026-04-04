@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 
-export function middleware(request: NextRequest) {
-  // Basic middleware - could be expanded for Auth protection if needed
-  return NextResponse.next();
-}
+export default createMiddleware({
+  // A list of all locales that are supported
+  locales: ['ca', 'es'],
+ 
+  // Used when no locale matches
+  defaultLocale: 'ca'
+});
 
 export const config = {
   matcher: [
@@ -16,3 +18,4 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico|logo.png|.*\\.png$).*)',
   ],
 };
+
