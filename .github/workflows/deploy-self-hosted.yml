@@ -25,12 +25,18 @@ jobs:
         run: |
           echo "--- DNS Check ---"
           ping -c 1 google.com || echo "DNS/Ping failed"
-
+          
           echo "--- MTU Check ---"
           ip link show
-
+          
           echo "--- Docker Registry Connectivity ---"
           curl -v https://registry-1.docker.io/v2/ || echo "Registry unreachable"
+
+      - name: 🐳 Mirror Base Image (GCR)
+        run: |
+          echo "Pulling from Google Mirror to bypass Docker Hub timeout..."
+          docker pull mirror.gcr.io/library/node:22-alpine
+          docker tag mirror.gcr.io/library/node:22-alpine node:22-alpine
 
       - name: 🔑 Create Environment Files from Secrets
         run: |
