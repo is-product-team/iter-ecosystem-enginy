@@ -67,7 +67,7 @@ jobs:
           # Ejecutamos la migración en un contenedor temporal que usa la red del proxy
           # Esto evita pelear por RAM con la API principal
           docker run --rm \
-            --network red_proxy \
+            --network global_proxy \
             -e DATABASE_URL="$DB_URL" \
             -e NODE_OPTIONS="--max-old-space-size=512" \
             iter-ecosystem-enginy-api \
