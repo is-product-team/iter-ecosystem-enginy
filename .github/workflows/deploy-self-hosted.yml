@@ -21,16 +21,19 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔍 Network Diagnostics (Debug)
+      - name: 🔍 Diagnostics & Cleanup (Space)
         run: |
-          echo "--- DNS Check ---"
-          ping -c 1 google.com || echo "DNS/Ping failed"
+          echo "--- Disk Space Before ---"
+          df -h
           
-          echo "--- MTU Check ---"
-          ip link show
+          echo "--- Aggressive Docker Cleanup ---"
+          # Limpia contenedores parados, redes no usadas e imágenes sin tag
+          docker system prune -f
+          # Limpia la caché de construcción de más de 24h para liberar espacio crítico
+          docker builder prune -af --filter "until=24h"
           
-          echo "--- Docker Registry Connectivity ---"
-          curl -v https://registry-1.docker.io/v2/ || echo "Registry unreachable"
+          echo "--- Disk Space After ---"
+          df -h
 
       - name: 🐳 Mirror Base Image (GCR)
         run: |
