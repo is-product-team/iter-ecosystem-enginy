@@ -21,6 +21,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
+      - name: 🔍 Network Diagnostics (Debug)
+        run: |
+          echo "--- DNS Check ---"
+          ping -c 1 google.com || echo "DNS/Ping failed"
+
+          echo "--- MTU Check ---"
+          ip link show
+
+          echo "--- Docker Registry Connectivity ---"
+          curl -v https://registry-1.docker.io/v2/ || echo "Registry unreachable"
+
       - name: 🔑 Create Environment Files from Secrets
         run: |
           # Crear el .env de la API
