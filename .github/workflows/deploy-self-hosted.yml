@@ -71,7 +71,7 @@ jobs:
             -e DATABASE_URL="$DB_URL" \
             -e NODE_OPTIONS="--max-old-space-size=512" \
             iter-ecosystem-enginy-api \
-            npx prisma db push --accept-data-loss
+            npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss
 
           # 2. Levantar los servicios de producción
           docker compose -f docker-compose.prod.yml up -d
