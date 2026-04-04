@@ -9,7 +9,7 @@ import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 
-interface AssignacioDetall {
+interface AssignmentDetail {
   workshop?: { title: string };
   teacher1?: { user: { fullName: string } };
   teacher2?: { user: { fullName: string } };
@@ -25,9 +25,9 @@ interface AssignacioDetall {
 export default function SessionManagementPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [user, setUser] = useState<User | null>(null);
-  const [assignacio, setAssignacio] = useState<AssignacioDetall | null>(null);
+  const [assignment, setAssignment] = useState<AssignmentDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [allProfessors, setAllProfessors] = useState<{ userId: number; fullName: string }[]>([]);
+  const [allTeachers, setAllTeachers] = useState<{ userId: number; fullName: string }[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -52,8 +52,8 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
           fullName: t.user?.fullName || t.name
         }));
 
-        setAssignacio(resAssig.data);
-        setAllProfessors(teachers);
+        setAssignment(resAssig.data);
+        setAllTeachers(teachers);
       } catch (error) {
         toast.error('Error loading data.');
         router.push('/center/sessions');
@@ -71,7 +71,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
       await api.post(`/assignments/sessions/${sessionId}/staff`, { idUser });
 
       const res = await api.get(`/assignments/${id}`);
-      setAssignacio(res.data);
+      setAssignment(res.data);
       toast.success('Teacher added to session.');
     } catch (error) {
       toast.error('Error adding teacher to session.');
@@ -84,26 +84,26 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
       await api.delete(`/assignments/sessions/${sessionId}/staff/${idUser}`);
 
       const res = await api.get(`/assignments/${id}`);
-      setAssignacio(res.data);
+      setAssignment(res.data);
       toast.success('Teacher removed from session.');
     } catch (error) {
       toast.error('Error removing teacher from session.');
     }
   };
 
-  if (loading || !assignacio) return <Loading fullScreen message="Loading sessions..." />;
+  if (loading || !assignment) return <Loading fullScreen message="Loading sessions..." />;
 
   return (
     <DashboardLayout
-      title={`SESSIONS: ${assignacio.workshop?.title}`}
+      title={`SESSIONS: ${assignment.workshop?.title}`}
       subtitle="Manage the teaching team for each day."
     >
       <div className="mb-8 p-6 bg-white border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
           <h3 className="text-lg font-black text-[#00426B] uppercase">General Referent Team</h3>
           <div className="flex gap-4 mt-2">
-            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignacio.teacher1?.user?.fullName || 'Pending'}</span>
-            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignacio.teacher2?.user?.fullName || 'Pending'}</span>
+            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher1?.user?.fullName || 'Pending'}</span>
+            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher2?.user?.fullName || 'Pending'}</span>
           </div>
         </div>
         <button
@@ -116,35 +116,35 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
-        {assignacio.sessions?.map((sessio, idx: number) => (
-          <div key={sessio.sessionId} className="bg-white border border-gray-200 p-6 flex flex-col gap-4 group hover:border-[#4197CB] transition-all shadow-sm">
+        {assignment.sessions?.map((session, idx: number) => (
+          <div key={session.sessionId} className="bg-white border border-gray-200 p-6 flex flex-col gap-4 group hover:border-[#4197CB] transition-all shadow-sm">
             <div className="flex justify-between items-start">
               <div className="flex flex-col">
                 <span className="text-[10px] font-black text-[#4197CB] uppercase tracking-widest">Session {idx + 1}</span>
                 <span className="text-sm font-black text-[#00426B] uppercase">
-                  {new Date(sessio.sessionDate).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  {new Date(session.sessionDate).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
               </div>
               <div className="text-[10px] font-bold text-gray-300">
-                {sessio.startTime || '09:00'} - {sessio.endTime || '11:00'}
+                {session.startTime || '09:00'} - {session.endTime || '11:00'}
               </div>
             </div>
 
             <div className="border-t border-gray-50 pt-4 flex flex-col gap-3">
               <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">SPECIFIC TEACHING TEAM</span>
               <div className="flex flex-wrap gap-2 min-h-[32px]">
-                {sessio.staff?.map((sp) => (
+                {session.staff?.map((sp) => (
                   <div key={sp.userId} className="flex items-center gap-2 bg-[#F8FAFC] border border-gray-100 pl-2 pr-1 py-1 group/chip">
                     <span className="text-[10px] font-bold text-[#00426B] uppercase">{sp.user?.fullName}</span>
                     <button
-                      onClick={() => handleRemoveSessionStaff(sessio.sessionId, sp.userId)}
+                      onClick={() => handleRemoveSessionStaff(session.sessionId, sp.userId)}
                       className="hover:text-red-500 text-gray-300 transition-colors p-0.5"
                     >
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                   </div>
                 ))}
-                {(!sessio.staff || sessio.staff.length === 0) && (
+                {(!session.staff || session.staff.length === 0) && (
                   <span className="text-[10px] text-gray-300 italic font-medium">Use referent team</span>
                 )}
               </div>
@@ -154,7 +154,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
               <select
                 onChange={(e) => {
                   if (e.target.value) {
-                    handleAddSessionStaff(sessio.sessionId, parseInt(e.target.value));
+                    handleAddSessionStaff(session.sessionId, parseInt(e.target.value));
                     e.target.value = "";
                   }
                 }}
@@ -162,7 +162,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                 defaultValue=""
               >
                 <option value="" disabled>+ Modify teacher for day</option>
-                {allProfessors?.map((p) => (
+                {allTeachers?.map((p) => (
                   <option key={p.userId} value={p.userId}>{p.fullName} (TEACHER)</option>
                 ))}
               </select>

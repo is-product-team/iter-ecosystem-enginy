@@ -345,8 +345,8 @@ export default function AdminRequestsPage() {
                             <div className="text-[10px] font-bold text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</div>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1?.name || (r.prof1Id ? `Teacher ${r.prof1Id}` : '-')}</div>
-                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2?.name || (r.prof2Id ? `Teacher ${r.prof2Id}` : '-')}</div>
+                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1?.name || (r.teacher1Id ? `Teacher ${r.teacher1Id}` : '-')}</div>
+                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2?.name || (r.teacher2Id ? `Teacher ${r.teacher2Id}` : '-')}</div>
                           </td>
                           <td className="px-6 py-4 text-center">
                             <span className="bg-gray-100 px-2 py-1 text-xs font-black text-[#00426B]">{r.studentsAprox}</span>

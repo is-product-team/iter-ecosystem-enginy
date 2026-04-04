@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Redirect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { View, ActivityIndicator, Platform } from 'react-native';
+import { ROLES } from '@iter/shared';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +31,7 @@ export default function Index() {
         if (token && userData) {
           try {
             const user = JSON.parse(userData);
-            if (user.role?.roleName === 'PROFESSOR') {
+            if (user.role?.roleName === ROLES.TEACHER || user.role?.roleName === 'PROFESSOR') {
               setHasToken(true);
             } else {
               console.warn("⚠️ [Auth] Role not permitted on mobile:", user.role?.roleName);

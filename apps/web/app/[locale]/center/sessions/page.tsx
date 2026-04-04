@@ -12,7 +12,7 @@ import Pagination from '@/components/Pagination';
 
 type AssignmentMode = 'single' | 'whole';
 
-interface Sessio {
+interface Session {
   sessionId: number | string;
   sessionDate: string;
   startTime?: string;
@@ -32,20 +32,20 @@ interface BackendAssignment {
   workshop?: { title: string; modality: string };
   teacher1?: { user: { fullName: string } };
   teacher2?: { user: { fullName: string } };
-  sessions?: Sessio[];
+  sessions?: Session[];
   status: string;
 }
 
-interface Professor {
+interface Teacher {
   userId: number;
   name: string;
 }
 
 export default function SessionsListPage() {
   const { user, loading: authLoading } = useAuth();
-  const [sessions, setSessions] = useState<Sessio[]>([]);
-  const [assignacions, setAssignacions] = useState<BackendAssignment[]>([]); // For the dropdown
-  const [allProfessors, setAllProfessors] = useState<Professor[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [assignments, setAssignments] = useState<BackendAssignment[]>([]); // For the dropdown
+  const [allTeachers, setAllTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Search & Filter State
@@ -57,9 +57,9 @@ export default function SessionsListPage() {
   // Modal State
   const [showModal, setShowModal] = useState(false);
   const [mode, setMode] = useState<AssignmentMode>('single');
-  const [selectedAssignacioId, setSelectedAssignacioId] = useState<string>("");
-  const [selectedSessioId, setSelectedSessioId] = useState<string>("");
-  const [selectedProfessorId, setSelectedProfessorId] = useState<string>("");
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string>("");
+  const [selectedSessionId, setSelectedSessionId] = useState<string>("");
+  const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
 
   const router = useRouter();
 
@@ -78,15 +78,15 @@ export default function SessionsListPage() {
           api.get('/teachers')
         ]);
 
-        const rawAssignacions = resAssig.data;
-        setAssignacions(rawAssignacions);
-        setAllProfessors(resProfs.data || []);
+        const rawAssignments = resAssig.data;
+        setAssignments(rawAssignments);
+        setAllTeachers(resProfs.data || []);
 
         // Flatten sessions
-        const flatSessions: Sessio[] = [];
-        rawAssignacions.forEach((a: BackendAssignment) => {
+        const flatSessions: Session[] = [];
+        rawAssignments.forEach((a: BackendAssignment) => {
           if (a.sessions && a.sessions.length > 0) {
-            a.sessions.forEach((s: Sessio) => {
+            a.sessions.forEach((s: Session) => {
               flatSessions.push({
                 ...s,
                 assignmentTitle: a.workshop?.title,
@@ -147,11 +147,11 @@ export default function SessionsListPage() {
   }, [searchQuery, selectedModality]);
 
   const handleAssign = async () => {
-    if (!selectedAssignacioId || !selectedProfessorId) {
+    if (!selectedAssignmentId || !selectedTeacherId) {
       toast.error('Select workshop and teacher');
       return;
     }
-    if (mode === 'single' && !selectedSessioId) {
+    if (mode === 'single' && !selectedSessionId) {
       toast.error('Select a session');
       return;
     }
@@ -161,33 +161,33 @@ export default function SessionsListPage() {
 
       if (mode === 'whole') {
         // Assign to the whole assignment (teaching staff)
-        await api.post(`/assignments/${selectedAssignacioId}/staff`, {
-          idUser: parseInt(selectedProfessorId)
+        await api.post(`/assignments/${selectedAssignmentId}/staff`, {
+          idUser: parseInt(selectedTeacherId)
         });
 
-        const targetAssignacio = assignacions.find(a => a.assignmentId === parseInt(selectedAssignacioId));
-        if (targetAssignacio?.sessions) {
-          await Promise.all(targetAssignacio.sessions.map((s: Sessio) =>
-            api.post(`/assignments/sessions/${s.sessionId}/staff`, { idUser: parseInt(selectedProfessorId) })
+        const targetAssignment = assignments.find(a => a.assignmentId === parseInt(selectedAssignmentId));
+        if (targetAssignment?.sessions) {
+          await Promise.all(targetAssignment.sessions.map((s: Session) =>
+            api.post(`/assignments/sessions/${s.sessionId}/staff`, { idUser: parseInt(selectedTeacherId) })
               .catch(() => { }) // Ignore duplicates
           ));
         }
 
-        toast.success('Professor assigned to the whole workshop');
+        toast.success('Teacher assigned to the whole workshop');
       } else {
         // Single session
-        await api.post(`/assignments/sessions/${selectedSessioId}/staff`, {
-          idUser: parseInt(selectedProfessorId)
+        await api.post(`/assignments/sessions/${selectedSessionId}/staff`, {
+          idUser: parseInt(selectedTeacherId)
         });
-        toast.success('Professor assigned to the selected day');
+        toast.success('Teacher assigned to the selected day');
       }
 
       setShowModal(false);
       fetchData(); // Refresh list to show new staff
 
       // Reset form
-      setSelectedSessioId("");
-      setSelectedProfessorId("");
+      setSelectedSessionId("");
+      setSelectedTeacherId("");
 
 
     } catch (_error) {
@@ -207,7 +207,7 @@ export default function SessionsListPage() {
     }
   };
 
-  const selectedAssignacio = assignacions.find(a => a.assignmentId.toString() === selectedAssignacioId);
+  const selectedAssignment = assignments.find(a => a.assignmentId.toString() === selectedAssignmentId);
 
   if (authLoading || loading) return <Loading fullScreen message="Loading sessions..." />;
 
@@ -271,30 +271,30 @@ export default function SessionsListPage() {
         ) : (
           <>
             <div className="divide-y divide-gray-100">
-              {paginatedSessions.map((sessio) => {
-                const dateObj = new Date(sessio.sessionDate);
+              {paginatedSessions.map((session) => {
+                const dateObj = new Date(session.sessionDate);
                 const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
                 const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
 
                 return (
-                  <div key={sessio.sessionId} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${sessio.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
+                  <div key={session.sessionId} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${session.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
                     <div className="flex items-start gap-4 mb-2 md:mb-0">
-                      <div className={`p-3 rounded-full shrink-0 ${sessio.isPending ? 'bg-gray-200 text-gray-400' : sessio.modality === 'A' ? 'bg-blue-50 text-[#00426B]' : 'bg-orange-50 text-orange-600'}`}>
+                      <div className={`p-3 rounded-full shrink-0 ${session.isPending ? 'bg-gray-200 text-gray-400' : session.modality === 'A' ? 'bg-blue-50 text-[#00426B]' : 'bg-orange-50 text-orange-600'}`}>
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sessio.isPending ? "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" : "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"} />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={session.isPending ? "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" : "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"} />
                         </svg>
                       </div>
                       <div>
                         <h4 className="text-base font-black text-[#00426B] uppercase tracking-tight leading-none mb-2">
-                          {sessio.assignmentTitle}
-                          {!sessio.isPending && (
+                          {session.assignmentTitle}
+                          {!session.isPending && (
                             <span className="ml-2 text-[9px] font-normal text-gray-400 normal-case tracking-normal border border-gray-200 px-1.5 py-0.5 rounded">
-                              {sessio.startTime || '09:00'} - {sessio.endTime || '11:00'}
+                              {session.startTime || '09:00'} - {session.endTime || '11:00'}
                             </span>
                           )}
                         </h4>
                         <p className="text-sm font-medium text-gray-600">
-                          {sessio.isPending ? (
+                          {session.isPending ? (
                             <span className="text-orange-500 font-bold uppercase text-[10px] tracking-widest">Pending final confirmation</span>
                           ) : (
                             <><span className="capitalize font-bold">{dayName}</span>, {dateStr}</>
@@ -312,10 +312,10 @@ export default function SessionsListPage() {
                         </span>
                         <div className="flex flex-col">
                           <span className="text-[10px] font-bold text-[#00426B] uppercase leading-tight">
-                            {sessio.referent1}
+                            {session.referent1}
                           </span>
                           <span className="text-[10px] font-bold text-[#00426B] uppercase leading-tight">
-                            {sessio.referent2}
+                            {session.referent2}
                           </span>
                         </div>
                       </div>
@@ -326,13 +326,13 @@ export default function SessionsListPage() {
                           <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest block mb-1">
                             Assigned Teachers
                           </span>
-                          {sessio.isPending ? (
+                          {session.isPending ? (
                             <span className="text-[10px] italic text-gray-400">
                               Confirmation required
                             </span>
-                          ) : sessio.staff && sessio.staff.length > 0 ? (
+                          ) : session.staff && session.staff.length > 0 ? (
                             <div className="flex flex-wrap justify-end gap-2 max-w-[300px]">
-                              {sessio.staff.map((staffMember: any) => (
+                              {session.staff.map((staffMember: any) => (
                                 <div key={staffMember.userId} className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-2 py-1 rounded group/chip hover:border-red-200 transition-colors">
                                   <span className="text-[10px] font-black text-[#4197CB] uppercase group-hover/chip:text-red-400 transition-colors">
                                     {staffMember.user?.fullName || staffMember.name}
@@ -341,7 +341,7 @@ export default function SessionsListPage() {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       if (staffMember.userId || staffMember.id) {
-                                        handleRemoveStaff(Number(sessio.sessionId), (staffMember.userId || staffMember.id) as number);
+                                        handleRemoveStaff(Number(session.sessionId), (staffMember.userId || staffMember.id) as number);
                                       }
                                     }}
                                     className="text-blue-300 hover:text-red-500 focus:outline-none transition-colors"
@@ -405,14 +405,14 @@ export default function SessionsListPage() {
               {/* Mode Selection */}
               <div className="flex bg-[#F1F5F9] p-1.5 rounded-lg border border-gray-100 shadow-inner">
                 <button
-                  onClick={() => { setMode('single'); setSelectedSessioId(""); }}
+                  onClick={() => { setMode('single'); setSelectedSessionId(""); }}
                   className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all rounded-md ${mode === 'single' ? 'bg-white text-[#00426B] shadow-lg ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600'
                     }`}
                 >
                   Specific Day
                 </button>
                 <button
-                  onClick={() => { setMode('whole'); setSelectedSessioId(""); }}
+                  onClick={() => { setMode('whole'); setSelectedSessionId(""); }}
                   className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all rounded-md ${mode === 'whole' ? 'bg-white text-[#00426B] shadow-lg ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600'
                     }`}
                 >
@@ -420,19 +420,19 @@ export default function SessionsListPage() {
                 </button>
               </div>
 
-              {/* Taller Select */}
+              {/* Workshop Select */}
               <div className="space-y-6">
                 <div>
                   <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">
                     Select Workshop
                   </label>
                   <select
-                    value={selectedAssignacioId}
-                    onChange={(e) => { setSelectedAssignacioId(e.target.value); setSelectedSessioId(""); }}
+                    value={selectedAssignmentId}
+                    onChange={(e) => { setSelectedAssignmentId(e.target.value); setSelectedSessionId(""); }}
                     className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
                   >
                     <option value="">-- Choose a workshop --</option>
-                    {assignacions.map(a => (
+                    {assignments.map(a => (
                       <option key={a.assignmentId} value={a.assignmentId}>
                         {a.workshop?.title} (Ref: {a.assignmentId})
                       </option>
@@ -441,18 +441,18 @@ export default function SessionsListPage() {
                 </div>
 
                 {/* Session Select (Only Single Mode) */}
-                {mode === 'single' && selectedAssignacioId && (
+                {mode === 'single' && selectedAssignmentId && (
                   <div className="animate-in slide-in-from-top-2 duration-200">
                     <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">
                       Select Day
                     </label>
                     <select
-                      value={selectedSessioId}
-                      onChange={(e) => setSelectedSessioId(e.target.value)}
+                      value={selectedSessionId}
+                      onChange={(e) => setSelectedSessionId(e.target.value)}
                       className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
                     >
                       <option value="">-- Choose a session --</option>
-                      {selectedAssignacio?.sessions?.map((s: Sessio, idx: number) => (
+                      {selectedAssignment?.sessions?.map((s: Session, idx: number) => (
                         <option key={s.sessionId} value={s.sessionId}>
                           Session {idx + 1} - {new Date(s.sessionDate).toLocaleDateString()} ({s.startTime}-{s.endTime})
                         </option>
@@ -467,12 +467,12 @@ export default function SessionsListPage() {
                     Select Teacher
                   </label>
                   <select
-                    value={selectedProfessorId}
-                    onChange={(e) => setSelectedProfessorId(e.target.value)}
+                    value={selectedTeacherId}
+                    onChange={(e) => setSelectedTeacherId(e.target.value)}
                     className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
                   >
                     <option value="">-- Choose a teacher --</option>
-                    {allProfessors.map(p => (
+                    {allTeachers.map(p => (
                       <option key={p.userId} value={p.userId}>
                         {p.name}
                       </option>

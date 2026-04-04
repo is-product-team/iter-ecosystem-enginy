@@ -20,7 +20,7 @@ interface Phase {
 
 export default function CalendarPage() {
   const { user, loading: authLoading } = useAuth();
-  const [activeFase, setActiveFase] = useState<Phase | null>(null);
+  const [activePhase, setActivePhase] = useState<Phase | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -61,7 +61,7 @@ export default function CalendarPage() {
       }));
 
       setEvents([...eventsRes.data, ...phaseEvents]);
-      setActiveFase(phasesData.find((f: Phase) => f.isActive));
+      setActivePhase(phasesData.find((f: Phase) => f.isActive));
     } catch (error) {
       console.error("Error fetching calendar data:", error);
     } finally {
@@ -79,9 +79,9 @@ export default function CalendarPage() {
       <div className="w-full relative">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
-            <div className={`w-3 h-3 rounded-full animate-pulse ${activeFase ? 'bg-consorci-pinkRed' : 'bg-gray-300'}`}></div>
+            <div className={`w-3 h-3 rounded-full animate-pulse ${activePhase ? 'bg-consorci-pinkRed' : 'bg-gray-300'}`}></div>
             <div className="text-[11px] font-black text-text-primary uppercase tracking-widest">
-              {activeFase ? `Current Phase: ${activeFase.name}` : "Loading phases..."}
+              {activePhase ? `Current Phase: ${activePhase.name}` : "Loading phases..."}
             </div>
           </div>
           <button

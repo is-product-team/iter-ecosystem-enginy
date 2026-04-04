@@ -30,10 +30,10 @@ export default function AdminReportsPage() {
         );
     }
 
-    const { general_avg, impact_distribution } = (metrics as { 
-        general_avg: { valoracio_experiencia: number, valoracio_docent: number }, 
-        impact_distribution: { impacte_vocacional: string, _count: { _all: number } }[] 
-    }) || { general_avg: { valoracio_experiencia: 0, valoracio_docent: 0 }, impact_distribution: [] };
+    const { generalAvg, impactDistribution } = (metrics as { 
+        generalAvg: { experienceRating: number, teacherRating: number }, 
+        impactDistribution: { vocationalImpact: string, _count: { _all: number } }[] 
+    }) || { generalAvg: { experienceRating: 0, teacherRating: 0 }, impactDistribution: [] };
 
     return (
         <DashboardLayout
@@ -46,16 +46,16 @@ export default function AdminReportsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div className="bg-white p-8 border shadow-sm flex flex-col items-center justify-center text-center">
                         <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4">Student Experience</span>
-                        <span className="text-5xl font-black text-blue-900">{(general_avg?.valoracio_experiencia || 0).toFixed(1)}</span>
+                        <span className="text-5xl font-black text-blue-900">{(generalAvg?.experienceRating || 0).toFixed(1)}</span>
                         <div className="w-full mt-4 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-900" style={{ width: `${(general_avg?.valoracio_experiencia || 0) * 10}%` }}></div>
+                            <div className="h-full bg-blue-900" style={{ width: `${(generalAvg?.experienceRating || 0) * 10}%` }}></div>
                         </div>
                     </div>
                     <div className="bg-white p-8 border shadow-sm flex flex-col items-center justify-center text-center">
                         <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4">Teacher Satisfaction</span>
-                        <span className="text-5xl font-black text-blue-900">{(general_avg?.valoracio_docent || 0).toFixed(1)}</span>
+                        <span className="text-5xl font-black text-blue-900">{(generalAvg?.teacherRating || 0).toFixed(1)}</span>
                         <div className="w-full mt-4 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-900" style={{ width: `${(general_avg?.valoracio_docent || 0) * 10}%` }}></div>
+                            <div className="h-full bg-blue-900" style={{ width: `${(generalAvg?.teacherRating || 0) * 10}%` }}></div>
                         </div>
                     </div>
                     {/* Mocks for additional metrics */}
@@ -76,8 +76,8 @@ export default function AdminReportsPage() {
                     <div className="lg:col-span-2 bg-white p-10 border shadow-sm">
                         <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-10">Vocational Impact Distribution</h3>
                         <div className="space-y-6">
-                            {impact_distribution.map((item: { impacte_vocacional: string, _count: { _all: number } }) => {
-                                const total = impact_distribution.reduce((acc: number, curr: { _count: { _all: number } }) => acc + curr._count._all, 0);
+                            {impactDistribution.map((item: { vocationalImpact: string, _count: { _all: number } }) => {
+                                const total = impactDistribution.reduce((acc: number, curr: { _count: { _all: number } }) => acc + curr._count._all, 0);
                                 const percent = (item._count._all / total) * 100;
                                 const labels: Record<string, string> = {
                                     'SI': 'Has chosen a professional branch',
@@ -85,15 +85,15 @@ export default function AdminReportsPage() {
                                     'CONSIDERANT': 'Is considering it right now'
                                 };
                                 return (
-                                    <div key={item.impacte_vocacional} className="space-y-2">
+                                    <div key={item.vocationalImpact} className="space-y-2">
                                         <div className="flex justify-between items-center text-sm font-bold">
-                                            <span className="text-gray-700">{labels[item.impacte_vocacional] || item.impacte_vocacional}</span>
+                                            <span className="text-gray-700">{labels[item.vocationalImpact] || item.vocationalImpact}</span>
                                             <span className="text-blue-900">{percent.toFixed(0)}% ({item._count._all})</span>
                                         </div>
                                         <div className="w-full h-8 bg-gray-50 border-2 overflow-hidden flex">
                                             <div
-                                                className={`h-full transition-all duration-1000 ${item.impacte_vocacional === 'SI' ? 'bg-green-500' :
-                                                    item.impacte_vocacional === 'CONSIDERANT' ? 'bg-blue-600' : 'bg-gray-200'
+                                                className={`h-full transition-all duration-1000 ${item.vocationalImpact === 'SI' ? 'bg-green-500' :
+                                                    item.vocationalImpact === 'CONSIDERANT' ? 'bg-blue-600' : 'bg-gray-200'
                                                     }`}
                                                 style={{ width: `${percent}%` }}
                                             ></div>

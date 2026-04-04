@@ -26,7 +26,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Workshop Management',
       description: 'Create, modify or delete workshops for centers.',
-      path: '/admin/workshops',
+      path: '/workshops',
       phase: 'General',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -38,7 +38,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Center Management',
       description: 'Create, modify or delete centers.',
-      path: '/admin/centers',
+      path: '/centers',
       phase: 'General',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Course Phases',
       description: 'Configure dates and status of the course phases.',
-      path: '/admin/phases',
+      path: '/phases',
       phase: 'Configuration',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,7 +62,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Statistics',
       description: 'Advanced analysis of system usage, most requested workshops and system activity.',
-      path: '/admin/stats',
+      path: '/stats',
       phase: 'Global',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,7 +74,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Center Requests',
       description: 'View center requests and assign workshops.',
-      path: '/admin/requests',
+      path: '/requests',
       phase: 'Phase 1',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,7 +86,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Document Verification',
       description: 'Validate documentation presented by centers (Pedagogical Agreement, Mobility, etc).',
-      path: '/admin/verifications',
+      path: '/verifications',
       phase: 'Phase 2',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">

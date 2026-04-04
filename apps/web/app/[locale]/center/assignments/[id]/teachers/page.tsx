@@ -11,13 +11,13 @@ import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 
-export default function DesignateProfessorsPage({ params }: { params: Promise<{ id: string }> }) {
+export default function DesignateTeachersPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [user, setUser] = useState<User | null>(null);
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [prof1Id, setProf1Id] = useState<string>('');
-  const [prof2Id, setProf2Id] = useState<string>('');
+  const [teacher1Id, setTeacher1Id] = useState<string>('');
+  const [teacher2Id, setTeacher2Id] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -34,8 +34,8 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
         const api = getApi();
 
         // Fetch phases first for gating
-        const resFases = await api.get("/phases");
-        const phasesData = resFases.data.data;
+        const resPhases = await api.get("/phases");
+        const phasesData = resPhases.data.data;
         const isPlanning = phasesData.find((f: { name: string, active: boolean }) => f.name === PHASES.PLANNING)?.active;
 
         if (!isPlanning) {
@@ -53,12 +53,12 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
           return;
         }
         setAssignment(found);
-        setProf1Id(found.teacher1?.userId?.toString() || '');
-        setProf2Id(found.teacher2?.userId?.toString() || '');
+        setTeacher1Id(found.teacher1?.userId?.toString() || '');
+        setTeacher2Id(found.teacher2?.userId?.toString() || '');
 
         // Fetch all teachers from center
-        const resProfs = await teacherService.getByCenter(currentUser.centerId || 0);
-        setTeachers(resProfs || []);
+        const resTeachers = await teacherService.getByCenter(currentUser.centerId || 0);
+        setTeachers(resTeachers || []);
       } catch (error) {
         console.error("Error fetching designation data:", error);
       } finally {
@@ -70,12 +70,12 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
   }, [id, router]);
 
   const handleSave = async () => {
-    if (!prof1Id || !prof2Id) {
+    if (!teacher1Id || !teacher2Id) {
       toast.error('You must designate two referring teachers.');
       return;
     }
 
-    if (prof1Id === prof2Id) {
+    if (teacher1Id === teacher2Id) {
       toast.error('The two teachers must be different people.');
       return;
     }
@@ -85,8 +85,8 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
       const api = getApi();
 
       await api.patch(`/assignments/checklist/designate-teachers/${id}`, {
-        teacher1Id: parseInt(prof1Id),
-        teacher2Id: parseInt(prof2Id)
+        teacher1Id: parseInt(teacher1Id),
+        teacher2Id: parseInt(teacher2Id)
       });
 
       toast.success('Teachers designated correctly.');
@@ -117,8 +117,8 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Main Teacher</label>
                 <select
-                  value={prof1Id}
-                  onChange={(e) => setProf1Id(e.target.value)}
+                  value={teacher1Id}
+                  onChange={(e) => setTeacher1Id(e.target.value)}
                   className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 outline-none rounded-none transition-all font-bold text-gray-800"
                 >
                   <option value="">Select...</option>
@@ -131,8 +131,8 @@ export default function DesignateProfessorsPage({ params }: { params: Promise<{ 
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Second Teacher</label>
                 <select
-                  value={prof2Id}
-                  onChange={(e) => setProf2Id(e.target.value)}
+                  value={teacher2Id}
+                  onChange={(e) => setTeacher2Id(e.target.value)}
                   className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 outline-none rounded-none transition-all font-bold text-gray-800"
                 >
                   <option value="">Select...</option>

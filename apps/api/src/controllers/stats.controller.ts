@@ -22,7 +22,7 @@ export const getStatsByStatus = async (req: Request, res: Response) => {
 
     res.json(stats);
   } catch (_error) {
-    res.status(500).json({ error: 'Error al obtener estadísticas de estados' });
+    res.status(500).json({ error: 'Error obtaining status statistics' });
   }
 };
 
@@ -46,7 +46,7 @@ export const getPopularWorkshops = async (req: Request, res: Response) => {
 
     res.json(stats);
   } catch (_error) {
-    res.status(500).json({ error: 'Error al obtener talleres populares' });
+    res.status(500).json({ error: 'Error obtaining popular workshops' });
   }
 };
 
@@ -62,7 +62,7 @@ export const getRecentActivity = async (req: Request, res: Response) => {
     });
     res.json(logs);
   } catch (_error) {
-    res.status(500).json({ error: 'Error al obtener actividad reciente' });
+    res.status(500).json({ error: 'Error obtaining recent activity' });
   }
 };
 
@@ -78,7 +78,7 @@ export const cleanupLogs = async (req: Request, res: Response) => {
     });
     res.json({ success: true, deletedCount: result.count });
   } catch (_error) {
-    res.status(500).json({ error: 'Error al limpiar logs' });
+    res.status(500).json({ error: 'Error cleaning up logs' });
   }
 };
 
@@ -109,7 +109,7 @@ export const runRiskAnalysis = async (req: Request, res: Response) => {
 
   } catch (_error) {
     console.error("Error in risk analysis:", _error);
-    res.status(500).json({ error: 'Error al ejecutar análisis de riesgo' });
+    res.status(500).json({ error: 'Error executing risk analysis' });
   }
 };
 

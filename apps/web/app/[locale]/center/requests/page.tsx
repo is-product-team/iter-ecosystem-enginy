@@ -111,8 +111,8 @@ export default function RequestsPage() {
 
     setApproxStudents(request.studentsAprox || '');
     setComments(request.comments || '');
-    setTeacher1Id(request.prof1Id ? request.prof1Id.toString() : '');
-    setTeacher2Id(request.prof2Id ? request.prof2Id.toString() : '');
+    setTeacher1Id(request.teacher1Id ? request.teacher1Id.toString() : '');
+    setTeacher2Id(request.teacher2Id ? request.teacher2Id.toString() : '');
     setError(null);
   };
 
@@ -157,8 +157,8 @@ export default function RequestsPage() {
         await requestService.update(editingRequestId, {
           studentsAprox: Number(approxStudents),
           comments,
-          prof1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
-          prof2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
+          teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
+          teacher2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
         });
       } else {
         // Create
@@ -166,8 +166,8 @@ export default function RequestsPage() {
           workshopId: parseInt(selectedWorkshopId),
           studentsAprox: Number(approxStudents),
           comments,
-          prof1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
-          prof2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
+          teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
+          teacher2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
           modality: selectedWorkshop.modality
         });
       }
@@ -377,7 +377,7 @@ export default function RequestsPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Selected Taller Info */}
+                  {/* Selected Workshop Info */}
                   <div className="bg-background-surface border-l-4 border-consorci-darkBlue p-4 rounded-none text-text-primary shadow-sm">
                     <div className="flex justify-between items-start mb-2">
                       <span className="text-[9px] font-black bg-consorci-darkBlue/10 text-consorci-darkBlue px-1.5 py-0.5 tracking-tighter uppercase">MOD {selectedWorkshop.modality}</span>

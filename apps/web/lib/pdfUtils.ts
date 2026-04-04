@@ -1,12 +1,12 @@
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Configurar el worker de PDF.js usando CDN para evitar problemas de empaquetado con Next.js/Webpack
+// Configure PDF.js worker using CDN to avoid packaging issues with Next.js/Webpack
 if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 }
 
 /**
- * Extrae todo el texto de un documento PDF.
+ * Extracts all text from a PDF document.
  */
 export async function extractTextFromPdf(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
@@ -45,14 +45,14 @@ export function classifyDocumentType(text: string): 'pedagogical_agreement' | 'm
 }
 
 /**
- * Extrae datos estructurados (Metadata) usando Expresiones Regulares
+ * Extracts structured data (Metadata) using Regular Expressions.
  */
 export function extractMetadata(text: string) {
-  // Ejemplo de extracción de IDALU (normalmente de 9 o 10 caracteres alfanuméricos tras la palabra IDALU)
+  // Example IDALU extraction (usually 8-12 alphanumeric characters after the word IDALU)
   const idaluRegex = /IDALU[\s:]*([a-zA-Z0-9]{8,12})/i;
   const matchIdalu = text.match(idaluRegex);
   
-  // Ejemplo de extracción de nombre (Asume un formato de formulario específico)
+  // Example name extraction (Assumes a specific form format)
   const nameRegex = /Nombre del alumno[\s:]+([A-Za-zÀ-ÖØ-öø-ÿ\s]+)/i;
   const matchName = text.match(nameRegex);
   

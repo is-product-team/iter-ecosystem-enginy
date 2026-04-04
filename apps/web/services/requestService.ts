@@ -9,8 +9,8 @@ export interface Request {
   createdAt: string;
   status: string;
   modality?: string;
-  prof1Id?: number;
-  prof2Id?: number;
+  teacher1Id?: number;
+  teacher2Id?: number;
   studentIds?: number[];
   workshop?: {
     title: string;
@@ -65,8 +65,8 @@ const requestService = {
         createdAt: r.createdAt,
         status: r.status,
         modality: r.modality,
-        prof1Id: r.prof1Id,
-        prof2Id: r.prof2Id,
+        teacher1Id: r.prof1Id,
+        teacher2Id: r.prof2Id,
         studentIds: r.studentIds,
         workshop: r.workshop ? {
           title: r.workshop.title,
@@ -92,8 +92,8 @@ const requestService = {
     workshopId: number;
     studentsAprox: number;
     comments?: string;
-    prof1Id?: number;
-    prof2Id?: number;
+    teacher1Id?: number;
+    teacher2Id?: number;
     modality?: string;
   }): Promise<Request> => {
     const api = getApi();
@@ -102,8 +102,8 @@ const requestService = {
         workshopId: data.workshopId,
         studentsAprox: data.studentsAprox,
         comments: data.comments,
-        prof1Id: data.prof1Id,
-        prof2Id: data.prof2Id,
+        prof1Id: data.teacher1Id,
+        prof2Id: data.teacher2Id,
         modality: data.modality,
       };
       const response = await api.post<BackendRequest>("/requests", payload);
@@ -117,8 +117,8 @@ const requestService = {
         createdAt: r.createdAt,
         status: r.status,
         modality: r.modality,
-        prof1Id: r.prof1Id,
-        prof2Id: r.prof2Id,
+        teacher1Id: r.prof1Id,
+        teacher2Id: r.prof2Id,
         studentIds: r.studentIds,
       };
     } catch (error) {
@@ -134,16 +134,16 @@ const requestService = {
   update: async (requestId: number, data: {
     studentsAprox?: number;
     comments?: string;
-    prof1Id?: number;
-    prof2Id?: number;
+    teacher1Id?: number;
+    teacher2Id?: number;
   }): Promise<Request> => {
     const api = getApi();
     try {
       const payload = {
         studentsAprox: data.studentsAprox,
         comments: data.comments,
-        prof1Id: data.prof1Id,
-        prof2Id: data.prof2Id,
+        prof1Id: data.teacher1Id,
+        prof2Id: data.teacher2Id,
       };
       const response = await api.put<BackendRequest>(`/requests/${requestId}`, payload);
       const r = response.data;
@@ -156,8 +156,8 @@ const requestService = {
         createdAt: r.createdAt,
         status: r.status,
         modality: r.modality,
-        prof1Id: r.prof1Id,
-        prof2Id: r.prof2Id,
+        teacher1Id: r.prof1Id,
+        teacher2Id: r.prof2Id,
         studentIds: r.studentIds,
       };
     } catch (error) {
@@ -184,8 +184,8 @@ const requestService = {
         createdAt: r.createdAt,
         status: r.status,
         modality: r.modality,
-        prof1Id: r.prof1Id,
-        prof2Id: r.prof2Id,
+        teacher1Id: r.prof1Id,
+        teacher2Id: r.prof2Id,
         studentIds: r.studentIds,
       };
     } catch (error) {

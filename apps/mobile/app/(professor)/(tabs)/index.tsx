@@ -77,14 +77,14 @@ export default function DashboardScreen() {
     const allSessions: any[] = [];
     assignments.forEach(assign => {
         if (assign.sessions && assign.sessions.length > 0) {
-            assign.sessions.forEach((sess: any) => {
+            assign.sessions.forEach((session: any) => {
                 allSessions.push({
                     assignmentId: assign.assignmentId,
                     workshop: assign.workshop,
                     center: assign.center,
-                    startDate: sess.sessionDate, 
-                    startTime: sess.startTime,
-                    endTime: sess.endTime,
+                    startDate: session.sessionDate, 
+                    startTime: session.startTime,
+                    endTime: session.endTime,
                     isSession: true,
                     submissions: assign.submissions
                 });

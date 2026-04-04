@@ -28,7 +28,7 @@ export default function LoginScreen() {
       const { token, user } = response.data;
       const userAny: any = user;
 
-      // Restricció de rol: Només els PROFESSORS poden entrar a l'app mòbil
+      // Role restriction: Only TEACHERS can access the mobile app
       if (userAny.role?.roleName !== ROLES.TEACHER) {
         setLoading(false);
         setRoleError(t('Auth.login.exclusive_use_error'));
