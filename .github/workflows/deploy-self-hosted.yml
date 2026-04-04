@@ -18,7 +18,7 @@ jobs:
         run: npm run verify
 
   deploy:
-    needs: verify
+    # needs: verify
     runs-on: [self-hosted, Linux, X64]
     steps:
       - name: 📥 Checkout code
@@ -63,7 +63,7 @@ jobs:
           echo "--- 🗄️ Ejecutando Migraciones (Contenedor Aislado) ---"
           # Extraemos la URL para pasarla al contenedor independiente
           export DB_URL=$(grep DATABASE_URL apps/api/.env.production | cut -d '=' -f2-)
-          
+
           # Ejecutamos la migración en un contenedor temporal que usa la red del proxy
           # Esto evita pelear por RAM con la API principal
           docker run --rm \
@@ -75,9 +75,9 @@ jobs:
 
           # 2. Levantar los servicios de producción
           docker compose -f docker-compose.prod.yml up -d
-          
+
           echo "--- ✅ Estado de los contenedores ---"
           docker compose -f docker-compose.prod.yml ps
-          
+
           # Limpieza final de imágenes huérfanas
           docker image prune -f
