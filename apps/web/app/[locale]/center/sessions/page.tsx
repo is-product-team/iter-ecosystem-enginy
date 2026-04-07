@@ -9,6 +9,7 @@ import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import Pagination from '@/components/Pagination';
+import { useTranslations, useLocale } from 'next-intl';
 
 type AssignmentMode = 'single' | 'whole';
 
@@ -47,10 +48,14 @@ export default function SessionsListPage() {
   const [assignments, setAssignments] = useState<BackendAssignment[]>([]); // For the dropdown
   const [allTeachers, setAllTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('Center.Sessions');
+  const tc = useTranslations('Common');
+  const tr = useTranslations('Center.Requests');
+  const locale = useLocale();
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedModality, setSelectedModality] = useState("All modalities");
+  const [selectedModality, setSelectedModality] = useState(tc("all_modalities"));
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -97,8 +102,6 @@ export default function SessionsListPage() {
               });
             });
           } else if (a.status !== 'PUBLISHED' && a.status !== 'CANCELLED') {
-            // If it doesn't have sessions but is in a phase where it should have them soon
-            // We add it as a "placeholder" item so the user knows it's there
             flatSessions.push({
               sessionId: `pending-${a.assignmentId}`,
               isPending: true,
@@ -132,7 +135,7 @@ export default function SessionsListPage() {
   // Filtering Logic
   const filteredSessions = (sessions || []).filter(s => {
     const matchesSearch = s.assignmentTitle?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesModality = selectedModality === "All modalities" || s.modality === selectedModality;
+    const matchesModality = selectedModality === tc("all_modalities") || s.modality === selectedModality;
     return matchesSearch && matchesModality;
   });
 
@@ -144,15 +147,15 @@ export default function SessionsListPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedModality]);
+  }, [searchQuery, selectedModality, tc]);
 
   const handleAssign = async () => {
     if (!selectedAssignmentId || !selectedTeacherId) {
-      toast.error('Select workshop and teacher');
+      toast.error(t('error_no_selection'));
       return;
     }
     if (mode === 'single' && !selectedSessionId) {
-      toast.error('Select a session');
+      toast.error(t('error_no_session'));
       return;
     }
 
@@ -173,13 +176,13 @@ export default function SessionsListPage() {
           ));
         }
 
-        toast.success('Teacher assigned to the whole workshop');
+        toast.success(t('success_whole'));
       } else {
         // Single session
         await api.post(`/assignments/sessions/${selectedSessionId}/staff`, {
           idUser: parseInt(selectedTeacherId)
         });
-        toast.success('Teacher assigned to the selected day');
+        toast.success(t('success_day'));
       }
 
       setShowModal(false);
@@ -191,7 +194,7 @@ export default function SessionsListPage() {
 
 
     } catch (_error) {
-      toast.error('Error making assignment');
+      toast.error(t('error_assignment'));
     }
   };
 
@@ -200,31 +203,31 @@ export default function SessionsListPage() {
       const api = getApi();
       await api.delete(`/assignments/sessions/${sessionId}/staff/${idUser}`);
       await fetchData(); // Refresh list
-      toast.success('Teacher removed successfully');
+      toast.success(t('success_remove'));
     } catch (error) {
       console.error(error);
-      toast.error('Error removing teacher');
+      toast.error(t('error_remove'));
     }
   };
 
   const selectedAssignment = assignments.find(a => a.assignmentId.toString() === selectedAssignmentId);
 
-  if (authLoading || loading) return <Loading fullScreen message="Loading sessions..." />;
+  if (authLoading || loading) return <Loading fullScreen message={tc('loading')} />;
 
   return (
     <DashboardLayout
-      title="Session Management"
-      subtitle="View and manage training sessions."
+      title={t('title')}
+      subtitle={t('description')}
     >
       {/* Search & Filter Bar */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8 shadow-sm">
         {/* Search */}
         <div className="flex-1">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">Search workshop</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_workshop')}</label>
           <div className="relative">
             <input
               type="text"
-              placeholder="Ex: Robotics, Cinema..."
+              placeholder={tc('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
@@ -237,16 +240,16 @@ export default function SessionsListPage() {
 
         {/* Modality Filter */}
         <div className="lg:w-64">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">Filter by modality</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">{tc('filter_by_modality')}</label>
           <select
             value={selectedModality}
             onChange={(e) => setSelectedModality(e.target.value)}
             className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary appearance-none"
           >
-            <option value="All modalities">All modalities</option>
-            <option value="A">Modality A</option>
-            <option value="B">Modality B</option>
-            <option value="C">Modality C</option>
+            <option value={tc("all_modalities")}>{tc("all_modalities")}</option>
+            <option value="A">{tc('modality_label', { modality: 'A' })}</option>
+            <option value="B">{tc('modality_label', { modality: 'B' })}</option>
+            <option value="C">{tc('modality_label', { modality: 'C' })}</option>
           </select>
         </div>
 
@@ -257,7 +260,7 @@ export default function SessionsListPage() {
             className="bg-consorci-darkBlue text-white px-8 py-[13px] text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-3 h-[46px]"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-            Assign Teachers
+            {t('assign_teacher')}
           </button>
         </div>
       </div>
@@ -266,15 +269,15 @@ export default function SessionsListPage() {
       <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
         {paginatedSessions.length === 0 ? (
           <div className="p-20 text-center text-text-muted font-medium text-sm italic">
-            No sessions found with these filters.
+            {tc('no_results')}
           </div>
         ) : (
           <>
             <div className="divide-y divide-gray-100">
               {paginatedSessions.map((session) => {
                 const dateObj = new Date(session.sessionDate);
-                const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-                const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
+                const dayName = dateObj.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { weekday: 'long' });
+                const dateStr = dateObj.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { day: 'numeric', month: 'long' });
 
                 return (
                   <div key={session.sessionId} className={`p-8 flex flex-col md:flex-row md:items-center justify-between hover:bg-background-subtle border-b border-border-subtle transition-colors group ${session.isPending ? 'opacity-70' : ''}`}>
@@ -295,7 +298,7 @@ export default function SessionsListPage() {
                         </h4>
                         <p className="text-[13px] text-text-muted">
                           {session.isPending ? (
-                            <span className="text-orange-600 font-medium tracking-tight">Pending confirmation</span>
+                            <span className="text-orange-600 font-medium tracking-tight">{t('pending_confirmation')}</span>
                           ) : (
                             <><span className="capitalize font-medium text-text-primary">{dayName}</span>, {dateStr}</>
                           )}
@@ -308,7 +311,7 @@ export default function SessionsListPage() {
                       {/* Referents */}
                       <div>
                         <span className="text-[10px] font-medium text-text-muted uppercase tracking-widest block mb-2">
-                          Center Referents
+                          {tr('referent_teachers')}
                         </span>
                         <div className="flex flex-col gap-1">
                           <span className="text-[12px] font-medium text-text-primary">
@@ -324,11 +327,11 @@ export default function SessionsListPage() {
                       <div className="md:min-w-[180px] flex justify-end">
                         <div className="flex flex-col items-end gap-2">
                           <span className="text-[10px] font-medium text-text-muted uppercase tracking-widest block mb-1">
-                            Assigned Teachers
+                            {t('specific_team')}
                           </span>
                           {session.isPending ? (
                             <span className="text-[12px] italic text-text-muted">
-                              Confirmation required
+                              {t('pending_confirmation')}
                             </span>
                           ) : session.staff && session.staff.length > 0 ? (
                             <div className="flex flex-wrap justify-end gap-2 max-w-[300px]">
@@ -356,7 +359,7 @@ export default function SessionsListPage() {
                             </div>
                           ) : (
                             <span className="text-[12px] font-medium text-red-500">
-                              No teacher assigned
+                              {t('no_teacher_assigned')}
                             </span>
                           )}
                         </div>
@@ -374,7 +377,7 @@ export default function SessionsListPage() {
               onPageChange={setCurrentPage}
               totalItems={filteredSessions.length}
               currentItemsCount={paginatedSessions.length}
-              itemName="sessions"
+              itemName={tc('sessions').toLowerCase()}
             />
           </>
         )}
@@ -386,8 +389,8 @@ export default function SessionsListPage() {
             {/* Header */}
             <div className="px-10 py-8 border-b border-border-subtle flex justify-between items-start sticky top-0 bg-background-surface z-10">
               <div>
-                <h3 className="text-xl font-medium text-text-primary tracking-tight">Assign Teacher</h3>
-                <p className="text-[12px] font-medium text-text-muted mt-2">Select the mode and teacher for the session.</p>
+                <h3 className="text-xl font-medium text-text-primary tracking-tight">{t('assign_teacher')}</h3>
+                <p className="text-[12px] font-medium text-text-muted mt-2">{t('assign_teacher_desc')}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
@@ -406,14 +409,14 @@ export default function SessionsListPage() {
                   className={`flex-1 py-3 text-[12px] font-medium transition-all ${mode === 'single' ? 'bg-background-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
                     }`}
                 >
-                  Specific Day
+                  {t('specific_day')}
                 </button>
                 <button
                   onClick={() => { setMode('whole'); setSelectedSessionId(""); }}
                   className={`flex-1 py-3 text-[12px] font-medium transition-all ${mode === 'whole' ? 'bg-background-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
                     }`}
                 >
-                  Whole Workshop
+                  {t('whole_workshop')}
                 </button>
               </div>
 
@@ -421,14 +424,14 @@ export default function SessionsListPage() {
               <div className="space-y-8">
                 <div className="space-y-3">
                   <label className="block text-[12px] font-medium text-text-primary px-1">
-                    Select Workshop
+                    {t('select_workshop')}
                   </label>
                   <select
                     value={selectedAssignmentId}
                     onChange={(e) => { setSelectedAssignmentId(e.target.value); setSelectedSessionId(""); }}
                     className="w-full bg-background-subtle border border-border-subtle text-sm p-3 font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                   >
-                    <option value="">-- Choose a workshop --</option>
+                    <option value="">{t('choose_workshop')}</option>
                     {assignments.map(a => (
                       <option key={a.assignmentId} value={a.assignmentId}>
                         {a.workshop?.title} (Ref: {a.assignmentId})
@@ -441,17 +444,17 @@ export default function SessionsListPage() {
                 {mode === 'single' && selectedAssignmentId && (
                   <div className="animate-in slide-in-from-top-2 duration-200 space-y-3">
                     <label className="block text-[12px] font-medium text-text-primary px-1">
-                      Select Day
+                      {t('select_day')}
                     </label>
                     <select
                       value={selectedSessionId}
                       onChange={(e) => setSelectedSessionId(e.target.value)}
                       className="w-full bg-background-subtle border border-border-subtle text-sm p-3 font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                     >
-                      <option value="">-- Choose a session --</option>
+                      <option value="">{t('choose_session')}</option>
                       {selectedAssignment?.sessions?.map((s: Session, idx: number) => (
                         <option key={s.sessionId} value={s.sessionId}>
-                          Session {idx + 1} - {new Date(s.sessionDate).toLocaleDateString()} ({s.startTime}-{s.endTime})
+                          {t('session_n', { number: idx + 1 })} - {new Date(s.sessionDate).toLocaleDateString()} ({s.startTime}-{s.endTime})
                         </option>
                       ))}
                     </select>
@@ -461,14 +464,14 @@ export default function SessionsListPage() {
                 {/* Professor Select */}
                 <div className="space-y-3">
                   <label className="block text-[12px] font-medium text-text-primary px-1">
-                    Select Teacher
+                    {t('select_teacher')}
                   </label>
                   <select
                     value={selectedTeacherId}
                     onChange={(e) => setSelectedTeacherId(e.target.value)}
                     className="w-full bg-background-subtle border border-border-subtle text-sm p-3 font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                   >
-                    <option value="">-- Choose a teacher --</option>
+                    <option value="">{t('choose_teacher')}</option>
                     {allTeachers.map(p => (
                       <option key={p.userId} value={p.userId}>
                         {p.name}
@@ -484,13 +487,13 @@ export default function SessionsListPage() {
                 onClick={() => setShowModal(false)}
                 className="flex-1 py-3 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline transition-colors"
               >
-                Cancel
+                {tc('cancel')}
               </button>
               <button
                 onClick={handleAssign}
                 className="flex-1 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
               >
-                Save assignment
+                {tc('save')}
               </button>
             </div>
           </div>

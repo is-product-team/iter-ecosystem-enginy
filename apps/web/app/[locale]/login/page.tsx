@@ -5,11 +5,14 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
-import { ROLES } from '@iter/shared';
+import { PHASES, ROLES } from '@iter/shared';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
+  const t = useTranslations('Auth.login');
+  const tc = useTranslations('Common');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +33,7 @@ export default function LoginPage() {
   }, [user, authLoading, router]);
 
   if (authLoading) {
-    return <Loading fullScreen message="Signing in..." />;
+    return <Loading fullScreen message={t('loading')} />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,7 +44,7 @@ export default function LoginPage() {
 
     try {
       const response = await apiLogin(email, password);
-      const { user, token } = response;
+      const { user } = response;
 
       if (user.role.name === ROLES.TEACHER) {
         setShowProfessorLink(true);
@@ -57,11 +60,11 @@ export default function LoginPage() {
       const errorObj = err as { message: string };
       // Improved error messaging based on backend response or common errors
       if (errorObj.message.includes('401') || errorObj.message.toLowerCase().includes('invalid')) {
-        setError('Incorrect email or password. Please try again.');
+        setError(t('error'));
       } else if (errorObj.message.includes('fetch') || errorObj.message.includes('network')) {
-        setError('Connection error. Please check if the server is active.');
+        setError('Error de conexió. Si us plau, verifica si el servidor està actiu.');
       } else {
-        setError(errorObj.message || 'An unexpected error occurred.');
+        setError(errorObj.message || 'S\x27ha produït un error inesperat.');
       }
     } finally {
       setLoading(false);
@@ -121,26 +124,26 @@ export default function LoginPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="space-y-4">
-              <label className="block text-text-primary text-[12px] font-medium px-1">Email Address</label>
+              <label className="block text-text-primary text-[12px] font-medium px-1">{t('email')}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-medium text-sm text-text-primary placeholder:text-text-muted outline-none"
-                placeholder="coordinator@center.com"
+                placeholder={t('email_placeholder')}
                 required
               />
             </div>
 
             <div className="space-y-4">
-              <label className="block text-text-primary text-[12px] font-medium px-1">Password</label>
+              <label className="block text-text-primary text-[12px] font-medium px-1">{t('password')}</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-medium text-sm text-text-primary placeholder:text-text-muted pr-12 outline-none"
-                  placeholder="••••••••"
+                  placeholder={t('password_placeholder')}
                   required
                 />
                 <button
@@ -171,9 +174,9 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <Loading size="sm" white message="" />
-                  <span>Signing in...</span>
+                  <span>{t('loading')}</span>
                 </>
-              ) : 'Enter Program'}
+              ) : t('submit')}
             </button>
           </form>
         )}

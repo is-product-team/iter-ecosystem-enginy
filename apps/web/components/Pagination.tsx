@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 interface PaginationProps {
   currentPage: number;
@@ -17,12 +18,13 @@ const Pagination: React.FC<PaginationProps> = ({
   currentItemsCount,
   itemName = 'items'
 }) => {
+  const t = useTranslations('Common');
   if (totalPages <= 1) return null;
 
   return (
     <div className="bg-background-subtle border-t border-border-subtle p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
       <div className="text-[12px] font-medium text-text-muted">
-        Showing <span className="text-text-primary">{currentItemsCount}</span> of <span className="text-text-primary">{totalItems}</span> {itemName}
+        {t('showing')} <span className="text-text-primary">{currentItemsCount}</span> {t('of')} <span className="text-text-primary">{totalItems}</span> {itemName}
       </div>
       <div className="flex items-center gap-2">
         <button 
@@ -32,10 +34,10 @@ const Pagination: React.FC<PaginationProps> = ({
             ? 'opacity-30 cursor-not-allowed' 
             : 'text-text-primary bg-background-surface hover:bg-background-subtle active:scale-[0.98]'}`}
         >
-          Previous
+          {t('previous')}
         </button>
         <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[12px] font-medium text-text-primary">
-          Page {currentPage} of {totalPages}
+          {t('page')} {currentPage} {t('of')} {totalPages}
         </div>
         <button 
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
@@ -44,7 +46,7 @@ const Pagination: React.FC<PaginationProps> = ({
             ? 'opacity-30 cursor-not-allowed' 
             : 'text-text-primary bg-background-surface hover:bg-background-subtle active:scale-[0.98]'}`}
         >
-          Next
+          {t('next')}
         </button>
       </div>
     </div>

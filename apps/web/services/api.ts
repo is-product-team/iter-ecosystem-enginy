@@ -34,7 +34,7 @@ apiInstance.interceptors.response.use(
 
         // Avoid infinite redirect loops if we are already on the login page
         if (!window.location.pathname.includes('/login')) {
-          window.location.replace('/login');
+          window.location.replace('/');
         }
       }
     }

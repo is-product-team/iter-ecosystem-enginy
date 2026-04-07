@@ -12,6 +12,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
 import getApi from '@/services/api';
 import Pagination from "@/components/Pagination";
+import { useTranslations } from 'next-intl';
 
 export default function TeachersCRUD() {
   const { user, loading: authLoading } = useAuth();
@@ -24,6 +25,9 @@ export default function TeachersCRUD() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const t = useTranslations('Center.Teachers');
+  const tc = useTranslations('Common');
+  const ta = useTranslations('Auth.login');
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -47,7 +51,7 @@ export default function TeachersCRUD() {
       return;
     }
     if (user) loadTeachers();
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
 
   const loadTeachers = async () => {
     try {
@@ -81,17 +85,17 @@ export default function TeachersCRUD() {
     try {
       if (editingTeacher) {
         await teacherService.update(editingTeacher.teacherId, formData);
-        toast.success("Teacher updated successfully.");
+        toast.success(tc("save_success"));
       } else {
         await teacherService.create(formData);
-        toast.success("Teacher created successfully.");
+        toast.success(tc("save_success"));
       }
       setIsModalOpen(false);
       setEditingTeacher(null);
       setFormData({ name: '', contact: '', password: '' });
       loadTeachers();
     } catch (err: unknown) {
-      toast.error((err as Error).message || "Error saving teacher.");
+      toast.error((err as Error).message || tc("error_loading"));
     }
   };
 
@@ -104,16 +108,16 @@ export default function TeachersCRUD() {
   const handleDelete = (id: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Teacher',
-      message: 'Are you sure you want to delete this teacher? Their access to the mobile App will also be removed.',
+      title: t('delete_title'),
+      message: t('delete_confirm'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await teacherService.delete(id);
           loadTeachers();
-          toast.success("Teacher deleted.");
+          toast.success(tc("delete_success"));
         } catch (err) {
-          toast.error("Error deleting teacher.");
+          toast.error(tc("delete_error"));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -125,24 +129,24 @@ export default function TeachersCRUD() {
       className="bg-consorci-darkBlue text-white px-6 py-3 font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
-      New Teacher
+      {t('add')}
     </button>
   );
 
   return (
     <DashboardLayout
-      title="Teacher Management"
-      subtitle="Manage the referring teachers of your educational center."
+      title={t('title')}
+      subtitle={t('description')}
       actions={headerActions}
     >
       {/* Filters Panel */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
         <div className="flex-1">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">Search by name or contact</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_placeholder')}</label>
           <div className="relative">
             <input
               type="text"
-              placeholder="Ex: Manuel Pérez, manuel@schol.cat..."
+              placeholder={tc('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
@@ -158,7 +162,7 @@ export default function TeachersCRUD() {
             onClick={() => setSearchQuery("")}
             className="w-full lg:w-auto px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-all border border-transparent h-[46px]"
           >
-            Clear filters
+            {tc('clear_filters')}
           </button>
         </div>
       </div>
@@ -172,9 +176,9 @@ export default function TeachersCRUD() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-background-subtle border-b border-border-subtle">
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Teacher</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Contact</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">Actions</th>
+                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_name')}</th>
+                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_email')}</th>
+                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{tc('actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-subtle">
@@ -200,7 +204,7 @@ export default function TeachersCRUD() {
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex justify-end items-center gap-4">
-                          <button onClick={() => handleEdit(p)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">Edit</button>
+                          <button onClick={() => handleEdit(p)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
                           <button onClick={() => handleDelete(p.teacherId)} className="text-text-muted hover:text-red-500 transition-all">
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
@@ -213,8 +217,8 @@ export default function TeachersCRUD() {
             </div>
             {filteredTeachers.length === 0 && (
               <div className="p-20 text-center">
-                <p className="text-text-primary font-medium text-sm">No teachers found</p>
-                <p className="text-text-muted text-[12px] font-medium mt-2">Try other search terms.</p>
+                <p className="text-text-primary font-medium text-sm">{tc('no_results')}</p>
+                <p className="text-text-muted text-[12px] font-medium mt-2">{tc('try_other_terms')}</p>
               </div>
             )}
           </div>
@@ -226,7 +230,7 @@ export default function TeachersCRUD() {
             onPageChange={setCurrentPage}
             totalItems={filteredTeachers.length}
             currentItemsCount={paginatedTeachers.length}
-            itemName="teachers"
+            itemName={tc('teachers').toLowerCase()}
           />
         </>
       )}
@@ -238,10 +242,10 @@ export default function TeachersCRUD() {
             <div className="px-10 py-8 border-b border-border-subtle flex justify-between items-start sticky top-0 bg-background-surface z-10">
               <div>
                 <h3 className="text-xl font-medium text-text-primary tracking-tight">
-                  {editingTeacher ? 'Edit Teacher' : 'New Teacher'}
+                  {editingTeacher ? t('edit_title') : t('add')}
                 </h3>
                 <p className="text-[12px] font-medium text-text-muted mt-2">
-                  {editingTeacher ? 'Modify teacher data' : 'Enter data for the new teacher'}
+                  {editingTeacher ? t('edit_subtitle') : t('add_subtitle')}
                 </p>
               </div>
               <button
@@ -263,7 +267,7 @@ export default function TeachersCRUD() {
                     size="xl"
                   />
                   <label className="cursor-pointer bg-background-subtle border border-border-subtle px-6 py-2 text-[11px] font-medium text-text-primary hover:bg-background-surface transition-all active:scale-95">
-                    Change profile photo
+                    {t('change_photo')}
                     <input
                       type="file"
                       className="hidden"
@@ -274,11 +278,11 @@ export default function TeachersCRUD() {
                           const formData = new FormData();
                           formData.append('photo', file);
                           try {
-                            const api = getApi();
-                            const res = await api.post(`/upload/profile/user/${editingTeacher.user.userId}`, formData, {
+                            const apiInstance = getApi();
+                            const res = await apiInstance.post(`/upload/profile/user/${editingTeacher.user.userId}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
-                            toast.success("Photo updated.");
+                            toast.success(t("photo_success"));
                             loadTeachers();
                             // Update local state for immediate feedback
                             setEditingTeacher({
@@ -286,10 +290,10 @@ export default function TeachersCRUD() {
                               user: { ...editingTeacher.user, photoUrl: res.data.photoUrl }
                             } as Teacher);
                           } catch (err) {
-                            toast.error("Error uploading photo.");
+                            toast.error(t("photo_error"));
                           }
                         } else if (!editingTeacher.user?.userId) {
-                          toast.error("Cannot upload photo to a teacher without a linked user.");
+                          toast.error(t("no_user_photo_error"));
                         }
                       }}
                     />
@@ -299,7 +303,7 @@ export default function TeachersCRUD() {
 
               <form onSubmit={handleSubmit} id="teacher-form" className="p-10 space-y-8">
                 <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">Full name</label>
+                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_name')}</label>
                   <input
                     type="text" value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -307,7 +311,7 @@ export default function TeachersCRUD() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">Contact Email</label>
+                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_email')}</label>
                   <input
                     type="email" value={formData.contact}
                     onChange={e => setFormData({ ...formData, contact: e.target.value })}
@@ -320,20 +324,20 @@ export default function TeachersCRUD() {
                 {!editingTeacher && (
                   <div className="space-y-2">
                     <label className="text-[12px] font-medium text-text-primary px-1 flex justify-between">
-                      Password
+                      {ta('password')}
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="text-consorci-darkBlue hover:underline font-medium"
                       >
-                        {showPassword ? 'Hide' : 'Show'}
+                        {showPassword ? tc('hide') : tc('show')}
                       </button>
                     </label>
                     <input
                       type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={e => setFormData({ ...formData, password: e.target.value })}
-                      placeholder="Password for the mobile App"
+                      placeholder={t('password_placeholder')}
                       className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
                       required={!editingTeacher}
                     />
@@ -343,8 +347,8 @@ export default function TeachersCRUD() {
             </div>
 
             <div className="p-10 border-t border-border-subtle flex gap-4 bg-background-surface">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline transition-colors">Cancel</button>
-              <button type="submit" form="teacher-form" className="flex-1 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]">Save teacher</button>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline transition-colors">{tc('cancel')}</button>
+              <button type="submit" form="teacher-form" className="flex-1 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]">{t('save_btn')}</button>
             </div>
           </div>
         </div>

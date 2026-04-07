@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import getApi from '@/services/api';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface DocumentUploadProps {
   assignmentId: number;
@@ -23,6 +24,7 @@ export default function DocumentUpload({
   label,
   onUploadSuccess
 }: DocumentUploadProps) {
+  const t = useTranslations('Common');
   // --- Upload and Validation States ---
   const [uploading, setUploading] = useState(false); // Indicates if the HTTP upload to backend is in progress
   const [currentUrl, setCurrentUrl] = useState(initialUrl); // Current URL of the uploaded document
@@ -58,14 +60,14 @@ export default function DocumentUpload({
 
       setCurrentUrl(newUrl);
       if (newUrl) onUploadSuccess(newUrl);
-      toast.success(`${label} uploaded successfully.`);
+      toast.success(t('upload_success', { label }));
       
       // Clear error/blocking states after success
       setOverrideMode(false);
       setPendingFile(null);
     } catch (error) {
       console.error('Error uploading document:', error);
-      toast.error('Error uploading document.');
+      toast.error(t('error_upload'));
     } finally {
       setUploading(false);
     }
@@ -80,7 +82,7 @@ export default function DocumentUpload({
 
     // Basic format validation
     if (file.type !== 'application/pdf') {
-      toast.error('Only PDF files are allowed.');
+      toast.error(t('only_pdf_allowed'));
       return;
     }
 
@@ -100,7 +102,7 @@ export default function DocumentUpload({
 
       // Validation 1: Text content must match the upload slot type
       if (detectedType !== 'unknown' && detectedType !== expectedInIAPipeline) {
-        toast.error(`AI detects a different type: ${detectedType}.`);
+        toast.error(t('ai_mismatch', { type: detectedType }));
         setOverrideMode(true);
         setPendingFile(file);
         return;
@@ -114,7 +116,7 @@ export default function DocumentUpload({
         const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // We look for 3 signatures
 
         if (!hasSignatures) {
-          toast.error('AI has not detected the required signatures.');
+          toast.error(t('ai_no_signatures'));
           setOverrideMode(true);
           setPendingFile(file);
           return;
@@ -125,7 +127,7 @@ export default function DocumentUpload({
       await handleValidUpload(file);
     } catch (err) {
       console.error("AI Validation Error:", err);
-      toast.error('Error processing AI. You can force the upload.');
+      toast.error(t('ai_error'));
       setOverrideMode(true);
       setPendingFile(file);
     } finally {
@@ -150,10 +152,10 @@ export default function DocumentUpload({
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              {isValidated ? 'Document Validated' : 'View Document'}
+              {isValidated ? t('document_validated') : t('view_document')}
             </a>
           ) : (
-            <span className="text-[11px] font-medium text-red-500 mt-1">Pending</span>
+            <span className="text-[11px] font-medium text-red-500 mt-1">{t('pending')}</span>
           )}
         </div>
 
@@ -163,14 +165,14 @@ export default function DocumentUpload({
               onClick={() => handleValidUpload(pendingFile)}
               className="px-3 py-1 text-[10px] font-medium text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition-all"
             >
-              Force Manual Upload
+              {t('force_manual_upload')}
             </button>
           )}
           
           <label className={`shrink-0 cursor-pointer px-4 py-2 text-[11px] font-medium transition-all border ${
             uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
           }`}>
-            {uploading ? 'Uploading...' : validatingAI ? 'Validating (AI)...' : currentUrl ? 'Change' : 'Attach'}
+            {uploading ? t('uploading') : validatingAI ? t('validating_ai') : currentUrl ? t('change') : t('attach')}
             <input
               type="file"
               className="hidden"

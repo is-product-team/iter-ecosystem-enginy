@@ -6,11 +6,14 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { evaluationService } from '@/services/evaluationService';
 import Pagination from "@/components/Pagination";
 import Loading from '@/components/Loading';
+import { useTranslations } from 'next-intl';
 
 export default function AdminQuestionnairesPage() {
     const [models, setModels] = useState<{ modelId: string, name: string, target: string, _count?: { questions: number } }[]>([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const t = useTranslations('Questionnaires');
+    const tc = useTranslations('Common');
 
     useEffect(() => {
         const fetchModels = async () => {
@@ -44,26 +47,26 @@ export default function AdminQuestionnairesPage() {
 
     return (
         <DashboardLayout
-            title="Questionnaire Management"
-            subtitle="Manage dynamic form models and view responses."
+            title={t('title')}
+            subtitle={t('subtitle')}
         >
             <div className="w-full pb-20">
                 <div className="flex justify-between items-center mb-12">
-                    <h2 className="text-[18px] font-medium text-text-primary tracking-tight">Available Models</h2>
+                    <h2 className="text-[18px] font-medium text-text-primary tracking-tight">{t('available_models')}</h2>
                     <button
                         onClick={() => router.push('/admin/questionnaires/builder')}
                         className="bg-consorci-darkBlue text-white px-8 py-4 text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-3"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
-                        New Questionnaire
+                        {t('new_questionnaire')}
                     </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {models.length === 0 ? (
                         <div className="col-span-full bg-background-surface p-24 border border-dashed border-border-subtle text-center">
-                            <p className="text-text-muted font-medium mb-8">No questionnaire models have been created yet.</p>
-                            <button onClick={() => router.push('/admin/questionnaires/builder')} className="text-consorci-darkBlue font-medium text-[13px] hover:underline">Create the first one</button>
+                            <p className="text-text-muted font-medium mb-8">{t('no_models')}</p>
+                            <button onClick={() => router.push('/admin/questionnaires/builder')} className="text-consorci-darkBlue font-medium text-[13px] hover:underline">{t('create_first')}</button>
                         </div>
                     ) : (
                         paginatedModels.map((m) => (
@@ -79,12 +82,12 @@ export default function AdminQuestionnairesPage() {
                                         <span className="text-[12px] text-text-muted font-medium opacity-50">#{m.modelId}</span>
                                     </div>
                                     <h3 className="text-[17px] font-medium text-text-primary mb-3 tracking-tight group-hover:text-consorci-darkBlue transition-colors">{m.name}</h3>
-                                    <p className="text-[12px] text-text-muted font-medium mb-8">{m._count?.questions || 0} Questions</p>
+                                    <p className="text-[12px] text-text-muted font-medium mb-8">{t('questions_count', { count: m._count?.questions || 0 })}</p>
                                 </div>
 
                                 <div className="flex gap-4">
-                                    <button className="flex-1 py-3.5 bg-background-subtle text-text-muted font-medium text-[13px] hover:bg-background-surface transition-all border border-border-subtle">Edit</button>
-                                    <button className="flex-1 py-3.5 bg-consorci-darkBlue text-white font-medium text-[13px] hover:bg-black transition-all active:scale-[0.98]">View results</button>
+                                    <button className="flex-1 py-3.5 bg-background-subtle text-text-muted font-medium text-[13px] hover:bg-background-surface transition-all border border-border-subtle">{tc('edit')}</button>
+                                    <button className="flex-1 py-3.5 bg-consorci-darkBlue text-white font-medium text-[13px] hover:bg-black transition-all active:scale-[0.98]">{t('view_results')}</button>
                                 </div>
                             </div>
                         ))
@@ -97,7 +100,7 @@ export default function AdminQuestionnairesPage() {
                     onPageChange={setCurrentPage}
                     totalItems={models.length}
                     currentItemsCount={paginatedModels.length}
-                    itemName="questionnaires"
+                    itemName={t('title').toLowerCase()}
                 />
 
                 {/* Help section */}
@@ -107,9 +110,9 @@ export default function AdminQuestionnairesPage() {
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
                         <div>
-                            <h4 className="text-[15px] font-medium text-text-primary mb-3">How do questionnaires work?</h4>
+                            <h4 className="text-[15px] font-medium text-text-primary mb-3">{t('how_works_title')}</h4>
                             <p className="text-[13px] text-text-muted leading-relaxed font-medium">
-                                Dynamic questionnaires can be sent to participants once the execution phase is finished. The data obtained automatically feeds the Evaluation Dashboard for Consortium administrators.
+                                {t('how_works_desc')}
                             </p>
                         </div>
                     </div>

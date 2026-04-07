@@ -8,6 +8,7 @@ import Calendar, { CalendarEvent } from "@/components/ui/Calendar";
 import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 
 interface Phase {
   phaseId: number;
@@ -23,6 +24,8 @@ export default function CalendarPage() {
   const [activePhase, setActivePhase] = useState<Phase | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
+  const t = useTranslations('Calendar');
+  const tc = useTranslations('Common');
 
   // Overlay states
   const [isLegendOpen, setIsLegendOpen] = useState(false);
@@ -52,7 +55,7 @@ export default function CalendarPage() {
 
       const phaseEvents = phasesData.map((f: Phase) => ({
         id: `phase-${f.phaseId}`,
-        title: `Phase: ${f.name}`,
+        title: `${tc('phase')}: ${f.name}`,
         date: f.startDate,
         endDate: f.endDate,
         type: 'milestone',
@@ -67,21 +70,21 @@ export default function CalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, tc]);
 
-  if (authLoading) return <Loading fullScreen message="Syncing your calendar..." />;
+  if (authLoading) return <Loading fullScreen message={t('loading_auth')} />;
 
   return (
     <DashboardLayout
-      title="Iter Calendar"
-      subtitle="Visualize all milestones, workshops, and deadlines in a dynamic calendar."
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       <div className="w-full relative">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 ${activePhase ? 'bg-consorci-darkBlue' : 'bg-border-subtle'}`}></div>
             <div className="text-[13px] font-medium text-text-primary">
-              {activePhase ? `Current Phase: ${activePhase.name}` : "Loading phases..."}
+              {activePhase ? t('active_fase', { nom: activePhase.name }) : t('sync_phases')}
             </div>
           </div>
           <button
@@ -91,7 +94,7 @@ export default function CalendarPage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Color legend
+            {t('view_legend')}
           </button>
         </div>
 
@@ -123,44 +126,44 @@ export default function CalendarPage() {
               </button>
 
               <h3 className="text-xl font-medium text-text-primary tracking-tight border-b border-border-subtle pb-6 mb-8">
-                Color legend
+                {t('legend_title')}
               </h3>
 
               <div className="space-y-6">
                 <div className="flex items-center gap-5 group cursor-default">
                   <div className="w-5 h-5 bg-consorci-lightBlue"></div>
                   <div>
-                    <span className="block text-[13px] font-medium text-text-primary transition-colors">Assignment</span>
-                    <span className="text-[12px] text-text-muted font-medium opacity-70">Workshop reservation at the center.</span>
+                    <span className="block text-[13px] font-medium text-text-primary transition-colors">{t('assignment_label')}</span>
+                    <span className="text-[12px] text-text-muted font-medium opacity-70">{t('assignment_desc')}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-5 group cursor-default">
                   <div className="w-5 h-5 bg-consorci-yellow"></div>
                   <div>
-                    <span className="block text-[13px] font-medium text-text-primary transition-colors">Workshop Session</span>
-                    <span className="text-[12px] text-text-muted font-medium opacity-70">Meeting with students.</span>
+                    <span className="block text-[13px] font-medium text-text-primary transition-colors">{t('session_label')}</span>
+                    <span className="text-[12px] text-text-muted font-medium opacity-70">{t('session_desc')}</span>
                   </div>
                 </div>
 
                 <div className="pt-8 border-t border-border-subtle">
-                  <span className="block text-[10px] font-medium text-text-muted uppercase tracking-wider mb-6 opacity-60">PROGRAM PHASES</span>
+                  <span className="block text-[10px] font-medium text-text-muted uppercase tracking-wider mb-6 opacity-60">{t('phases_label')}</span>
                   <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                     <div className="flex items-center gap-3">
                       <div className="w-3.5 h-3.5 bg-consorci-darkBlue"></div>
-                      <span className="text-[11px] font-medium text-text-primary">Registration</span>
+                      <span className="text-[11px] font-medium text-text-primary">{t('phase_solicitud')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-3.5 h-3.5 bg-consorci-actionBlue"></div>
-                      <span className="text-[11px] font-medium text-text-primary">Planning</span>
+                      <span className="text-[11px] font-medium text-text-primary">{t('phase_planificacion')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-3.5 h-3.5 bg-consorci-pinkRed"></div>
-                      <span className="text-[11px] font-medium text-text-primary">Execution</span>
+                      <span className="text-[11px] font-medium text-text-primary">{t('phase_ejecucion')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-3.5 h-3.5 bg-consorci-beige"></div>
-                      <span className="text-[11px] font-medium text-text-primary">Evaluation</span>
+                      <span className="text-[11px] font-medium text-text-primary">{t('phase_evaluacion')}</span>
                     </div>
                   </div>
                 </div>
@@ -170,7 +173,7 @@ export default function CalendarPage() {
                 onClick={() => setIsLegendOpen(false)}
                 className="w-full mt-10 py-4 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-95"
               >
-                Accept
+                {t('legend_ok')}
               </button>
             </div>
           </div>

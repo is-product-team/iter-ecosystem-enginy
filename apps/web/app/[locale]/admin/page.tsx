@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect } from 'react';
 import Loading from '@/components/Loading';
+import { useTranslations } from 'next-intl';
 
 export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const t = useTranslations('Admin');
+  const tc = useTranslations('Common');
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
@@ -18,16 +21,16 @@ export default function AdminDashboardPage() {
 
   if (authLoading || !user) {
     return (
-      <Loading fullScreen message="Authenticating administrator..." />
+      <Loading fullScreen message={tc('loading')} />
     );
   }
 
   const sections = [
     {
-      title: 'Workshop Management',
-      description: 'Create, modify or delete workshops for centers.',
+      title: t('Workshops.title'),
+      description: t('Workshops.description'),
       path: '/workshops',
-      phase: 'General',
+      phase: tc('general'),
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -36,10 +39,10 @@ export default function AdminDashboardPage() {
       color: 'blue'
     },
     {
-      title: 'Center Management',
-      description: 'Create, modify or delete centers.',
+      title: t('Centers.title'),
+      description: t('Centers.description'),
       path: '/centers',
-      phase: 'General',
+      phase: tc('general'),
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -48,10 +51,10 @@ export default function AdminDashboardPage() {
       color: 'red'
     },
     {
-      title: 'Course Phases',
-      description: 'Configure dates and status of the course phases.',
+      title: t('Phases.title'),
+      description: t('Phases.description'),
       path: '/phases',
-      phase: 'Configuration',
+      phase: tc('configuration'),
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -60,10 +63,10 @@ export default function AdminDashboardPage() {
       color: 'purple'
     },
     {
-      title: 'Statistics',
-      description: 'Advanced analysis of system usage, most requested workshops and system activity.',
+      title: t('Stats.title'),
+      description: t('Stats.description'),
       path: '/stats',
-      phase: 'Global',
+      phase: tc('global'),
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -72,10 +75,10 @@ export default function AdminDashboardPage() {
       color: 'green'
     },
     {
-      title: 'Center Requests',
-      description: 'View center requests and assign workshops.',
+      title: t('Requests.title'),
+      description: t('Requests.description'),
       path: '/requests',
-      phase: 'Phase 1',
+      phase: `${tc('phase')} 1`,
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -84,10 +87,10 @@ export default function AdminDashboardPage() {
       color: 'orange'
     },
     {
-      title: 'Document Verification',
-      description: 'Validate documentation presented by centers (Pedagogical Agreement, Mobility, etc).',
+      title: t('Verifications.title'),
+      description: t('Verifications.description'),
       path: '/verifications',
-      phase: 'Phase 2',
+      phase: `${tc('phase')} 2`,
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -99,8 +102,8 @@ export default function AdminDashboardPage() {
 
   return (
     <DashboardLayout
-      title="Admin Dashboard"
-      subtitle="Welcome to the Iter control center. Manage workshops, centers, and requests from this panel."
+      title={t('dashboard.title')}
+      subtitle={t('dashboard.welcome')}
     >
       <div className="flex justify-center w-full pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">

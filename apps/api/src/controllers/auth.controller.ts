@@ -8,10 +8,11 @@ import prisma from '../lib/prisma.js';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
+  const normalizedEmail = email.toLowerCase().trim();
 
   try {
     // 1. Use the repository to find the user
-    const user = await userRepository.findByEmail(email);
+    const user = await userRepository.findByEmail(normalizedEmail);
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -58,6 +59,7 @@ export const login = async (req: Request, res: Response) => {
 
 export const register = async (req: Request, res: Response) => {
   const { email, password, fullName, roleId, centerId } = req.body;
+  const normalizedEmail = email.toLowerCase().trim();
 
   try {
     const salt = await bcrypt.genSalt(10);
@@ -65,7 +67,7 @@ export const register = async (req: Request, res: Response) => {
 
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         passwordHash,
         fullName,
         roleId: parseInt(roleId),

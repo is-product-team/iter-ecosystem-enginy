@@ -3,10 +3,14 @@
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { evaluationService } from '@/services/evaluationService';
+import { useTranslations } from 'next-intl';
+import Loading from '@/components/Loading';
 
 export default function AdminReportsPage() {
     const [metrics, setMetrics] = useState<unknown>(null);
     const [loading, setLoading] = useState(true);
+    const t = useTranslations('Reports');
+    const tc = useTranslations('Common');
 
     useEffect(() => {
         const fetchMetrics = async () => {
@@ -37,22 +41,22 @@ export default function AdminReportsPage() {
 
     return (
         <DashboardLayout
-            title="Evaluation Dashboard"
-            subtitle="Analyze the quality and impact of the Enginy Program."
+            title={t('title')}
+            subtitle={t('subtitle')}
         >
             <div className="w-full pb-20 space-y-12">
 
                 {/* General Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
-                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">Student Experience</span>
+                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">{t('student_exp')}</span>
                         <span className="text-4xl font-medium text-text-primary">{(generalAvg?.experienceRating || 0).toFixed(1)}</span>
                         <div className="w-full mt-6 h-1.5 bg-background-subtle overflow-hidden">
                             <div className="h-full bg-consorci-darkBlue" style={{ width: `${(generalAvg?.experienceRating || 0) * 10}%` }}></div>
                         </div>
                     </div>
                     <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
-                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">Teacher Satisfaction</span>
+                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">{t('teacher_sat')}</span>
                         <span className="text-4xl font-medium text-text-primary">{(generalAvg?.teacherRating || 0).toFixed(1)}</span>
                         <div className="w-full mt-6 h-1.5 bg-background-subtle overflow-hidden">
                             <div className="h-full bg-consorci-darkBlue" style={{ width: `${(generalAvg?.teacherRating || 0) * 10}%` }}></div>
@@ -60,29 +64,29 @@ export default function AdminReportsPage() {
                     </div>
                     {/* Mocks for additional metrics */}
                     <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
-                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">Workshops Completed</span>
+                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">{t('workshops_completed')}</span>
                         <span className="text-4xl font-medium text-text-primary">84%</span>
-                        <p className="text-[12px] font-medium text-green-600 mt-4 opacity-80">+5% vs 2023</p>
+                        <p className="text-[12px] font-medium text-green-600 mt-4 opacity-80">{t('vs_last_year')}</p>
                     </div>
                     <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
-                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">Student Participation</span>
+                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">{t('student_part')}</span>
                         <span className="text-4xl font-medium text-text-primary">1240</span>
-                        <p className="text-[12px] font-medium text-consorci-darkBlue mt-4 opacity-80">Total enrollments</p>
+                        <p className="text-[12px] font-medium text-consorci-darkBlue mt-4 opacity-80">{t('total_enrollments')}</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Vocational Impact */}
                     <div className="lg:col-span-2 bg-background-surface p-12 border border-border-subtle">
-                        <h3 className="text-[17px] font-medium text-text-primary mb-12 tracking-tight">Vocational Impact Distribution</h3>
+                        <h3 className="text-[17px] font-medium text-text-primary mb-12 tracking-tight">{t('vocational_dist')}</h3>
                         <div className="space-y-10">
                             {impactDistribution.map((item: { vocationalImpact: string, _count: { _all: number } }) => {
                                 const total = impactDistribution.reduce((acc: number, curr: { _count: { _all: number } }) => acc + curr._count._all, 0);
                                 const percent = (item._count._all / total) * 100;
                                 const labels: Record<string, string> = {
-                                    'SI': 'Has chosen a professional branch',
-                                    'NO': 'Has not changed their opinion',
-                                    'CONSIDERANT': 'Is considering it right now'
+                                    'SI': t('impact_labels.si'),
+                                    'NO': t('impact_labels.no'),
+                                    'CONSIDERANT': t('impact_labels.considerant')
                                 };
                                 return (
                                     <div key={item.vocationalImpact} className="space-y-4">
@@ -107,7 +111,7 @@ export default function AdminReportsPage() {
 
                     {/* Top Workshops */}
                     <div className="bg-background-subtle p-12 border border-border-subtle flex flex-col">
-                        <h3 className="text-[17px] font-medium text-text-primary mb-12 tracking-tight">Top Rated Workshops</h3>
+                        <h3 className="text-[17px] font-medium text-text-primary mb-12 tracking-tight">{t('top_rated')}</h3>
                         <div className="space-y-8 flex-1">
                             {[
                                 { name: '3D Printing', score: 4.8 },
@@ -121,7 +125,7 @@ export default function AdminReportsPage() {
                                 </div>
                             ))}
                         </div>
-                        <button className="mt-12 w-full py-4 bg-consorci-darkBlue text-white font-medium text-[13px] hover:bg-black transition-all active:scale-[0.98]">Download PDF summary</button>
+                        <button className="mt-12 w-full py-4 bg-consorci-darkBlue text-white font-medium text-[13px] hover:bg-black transition-all active:scale-[0.98]">{t('download_pdf')}</button>
                     </div>
                 </div>
 
@@ -131,10 +135,10 @@ export default function AdminReportsPage() {
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     </div>
                     <div>
-                        <h4 className="text-[13px] font-medium text-red-700 mb-1">Low rating alerts</h4>
-                        <p className="text-[13px] text-red-900/60 font-medium">2 Workshops show satisfaction below 3.5. Review with the reference center is recommended.</p>
+                        <h4 className="text-[13px] font-medium text-red-700 mb-1">{t('low_rating_alerts')}</h4>
+                        <p className="text-[13px] text-red-900/60 font-medium">{t('low_rating_msg')}</p>
                     </div>
-                    <button className="ml-auto bg-red-600 text-white px-8 py-3.5 text-[13px] font-medium hover:bg-black transition-all active:scale-[0.98]">View details</button>
+                    <button className="ml-auto bg-red-600 text-white px-8 py-3.5 text-[13px] font-medium hover:bg-black transition-all active:scale-[0.98]">{t('view_details')}</button>
                 </div>
 
             </div>

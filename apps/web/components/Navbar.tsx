@@ -7,11 +7,13 @@ import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import notificationService from '@/services/notificationService';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(0);
+  const t = useTranslations('Common');
 
   useEffect(() => {
     if (user) {
@@ -42,10 +44,10 @@ const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { label: 'Home', path: getHomePath(), show: true },
-    { label: 'Notifications', path: `/center/notifications`, show: true, isNotifications: true },
-    { label: 'Calendar', path: `/calendar`, show: true },
-    { label: 'Profile', path: `/profile`, show: true },
+    { label: t('home'), path: getHomePath(), show: true },
+    { label: t('notifications'), path: `/center/notifications`, show: true, isNotifications: true },
+    { label: t('calendar'), path: `/calendar`, show: true },
+    { label: t('profile'), path: `/profile`, show: true },
   ];
 
   return (
@@ -103,7 +105,7 @@ const Navbar: React.FC = () => {
                   {user?.fullName || ''}
                 </span>
                 <span className="text-text-secondary text-[11px] font-normal">
-                  {user?.center?.name || 'Educational center'}
+                  {user?.center?.name || t('educational_center')}
                 </span>
                 <span className="text-[11px] font-normal text-text-muted mt-0.5 truncate max-w-[180px]">
                   {user?.role?.name} {user?.center?.centerCode ? `• ${user.center.centerCode}` : ''}
@@ -113,7 +115,7 @@ const Navbar: React.FC = () => {
                 onClick={logout}
                 className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[12px] font-medium px-5 py-2 transition-all active:scale-[0.98]"
               >
-                Logout
+                {t('logout')}
               </button>
             </div>
           </div>
