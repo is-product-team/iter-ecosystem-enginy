@@ -7,7 +7,7 @@
         "./*"
       ],
       "@iter/shared": [
-        "../../packages/shared/index.ts"
+        "../../shared/index.ts"
       ]
     }
   },

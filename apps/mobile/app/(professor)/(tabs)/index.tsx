@@ -45,14 +45,19 @@ export default function DashboardScreen() {
         
         if (userData) {
           const user = JSON.parse(userData);
+          console.log("🔍 [DEBUG DASHBOARD] User found:", user.email, "Role:", user.role?.roleName);
+
           if (user.firstName) setUserName(user.firstName);
           else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
           
-          if (user.role?.roleName !== 'PROFESSOR') {
+          const roleName = user.role?.roleName;
+          if (roleName !== 'PROFESSOR' && roleName !== 'TEACHER') {
+            console.warn("⚠️ [Dashboard] Unauthorized role:", roleName);
             router.replace('/login');
             return;
           }
         } else {
+          console.log("🔍 [DEBUG DASHBOARD] No user data, redirecting...");
           router.replace('/login');
           return;
         }
@@ -61,10 +66,19 @@ export default function DashboardScreen() {
           getPhases(),
           getMyAssignments()
         ]);
-        setPhases(phasesRes.data);
-        setAssignments(assignmentsRes.data);
+        
+        // The /phases API returns { data: [...], meta: [...] }
+        const phasesData = phasesRes.data as any;
+        const phasesArray = Array.isArray(phasesData) ? phasesData : phasesData.data;
+        setPhases(Array.isArray(phasesArray) ? phasesArray : []);
+        
+        // Assignments API returns the array directly
+        setAssignments(Array.isArray(assignmentsRes.data) ? assignmentsRes.data : []);
       } catch (error: any) {
         console.error("Error fetching dashboard data:", error);
+        // Ensure state remains valid even on error
+        setPhases([]);
+        setAssignments([]);
       } finally {
         setLoading(false);
         setRefreshing(false);

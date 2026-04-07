@@ -29,7 +29,8 @@ export default function LoginScreen() {
       const userAny: any = user;
 
       // Role restriction: Only TEACHERS can access the mobile app
-      if (userAny.role?.roleName !== ROLES.TEACHER) {
+      const roleName = userAny.role?.roleName;
+      if (roleName !== ROLES.TEACHER && roleName !== 'PROFESSOR') {
         setLoading(false);
         setRoleError(t('Auth.login.exclusive_use_error'));
         return;
