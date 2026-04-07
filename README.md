@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="doc/assets/logo-advance.png" alt="Iter Logo" width="180" />
+  <img src="docs/assets/logo-advance.png" alt="Iter Logo" width="180" />
   <h1 style="font-size: 3.5rem; font-weight: 900; margin-top: 10px; color: #00426B;">ITER ECOSYSTEM</h1>
   
   <p style="font-size: 1.2rem; color: #475569;">
@@ -24,40 +24,17 @@
 
 ## 🏛️ Project Architecture
 
-Iter is a high-performance **Monorepo** designed to streamline the lifecycle of educational workshops, from scheduling and enrollment to real-time attendance and AI-assisted evaluations.
+Iter is a high-performance **Monorepo** designed to streamline the lifecycle of educational workshops.
 
-```mermaid
-graph LR
-    subgraph Client Applications
-        Web[Admin & Web Panel]
-        Mobile[Professor Mobile App]
-    end
-    
-    subgraph Backend Core
-        API[Express API]
-        DB[(PostgreSQL)]
-        AI[Intelligence Engine]
-    end
-    
-    Web <--> API
-    Mobile <--> API
-    API <--> DB
-    API <--> AI
-```
+- **[Full Technical Portal](./docs/index.md)**: Entry point for all documentation.
+- **[System Overview](./docs/architecture/system-overview.md)**: Tech stack and service map.
+- **[Data Model](./docs/architecture/data-model.md)**: Database schema and ERD.
 
 ## 🚀 Key Capabilities
 
-- **🧠 AI Scheduling**: Automated, fair distribution of students to workshops based on capacity and demand.
-- **🎙️ NLP Evaluation**: Voice-to-text processing for real-time presence and competency assessment.
-- **📄 Vision Validation**: Automated verification of signed pedagogical agreements using Computer Vision.
-- **📊 Risk Analytics**: Early-warning system for student dropout prevention based on attendance patterns.
-
-## 📁 System Structure
-
-- **`apps/web`**: Consolidated **Next.js** application for Admin and Public interfaces.
-- **`apps/api`**: Robust **Express** backend optimized with `tsx` and Prisma.
-- **`apps/mobile`**: Multi-platform **Expo** application for field operations.
-- **`packages/shared`**: Single source of truth for **Design Tokens**, Zod schemas, and Shared Types.
+- **🧠 AI Scheduling**: Automated distribution of students to workshops.
+- **🎙️ NLP Evaluation**: Voice-to-text processing for competency assessment.
+- **📄 Vision Validation**: Automated verification of signed agreements.
 
 ## 🛠️ Quick Start
 
@@ -68,18 +45,15 @@ Experience the full ecosystem in minutes using our automated Docker orchestratio
 git clone https://github.com/iter-ecosystem/enginy.git
 
 # Up the entire stack
-docker compose up
+docker compose up --build
 ```
 
 > [!TIP]
-> **New Developer?** Check out our [Getting Started Guide](./docs/guides/getting-started.md) for detailed environment configuration and the [OpenSpec Workflow](./docs/guides/openspec-workflow.md) to understand our AI-driven development cycle.
+> For detailed environment configuration and login credentials, see the **[Getting Started Guide](./docs/guides/getting-started.md)** and the **[Auth & Roles Guide](./docs/guides/auth-and-roles.md)**.
 
-## 🌐 Infrastructure & Deployment
+## 🛡️ Security
 
-The ecosystem is optimized for **Production Reliability**:
-- **Deployment**: Automated CI/CD via GitHub Self-Hosted Runners.
-- **Proxy**: Global Nginx management for secure SSL termination.
-- **Containerization**: Multi-stage Docker builds for minimal footprint.
+We take security seriously. For technical implementation details, see our **[Security Architecture](./docs/architecture/security.md)**. To report a vulnerability, please refer to our **[Security Policy](./SECURITY.md)**.
 
 ---
 <div align="center">

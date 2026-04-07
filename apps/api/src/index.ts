@@ -23,10 +23,12 @@ const defaultAllowedOrigins = [
   'http://localhost:8002',
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:8000',
+  'http://localhost:8081',
 ];
 
-const allowedOrigins = env.CORS_ALLOWED_ORIGINS.length > 0 
-  ? env.CORS_ALLOWED_ORIGINS 
+const allowedOrigins = env.CORS_ORIGIN.length > 0 
+  ? env.CORS_ORIGIN 
   : defaultAllowedOrigins;
 
 app.use(cors({

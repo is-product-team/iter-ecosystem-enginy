@@ -1,37 +1,77 @@
-# Architecture: System Overview
+# System Overview
 
-The Iter Ecosystem is a mono-repository managed by **Turborepo**, designed for high scalability, performance, and developer efficiency.
+The **Iter Ecosystem** is a modern, full-stack platform built with a monorepo architecture. It connects educational centers, coordinators, and teachers through a unified data layer and specialized client applications.
 
-## 1. High-Level Architecture
+## 🛠️ Technology Stack
 
-The system is divided into three main applications and shared logic:
+| Layer | Technology |
+| :--- | :--- |
+| **Monorepo** | [Turborepo](https://turbo.build/) + NPM Workspaces |
+| **Backend** | [Node.js](https://nodejs.org/) + [Express](https://expressjs.com/) |
+| **Frontend** | [Next.js 15](https://nextjs.org/) (App Router) |
+| **Mobile** | [React Native](https://reactnative.dev/) + [Expo](https://expo.dev/) |
+| **Database** | [PostgreSQL](https://www.postgresql.org/) + [Prisma ORM](https://www.prisma.io/) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) (Strict Mode) |
 
-- **Web App (`apps/web`)**: Admin and Client interface built with **Next.js (App Router)** and Tailwind CSS.
-- **API Backend (`apps/api`)**: Node.js/Express server using **Prisma ORM** and PostgreSQL.
-- **Mobile app (`apps/mobile`)**: Multi-platform (iOS/Android) application built with **Expo/React Native**.
-- **Shared Package (`packages/shared`)**: Single source of truth for design tokens, Zod schemas, and TypeScript types.
+## 📁 Directory Structure
 
-## 2. Infrastructure Stack
+```text
+.
+├── apps/
+│   ├── api/          # Express Backend (Business logic, DB interaction)
+│   ├── web/          # Next.js Frontend (Institutional & Dashboard)
+│   └── mobile/       # React Native / Expo App (Teacher field work)
+├── shared/           # Common types, roles, and schema-based constants
+├── docs/             # This documentation suite
+├── openspec/         # AI-driven feature specifications (OPSX)
+└── docker-compose.yml# Local infrastructure orchestration
+```
 
-- **Containerization**: Entire development stack runs on **Docker**.
-- **Orchestration**: **Turborepo** handles the pipeline for builds and dev servers.
-- **Database**: **PostgreSQL 15** for relational data persistence.
-- **Deployment**: Automated via GitHub Actions with a self-hosted runner on Proxmox LXC.
+## 🏗️ High-Level Architecture
 
-## 3. Core Capabilities
+### Core Data Flows
 
-The ecosystem provides advanced educational management features:
-- **AI-Driven Scheduling**: Automated assignment of workshops to centers.
-- **Vision AI Validation**: Automated checking of signed legal documents.
-- **Natural Language Evaluations**: NLP-assisted presence and competency tracking.
-- **High-Frequency Telemetry**: (Planned) Real-time GPS tracking for field activities.
+#### 1. Workshop Enrollment Lifecycle
+The journey from a center's request to a validated student enrollment.
 
-## 4. Security Model
+```mermaid
+sequenceDiagram
+    participant Center as Center (Admin)
+    participant API as Backend API
+    participant AI as Vision AI
+    participant DB as PostgreSQL
 
-- **Authentication**: JWT-based stateless authentication.
-- **RBAC**: Role-Based Access Control (Admin, Coordinator, Teacher, Center).
-- **Proxy**: All traffic is routed through a global Nginx reverse proxy with SSL managed via Cloudflare Tunnel.
+    Center->>API: POST /requests (Apply for Workshop)
+    API->>DB: Status: PENDING
+    Note over API: Scheduling Engine (Tetris) runs
+    API->>DB: Status: PROVISIONAL / PUBLISHED
+    Center->>API: Upload Signed Agreement (PDF)
+    API->>AI: analyzeDocument(PDF)
+    AI-->>API: { signatureFound: true, valid: true }
+    API->>DB: Status: VALIDATED
+```
+
+#### 2. Real-Time Feedback & Attendance
+Interaction between the professor's mobile app and AI services.
+
+```mermaid
+graph TD
+    App[Mobile App] -- Voice/Text --> API[Express API]
+    API -- Analysis --> NLP[NLP Service]
+    NLP -- Status/Score --> API
+    API -- Update --> DB[(PostgreSQL)]
+    DB -- Push Notification --> App
+```
+
+## 🧱 Service Responsibilities
+
+1.  **Core API**: The `api` service handles all authentication, data validation, and business logic. It exposes a RESTful interface.
+2.  **Shared Package**: The `shared` package is a key component that exports TypeScript interfaces and constants (like `ROLES` or `PHASES`) used by both the API and the Web/Mobile clients.
+3.  **Client Applications**:
+    - **Web**: Focused on administrative tasks (Coordinators and Admins).
+    - **Mobile**: Focused on operational tasks (Teachers marking attendance).
 
 ---
 
-*To start developing, refer to the [Getting Started Guide](../guides/getting-started.md).*
+> [!NOTE]
+> For detailed information on the database structure, refer to the **[Data Model](./data-model.md)** guide.
