@@ -2,7 +2,7 @@
 export interface NLPAnalysisResult {
     attendanceStatus?: 'PRESENT' | 'LATE' | 'ABSENT' | 'JUSTIFIED_ABSENCE';
     competenceUpdate?: {
-        competenceName: string; // 'Transversal' usually
+        competenceName: string;
         score: number;
         reason: string;
     };
@@ -10,40 +10,67 @@ export interface NLPAnalysisResult {
 }
 
 export class NLPService {
+    private ollamaHost: string;
+    private model: string;
+
+    constructor() {
+        this.ollamaHost = process.env.OLLAMA_HOST || 'http://ollama:11434';
+        this.model = process.env.AI_MODEL_NLP || 'tinyllama';
+    }
 
     /**
-     * Analyzes the teacher's input text to extract structured data.
+     * Analyzes the teacher's input text to extract structured data using Local AI.
+     * Specialized for 4GB RAM stack using TinyLlama (1.1B).
      */
-    public processText(text: string): NLPAnalysisResult {
-        const lowerText = text.toLowerCase();
-        const result: NLPAnalysisResult = {
-            cleanedObservation: text
-        };
-
-        // 1. Detect Punctuality
-        if (lowerText.includes('tarde') || lowerText.includes('retraso') || lowerText.includes('retard')) {
-            result.attendanceStatus = 'LATE';
-        } else if (lowerText.includes('falta') || lowerText.includes('no ha venido') || lowerText.includes('absent')) {
-            result.attendanceStatus = 'ABSENT';
-        } else if (lowerText.includes('justificad')) {
-            result.attendanceStatus = 'JUSTIFIED_ABSENCE';
-        } else if (lowerText.includes('puntual') || lowerText.includes('a tiempo')) {
-            result.attendanceStatus = 'PRESENT';
+    public async processText(text: string): Promise<NLPAnalysisResult> {
+        // Fallback for empty text
+        if (!text || text.trim().length < 3) {
+            return { cleanedObservation: text };
         }
 
-        // 2. Detect Competence (Teamwork / Initiative)
-        // Keywords for positive transversal competence
-        const positiveKeywords = ['ayuda', 'lidera', 'iniciativa', 'proactiv', 'colabora', 'equip', 'ajuda'];
-        const matches = positiveKeywords.filter(k => lowerText.includes(k));
+        try {
+            const prompt = `
+            Task: Extract student attendance and competence evaluation from teacher feedback.
+            Context: The project Iter uses 3 documents: Pedagogical Agreement, Nominal Register, and Competence Evaluation.
+            Output: JSON only.
+            
+            Schema:
+            {
+              "attendanceStatus": "PRESENT" | "LATE" | "ABSENT" | "JUSTIFIED_ABSENCE" | null,
+              "competenceUpdate": { "competenceName": "Transversal", "score": 1-5, "reason": "Short summary" } | null
+            }
 
-        if (matches.length > 0) {
-            result.competenceUpdate = {
-                competenceName: 'Transversal', // General assumption for this prototype
-                score: 5, // High score for positive mention
-                reason: `Detected positive behaviors: ${matches.join(', ')}`
+            Input: "${text}"
+            Response:`;
+
+            const response = await fetch(`${this.ollamaHost}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: this.model,
+                    prompt: prompt,
+                    stream: false,
+                    format: 'json'
+                })
+            });
+
+            if (!response.ok) throw new Error('Ollama connection failed');
+
+            const data = await response.json() as any;
+            const aiResult = JSON.parse(data.response);
+
+            return {
+                attendanceStatus: aiResult.attendanceStatus || undefined,
+                competenceUpdate: aiResult.competenceUpdate || undefined,
+                cleanedObservation: text
+            };
+
+        } catch (error) {
+            console.error('❌ NLPService Local AI Error:', error);
+            // Graceful fallback to empty structured data if AI fails
+            return {
+                cleanedObservation: text
             };
         }
-
-        return result;
     }
 }
