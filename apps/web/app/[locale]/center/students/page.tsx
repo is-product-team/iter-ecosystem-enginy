@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -40,10 +40,12 @@ export default function StudentsCRUD() {
   });
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
       return;
     }
     if (user) loadStudents();

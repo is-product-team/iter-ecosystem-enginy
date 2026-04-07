@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
@@ -17,17 +17,19 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showProfessorLink, setShowProfessorLink] = useState(false);
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
   const { user, login, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (!authLoading && user) {
       if (user.role.name === ROLES.ADMIN) {
-        router.push('/admin');
+        router.push(`/${locale}/admin`);
       } else if (user.role.name === ROLES.COORDINATOR) {
-        router.push('/center');
+        router.push(`/${locale}/center`);
       }
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   if (authLoading) {
     return <Loading fullScreen message="Signing in..." />;
@@ -48,9 +50,9 @@ export default function LoginPage() {
       } else {
         login(user);
         if (user.role.name === ROLES.ADMIN) {
-          router.push('/admin');
+          router.push(`/${locale}/admin`);
         } else if (user.role.name === ROLES.COORDINATOR) {
-          router.push('/center');
+          router.push(`/${locale}/center`);
         }
       }
     } catch (err) {

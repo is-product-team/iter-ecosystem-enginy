@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect } from 'react';
 import Loading from '@/components/Loading';
@@ -9,12 +9,14 @@ import Loading from '@/components/Loading';
 export default function AdminDashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   if (authLoading || !user) {
     return (
@@ -26,7 +28,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Workshop Management',
       description: 'Create, modify or delete workshops for centers.',
-      path: '/workshops',
+      path: `/${locale}/workshops`,
       phase: 'General',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -38,7 +40,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Center Management',
       description: 'Create, modify or delete centers.',
-      path: '/centers',
+      path: `/${locale}/centers`,
       phase: 'General',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +52,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Course Phases',
       description: 'Configure dates and status of the course phases.',
-      path: '/phases',
+      path: `/${locale}/phases`,
       phase: 'Configuration',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,7 +64,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Statistics',
       description: 'Advanced analysis of system usage, most requested workshops and system activity.',
-      path: '/stats',
+      path: `/${locale}/stats`,
       phase: 'Global',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,7 +76,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Center Requests',
       description: 'View center requests and assign workshops.',
-      path: '/requests',
+      path: `/${locale}/requests`,
       phase: 'Phase 1',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,7 +88,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Document Verification',
       description: 'Validate documentation presented by centers (Pedagogical Agreement, Mobility, etc).',
-      path: '/verifications',
+      path: `/${locale}/verifications`,
       phase: 'Phase 2',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">

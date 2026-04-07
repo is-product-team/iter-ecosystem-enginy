@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { THEME, ROLES } from "@iter/shared";
 import DashboardLayout from "../../../components/DashboardLayout";
@@ -17,12 +17,14 @@ import Pagination from "@/components/Pagination";
 export default function CentersScreen() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
   
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   const [editingCenter, setEditingCenter] = useState<Center | null>(null);
   const [centers, setCenters] = useState<Center[]>([]);

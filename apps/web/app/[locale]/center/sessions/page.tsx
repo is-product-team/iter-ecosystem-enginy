@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -62,12 +62,14 @@ export default function SessionsListPage() {
   const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   const fetchData = useCallback(async () => {
     if (user && user.center?.centerId) {

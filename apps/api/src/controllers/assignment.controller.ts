@@ -97,7 +97,7 @@ export const getAssignmentById = async (req: Request, res: Response) => {
     }
 
     // Security Scoping
-    if (role !== ROLES.ADMIN && assignment.centerId !== centerId) {
+    if (role !== ROLES.ADMIN && Number(assignment.centerId) !== Number(centerId)) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -113,8 +113,13 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
   const { centerId, role } = req.user!;
 
   // Security Scoping
-  if (role !== ROLES.ADMIN && parseInt(targetCenterId as string) !== centerId) {
-    return res.status(403).json({ error: 'Access denied: You cannot view assignments from another center' });
+  if (role !== ROLES.ADMIN) {
+    if (!centerId) {
+      return res.status(403).json({ error: 'Access denied: Your account has no center assigned' });
+    }
+    if (Number(targetCenterId) !== Number(centerId)) {
+      return res.status(403).json({ error: 'Access denied: You cannot view assignments from another center' });
+    }
   }
 
   try {
@@ -220,8 +225,13 @@ export const getIssuesByCenter = async (req: Request, res: Response) => {
   const { centerId, role } = req.user!;
 
   // Security Scoping
-  if (role !== ROLES.ADMIN && parseInt(targetCenterId as string) !== centerId) {
-    return res.status(403).json({ error: 'Access denied: You cannot view issues from another center' });
+  if (role !== ROLES.ADMIN) {
+    if (!centerId) {
+      return res.status(403).json({ error: 'Access denied: Your account has no center assigned' });
+    }
+    if (Number(targetCenterId) !== Number(centerId)) {
+      return res.status(403).json({ error: 'Access denied: You cannot view issues from another center' });
+    }
   }
 
   try {

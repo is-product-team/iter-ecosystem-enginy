@@ -11,7 +11,12 @@ const Breadcrumbs: React.FC = () => {
   if (pathname === '/' || pathname === '/login') return null;
 
   const pathSegments = pathname.split('/').filter(Boolean);
+  const locale = pathSegments[0];
+  const isLocaleInPath = ['ca', 'es'].includes(locale);
   
+  // Filter out locale from display segments but keep it for path generation
+  const displaySegments = isLocaleInPath ? pathSegments.slice(1) : pathSegments;
+
   // Mapping of segments to readable names
   const segmentMap: Record<string, string> = {
     admin: 'Home',
@@ -21,7 +26,6 @@ const Breadcrumbs: React.FC = () => {
     requests: 'Requests',
     phases: 'Phases',
     calendar: 'Calendar',
-    profile: 'Profile',
     students: 'Students',
     teachers: 'Teachers',
     assignments: 'Assignments',
@@ -32,9 +36,13 @@ const Breadcrumbs: React.FC = () => {
   return (
     <div className="mb-10 w-full">
       <nav className="flex items-center space-x-2 text-[11px] font-bold uppercase tracking-widest" aria-label="Breadcrumb">
-        {pathSegments.map((segment, index) => {
-          const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
-          const isLast = index === pathSegments.length - 1;
+        {displaySegments.map((segment, index) => {
+          // Construct path including the locale
+          const path = isLocaleInPath 
+            ? `/${locale}/${displaySegments.slice(0, index + 1).join('/')}`
+            : `/${displaySegments.slice(0, index + 1).join('/')}`;
+            
+          const isLast = index === displaySegments.length - 1;
           const label = segmentMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
 
           return (

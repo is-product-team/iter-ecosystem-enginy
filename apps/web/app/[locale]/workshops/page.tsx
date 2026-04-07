@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { THEME, ROLES } from "@iter/shared";
 import WorkshopIcon from "../../../components/WorkshopIcon";
@@ -15,12 +15,14 @@ import workshopService, { Workshop } from "@/services/workshopService";
 export default function WorkshopAdminPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
   
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   const [editingWorkshop, setEditingWorkshop] = useState<Workshop | null>(null);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);

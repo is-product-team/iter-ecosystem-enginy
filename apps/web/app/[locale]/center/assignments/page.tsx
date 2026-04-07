@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { getUser, User } from '@/lib/auth';
 import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -36,6 +36,8 @@ export default function AssignmentsPage() {
   });
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     let isMounted = true;
@@ -44,7 +46,7 @@ export default function AssignmentsPage() {
       if (!isMounted) return;
 
       if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
-        router.push('/login');
+        router.push(`/${locale}/login`);
         return;
       }
       
@@ -194,7 +196,7 @@ export default function AssignmentsPage() {
                     </td>
                     <td className="px-10 py-10 text-right">
                       <button
-                        onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
+                        onClick={() => router.push(`/${locale}/center/assignments/${a.assignmentId}`)}
                         className="btn-primary py-2 px-6 text-[10px]"
                       >
                         Manage
