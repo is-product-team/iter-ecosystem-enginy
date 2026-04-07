@@ -59,6 +59,7 @@ const Navbar: React.FC = () => {
                 alt="Iter Logo" 
                 width={40}
                 height={40}
+                priority
                 className="w-10 h-10 object-contain block dark:hidden" 
               />
               <Image 
@@ -66,6 +67,7 @@ const Navbar: React.FC = () => {
                 alt="Iter Logo" 
                 width={40}
                 height={40}
+                priority
                 className="w-10 h-10 object-contain hidden dark:block" 
               />
             </Link>

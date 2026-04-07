@@ -7,6 +7,15 @@ import { VisionService } from '../services/vision.service.js';
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
+import { SessionService } from '../services/session.service.js';
+
+// Schema for bulk attendance update
+const AttendanceUpdateSchema = z.array(z.object({
+  enrollmentId: z.number(),
+  status: z.enum(['PRESENT', 'ABSENT', 'LATE', 'JUSTIFIED_ABSENCE']),
+  observations: z.string().optional().nullable()
+}));
 
 // GET: All assignments (Admin only)
 export const getAssignments = async (req: Request, res: Response) => {
@@ -863,11 +872,115 @@ export const getSessions = async (req: Request, res: Response) => {
 };
 
 export const getSessionAttendance = async (req: Request, res: Response) => {
-  res.status(501).json({ error: 'Not implemented: getSessionAttendance' });
+  const { idAssignment, sessionNum } = req.params;
+  const assignmentId = parseInt(idAssignment as string);
+  const num = parseInt(sessionNum as string);
+
+  if (isNaN(assignmentId) || isNaN(num)) {
+    return res.status(400).json({ error: 'Invalid parameters' });
+  }
+
+  try {
+    // 0. Sync sessions if they don't exist yet
+    let sessions = await prisma.session.findMany({
+      where: { assignmentId },
+      orderBy: { sessionDate: 'asc' }
+    });
+
+    if (sessions.length === 0) {
+      await SessionService.syncSessionsForAssignment(assignmentId);
+      sessions = await prisma.session.findMany({
+        where: { assignmentId },
+        orderBy: { sessionDate: 'asc' }
+      });
+    }
+
+    const targetSession = sessions[num - 1];
+    if (!targetSession) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    // 2. Ensure attendance records are initialized
+    await SessionService.ensureAttendanceRecords(assignmentId, num, targetSession.sessionDate);
+
+    // 3. Get combined attendance list
+    const rawAttendance = await prisma.attendance.findMany({
+      where: {
+        enrollment: { assignmentId },
+        sessionNumber: num
+      },
+      include: {
+        enrollment: {
+          include: {
+            student: true
+          }
+        }
+      }
+    });
+
+    const attendance = rawAttendance.map((r) => ({
+      attendanceId: r.attendanceId,
+      enrollmentId: r.enrollmentId,
+      sessionNumber: r.sessionNumber,
+      sessionDate: r.sessionDate.toISOString(),
+      status: r.status,
+      observations: r.observations,
+      enrollment: {
+        student: {
+          fullName: r.enrollment.student.fullName,
+          lastName: r.enrollment.student.lastName,
+          idalu: r.enrollment.student.idalu
+        }
+      }
+    }));
+
+    res.json(attendance);
+  } catch (error) {
+    console.error("Error in getSessionAttendance:", error);
+    res.status(500).json({ error: 'Error obtaining attendance records' });
+  }
 };
 
 export const registerAttendance = async (req: Request, res: Response) => {
-  res.status(501).json({ error: 'Not implemented: registerAttendance' });
+  const { idAssignment, sessionNum } = req.params;
+  const assignmentId = parseInt(idAssignment as string);
+  const num = parseInt(sessionNum as string);
+
+  if (isNaN(assignmentId) || isNaN(num)) {
+    return res.status(400).json({ error: 'Invalid parameters' });
+  }
+
+  // Validate body
+  const validation = AttendanceUpdateSchema.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(400).json({ error: 'Invalid attendance data', details: validation.error.format() });
+  }
+
+  const validatedData = validation.data;
+
+  try {
+    // Use transaction for consistency
+    await prisma.$transaction(
+      validatedData.map(item =>
+        prisma.attendance.updateMany({
+          where: {
+            enrollmentId: item.enrollmentId,
+            sessionNumber: num,
+            enrollment: { assignmentId }
+          },
+          data: {
+            status: item.status,
+            observations: item.observations
+          }
+        })
+      )
+    );
+
+    res.json({ success: true, message: 'Attendance registered correctly' });
+  } catch (error) {
+    console.error("Error in registerAttendance:", error);
+    res.status(500).json({ error: 'Error saving attendance' });
+  }
 };
 
 // Phase 2: Teaching Staff Management

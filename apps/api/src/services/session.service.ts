@@ -59,12 +59,13 @@ export class SessionService {
 
     /**
      * Ensures attendance records exist for a given assignment and session number.
-     * If not, creates them for all currently enrolled students.
+     * If not, creates them for all currently enrolled students with a 'PRESENT' status.
      */
     static async ensureAttendanceRecords(assignmentId: number, sessionNum: number, date: Date) {
         // 1. Get all enrollments for this assignment
         const enrollments = await prisma.enrollment.findMany({
-            where: { assignmentId: assignmentId }
+            where: { assignmentId },
+            select: { enrollmentId: true }
         });
 
         if (enrollments.length === 0) return;
@@ -72,25 +73,28 @@ export class SessionService {
         // 2. Check which students already have attendance for this session
         const existingAttendance = await prisma.attendance.findMany({
             where: {
-                enrollment: { assignmentId: assignmentId },
+                enrollment: { assignmentId },
                 sessionNumber: sessionNum
             },
             select: { enrollmentId: true }
         });
 
-        const existingIds = new Set(existingAttendance.map((a: any) => a.enrollmentId));
+        const existingIds = new Set(existingAttendance.map((a) => a.enrollmentId));
 
-        // 3. Create missing records
-        const missingEnrollments = enrollments.filter((e: any) => !existingIds.has(e.enrollmentId));
+        // 3. Identify and create missing records
+        const toCreate = enrollments
+            .filter((e) => !existingIds.has(e.enrollmentId))
+            .map((e) => ({
+                enrollmentId: e.enrollmentId,
+                sessionNumber: sessionNum,
+                sessionDate: date,
+                status: 'PRESENT' as any // Prisma enum needs cast or correct string
+            }));
 
-        if (missingEnrollments.length > 0) {
-            await (prisma.attendance as any).createMany({
-                data: missingEnrollments.map((e: any) => ({
-                    enrollmentId: e.enrollmentId,
-                    sessionNumber: sessionNum,
-                    sessionDate: date,
-                    status: 'PRESENT'
-                }))
+        if (toCreate.length > 0) {
+            await prisma.attendance.createMany({
+                data: toCreate,
+                skipDuplicates: true
             });
         }
     }
@@ -101,7 +105,7 @@ export class SessionService {
     static async getSessionStatus(assignmentId: number, sessionNum: number): Promise<string> {
         const count = await prisma.attendance.count({
             where: {
-                enrollment: { assignmentId: assignmentId },
+                enrollment: { assignmentId },
                 sessionNumber: sessionNum
             }
         });
@@ -113,30 +117,30 @@ export class SessionService {
      */
     static async syncSessionsForAssignment(assignmentId: number) {
         const assignment = await prisma.assignment.findUnique({
-            where: { assignmentId: assignmentId },
+            where: { assignmentId },
             include: { workshop: true }
         });
 
         if (!assignment || !assignment.startDate) return;
 
-        const schedule = assignment.workshop.executionDays;
-        const sessionDates = this.generateDatesFromSchedule(assignment.startDate, schedule as any);
+        const scheduleData = assignment.workshop?.executionDays || [];
+        const sessionDates = this.generateDatesFromSchedule(assignment.startDate, scheduleData as any);
 
         const hasAttendance = await prisma.attendance.count({
-            where: { enrollment: { assignmentId: assignmentId } }
+            where: { enrollment: { assignmentId } }
         });
 
         if (hasAttendance > 0) return;
 
         // Delete existing sessions
         await prisma.session.deleteMany({
-            where: { assignmentId: assignmentId }
+            where: { assignmentId }
         });
 
         // Create new ones
-        await (prisma.session as any).createMany({
+        await prisma.session.createMany({
             data: sessionDates.map(date => ({
-                assignmentId: assignmentId,
+                assignmentId,
                 sessionDate: date
             }))
         });

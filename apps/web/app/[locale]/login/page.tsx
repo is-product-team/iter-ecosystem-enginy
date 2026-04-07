@@ -78,6 +78,7 @@ export default function LoginPage() {
               alt="Iter Logo"
               width={128}
               height={128}
+              priority
               className="w-full h-full object-contain dark:invert"
             />
           </div>
