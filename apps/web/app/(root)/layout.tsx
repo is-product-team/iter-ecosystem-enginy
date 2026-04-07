@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import '../globals.css';
+import '@/app/globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -31,8 +31,8 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             {children}
-            <Toaster 
-              position="top-right" 
+            <Toaster
+              position="top-right"
               offset={80}
               toastOptions={{
                 className: 'font-bold uppercase text-[10px] tracking-widest',
