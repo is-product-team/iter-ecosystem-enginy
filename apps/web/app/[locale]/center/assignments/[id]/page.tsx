@@ -11,6 +11,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import DocumentUpload from '@/components/DocumentUpload';
 import Avatar from '@/components/Avatar';
+import getApi from '@/services/api';
 
 type ViewMode = 'workshop' | 'selection';
 
@@ -245,6 +246,44 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                 Confirm and Generate Sessions
               </button>
             )}
+          </div>
+        )}
+
+        {/* ACTION: CLOSE WORKSHOP */}
+        {assignment.status === 'IN_PROGRESS' && (
+          <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm border bg-indigo-50 border-indigo-100 mt-8">
+            <div>
+              <h4 className="text-lg font-black uppercase text-indigo-700">
+                Close Workshop
+              </h4>
+              <p className="text-xs text-gray-600 mt-1 max-w-xl">
+                Once all sessions and competence evaluations are completed, you can close the workshop. This action will automatically generate the attendance certificates.
+              </p>
+            </div>
+            <button 
+              onClick={async () => {
+                const pendingEvaluations = assignment.enrollments?.filter(e => !e.hasTeacherEvaluation).length || 0;
+                
+                if (pendingEvaluations > 0) {
+                  toast.error(`Cannot close assignment. There are ${pendingEvaluations} pending evaluations.`);
+                  return;
+                }
+
+                if(!confirm("Are you sure you want to close this workshop? This action is irreversible and will generate the completion certificates.")) return;
+                try {
+                  const api = getApi();
+                  await api.post(`/assignments/${id}/close`);
+                  toast.success("Workshop closed and certificates generated successfully!");
+                  window.location.reload();
+                } catch(_e: any) {
+                  const message = _e.response?.data?.error || "Error closing the workshop.";
+                  toast.error(message);
+                }
+              }}
+              className="px-8 py-4 bg-indigo-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition"
+            >
+              Close Workshop
+            </button>
           </div>
         )}
       </div>

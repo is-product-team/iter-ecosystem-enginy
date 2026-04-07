@@ -11,7 +11,8 @@ export type * from '@prisma/client';
 export const ROLES = {
   ADMIN: 'ADMIN',
   COORDINATOR: 'COORDINATOR',
-  TEACHER: 'TEACHER'
+  TEACHER: 'TEACHER',
+  STUDENT: 'STUDENT'
 } as const;
 
 export type RoleTag = typeof ROLES[keyof typeof ROLES];

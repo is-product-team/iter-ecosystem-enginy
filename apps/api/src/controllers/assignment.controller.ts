@@ -1076,5 +1076,85 @@ export const removeSessionTeacher = async (req: Request, res: Response) => {
 
 // Phase 4: Closing
 export const closeAssignment = async (req: Request, res: Response) => {
-  res.status(501).json({ error: 'Not implemented: closeAssignment' });
+  const { idAssignment } = req.params;
+  const assignmentId = parseInt(idAssignment as string);
+
+  try {
+    const assignment = await prisma.assignment.findUnique({
+      where: { assignmentId },
+      include: {
+        enrollments: {
+          include: {
+            evaluations: true,
+            student: true,
+            attendance: true
+          }
+        },
+        workshop: true
+      }
+    });
+
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+
+    // 1. Validate that all enrollments have an evaluation
+    const missingEvaluations = assignment.enrollments.filter(e => e.evaluations.length === 0);
+    if (missingEvaluations.length > 0) {
+      return res.status(400).json({ 
+        error: 'Cannot close assignment: Some students haven\'t been evaluated.',
+        missingCount: missingEvaluations.length
+      });
+    }
+
+    // 2. Generate certificates for students with >= 80% attendance
+    // (Logic adapted from certificate.controller)
+    const totalSessions = await prisma.session.count({ where: { assignmentId } });
+    let certificatesIssued = 0;
+
+    for (const enrollment of assignment.enrollments) {
+      const attendedCount = enrollment.attendance.filter((a: any) =>
+        a.status === 'PRESENT' || a.status === 'LATE'
+      ).length;
+
+      const percentage = totalSessions > 0 ? (attendedCount / totalSessions) * 100 : 0;
+
+      if (percentage >= 80) {
+        await prisma.certificate.upsert({
+          where: {
+            studentId_assignmentId: {
+              studentId: enrollment.studentId,
+              assignmentId
+            }
+          },
+          update: {},
+          create: {
+            studentId: enrollment.studentId,
+            assignmentId: assignmentId,
+            issuedAt: new Date()
+          }
+        });
+        certificatesIssued++;
+      }
+    }
+
+    // 3. Update assignment status to COMPLETED
+    const updated = await prisma.assignment.update({
+      where: { assignmentId },
+      data: { status: 'COMPLETED' }
+    });
+
+    // 4. Log the change
+    await logStatusChange(assignmentId, assignment.status, 'COMPLETED');
+
+    res.json({
+      success: true,
+      message: `${certificatesIssued} certificates generated and assignment closed.`,
+      status: updated.status
+    });
+
+  } catch (error) {
+    console.error("Error in closeAssignment:", error);
+    res.status(500).json({ error: 'Error closing the assignment' });
+  }
 };
