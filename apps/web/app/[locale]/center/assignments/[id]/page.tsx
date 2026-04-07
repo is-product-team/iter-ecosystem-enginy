@@ -9,9 +9,11 @@ import assignmentService, { Assignment, Enrollment } from '@/services/assignment
 import studentService, { Student } from '@/services/studentService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
-import DocumentUpload from '@/components/DocumentUpload';
+import dynamic from 'next/dynamic';
 import Avatar from '@/components/Avatar';
 import getApi from '@/services/api';
+
+const DocumentUpload = dynamic(() => import('@/components/DocumentUpload'), { ssr: false });
 
 type ViewMode = 'workshop' | 'selection';
 
