@@ -14,6 +14,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from "@/components/Pagination";
+import { useTranslations } from 'next-intl';
 
 export default function AdminRequestsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -23,6 +24,8 @@ export default function AdminRequestsPage() {
   const [_phases, _setPhases] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations('Admin.Requests');
+  const tc = useTranslations('Common');
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,7 +68,7 @@ export default function AdminRequestsPage() {
       setCenters(fetchedCenters);
     } catch (err) {
       console.error(err);
-      setError('Could not load data.');
+      setError(tc('error_loading'));
     } finally {
       setLoading(false);
     }
@@ -85,16 +88,16 @@ export default function AdminRequestsPage() {
   const handleApprove = (requestId: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Approve Request',
-      message: 'Are you sure you want to approve this request and generate the assignment immediately?',
+      title: t('approve_title'),
+      message: t('approve_confirm'),
       onConfirm: async () => {
         try {
           await requestService.updateStatus(requestId, REQUEST_STATUSES.APPROVED);
           await assignmentService.createFromRequest(requestId);
           await fetchData();
-          toast.success('Request approved and assignment generated successfully.');
+          toast.success(t('success_approve'));
         } catch (err) {
-          toast.error('Error in the approval process.');
+          toast.error(t('error_approve'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -104,16 +107,16 @@ export default function AdminRequestsPage() {
   const handleReject = async (requestId: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Reject Request',
-      message: 'Are you sure you want to reject this request? This action cannot be undone.',
+      title: t('reject_title'),
+      message: t('reject_confirm'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await requestService.updateStatus(requestId, REQUEST_STATUSES.REJECTED);
           await fetchData();
-          toast.success('Request rejected.');
+          toast.success(t('success_reject'));
         } catch (err) {
-          toast.error('Error rejecting the request.');
+          toast.error(t('error_reject'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -123,19 +126,19 @@ export default function AdminRequestsPage() {
   const handleRunTetris = () => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Run Automatic Assignment',
-      message: 'This action will process all pending approved requests and generate assignments for all centers. Continue?',
+      title: t('tetris_title'),
+      message: t('tetris_confirm'),
       onConfirm: async () => {
         setLoading(true);
         try {
           const result = await assignmentService.runTetris() as { assignmentsCreated: number };
-          toast.success(`Assignment completed: ${result.assignmentsCreated} new assignments.`);
+          toast.success(t('success_tetris', { count: result.assignmentsCreated }));
           await fetchData();
         } catch (err: unknown) {
           const errorMessage = (err as { response?: { data?: { error?: string } }, message?: string })?.response?.data?.error 
             || (err as Error).message 
             || 'Unknown error';
-          toast.error('Error running Tetris: ' + errorMessage);
+          toast.error(t('error_tetris') + errorMessage);
         } finally {
           setLoading(false);
         }
@@ -167,12 +170,12 @@ export default function AdminRequestsPage() {
         studentsAprox: editFormData.approxStudents,
         comments: editFormData.comments
       });
-      toast.success('Request updated successfully.');
+      toast.success(t('success_update'));
       setIsEditModalOpen(false);
       setEditingRequest(null);
       await fetchData();
     } catch (err) {
-      toast.error('Error updating the request.');
+      toast.error(t('error_update'));
     }
   };
 
@@ -222,44 +225,44 @@ export default function AdminRequestsPage() {
   );
 
   if (authLoading || !user) {
-    return <Loading fullScreen message="Verifying admin credentials..." />;
+    return <Loading fullScreen message={tc('authenticating')} />;
   }
 
   return (
     <DashboardLayout
-      title="Request Management"
-      subtitle="Monitor and manage educational center requests for the current course."
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       {/* Filter Section */}
       <div className="space-y-6 mb-8">
         <div className="bg-white border border-gray-200 p-6 flex flex-col xl:flex-row gap-6 items-end">
           <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Search Workshop</label>
+            <div className="space-y-2">
+              <label className="text-[12px] font-medium text-text-primary px-1">{tc('search_by_title')}</label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Ex: Robotics, Cinema..."
+                  placeholder={tc('search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 focus:border-[#00426B] outline-none text-xs font-bold"
+                  className="w-full pl-10 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted"
                 />
-                <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg className="absolute left-3 top-3 h-4 w-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
             </div>
 
             {/* Center Filter */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Educational Center</label>
+            <div className="space-y-2">
+              <label className="text-[12px] font-medium text-text-primary px-1">{tc('educational_center')}</label>
               <select
                 value={selectedCenterId}
                 onChange={(e) => setSelectedCenterId(e.target.value)}
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:border-[#00426B] outline-none text-xs font-bold"
+                className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
               >
-                <option value="">All centers</option>
+                <option value="">{tc('all_centers')}</option>
                 {centers.map(c => (
                   <option key={c.centerId} value={c.centerId}>{c.name}</option>
                 ))}
@@ -267,40 +270,39 @@ export default function AdminRequestsPage() {
             </div>
 
             {/* Modality Filter */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Modality</label>
+            <div className="space-y-2">
+              <label className="text-[12px] font-medium text-text-primary px-1">{tc('filter_by_modality')}</label>
               <select
                 value={selectedModality}
                 onChange={(e) => setSelectedModality(e.target.value)}
-                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:border-[#00426B] outline-none text-xs font-bold"
+                className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
               >
-                <option value="">All modalities</option>
-                <option value="A">Modality A (Complete group)</option>
-                <option value="B">Modality B (Half group)</option>
-                <option value="C">Modality C (Individual projects)</option>
+                <option value="">{tc('all_modalities')}</option>
+                <option value="A">{tc('modality_label', { modality: 'A' })}</option>
+                <option value="B">{tc('modality_label', { modality: 'B' })}</option>
+                <option value="C">{tc('modality_label', { modality: 'C' })}</option>
               </select>
             </div>
           </div>
 
           <div className="hidden xl:block w-px h-10 bg-gray-200 mx-2"></div>
 
-          <div className="flex w-full xl:w-auto">
+          <div className="flex w-full xl:w-auto mt-4 xl:mt-0 px-1">
             <button
               onClick={handleRunTetris}
-              className="flex-1 xl:w-auto bg-[#00426B] text-white px-8 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all flex items-center justify-center gap-2"
+              className="flex-1 xl:w-auto bg-consorci-darkBlue text-white px-8 py-3 text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M11.5 2L14 9L21 11.5L14 14L11.5 21L9 14L2 11.5L9 9L11.5 2Z" />
-                <path d="M19 14L20.2 17.5L23.7 18.7L20.2 19.9L19 23.4L17.8 19.9L14.3 18.7L17.8 17.5L19 14Z" />
               </svg>
-              Automatic Assignment
+              {t('run_tetris_btn')}
             </button>
           </div>
         </div>
       </div>
 
       {loading ? (
-        <Loading message="Syncing requests..." />
+        <Loading message={tc('loading')} />
       ) : error ? (
         <div className="bg-red-50 border-l-4 border-red-500 p-6">
           <p className="text-red-700 font-bold text-sm">{error}</p>
@@ -312,16 +314,16 @@ export default function AdminRequestsPage() {
             const currentRequests = workshopRequests[workshopId] || [];
             return (
               <section key={workshop._id} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center gap-4 mb-4 border-b border-gray-100 pb-2">
-                  <div className="h-6 w-1 bg-[#00426B]"></div>
+                <div className="flex items-center gap-4 mb-4 border-b border-border-subtle pb-6 mt-12">
+                  <div className="h-6 w-1 bg-consorci-darkBlue"></div>
                   <div>
-                    <h3 className="text-lg font-black text-[#00426B] uppercase tracking-tight">{workshop.title}</h3>
-                    <div className="flex items-center gap-3">
-                      <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">{workshop.sector}</span>
-                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 border ${workshop.modality === 'A' ? 'border-green-200 bg-green-50 text-green-700' :
-                        workshop.modality === 'B' ? 'border-orange-200 bg-orange-50 text-orange-700' :
-                          'border-blue-200 bg-blue-50 text-blue-700'
-                        }`}>MOD {workshop.modality}</span>
+                    <h3 className="text-xl font-medium text-text-primary tracking-tight">{workshop.title}</h3>
+                    <div className="flex items-center gap-4 mt-2">
+                      <span className="text-[11px] font-medium text-text-muted">{workshop.sector}</span>
+                      <span className={`text-[10px] font-medium px-2 py-0.5 border ${workshop.modality === 'A' ? 'border-green-200/50 bg-green-500/5 text-green-600' :
+                        workshop.modality === 'B' ? 'border-orange-200/50 bg-orange-500/5 text-orange-600' :
+                          'border-blue-200/50 bg-blue-500/5 text-blue-600'
+                        }`}>{tc('modality_label', { modality: workshop.modality })}</span>
                     </div>
                   </div>
                 </div>
@@ -329,65 +331,62 @@ export default function AdminRequestsPage() {
                 <div className="border border-gray-200 bg-white">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Center / Date</th>
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Teachers</th>
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Students</th>
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                      <tr className="bg-background-subtle border-b border-border-subtle">
+                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_center_date')}</th>
+                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_teachers')}</th>
+                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-center">{t('table_students')}</th>
+                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
+                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{tc('actions')}</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-border-subtle">
                       {currentRequests.map(r => (
-                        <tr key={r.requestId} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="text-sm font-bold text-[#00426B]">{r.center?.name}</div>
-                            <div className="text-[10px] font-bold text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</div>
+                        <tr key={r.requestId} className="hover:bg-background-subtle transition-colors">
+                          <td className="px-6 py-5">
+                            <div className="text-sm font-medium text-text-primary">{r.center?.name}</div>
+                            <div className="text-[11px] font-medium text-text-muted mt-1">{new Date(r.createdAt).toLocaleDateString()}</div>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1?.name || (r.teacher1Id ? `Teacher ${r.teacher1Id}` : '-')}</div>
-                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2?.name || (r.teacher2Id ? `Teacher ${r.teacher2Id}` : '-')}</div>
+                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1?.name || (r.teacher1Id ? `${tc('teachers')} ${r.teacher1Id}` : '-')}</div>
+                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2?.name || (r.teacher2Id ? `${tc('teachers')} ${r.teacher2Id}` : '-')}</div>
                           </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="bg-gray-100 px-2 py-1 text-xs font-black text-[#00426B]">{r.studentsAprox}</span>
+                          <td className="px-6 py-5 text-center">
+                            <span className="bg-background-subtle px-3 py-1.5 text-xs font-medium text-text-primary border border-border-subtle">{r.studentsAprox}</span>
                           </td>
-                          <td className="px-6 py-4">
-                            <span className={`text-[9px] font-black uppercase px-2 py-1 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200 text-orange-600 bg-orange-50' :
-                              r.status === REQUEST_STATUSES.APPROVED ? 'border-green-200 text-green-600 bg-green-50' :
-                                'border-red-200 text-red-600 bg-red-50'
+                          <td className="px-6 py-5">
+                            <span className={`text-[10px] font-medium px-2 py-1 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200/50 text-orange-600 bg-orange-500/5' :
+                              r.status === REQUEST_STATUSES.APPROVED ? 'border-green-200/50 text-green-600 bg-green-500/5' :
+                                'border-red-200/50 text-red-600 bg-red-500/5'
                               }`}>
-                              {r.status}
+                              {r.status === REQUEST_STATUSES.PENDING ? tc('pending') : r.status === REQUEST_STATUSES.APPROVED ? t('assigned') : t('rejected')}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-6 py-5 text-right">
                             {r.status === REQUEST_STATUSES.REJECTED ? (
-                              <span className="text-[9px] font-bold text-gray-300 uppercase italic">Rejected</span>
+                              <span className="text-[11px] font-medium text-text-muted italic">{t('rejected')}</span>
                             ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
-                                <span className="text-[9px] font-bold text-gray-300 uppercase italic">Assigned</span>
+                                <span className="text-[11px] font-medium text-text-muted italic">{t('assigned')}</span>
                             ) : (
-                              <div className="flex justify-end gap-2">
+                              <div className="flex justify-end gap-3">
                                 <button
                                   onClick={() => handleEditClick(r)}
-                                  className="px-3 py-1.5 border border-gray-200 text-gray-600 hover:text-[#00426B] text-[9px] font-black uppercase tracking-widest hover:bg-gray-50 flex items-center gap-1"
+                                  className="px-3 py-1.5 text-text-muted hover:text-consorci-darkBlue text-[12px] font-medium hover:underline transition-all flex items-center gap-1"
                                 >
-                                  <svg className="w-3 h-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                  </svg>
-                                  Edit
+                                  {tc('edit')}
                                 </button>
                                 {r.status === REQUEST_STATUSES.PENDING && (
                                   <button
                                     onClick={() => handleApprove(r.requestId)}
-                                    className="px-3 py-1.5 bg-[#00426B] text-white text-[9px] font-black uppercase tracking-widest hover:bg-[#0775AB]"
+                                    className="px-4 py-1.5 bg-consorci-darkBlue text-white text-[12px] font-medium transition-all hover:bg-black"
                                   >
-                                    Approve
+                                    {t('approve_btn')}
                                   </button>
                                 )}
                                 <button
                                   onClick={() => handleReject(r.requestId)}
-                                  className="px-3 py-1.5 border border-red-200 text-red-600 text-[9px] font-black uppercase tracking-widest hover:bg-red-50"
+                                  className="px-3 py-1.5 text-red-500 hover:underline text-[12px] font-medium transition-all"
                                 >
-                                  Reject
+                                  {t('reject_btn')}
                                 </button>
                               </div>
                             )}
@@ -407,51 +406,51 @@ export default function AdminRequestsPage() {
             onPageChange={setCurrentPage}
             totalItems={filteredWorkshops.length}
             currentItemsCount={paginatedWorkshops.length}
-            itemName="workshops"
+            itemName={tc('workshops').toLowerCase()}
           />
         </div>
       ) : (
         <div className="bg-white border border-dashed border-gray-200 p-20 text-center">
-          <p className="text-gray-400 text-xs font-black uppercase tracking-widest">No requests found with the applied filters</p>
+          <p className="text-gray-400 text-xs font-black uppercase tracking-widest">{t('no_requests')}</p>
         </div>
       )}
       {/* Edit Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white max-w-md w-full p-6 shadow-2xl border-t-4 border-[#00426B]">
-            <h3 className="text-lg font-black text-[#00426B] uppercase mb-4">Edit Request</h3>
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Number of Students</label>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-background-surface max-w-md w-full p-10 border border-border-subtle slide-in-from-bottom-4 animate-in duration-500">
+            <h3 className="text-xl font-medium text-text-primary tracking-tight mb-8">{t('edit_title')}</h3>
+            <form onSubmit={handleEditSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="block text-[12px] font-medium text-text-primary px-1">{t('num_students')}</label>
                 <input
                   type="number"
                   min="1"
-                  className="w-full border border-gray-300 p-2 text-sm font-bold text-[#00426B] focus:border-[#00426B] outline-none"
+                  className="w-full bg-background-subtle border border-border-subtle p-3 text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none"
                   value={editFormData.approxStudents || ''}
                   onChange={(e) => setEditFormData({ ...editFormData, approxStudents: e.target.value === '' ? 0 : parseInt(e.target.value) })}
                 />
               </div>
-              <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Comments</label>
+              <div className="space-y-2">
+                <label className="block text-[12px] font-medium text-text-primary px-1">{t('comments')}</label>
                 <textarea
-                  className="w-full border border-gray-300 p-2 text-sm text-gray-600 focus:border-[#00426B] outline-none h-24 resize-none"
+                  className="w-full bg-background-subtle border border-border-subtle p-3 text-sm text-text-primary focus:border-consorci-darkBlue outline-none h-32 resize-none"
                   value={editFormData.comments}
                   onChange={(e) => setEditFormData({ ...editFormData, comments: e.target.value })}
                 />
               </div>
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 mt-10">
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-100"
+                  className="px-6 py-2 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline"
                 >
-                  Cancel
+                  {tc('cancel')}
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB]"
+                  className="px-8 py-2 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black"
                 >
-                  Save Changes
+                  {tc('save')}
                 </button>
               </div>
             </form>

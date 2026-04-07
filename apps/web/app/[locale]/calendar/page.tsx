@@ -8,6 +8,7 @@ import Calendar, { CalendarEvent } from "@/components/ui/Calendar";
 import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 
 interface Phase {
   phaseId: number;
@@ -23,6 +24,8 @@ export default function CalendarPage() {
   const [activePhase, setActivePhase] = useState<Phase | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
+  const t = useTranslations('Calendar');
+  const tc = useTranslations('Common');
 
   // Overlay states
   const [isLegendOpen, setIsLegendOpen] = useState(false);
@@ -52,7 +55,7 @@ export default function CalendarPage() {
 
       const phaseEvents = phasesData.map((f: Phase) => ({
         id: `phase-${f.phaseId}`,
-        title: `Phase: ${f.name}`,
+        title: `${tc('phase')}: ${f.name}`,
         date: f.startDate,
         endDate: f.endDate,
         type: 'milestone',
@@ -67,35 +70,35 @@ export default function CalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, tc]);
 
-  if (authLoading) return <Loading fullScreen message="Syncing your calendar..." />;
+  if (authLoading) return <Loading fullScreen message={t('loading_auth')} />;
 
   return (
     <DashboardLayout
-      title="Iter Calendar"
-      subtitle="Visualize all milestones, workshops, and deadlines in a dynamic calendar."
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       <div className="w-full relative">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
-            <div className={`w-3 h-3 rounded-full animate-pulse ${activePhase ? 'bg-consorci-pinkRed' : 'bg-gray-300'}`}></div>
-            <div className="text-[11px] font-black text-text-primary uppercase tracking-widest">
-              {activePhase ? `Current Phase: ${activePhase.name}` : "Loading phases..."}
+            <div className={`w-3 h-3 ${activePhase ? 'bg-consorci-darkBlue' : 'bg-border-subtle'}`}></div>
+            <div className="text-[13px] font-medium text-text-primary">
+              {activePhase ? t('active_fase', { nom: activePhase.name }) : t('sync_phases')}
             </div>
           </div>
           <button
             onClick={() => setIsLegendOpen(true)}
-            className="px-6 py-2.5 bg-background-surface border-2 border-border-subtle text-text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:border-consorci-darkBlue hover:bg-consorci-darkBlue hover:text-white transition-all flex items-center gap-2 shadow-sm"
+            className="px-6 py-2.5 bg-background-surface border border-border-subtle text-text-primary text-[13px] font-medium transition-all hover:bg-background-subtle active:scale-[0.98] flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Color Legend
+            {t('view_legend')}
           </button>
         </div>
 
-        <div className="shadow-2xl">
+        <div className="border border-border-subtle bg-background-surface">
           <Calendar
             events={events}
             isLoading={loading}
@@ -111,56 +114,56 @@ export default function CalendarPage() {
         </div>
 
         {isLegendOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-consorci-darkBlue/40 backdrop-blur-md animate-in fade-in duration-300">
-            <div className="bg-background-surface border-4 border-consorci-darkBlue w-full max-w-sm p-10 shadow-[0_0_50px_rgba(0,0,0,0.3)] relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-background-surface border border-border-subtle w-full max-w-sm p-10 relative">
               <button
                 onClick={() => setIsLegendOpen(false)}
-                className="absolute top-6 right-6 text-text-muted hover:text-consorci-darkBlue transition-colors"
+                className="absolute top-8 right-8 text-text-muted hover:text-text-primary transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
 
-              <h3 className="text-xl font-black text-text-primary uppercase tracking-tighter border-b-4 border-consorci-darkBlue pb-4 mb-8">
-                Color Legend
+              <h3 className="text-xl font-medium text-text-primary tracking-tight border-b border-border-subtle pb-6 mb-8">
+                {t('legend_title')}
               </h3>
 
               <div className="space-y-6">
-                <div className="flex items-center gap-4 group cursor-default">
-                  <div className="w-6 h-6 bg-consorci-lightBlue shadow-inner"></div>
+                <div className="flex items-center gap-5 group cursor-default">
+                  <div className="w-5 h-5 bg-consorci-lightBlue"></div>
                   <div>
-                    <span className="block text-[11px] font-black text-text-primary uppercase tracking-widest group-hover:text-consorci-lightBlue transition-colors">Assignment</span>
-                    <span className="text-[10px] text-text-muted font-bold">Workshop reservation at the center.</span>
+                    <span className="block text-[13px] font-medium text-text-primary transition-colors">{t('assignment_label')}</span>
+                    <span className="text-[12px] text-text-muted font-medium opacity-70">{t('assignment_desc')}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 group cursor-default">
-                  <div className="w-6 h-6 bg-consorci-yellow shadow-inner"></div>
+                <div className="flex items-center gap-5 group cursor-default">
+                  <div className="w-5 h-5 bg-consorci-yellow"></div>
                   <div>
-                    <span className="block text-[11px] font-black text-text-primary uppercase tracking-widest group-hover:text-consorci-yellow transition-colors">Workshop Session</span>
-                    <span className="text-[10px] text-text-muted font-bold">Meeting with students.</span>
+                    <span className="block text-[13px] font-medium text-text-primary transition-colors">{t('session_label')}</span>
+                    <span className="text-[12px] text-text-muted font-medium opacity-70">{t('session_desc')}</span>
                   </div>
                 </div>
 
-                <div className="pt-6 border-t-2 border-border-subtle">
-                  <span className="block text-[9px] font-black text-text-muted uppercase tracking-[0.3em] mb-6">Program Phases</span>
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="pt-8 border-t border-border-subtle">
+                  <span className="block text-[10px] font-medium text-text-muted uppercase tracking-wider mb-6 opacity-60">{t('phases_label')}</span>
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 bg-consorci-darkBlue"></div>
-                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Registration</span>
+                      <div className="w-3.5 h-3.5 bg-consorci-darkBlue"></div>
+                      <span className="text-[11px] font-medium text-text-primary">{t('phase_solicitud')}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 bg-consorci-actionBlue"></div>
-                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Planning</span>
+                      <div className="w-3.5 h-3.5 bg-consorci-actionBlue"></div>
+                      <span className="text-[11px] font-medium text-text-primary">{t('phase_planificacion')}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 bg-consorci-pinkRed"></div>
-                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Execution</span>
+                      <div className="w-3.5 h-3.5 bg-consorci-pinkRed"></div>
+                      <span className="text-[11px] font-medium text-text-primary">{t('phase_ejecucion')}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 bg-consorci-beige"></div>
-                      <span className="text-[9px] font-black text-text-secondary uppercase tracking-tighter">Evaluation</span>
+                      <div className="w-3.5 h-3.5 bg-consorci-beige"></div>
+                      <span className="text-[11px] font-medium text-text-primary">{t('phase_evaluacion')}</span>
                     </div>
                   </div>
                 </div>
@@ -168,9 +171,9 @@ export default function CalendarPage() {
 
               <button
                 onClick={() => setIsLegendOpen(false)}
-                className="w-full mt-10 py-4 bg-consorci-darkBlue text-white text-[11px] font-black uppercase tracking-[0.2em] hover:bg-consorci-actionBlue transition-all shadow-lg active:scale-95"
+                className="w-full mt-10 py-4 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-95"
               >
-                Okay
+                {t('legend_ok')}
               </button>
             </div>
           </div>

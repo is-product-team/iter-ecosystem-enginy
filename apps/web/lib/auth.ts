@@ -54,7 +54,7 @@ export function logout() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('user');
     // Session is handled by cookie, API logout clears it
-    window.location.href = '/login';
+    window.location.href = '/';
   }
 }
 

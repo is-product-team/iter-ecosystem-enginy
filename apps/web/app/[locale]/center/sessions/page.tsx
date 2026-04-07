@@ -9,6 +9,7 @@ import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import Pagination from '@/components/Pagination';
+import { useTranslations, useLocale } from 'next-intl';
 
 type AssignmentMode = 'single' | 'whole';
 
@@ -47,10 +48,14 @@ export default function SessionsListPage() {
   const [assignments, setAssignments] = useState<BackendAssignment[]>([]); // For the dropdown
   const [allTeachers, setAllTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslations('Center.Sessions');
+  const tc = useTranslations('Common');
+  const tr = useTranslations('Center.Requests');
+  const locale = useLocale();
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedModality, setSelectedModality] = useState("All modalities");
+  const [selectedModality, setSelectedModality] = useState(tc("all_modalities"));
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -97,8 +102,6 @@ export default function SessionsListPage() {
               });
             });
           } else if (a.status !== 'PUBLISHED' && a.status !== 'CANCELLED') {
-            // If it doesn't have sessions but is in a phase where it should have them soon
-            // We add it as a "placeholder" item so the user knows it's there
             flatSessions.push({
               sessionId: `pending-${a.assignmentId}`,
               isPending: true,
@@ -132,7 +135,7 @@ export default function SessionsListPage() {
   // Filtering Logic
   const filteredSessions = (sessions || []).filter(s => {
     const matchesSearch = s.assignmentTitle?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesModality = selectedModality === "All modalities" || s.modality === selectedModality;
+    const matchesModality = selectedModality === tc("all_modalities") || s.modality === selectedModality;
     return matchesSearch && matchesModality;
   });
 
@@ -144,15 +147,15 @@ export default function SessionsListPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedModality]);
+  }, [searchQuery, selectedModality, tc]);
 
   const handleAssign = async () => {
     if (!selectedAssignmentId || !selectedTeacherId) {
-      toast.error('Select workshop and teacher');
+      toast.error(t('error_no_selection'));
       return;
     }
     if (mode === 'single' && !selectedSessionId) {
-      toast.error('Select a session');
+      toast.error(t('error_no_session'));
       return;
     }
 
@@ -173,13 +176,13 @@ export default function SessionsListPage() {
           ));
         }
 
-        toast.success('Teacher assigned to the whole workshop');
+        toast.success(t('success_whole'));
       } else {
         // Single session
         await api.post(`/assignments/sessions/${selectedSessionId}/staff`, {
           idUser: parseInt(selectedTeacherId)
         });
-        toast.success('Teacher assigned to the selected day');
+        toast.success(t('success_day'));
       }
 
       setShowModal(false);
@@ -191,7 +194,7 @@ export default function SessionsListPage() {
 
 
     } catch (_error) {
-      toast.error('Error making assignment');
+      toast.error(t('error_assignment'));
     }
   };
 
@@ -200,53 +203,53 @@ export default function SessionsListPage() {
       const api = getApi();
       await api.delete(`/assignments/sessions/${sessionId}/staff/${idUser}`);
       await fetchData(); // Refresh list
-      toast.success('Teacher removed successfully');
+      toast.success(t('success_remove'));
     } catch (error) {
       console.error(error);
-      toast.error('Error removing teacher');
+      toast.error(t('error_remove'));
     }
   };
 
   const selectedAssignment = assignments.find(a => a.assignmentId.toString() === selectedAssignmentId);
 
-  if (authLoading || loading) return <Loading fullScreen message="Loading sessions..." />;
+  if (authLoading || loading) return <Loading fullScreen message={tc('loading')} />;
 
   return (
     <DashboardLayout
-      title="Session Management"
-      subtitle="View and manage training sessions."
+      title={t('title')}
+      subtitle={t('description')}
     >
       {/* Search & Filter Bar */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8 shadow-sm">
         {/* Search */}
         <div className="flex-1">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Search workshop</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_workshop')}</label>
           <div className="relative">
             <input
               type="text"
-              placeholder="Ex: Robotics, Cinema..."
+              placeholder={tc('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
         </div>
 
         {/* Modality Filter */}
         <div className="lg:w-64">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filter by modality</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">{tc('filter_by_modality')}</label>
           <select
             value={selectedModality}
             onChange={(e) => setSelectedModality(e.target.value)}
-            className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
+            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary appearance-none"
           >
-            <option value="All modalities">All modalities</option>
-            <option value="A">Modality A</option>
-            <option value="B">Modality B</option>
-            <option value="C">Modality C</option>
+            <option value={tc("all_modalities")}>{tc("all_modalities")}</option>
+            <option value="A">{tc('modality_label', { modality: 'A' })}</option>
+            <option value="B">{tc('modality_label', { modality: 'B' })}</option>
+            <option value="C">{tc('modality_label', { modality: 'C' })}</option>
           </select>
         </div>
 
@@ -254,10 +257,10 @@ export default function SessionsListPage() {
         <div className="flex items-end">
           <button
             onClick={() => setShowModal(true)}
-            className="bg-[#00426B] text-white px-8 py-[13px] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#0775AB] transition-all flex items-center gap-3 shadow-lg h-[46px]"
+            className="bg-consorci-darkBlue text-white px-8 py-[13px] text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-3 h-[46px]"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-            Assign Teachers
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+            {t('assign_teacher')}
           </button>
         </div>
       </div>
@@ -265,39 +268,39 @@ export default function SessionsListPage() {
       {/* Flat List */}
       <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
         {paginatedSessions.length === 0 ? (
-          <div className="p-20 text-center text-gray-400 font-bold uppercase tracking-widest text-xs italic">
-            No sessions found with these filters.
+          <div className="p-20 text-center text-text-muted font-medium text-sm italic">
+            {tc('no_results')}
           </div>
         ) : (
           <>
             <div className="divide-y divide-gray-100">
               {paginatedSessions.map((session) => {
                 const dateObj = new Date(session.sessionDate);
-                const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-                const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
+                const dayName = dateObj.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { weekday: 'long' });
+                const dateStr = dateObj.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { day: 'numeric', month: 'long' });
 
                 return (
-                  <div key={session.sessionId} className={`p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-gray-50 transition-colors group ${session.isPending ? 'opacity-70 bg-gray-50/50' : ''}`}>
-                    <div className="flex items-start gap-4 mb-2 md:mb-0">
-                      <div className={`p-3 rounded-full shrink-0 ${session.isPending ? 'bg-gray-200 text-gray-400' : session.modality === 'A' ? 'bg-blue-50 text-[#00426B]' : 'bg-orange-50 text-orange-600'}`}>
+                  <div key={session.sessionId} className={`p-8 flex flex-col md:flex-row md:items-center justify-between hover:bg-background-subtle border-b border-border-subtle transition-colors group ${session.isPending ? 'opacity-70' : ''}`}>
+                    <div className="flex items-start gap-5 mb-4 md:mb-0">
+                      <div className={`w-12 h-12 flex items-center justify-center shrink-0 border ${session.isPending ? 'bg-background-subtle text-text-muted border-border-subtle' : session.modality === 'A' ? 'bg-blue-500/5 text-consorci-darkBlue border-blue-200/50' : 'bg-orange-500/5 text-orange-600 border-orange-200/50'}`}>
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={session.isPending ? "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" : "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"} />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={session.isPending ? "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" : "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"} />
                         </svg>
                       </div>
                       <div>
-                        <h4 className="text-base font-black text-[#00426B] uppercase tracking-tight leading-none mb-2">
+                        <h4 className="text-[17px] font-medium text-text-primary tracking-tight mb-2">
                           {session.assignmentTitle}
                           {!session.isPending && (
-                            <span className="ml-2 text-[9px] font-normal text-gray-400 normal-case tracking-normal border border-gray-200 px-1.5 py-0.5 rounded">
+                            <span className="ml-3 text-[11px] font-medium text-text-muted border border-border-subtle px-2 py-0.5">
                               {session.startTime || '09:00'} - {session.endTime || '11:00'}
                             </span>
                           )}
                         </h4>
-                        <p className="text-sm font-medium text-gray-600">
+                        <p className="text-[13px] text-text-muted">
                           {session.isPending ? (
-                            <span className="text-orange-500 font-bold uppercase text-[10px] tracking-widest">Pending final confirmation</span>
+                            <span className="text-orange-600 font-medium tracking-tight">{t('pending_confirmation')}</span>
                           ) : (
-                            <><span className="capitalize font-bold">{dayName}</span>, {dateStr}</>
+                            <><span className="capitalize font-medium text-text-primary">{dayName}</span>, {dateStr}</>
                           )}
                         </p>
                       </div>
@@ -307,34 +310,34 @@ export default function SessionsListPage() {
                     <div className="flex flex-col md:flex-row gap-6 md:gap-10 md:text-right pl-14 md:pl-0">
                       {/* Referents */}
                       <div>
-                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest block mb-1">
-                          Center Referents
+                        <span className="text-[10px] font-medium text-text-muted uppercase tracking-widest block mb-2">
+                          {tr('referent_teachers')}
                         </span>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold text-[#00426B] uppercase leading-tight">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[12px] font-medium text-text-primary">
                             {session.referent1}
                           </span>
-                          <span className="text-[10px] font-bold text-[#00426B] uppercase leading-tight">
+                          <span className="text-[12px] font-medium text-text-primary">
                             {session.referent2}
                           </span>
                         </div>
                       </div>
 
                       {/* Assigned Staff */}
-                      <div className="md:min-w-[150px] flex justify-end">
-                        <div className="flex flex-col items-end gap-1">
-                          <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest block mb-1">
-                            Assigned Teachers
+                      <div className="md:min-w-[180px] flex justify-end">
+                        <div className="flex flex-col items-end gap-2">
+                          <span className="text-[10px] font-medium text-text-muted uppercase tracking-widest block mb-1">
+                            {t('specific_team')}
                           </span>
                           {session.isPending ? (
-                            <span className="text-[10px] italic text-gray-400">
-                              Confirmation required
+                            <span className="text-[12px] italic text-text-muted">
+                              {t('pending_confirmation')}
                             </span>
                           ) : session.staff && session.staff.length > 0 ? (
                             <div className="flex flex-wrap justify-end gap-2 max-w-[300px]">
                               {session.staff.map((staffMember: any) => (
-                                <div key={staffMember.userId} className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 px-2 py-1 rounded group/chip hover:border-red-200 transition-colors">
-                                  <span className="text-[10px] font-black text-[#4197CB] uppercase group-hover/chip:text-red-400 transition-colors">
+                                <div key={staffMember.userId} className="flex items-center gap-2 bg-background-subtle border border-border-subtle px-3 py-1 hover:border-red-200 transition-colors group/chip">
+                                  <span className="text-[11px] font-medium text-text-primary group-hover/chip:text-red-500 transition-colors">
                                     {staffMember.user?.fullName || staffMember.name}
                                   </span>
                                   <button
@@ -344,19 +347,19 @@ export default function SessionsListPage() {
                                         handleRemoveStaff(Number(session.sessionId), (staffMember.userId || staffMember.id) as number);
                                       }
                                     }}
-                                    className="text-blue-300 hover:text-red-500 focus:outline-none transition-colors"
+                                    className="text-text-muted hover:text-red-500 focus:outline-none transition-colors"
                                     title="Remove teacher"
                                   >
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                   </button>
                                 </div>
                               ))}
                             </div>
                           ) : (
-                            <span className="text-[10px] font-bold text-red-400 uppercase">
-                              No teacher assigned
+                            <span className="text-[12px] font-medium text-red-500">
+                              {t('no_teacher_assigned')}
                             </span>
                           )}
                         </div>
@@ -374,64 +377,61 @@ export default function SessionsListPage() {
               onPageChange={setCurrentPage}
               totalItems={filteredSessions.length}
               currentItemsCount={paginatedSessions.length}
-              itemName="sessions"
+              itemName={tc('sessions').toLowerCase()}
             />
           </>
         )}
       </div>
 
-      {/* Modal Assignment */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-300">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
-
-          <div className="relative bg-white w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-gray-100 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-background-surface w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in slide-in-from-bottom-4 duration-500 border border-border-subtle">
             {/* Header */}
-            <div className="bg-gray-50 px-8 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
+            <div className="px-10 py-8 border-b border-border-subtle flex justify-between items-start sticky top-0 bg-background-surface z-10">
               <div>
-                <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight">Assign Teacher</h3>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Select the mode and teacher for the session.</p>
+                <h3 className="text-xl font-medium text-text-primary tracking-tight">{t('assign_teacher')}</h3>
+                <p className="text-[12px] font-medium text-text-muted mt-2">{t('assign_teacher_desc')}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-300 hover:text-[#00426B] transition-colors"
+                className="text-text-muted hover:text-text-primary transition-colors mt-1"
                 aria-label="Close"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar">
               {/* Mode Selection */}
-              <div className="flex bg-[#F1F5F9] p-1.5 rounded-lg border border-gray-100 shadow-inner">
+              <div className="flex bg-background-subtle p-1 border border-border-subtle">
                 <button
                   onClick={() => { setMode('single'); setSelectedSessionId(""); }}
-                  className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all rounded-md ${mode === 'single' ? 'bg-white text-[#00426B] shadow-lg ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600'
+                  className={`flex-1 py-3 text-[12px] font-medium transition-all ${mode === 'single' ? 'bg-background-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
                     }`}
                 >
-                  Specific Day
+                  {t('specific_day')}
                 </button>
                 <button
                   onClick={() => { setMode('whole'); setSelectedSessionId(""); }}
-                  className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all rounded-md ${mode === 'whole' ? 'bg-white text-[#00426B] shadow-lg ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600'
+                  className={`flex-1 py-3 text-[12px] font-medium transition-all ${mode === 'whole' ? 'bg-background-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
                     }`}
                 >
-                  Whole Workshop
+                  {t('whole_workshop')}
                 </button>
               </div>
 
               {/* Workshop Select */}
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">
-                    Select Workshop
+              <div className="space-y-8">
+                <div className="space-y-3">
+                  <label className="block text-[12px] font-medium text-text-primary px-1">
+                    {t('select_workshop')}
                   </label>
                   <select
                     value={selectedAssignmentId}
                     onChange={(e) => { setSelectedAssignmentId(e.target.value); setSelectedSessionId(""); }}
-                    className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
+                    className="w-full bg-background-subtle border border-border-subtle text-sm p-3 font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                   >
-                    <option value="">-- Choose a workshop --</option>
+                    <option value="">{t('choose_workshop')}</option>
                     {assignments.map(a => (
                       <option key={a.assignmentId} value={a.assignmentId}>
                         {a.workshop?.title} (Ref: {a.assignmentId})
@@ -442,19 +442,19 @@ export default function SessionsListPage() {
 
                 {/* Session Select (Only Single Mode) */}
                 {mode === 'single' && selectedAssignmentId && (
-                  <div className="animate-in slide-in-from-top-2 duration-200">
-                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">
-                      Select Day
+                  <div className="animate-in slide-in-from-top-2 duration-200 space-y-3">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">
+                      {t('select_day')}
                     </label>
                     <select
                       value={selectedSessionId}
                       onChange={(e) => setSelectedSessionId(e.target.value)}
-                      className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
+                      className="w-full bg-background-subtle border border-border-subtle text-sm p-3 font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                     >
-                      <option value="">-- Choose a session --</option>
+                      <option value="">{t('choose_session')}</option>
                       {selectedAssignment?.sessions?.map((s: Session, idx: number) => (
                         <option key={s.sessionId} value={s.sessionId}>
-                          Session {idx + 1} - {new Date(s.sessionDate).toLocaleDateString()} ({s.startTime}-{s.endTime})
+                          {t('session_n', { number: idx + 1 })} - {new Date(s.sessionDate).toLocaleDateString()} ({s.startTime}-{s.endTime})
                         </option>
                       ))}
                     </select>
@@ -462,16 +462,16 @@ export default function SessionsListPage() {
                 )}
 
                 {/* Professor Select */}
-                <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">
-                    Select Teacher
+                <div className="space-y-3">
+                  <label className="block text-[12px] font-medium text-text-primary px-1">
+                    {t('select_teacher')}
                   </label>
                   <select
                     value={selectedTeacherId}
                     onChange={(e) => setSelectedTeacherId(e.target.value)}
-                    className="w-full bg-[#F8FAFC] border border-gray-100 text-sm p-3 font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
+                    className="w-full bg-background-subtle border border-border-subtle text-sm p-3 font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                   >
-                    <option value="">-- Choose a teacher --</option>
+                    <option value="">{t('choose_teacher')}</option>
                     {allTeachers.map(p => (
                       <option key={p.userId} value={p.userId}>
                         {p.name}
@@ -482,18 +482,18 @@ export default function SessionsListPage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <div className="p-10 border-t border-border-subtle flex gap-4 bg-background-surface">
               <button
                 onClick={() => setShowModal(false)}
-                className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors"
+                className="flex-1 py-3 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline transition-colors"
               >
-                Cancel
+                {tc('cancel')}
               </button>
               <button
                 onClick={handleAssign}
-                className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#0775AB] transition-all shadow-xl active:scale-95"
+                className="flex-1 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
               >
-                Save Assignment
+                {tc('save')}
               </button>
             </div>
           </div>

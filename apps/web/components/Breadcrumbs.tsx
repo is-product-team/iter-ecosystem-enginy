@@ -1,48 +1,54 @@
 'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 const Breadcrumbs: React.FC = () => {
   const pathname = usePathname();
-  
+  const t = useTranslations('Common');
+
   // No mostrar breadcrumbs en la raíz o en login
   if (pathname === '/' || pathname === '/login') return null;
 
   const pathSegments = pathname.split('/').filter(Boolean);
-  
-  // Mapping of segments to readable names
+  // Remove locale segment from segments if present (next-intl usually has it as first)
+  const localePrefixes = ['ca', 'es'];
+  const segments = pathSegments.filter(s => !localePrefixes.includes(s));
+
+  // Mapping of segments to translation keys
   const segmentMap: Record<string, string> = {
-    admin: 'Home',
-    center: 'Home',
-    workshops: 'Workshops',
-    centers: 'Centers',
-    requests: 'Requests',
-    phases: 'Phases',
-    calendar: 'Calendar',
-    profile: 'Profile',
-    students: 'Students',
-    teachers: 'Teachers',
-    assignments: 'Assignments',
-    sessions: 'Sessions',
-    notifications: 'Notifications'
+    admin: 'home',
+    center: 'home',
+    workshops: 'workshops',
+    centers: 'centers',
+    requests: 'requests',
+    phases: 'phases',
+    calendar: 'calendar',
+    profile: 'profile',
+    students: 'students',
+    teachers: 'teachers',
+    assignments: 'assignments',
+    sessions: 'sessions',
+    notifications: 'notifications'
   };
 
   return (
     <div className="mb-10 w-full">
-      <nav className="flex items-center space-x-2 text-[11px] font-bold uppercase tracking-widest" aria-label="Breadcrumb">
-        {pathSegments.map((segment, index) => {
-          const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
-          const isLast = index === pathSegments.length - 1;
-          const label = segmentMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
+      <nav className="flex items-center space-x-2 text-[12px] font-normal" aria-label="Breadcrumb">
+        {segments.map((segment, index) => {
+          const path = `/${pathSegments.slice(0, pathSegments.indexOf(segment) + 1).join('/')}`;
+          const isLast = index === segments.length - 1;
+          const labelKey = segmentMap[segment];
+          const label = labelKey ? t(labelKey) : segment.charAt(0).toUpperCase() + segment.slice(1);
 
           return (
             <React.Fragment key={path}>
+...
               {index > 0 && (
                 <span className="text-text-muted mx-2">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M9 5l7 7-7 7" />
+                  <svg className="w-3 h-3 text-text-muted/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </span>
               )}

@@ -13,6 +13,7 @@ export function mapUserResponse(prismaUser: any) {
     centerId: prismaUser.centerId,
     role: {
       roleId: prismaUser.role?.roleId,
+      name: prismaUser.role?.roleName,
       roleName: prismaUser.role?.roleName
     },
     center: prismaUser.center ? {
