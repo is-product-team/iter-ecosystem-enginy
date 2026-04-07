@@ -6,7 +6,10 @@
     "back": "Volver",
     "success": "Éxito",
     "error": "Error",
-    "branding": "Consorci d'Educació de Barcelona"
+    "branding": "Consorci d'Educació de Barcelona",
+    "call": "Llamar",
+    "coming_soon": "Próximamente",
+    "no_description": "Sin descripción disponible"
   },
   "Auth": {
     "logout": {
@@ -42,6 +45,11 @@
       "system": "Sistema"
     },
     "security": "Seguridad y Contraseña",
+    "language": "Idioma / Lengua",
+    "languages": {
+      "ca": "Catalán",
+      "es": "Español"
+    },
     "help": "Soporte y Ayuda"
   },
   "Routes": {
@@ -112,5 +120,26 @@
     "mark_read": "Marcar como leído",
     "delete": "Eliminar",
     "empty": "No hay avisos nuevos"
+  },
+  "Tabs": {
+    "dashboard": "Inicio",
+    "notifications": "Avisos",
+    "calendar": "Calendario",
+    "coordination": "Coordinación",
+    "profile": "Perfil"
+  },
+  "Calendar": {
+    "academic_agenda": "Agenda Académica",
+    "title": "Mi Calendario"
+  },
+  "Coordination": {
+    "teacher_space": "Espacio del Docente",
+    "collaboration": "Coordinación y Soporte",
+    "teaching_team": "Equipo Docente",
+    "main_referent": "Referente Principal",
+    "secondary_referent": "Segundo Referente",
+    "no_referents_assigned": "No hay referentes asignados a este taller todavía.",
+    "no_contacts_yet": "Todavía no tienes contactos de coordinación.",
+    "group_chat_instruction": "Pronto podrás chatear directamente con el equipo de coordinación del centro."
   }
 }

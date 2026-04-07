@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 
 export default function PerfilScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -175,6 +175,52 @@ export default function PerfilScreen() {
                </View>
              </View>
 
+             {/* Language selector */}
+             <View className="p-4 border-b border-border-subtle">
+               <View className="flex-row items-center mb-4">
+                 <View className="w-10 h-10 rounded-xl bg-background-subtle items-center justify-center mr-4 border border-border-subtle shadow-sm">
+                   <Ionicons name="language" size={18} color="#64748B" />
+                 </View>
+                 <Text className="font-bold text-sm text-text-primary">{t('Profile.language')}</Text>
+               </View>
+               
+               <View className="flex-row bg-background-subtle rounded-xl p-0.5 border border-border-subtle gap-0.5">
+                 {[
+                   { id: 'ca', label: t('Profile.languages.ca') },
+                   { id: 'es', label: t('Profile.languages.es') },
+                 ].map((lang) => {
+                   const isActive = i18n.language.startsWith(lang.id);
+                   return (
+                     <TouchableOpacity 
+                       key={lang.id}
+                       onPress={async () => {
+                         await i18n.changeLanguage(lang.id);
+                         if (Platform.OS === 'web') {
+                           localStorage.setItem('user-language', lang.id);
+                         } else {
+                           await SecureStore.setItemAsync('user-language', lang.id);
+                         }
+                       }}
+                       activeOpacity={0.7}
+                       style={{
+                          flex: 1,
+                          paddingVertical: 8,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 8,
+                          backgroundColor: isActive ? '#00426B' : 'transparent',
+                       }}
+                     >
+                       <Text className={`text-[9px] font-black uppercase tracking-widest ${
+                         isActive ? 'text-white' : 'text-text-muted'
+                       }`}>
+                         {lang.label}
+                       </Text>
+                     </TouchableOpacity>
+                   );
+                 })}
+               </View>
+             </View>
              
              {/* Change Password */}
              <TouchableOpacity className="p-4 flex-row justify-between items-center border-b border-border-subtle">

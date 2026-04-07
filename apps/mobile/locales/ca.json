@@ -6,7 +6,10 @@
     "back": "Tornar",
     "success": "Èxit",
     "error": "Error",
-    "branding": "Consorci d'Educació de Barcelona"
+    "branding": "Consorci d'Educació de Barcelona",
+    "call": "Trucar",
+    "coming_soon": "Pròximament",
+    "no_description": "Sense descripció disponible"
   },
   "Auth": {
     "logout": {
@@ -42,6 +45,11 @@
       "system": "Sistema"
     },
     "security": "Seguretat i Contrasenya",
+    "language": "Idioma / Llengua",
+    "languages": {
+      "ca": "Català",
+      "es": "Español"
+    },
     "help": "Suport i Ajuda"
   },
   "Routes": {
@@ -112,5 +120,26 @@
     "mark_read": "Marcar com a llegit",
     "delete": "Eliminar",
     "empty": "No hi ha avisos nous"
+  },
+  "Tabs": {
+    "dashboard": "Inici",
+    "notifications": "Avisos",
+    "calendar": "Calendari",
+    "coordination": "Coordinació",
+    "profile": "Perfil"
+  },
+  "Calendar": {
+    "academic_agenda": "Agenda Acadèmica",
+    "title": "El Meu Calendari"
+  },
+  "Coordination": {
+    "teacher_space": "Espai del Docent",
+    "collaboration": "Coordinació i Suport",
+    "teaching_team": "Equip Docent",
+    "main_referent": "Referent Principal",
+    "secondary_referent": "Segon Referent",
+    "no_referents_assigned": "No hi ha referents assignats a aquest taller encara.",
+    "no_contacts_yet": "Encara no tens contactes de coordinació.",
+    "group_chat_instruction": "Aviat podràs xatejar directament amb l'equip de coordinació del centre."
   }
 }
