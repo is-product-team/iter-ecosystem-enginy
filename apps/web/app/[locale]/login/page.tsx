@@ -70,7 +70,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-background-page">
-      <div className="w-full max-w-md bg-background-surface p-12 border border-border-subtle shadow-xl">
+      <div className="w-full max-w-md bg-background-surface p-12 border border-border-subtle">
         <div className="text-center mb-12">
           <div className="w-32 h-32 bg-background-surface flex items-center justify-center mx-auto mb-6">
             <Image
@@ -81,13 +81,13 @@ export default function LoginPage() {
               className="w-full h-full object-contain dark:invert"
             />
           </div>
-          <h2 className="text-4xl font-black tracking-tighter text-text-primary uppercase leading-none">Iter</h2>
-          <div className="h-1 w-12 bg-consorci-darkBlue mx-auto mt-2"></div>
-          <p className="text-text-primary text-[10px] font-black uppercase tracking-[0.3em] mt-4 opacity-70">Learning Management</p>
+          <h2 className="text-2xl font-medium tracking-tight text-text-primary leading-none">Iter</h2>
+          <div className="h-0.5 w-8 bg-consorci-darkBlue mx-auto mt-4"></div>
+          <p className="text-text-muted text-[12px] font-medium mt-6">Learning Management Platform</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 mb-8 text-xs font-bold flex items-center gap-3">
+          <div className="bg-background-subtle border border-red-200/30 text-red-500 px-5 py-4 mb-8 text-xs font-medium flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
@@ -96,50 +96,50 @@ export default function LoginPage() {
         )}
 
         {showProfessorLink ? (
-          <div className="bg-background-subtle p-10 text-center animate-in fade-in zoom-in duration-300">
-            <h3 className="text-xl font-black text-consorci-darkBlue uppercase mb-4 tracking-tight">Access via Mobile App</h3>
-            <p className="text-xs text-text-muted font-bold uppercase tracking-wider mb-8 leading-relaxed">
+          <div className="bg-background-subtle p-10 text-center animate-in fade-in zoom-in duration-300 border border-border-subtle">
+            <h3 className="text-xl font-medium text-text-primary mb-4">Access via Mobile App</h3>
+            <p className="text-xs text-text-muted leading-relaxed mb-8">
               As a teacher, you must use the Iter mobile app to manage your sessions.
             </p>
             <a
               href="#"
-              className="group relative flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white text-xs font-bold uppercase tracking-widest transition-all hover:bg-consorci-actionBlue active:scale-95"
-              onClick={(e) => { e.preventDefault(); toast.info('Download link coming soon (Expo Go / TestFlight)'); }}
+              className="group relative flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
+              onClick={(e) => { e.preventDefault(); toast.info('Download link coming soon'); }}
             >
               <span>Download Iter App</span>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </a>
             <button
               onClick={() => setShowProfessorLink(false)}
-              className="mt-8 text-[10px] font-black text-consorci-lightBlue hover:text-consorci-darkBlue tracking-[0.2em] uppercase transition-colors"
+              className="mt-8 text-[12px] font-medium text-consorci-darkBlue hover:underline transition-all"
             >
               ← Back to login
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-2">
-              <label className="block text-text-primary text-[10px] font-black uppercase tracking-widest px-1">Email Address</label>
+            <div className="space-y-4">
+              <label className="block text-text-primary text-[12px] font-medium px-1">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-bold text-sm text-text-primary placeholder:text-text-muted outline-none"
+                className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-medium text-sm text-text-primary placeholder:text-text-muted outline-none"
                 placeholder="coordinator@center.com"
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-text-primary text-[10px] font-black uppercase tracking-widest px-1">Password</label>
+            <div className="space-y-4">
+              <label className="block text-text-primary text-[12px] font-medium px-1">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-bold text-sm text-text-primary placeholder:text-text-muted pr-12 outline-none"
+                  className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-medium text-sm text-text-primary placeholder:text-text-muted pr-12 outline-none"
                   placeholder="••••••••"
                   required
                 />
@@ -166,7 +166,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-consorci-darkBlue hover:bg-black text-white text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] shadow-lg shadow-blue-900/10 flex items-center justify-center gap-4"
+              className="w-full py-4 bg-consorci-darkBlue hover:bg-black text-white text-[13px] font-medium transition-all duration-300 disabled:opacity-50 active:scale-[0.98] flex items-center justify-center gap-4"
             >
               {loading ? (
                 <>

@@ -130,9 +130,9 @@ export default function StudentsCRUD() {
   const headerActions = (
     <button 
       onClick={() => { setEditingStudent(null); setFormData({ fullName: '', lastName: '', idalu: '', grade: '' }); setIsModalOpen(true); }}
-      className="bg-[#00426B] text-white px-6 py-3 font-black uppercase text-[10px] tracking-widest hover:bg-[#0775AB] transition-all flex items-center gap-2 shadow-lg"
+      className="bg-consorci-darkBlue text-white px-6 py-3 font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
     >
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
       New Student
     </button>
   );
@@ -146,27 +146,27 @@ export default function StudentsCRUD() {
       {/* Filters Panel */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
         <div className="flex-1">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Search by name or IDALU</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">Search by name or IDALU</label>
           <div className="relative">
             <input 
               type="text"
               placeholder="Ex: Joan García, 1234567..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
         </div>
 
         <div className="lg:w-64">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filter by course</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">Filter by course</label>
           <select 
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
-            className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
+            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary appearance-none"
           >
             <option value="All courses">All courses</option>
             {uniqueCourses.map(c => (
@@ -178,9 +178,9 @@ export default function StudentsCRUD() {
         <div className="flex items-end">
           <button 
             onClick={() => { setSearchQuery(""); setSelectedCourse("All courses"); }}
-            className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
+            className="w-full lg:w-auto px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-all border border-transparent h-[46px]"
           >
-            Clear
+            Clear filters
           </button>
         </div>
       </div>
@@ -188,18 +188,18 @@ export default function StudentsCRUD() {
       {loading ? (
         <Loading />
       ) : (
-        <div className="bg-white border border-gray-200 overflow-hidden">
+        <div className="bg-background-surface border border-border-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Student Information</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Identification (IDALU)</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Course / Level</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Actions</th>
+                <tr className="bg-background-subtle border-b border-border-subtle">
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Student Information</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Identification (IDALU)</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Course / Level</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border-subtle">
                 {paginatedStudents.map(a => (
                   <tr key={a.studentId} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-5">
@@ -212,23 +212,23 @@ export default function StudentsCRUD() {
                           size="md"
                         />
                         <div>
-                          <div className="text-sm font-black text-[#00426B] uppercase tracking-tight">{a.fullName} {a.lastName}</div>
+                          <div className="text-sm font-medium text-text-primary tracking-tight">{a.fullName} {a.lastName}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="text-[10px] font-bold text-gray-400 font-mono tracking-widest uppercase">{a.idalu}</span>
+                      <span className="text-[12px] font-medium text-text-muted font-mono">{a.idalu}</span>
                     </td>
                     <td className="px-6 py-5">
-                      <span className="px-2 py-0.5 bg-[#EAEFF2] text-[#00426B] text-[10px] font-black uppercase tracking-widest border border-[#EAEFF2]">
+                      <span className="px-2 py-0.5 bg-background-subtle text-text-primary text-[11px] font-medium border border-border-subtle">
                         {a.grade}
                       </span>
                     </td>
                     <td className="px-6 py-5">
-                      <div className="flex justify-end items-center gap-2">
-                        <button onClick={() => handleEdit(a)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Edit</button>
-                        <button onClick={() => handleDelete(a.studentId)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      <div className="flex justify-end items-center gap-4">
+                        <button onClick={() => handleEdit(a)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">Edit</button>
+                        <button onClick={() => handleDelete(a.studentId)} className="text-text-muted hover:text-red-500 transition-all">
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       </div>
                     </td>
@@ -239,8 +239,8 @@ export default function StudentsCRUD() {
           </div>
           {filteredStudents.length === 0 && !loading && (
             <div className="p-20 text-center">
-              <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No students found</p>
-              <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Try other search terms.</p>
+              <p className="text-text-primary font-medium text-sm">No students found</p>
+              <p className="text-text-muted text-[12px] font-medium mt-2">Try other search terms.</p>
             </div>
           )}
 
@@ -257,39 +257,38 @@ export default function StudentsCRUD() {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
-          <div className="bg-white shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 border border-gray-100">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+          <div className="bg-background-surface w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in slide-in-from-bottom-4 duration-500 border border-border-subtle">
             {/* Header */}
-            <div className="bg-gray-50 px-8 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
+            <div className="px-10 py-8 border-b border-border-subtle flex justify-between items-start sticky top-0 bg-background-surface z-10">
               <div>
-                <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
+                <h3 className="text-xl font-medium text-text-primary tracking-tight">
                   {editingStudent ? 'Edit Student' : 'New Student'}
                 </h3>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                <p className="text-[12px] font-medium text-text-muted mt-2">
                   {editingStudent ? 'Modify student data' : 'Enter the data for the new student'}
                 </p>
               </div>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-300 hover:text-[#00426B] transition-colors"
+                className="text-text-muted hover:text-text-primary transition-colors mt-1"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               {editingStudent && (
-                <div className="p-8 bg-gray-50/50 border-b border-gray-50 flex flex-col items-center gap-4">
+                <div className="p-10 border-b border-border-subtle flex flex-col items-center gap-6">
                   <Avatar 
                     url={editingStudent.photoUrl} 
                     name={`${editingStudent.fullName} ${editingStudent.lastName}`} 
                     id={editingStudent.studentId} 
                     type="student" 
                     size="xl"
-                    className="shadow-xl ring-4 ring-white"
                   />
-                  <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95">
-                    Change Photo
+                  <label className="cursor-pointer bg-background-subtle border border-border-subtle px-6 py-2 text-[11px] font-medium text-text-primary hover:bg-background-surface transition-all active:scale-95">
+                    Change profile photo
                     <input 
                       type="file" 
                       className="hidden" 
@@ -317,45 +316,45 @@ export default function StudentsCRUD() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} id="student-form" className="p-8 space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Student name</label>
+              <form onSubmit={handleSubmit} id="student-form" className="p-10 space-y-8">
+                <div className="space-y-2">
+                  <label className="block text-[12px] font-medium text-text-primary px-1">Student name</label>
                   <input 
                     type="text" value={formData.fullName} 
                     onChange={e => setFormData({...formData, fullName: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
                   />
                 </div>
-                <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Surnames</label>
+                <div className="space-y-2">
+                  <label className="block text-[12px] font-medium text-text-primary px-1">Surnames</label>
                   <input 
                     type="text" value={formData.lastName} 
                     onChange={e => setFormData({...formData, lastName: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
                   />
                 </div>
-                <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">IDALU Code</label>
+                <div className="space-y-2">
+                  <label className="block text-[12px] font-medium text-text-primary px-1">IDALU Code</label>
                   <input 
                     type="text" value={formData.idalu} 
                     onChange={e => setFormData({...formData, idalu: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all font-mono tracking-widest" required
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all font-mono appearance-none" required
                   />
                 </div>
-                <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Course / Level (Ex: 4th ESO)</label>
+                <div className="space-y-2">
+                  <label className="block text-[12px] font-medium text-text-primary px-1">Course / Level (Ex: 4th ESO)</label>
                   <input 
                     type="text" value={formData.grade} 
                     onChange={e => setFormData({...formData, grade: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all" required
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
                   />
                 </div>
               </form>
             </div>
 
-            <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
-              <button type="submit" form="student-form" className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg active:scale-95">Save Student</button>
+            <div className="p-10 border-t border-border-subtle flex gap-4 bg-background-surface">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline transition-colors">Cancel</button>
+              <button type="submit" form="student-form" className="flex-1 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]">Save student</button>
             </div>
           </div>
         </div>

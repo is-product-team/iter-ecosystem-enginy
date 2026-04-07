@@ -160,13 +160,12 @@ export default function WorkshopAdminPage() {
         setEditingWorkshop(null);
         setCreateModalVisible(true);
       }}
-      className="flex items-center gap-2 px-6 py-3 text-white font-bold shadow-lg"
-      style={{ backgroundColor: THEME.colors.primary }}
+      className="flex items-center gap-2 px-6 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
       </svg>
-      New Workshop  
+      New workshop  
     </button>
   );
 
@@ -177,31 +176,31 @@ export default function WorkshopAdminPage() {
       actions={headerActions}
     >
       {/* Filters Panel */}
-      <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-background-surface border border-border-subtle p-8">
+      <div className="mb-10 flex flex-col lg:flex-row gap-8 bg-background-surface border border-border-subtle p-10">
         {/* Text Search */}
         <div className="flex-1">
-          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Search by title</label>
+          <label className="block text-[13px] font-medium text-text-primary mb-3">Search by title</label>
           <div className="relative">
             <input 
               type="text"
               placeholder="Ex: Woodwork, Robotics..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary placeholder:text-text-muted transition-all"
+              className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-4 h-4.5 w-4.5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
         </div>
 
         {/* Sector Filter */}
         <div className="lg:w-64">
-          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Filter by sector</label>
+          <label className="block text-[13px] font-medium text-text-primary mb-3">Filter by sector</label>
           <select 
             value={selectedSector}
             onChange={(e) => handleSectorChange(e.target.value)}
-            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary appearance-none"
+            className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
           >
             {uniqueSectors.map(s => (
               <option key={s} value={s}>{s}</option>
@@ -211,11 +210,11 @@ export default function WorkshopAdminPage() {
 
         {/* Modality Filter */}
         <div className="lg:w-64">
-          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Filter by modality</label>
+          <label className="block text-[11px] font-medium text-text-primary mb-3">Filter by modality</label>
           <select 
             value={selectedModality}
             onChange={(e) => handleModalityChange(e.target.value)}
-            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary appearance-none"
+            className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
           >
             {uniqueModalities.map(m => (
               <option key={m} value={m}>{m}</option>
@@ -231,9 +230,9 @@ export default function WorkshopAdminPage() {
               setSelectedSector("All sectors");
               setSelectedModality("All modalities");
             }}
-            className="w-full lg:w-auto px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
+            className="w-full lg:w-auto px-6 py-3 text-[13px] font-medium text-text-muted hover:text-red-500 hover:bg-red-500/5 transition-all h-[49px]"
           >
-            Clear
+            Clear filters
           </button>
         </div>
       </div>
@@ -244,59 +243,59 @@ export default function WorkshopAdminPage() {
       ) : filteredWorkshops.length > 0 ? (
         <div className="bg-background-surface border border-border-subtle overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left">
               <thead>
                 <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Workshop Information</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Classification</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Details and Capacity</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary text-right">Actions</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Workshop Information</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Classification</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Details and Capacity</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle">
                 {paginatedWorkshops.map((workshop) => (
                   <tr key={workshop._id} className="hover:bg-background-subtle transition-colors group">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors">
+                    <td className="px-6 py-6">
+                      <div className="flex items-center gap-5">
+                        <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
                           <WorkshopIcon iconName={workshop.icon} className="w-5 h-5" />
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-text-primary uppercase tracking-tight">{workshop.title}</div>
-                          <div className="text-[10px] font-bold text-text-muted uppercase tracking-tighter mt-0.5">ID: {workshop._id}</div>
+                          <div className="text-[15px] font-medium text-text-primary leading-tight">{workshop.title}</div>
+                          <div className="text-[12px] font-medium text-text-muted mt-1 uppercase tracking-tighter opacity-70">ID: {workshop._id}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-[11px] font-medium text-text-secondary">
+                    <td className="px-6 py-6 text-[13px] font-medium text-text-primary">
                       <div className="flex flex-col gap-1">
-                        <span className="font-bold text-consorci-actionBlue uppercase">{workshop.sector}</span>
-                        <span className="text-text-muted">Modality {workshop.modality}</span>
+                        <span className="text-consorci-darkBlue">{workshop.sector}</span>
+                        <span className="text-text-muted opacity-70">Modality {workshop.modality}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-6 py-6">
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-text-muted uppercase tracking-wide">
+                        <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
                           {workshop.technicalDetails?.durationHours}h • {workshop.technicalDetails?.maxPlaces} Places
                         </div>
-                        <div className="text-[10px] text-text-muted font-medium line-clamp-1 max-w-[200px]">
+                        <div className="text-[12px] text-text-muted font-medium line-clamp-1 max-w-[240px] opacity-70">
                           {workshop.technicalDetails?.description}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex justify-end items-center gap-2">
+                    <td className="px-6 py-6">
+                      <div className="flex justify-end items-center gap-4">
                         <button 
                           onClick={() => handleEdit(workshop)}
-                          className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-consorci-darkBlue hover:bg-background-subtle transition-colors"
+                          className="text-[13px] font-medium text-consorci-darkBlue hover:text-black transition-colors"
                         >
                           Edit
                         </button>
                         <button 
                           onClick={() => handleDelete(workshop._id)}
-                          className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
+                          className="p-2 text-text-muted hover:text-red-600 transition-all"
                         >
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
                       </div>
@@ -324,8 +323,8 @@ export default function WorkshopAdminPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <p className="text-text-primary font-bold uppercase text-xs tracking-widest">No workshops found</p>
-          <p className="text-text-muted text-[10px] uppercase font-bold mt-1 tracking-widest">Try other search terms.</p>
+          <p className="text-text-primary font-medium text-sm">No workshops found</p>
+          <p className="text-text-muted text-[11px] font-normal mt-1">Try other search terms.</p>
         </div>
       )}
 

@@ -59,7 +59,7 @@ export default function CenterDashboard() {
       {/* Institutional Section Timeline */}
       <section className="bg-background-surface border-2 border-border-subtle p-12 mb-12 relative overflow-hidden">
 
-        <h3 className="header-label">
+        <h3 className="text-[12px] font-medium text-text-muted mb-8 text-center tracking-widest uppercase">
           Iter 25-26 Program Status
         </h3>
 
@@ -69,29 +69,29 @@ export default function CenterDashboard() {
 
           <div className="flex flex-col md:flex-row justify-between items-start gap-y-12 gap-x-8">
             {loadingPhases ? (
-              <div className="w-full py-8 text-center uppercase text-[10px] font-bold tracking-widest text-[#00426B]">Loading calendar...</div>
+              <div className="w-full py-8 text-center text-[12px] font-medium text-text-muted">Loading calendar...</div>
             ) : (
               phases.map((phase) => (
                 <div key={phase.phaseId} className="relative flex flex-col items-center text-center flex-1 group">
                   {/* Square with number */}
                   <div
-                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border-2 transition-all ${phase.isActive
+                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border transition-all ${phase.isActive
                       ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
                       : 'bg-background-surface text-text-muted border-border-subtle'
                       }`}
                   >
-                    <span className="text-base font-bold">
+                    <span className="text-base font-medium">
                       {phase.order}
                     </span>
                   </div>
 
                   {/* Name and Date */}
-                  <h4 className={`font-black text-[10px] uppercase tracking-[0.1em] mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue' : 'text-text-muted'}`}>
+                  <h4 className={`text-[12px] font-medium tracking-tight mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue font-medium' : 'text-text-muted'}`}>
                     {phase.name}
                   </h4>
 
-                  <div className={`text-[10px] font-bold px-4 py-2 border-2 ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
-                    {new Date(phase.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }).toUpperCase()}
+                  <div className={`text-[11px] font-medium px-4 py-2 border ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
+                    {new Date(phase.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
                   </div>
                 </div>
               ))
@@ -149,11 +149,11 @@ export default function CenterDashboard() {
               key={idx}
               onClick={() => item.active && router.push(item.path)}
               className={`group bg-background-surface p-8 md:p-10 border transition-all duration-300 relative overflow-hidden ${item.active
-                ? 'border-border-subtle cursor-pointer hover:border-consorci-actionBlue hover:shadow-xl'
+                ? 'border-border-subtle cursor-pointer hover:border-consorci-darkBlue'
                 : 'border-border-subtle opacity-60 cursor-not-allowed'
                 }`}
             >
-              <div className={`absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${item.active ? 'group-hover:bg-consorci-actionBlue' : ''
+              <div className={`absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${item.active ? 'group-hover:bg-consorci-darkBlue' : ''
                 }`}></div>
 
               <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-border-subtle transition-all duration-300 ${item.active
@@ -167,17 +167,17 @@ export default function CenterDashboard() {
                 </div>
               </div>
 
-              <h3 className={`text-xl font-medium mb-3 uppercase tracking-tight ${item.active ? 'text-consorci-darkBlue' : 'text-text-muted'
+              <h3 className={`text-xl font-medium mb-3 tracking-tight ${item.active ? 'text-text-primary' : 'text-text-muted'
                 }`}>
                 {item.title}
               </h3>
 
-              <p className="text-xs text-text-muted font-medium leading-relaxed uppercase tracking-wider">
+              <p className="text-xs text-text-muted font-normal leading-relaxed">
                 {item.text}
               </p>
 
               <div className="mt-8 flex items-center">
-                <div className={`flex items-center font-bold text-[10px] uppercase tracking-[0.2em] transition-transform ${item.active ? 'text-consorci-actionBlue group-hover:translate-x-2' : 'text-text-muted'
+                <div className={`flex items-center font-medium text-[11px] transition-transform ${item.active ? 'text-consorci-darkBlue group-hover:translate-x-2' : 'text-text-muted'
                   }`}>
                   {item.active ? item.phase : "Module closed"}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

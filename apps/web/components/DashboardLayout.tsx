@@ -27,11 +27,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <header className="w-full mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 py-2 container-responsive">
             <div className="">
               {title && (
-                <h2 className="text-3xl font-bold text-text-primary tracking-tight uppercase">
+                <h2 className="text-3xl font-medium text-text-primary tracking-tight">
                   {title}
                 </h2>
               )}
-              {subtitle && <div className="mt-2 text-consorci-lightBlue text-[11px] font-bold uppercase tracking-[0.1em]">{subtitle}</div>}
+              {subtitle && <div className="mt-2 text-consorci-lightBlue text-[12px] font-medium">{subtitle}</div>}
             </div>
 
             {actions && (

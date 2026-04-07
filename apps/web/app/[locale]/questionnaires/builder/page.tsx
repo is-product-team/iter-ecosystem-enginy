@@ -65,25 +65,25 @@ export default function QuestionnaireBuilderPage() {
             <div className="w-full pb-20">
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Basic Configuration */}
-                    <div className="bg-white p-10 border shadow-sm space-y-8">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-6">General Configuration</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="bg-background-surface p-12 border border-border-subtle space-y-10">
+                        <h3 className="text-[13px] font-medium text-consorci-darkBlue uppercase tracking-wider opacity-80 mb-8">General configuration</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="space-y-4">
-                                <label className="block text-xs font-black uppercase tracking-widest text-gray-400">Questionnaire Title</label>
+                                <label className="block text-[13px] font-medium text-text-primary px-1">Questionnaire title</label>
                                 <input
                                     type="text"
                                     value={form.title}
                                     onChange={(e) => setForm({ ...form, title: e.target.value })}
                                     placeholder="Ex: Workshop Satisfaction Survey 2026"
-                                    className="w-full border-b-2 p-4 text-xl font-bold outline-none focus:border-blue-900 transition-all"
+                                    className="w-full border-b border-border-subtle p-5 text-2xl font-medium outline-none focus:border-consorci-darkBlue transition-all bg-transparent"
                                 />
                             </div>
                             <div className="space-y-4">
-                                <label className="block text-xs font-black uppercase tracking-widest text-gray-400">Target Audience</label>
+                                <label className="block text-[13px] font-medium text-text-primary px-1">Target audience</label>
                                 <select
                                     value={form.target}
                                     onChange={(e) => setForm({ ...form, target: e.target.value })}
-                                    className="w-full border-b-2 p-4 text-sm font-bold bg-white outline-none focus:border-blue-900"
+                                    className="w-full border-b border-border-subtle p-5 text-[15px] font-medium bg-transparent outline-none focus:border-consorci-darkBlue appearance-none"
                                 >
                                     <option value="STUDENT">Students</option>
                                     <option value="TEACHER">Teachers</option>
@@ -94,45 +94,45 @@ export default function QuestionnaireBuilderPage() {
                     </div>
 
                     {/* Questions */}
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Questions ({form.questions.length})</h3>
+                            <h3 className="text-[13px] font-medium text-text-muted uppercase tracking-wider opacity-60">QUESTIONS ({form.questions.length})</h3>
                             <button
                                 type="button"
                                 onClick={addQuestion}
-                                className="bg-black text-white px-6 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-blue-900 transition-all shadow-md"
+                                className="bg-consorci-darkBlue text-white px-6 py-2.5 text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
                             >
-                                + Add Question
+                                + Add question
                             </button>
                         </div>
 
                         {form.questions.map((q, idx) => (
-                            <div key={idx} className="bg-white p-8 border shadow-sm relative group animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div key={idx} className="bg-background-surface p-10 border border-border-subtle relative group animate-in fade-in slide-in-from-bottom-4 duration-300">
                                 <button
                                     type="button"
                                     onClick={() => removeQuestion(idx)}
-                                    className="absolute top-4 right-4 text-gray-200 hover:text-red-500 transition-colors"
+                                    className="absolute top-6 right-6 text-text-muted opacity-30 hover:opacity-100 hover:text-red-500 transition-all"
                                 >
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                                     <div className="md:col-span-2 space-y-4">
-                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Question Text {idx + 1}</label>
+                                        <label className="block text-[12px] font-medium text-text-muted px-1">QUESTION TEXT {idx + 1}</label>
                                         <input
                                             type="text"
                                             value={q.text}
                                             onChange={(e) => updateQuestion(idx, 'text', e.target.value)}
                                             placeholder="What do you want to ask?"
-                                            className="w-full border-b p-2 font-bold outline-none focus:border-blue-900 transition-all"
+                                            className="w-full border-b border-border-subtle p-3 font-medium text-[16px] outline-none focus:border-consorci-darkBlue transition-all bg-transparent"
                                         />
                                     </div>
                                     <div className="space-y-4">
-                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Response Type</label>
+                                        <label className="block text-[12px] font-medium text-text-muted px-1">RESPONSE TYPE</label>
                                         <select
                                             value={q.response_type}
                                             onChange={(e) => updateQuestion(idx, 'response_type', e.target.value)}
-                                            className="w-full border-b p-2 text-xs font-bold bg-white outline-none focus:border-blue-900"
+                                            className="w-full border-b border-border-subtle p-3 text-[14px] font-medium bg-transparent outline-none focus:border-consorci-darkBlue appearance-none"
                                         >
                                             <option value="Likert_1_5">Scale 1-5 (Likert)</option>
                                             <option value="Likert_1_10">Scale 1-10</option>
@@ -143,14 +143,14 @@ export default function QuestionnaireBuilderPage() {
                                 </div>
 
                                 {q.response_type === 'Multiple' && (
-                                    <div className="mt-6 p-6 bg-gray-50 border-l-2 border-blue-900 animate-in zoom-in-95 duration-200">
-                                        <label className="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-4">Options (separated by commas)</label>
+                                    <div className="mt-10 p-8 bg-background-subtle border border-border-subtle animate-in zoom-in-95 duration-200">
+                                        <label className="block text-[12px] font-medium text-text-muted mb-4 px-1">OPTIONS (SEPARATED BY COMMAS)</label>
                                         <input
                                             type="text"
                                             value={q.options.join(',')}
                                             onChange={(e) => updateQuestion(idx, 'options', e.target.value.split(','))}
                                             placeholder="Option 1, Option 2, Option 3..."
-                                            className="w-full bg-transparent border-b p-2 text-xs outline-none focus:border-blue-900"
+                                            className="w-full bg-transparent border-b border-border-subtle p-3 text-[14px] font-medium outline-none focus:border-consorci-darkBlue"
                                         />
                                     </div>
                                 )}
@@ -158,13 +158,13 @@ export default function QuestionnaireBuilderPage() {
                         ))}
                     </div>
 
-                    <div className="pt-8">
+                    <div className="pt-12">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-blue-900 text-white py-6 font-black uppercase text-xs tracking-[0.3em] shadow-2xl hover:bg-black active:scale-95 transition-all disabled:opacity-50"
+                            className="w-full bg-consorci-darkBlue text-white py-5 font-medium text-[15px] hover:bg-black active:scale-[0.98] transition-all disabled:opacity-50"
                         >
-                            {loading ? 'Creating...' : 'Publish Questionnaire Model'}
+                            {loading ? 'Creating...' : 'Publish questionnaire model'}
                         </button>
                     </div>
                 </form>

@@ -20,29 +20,29 @@ const Pagination: React.FC<PaginationProps> = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="bg-[#F8FAFC] border-t border-gray-100 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-        Showing <span className="text-[#00426B]">{currentItemsCount}</span> of <span className="text-[#00426B]">{totalItems}</span> {itemName}
+    <div className="bg-background-subtle border-t border-border-subtle p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="text-[12px] font-medium text-text-muted">
+        Showing <span className="text-text-primary">{currentItemsCount}</span> of <span className="text-text-primary">{totalItems}</span> {itemName}
       </div>
       <div className="flex items-center gap-2">
         <button 
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === 1 
-            ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-            : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+          className={`px-4 py-2 text-[12px] font-medium border border-border-subtle transition-all outline-none ${currentPage === 1 
+            ? 'opacity-30 cursor-not-allowed' 
+            : 'text-text-primary bg-background-surface hover:bg-background-subtle active:scale-[0.98]'}`}
         >
           Previous
         </button>
-        <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-bold text-[#00426B] tracking-[0.2em]">
+        <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[12px] font-medium text-text-primary">
           Page {currentPage} of {totalPages}
         </div>
         <button 
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${currentPage === totalPages 
-            ? 'text-gray-200 border-gray-100 cursor-not-allowed' 
-            : 'text-[#00426B] border-gray-200 hover:bg-[#EAEFF2]'}`}
+          className={`px-4 py-2 text-[12px] font-medium border border-border-subtle transition-all outline-none ${currentPage === totalPages 
+            ? 'opacity-30 cursor-not-allowed' 
+            : 'text-text-primary bg-background-surface hover:bg-background-subtle active:scale-[0.98]'}`}
         >
           Next
         </button>

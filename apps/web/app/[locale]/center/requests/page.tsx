@@ -197,40 +197,40 @@ export default function RequestsPage() {
         {/* Left Section: Catalog */}
         <div className="flex-1 space-y-6">
           {/* Filter Bar */}
-          <div className="bg-white border border-gray-200 p-4 rounded-none shadow-sm flex flex-col md:flex-row gap-4 items-center">
+          <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row gap-6 items-center">
             <div className="relative flex-1 group w-full">
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#00426B] transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
                 type="text"
                 placeholder="Search workshop or sector..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] focus:ring-1 focus:ring-[#00426B] text-sm transition-all"
+                className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:outline-none focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all"
               />
             </div>
-            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">
+            <div className="text-[12px] font-medium text-text-muted whitespace-nowrap">
               {filteredWorkshops.length} Workshops available
             </div>
           </div>
 
           {/* Workshop Table */}
-          <div className="bg-white border border-gray-200 rounded-none shadow-sm overflow-hidden">
-            <table className="w-full text-left border-collapse">
+          <div className="bg-background-surface border border-border-subtle overflow-hidden">
+            <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider w-12 text-center">Mod</th>
-                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider">Workshop / Sector</th>
-                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider text-right">Status / Action</th>
+                <tr className="bg-background-subtle border-b border-border-subtle">
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary w-12 text-center">Mod</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Workshop / Sector</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">Status / Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border-subtle">
                 {loading ? (
                   <tr>
                     <td colSpan={3} className="px-6 py-12">
@@ -251,28 +251,28 @@ export default function RequestsPage() {
                           }
                         }}
                         className={`group transition-colors ${existingRequest && existingRequest.status !== REQUEST_STATUSES.PENDING && !isSelected
-                          ? 'bg-gray-50 opacity-60 cursor-default'
+                          ? 'opacity-60 cursor-default'
                           : isSelected
-                            ? 'bg-blue-50/50 cursor-pointer border-l-4 border-l-[#00426B]'
+                            ? 'bg-background-subtle cursor-pointer border-l-2 border-l-consorci-darkBlue'
                             : (!existingRequest && !editingRequestId)
-                              ? 'hover:bg-gray-50 cursor-pointer border-l-4 border-l-transparent'
-                              : 'cursor-default border-l-4 border-l-transparent'
+                              ? 'hover:bg-background-subtle cursor-pointer border-l-2 border-l-transparent'
+                              : 'cursor-default border-l-2 border-l-transparent'
                           }`}
                       >
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 flex items-center justify-center font-bold text-xs shrink-0 ${workshop.modality === 'A' ? 'bg-green-100 text-green-700' :
-                              workshop.modality === 'B' ? 'bg-orange-100 text-orange-700' :
-                                'bg-purple-100 text-purple-700'
+                          <div className="flex items-center gap-4">
+                            <div className={`w-8 h-8 flex items-center justify-center font-medium text-[11px] shrink-0 ${workshop.modality === 'A' ? 'bg-green-500/10 text-green-600' :
+                              workshop.modality === 'B' ? 'bg-orange-500/10 text-orange-600' :
+                                'bg-purple-500/10 text-purple-600'
                               }`}>
                               {workshop.modality}
                             </div>
-                            <WorkshopIcon iconName={workshop.icon} className="w-6 h-6 text-[#00426B]" />
+                            <WorkshopIcon iconName={workshop.icon} className="w-5 h-5 text-text-primary" />
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="font-bold text-gray-800 text-sm group-hover:text-[#00426B] transition-colors">{workshop.title}</div>
-                          <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">{workshop.sector}</div>
+                          <div className="font-medium text-text-primary text-[14px] leading-tight mb-1">{workshop.title}</div>
+                          <div className="text-[11px] font-medium text-text-muted">{workshop.sector}</div>
                         </td>
                         <td className="px-6 py-4">
                           {existingRequest && (
@@ -290,23 +290,23 @@ export default function RequestsPage() {
                                   e.stopPropagation();
                                   handleEdit(existingRequest);
                                 }}
-                                className="text-[10px] font-black border border-yellow-400 bg-yellow-50 px-3 py-1 text-yellow-600 uppercase tracking-widest hover:bg-yellow-100 transition-colors"
+                                className="text-[11px] font-medium border border-border-subtle px-3 py-1 text-text-primary hover:bg-background-subtle transition-colors"
                               >
-                                Edit
+                                Edit request
                               </button>
                             ) : (
-                              <span className={`text-[10px] font-black border px-2 py-1 uppercase tracking-widest ${existingRequest.status === REQUEST_STATUSES.APPROVED
-                                ? 'border-green-200 bg-green-50 text-green-600'
-                                : 'border-red-200 bg-red-50 text-red-600'
+                              <span className={`text-[11px] font-medium border px-2 py-1 tracking-tight ${existingRequest.status === REQUEST_STATUSES.APPROVED
+                                ? 'border-green-500/20 bg-green-500/5 text-green-600'
+                                : 'border-red-500/20 bg-red-500/5 text-red-600'
                                 }`}>
                                 {existingRequest.status}
                               </span>
                             )
                           ) : isSelected ? (
-                            <span className="text-[10px] font-black border border-[#00426B] px-2 py-1 text-[#00426B] uppercase tracking-widest bg-blue-50">Selected</span>
+                            <span className="text-[11px] font-medium border border-consorci-darkBlue px-2 py-1 text-consorci-darkBlue bg-background-subtle">Selected</span>
                           ) : (
                             !editingRequestId && (
-                              <span className="text-[10px] font-black border border-transparent group-hover:border-gray-300 px-2 py-1 text-gray-300 uppercase tracking-widest transition-all group-hover:text-gray-400">Select</span>
+                              <span className="text-[11px] font-medium text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">Select</span>
                             )
                           )}
                         </td>
@@ -315,8 +315,8 @@ export default function RequestsPage() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={3} className="px-6 py-12 text-center">
-                      <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">No workshops found</p>
+                    <td colSpan={4} className="px-6 py-12 text-center">
+                      <p className="text-text-muted text-[13px] font-medium">No workshops found</p>
                     </td>
                   </tr>
                 )}
@@ -335,78 +335,78 @@ export default function RequestsPage() {
 
         {/* Right Section: Form Sidebar */}
         <div className="w-full lg:w-96">
-          <div className="bg-white border border-gray-200 rounded-none shadow-sm sticky top-8">
-            <div className="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-              <h3 className="text-sm font-black text-[#00426B] uppercase tracking-widest flex items-center gap-2">
+          <div className="bg-background-surface border border-border-subtle sticky top-8">
+            <div className="p-8 border-b border-border-subtle bg-background-subtle flex justify-between items-center">
+              <h3 className="text-[14px] font-medium text-text-primary flex items-center gap-3">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 {editingRequestId ? 'Edit Request' : 'New Request'}
               </h3>
               {editingRequestId && (
                 <button
                   onClick={cancelEdit}
-                  className="text-[10px] text-gray-400 hover:text-red-500 font-bold uppercase tracking-wide"
+                  className="text-[11px] text-text-muted hover:text-red-500 font-medium"
                 >
                   Cancel
                 </button>
               )}
             </div>
 
-            <div className="p-6">
+            <div className="p-8">
               {error && (
-                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 text-red-700 dark:text-red-400">
-                  <p className="text-[11px] font-bold uppercase tracking-wide mb-1 flex items-center gap-2">
+                <div className="mb-8 p-4 bg-red-500/5 border-l-2 border-red-500 text-red-600">
+                  <p className="text-[12px] font-medium mb-1 flex items-center gap-2">
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
                     Error in the request
                   </p>
-                  <p className="text-xs">{error}</p>
+                  <p className="text-[13px] opacity-90">{error}</p>
                 </div>
               )}
 
               {!selectedWorkshop ? (
-                <div className="text-center py-12 border-2 border-dashed border-border-subtle bg-background-subtle/30">
-                  <div className="w-12 h-12 rounded-full bg-background-subtle flex items-center justify-center mx-auto mb-4">
+                <div className="text-center py-16 border border-dashed border-border-subtle bg-background-subtle/20">
+                  <div className="w-12 h-12 bg-background-subtle flex items-center justify-center mx-auto mb-4 border border-border-subtle">
                     <svg className="w-6 h-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
                     </svg>
                   </div>
-                  <p className="text-xs font-bold text-text-muted uppercase tracking-widest px-6">
-                    Select a workshop from the list to start
+                  <p className="text-[12px] font-medium text-text-muted px-8">
+                    Select a workshop from the catalog to start your request
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-8">
                   {/* Selected Workshop Info */}
-                  <div className="bg-background-surface border-l-4 border-consorci-darkBlue p-4 rounded-none text-text-primary shadow-sm">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-[9px] font-black bg-consorci-darkBlue/10 text-consorci-darkBlue px-1.5 py-0.5 tracking-tighter uppercase">MOD {selectedWorkshop.modality}</span>
+                  <div className="bg-background-subtle border border-border-subtle p-5">
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="text-[10px] font-medium bg-consorci-darkBlue/10 text-consorci-darkBlue px-2 py-0.5 border border-consorci-darkBlue/20">MOD {selectedWorkshop.modality}</span>
                       {!editingRequestId && (
                         <button
                           type="button"
                           onClick={() => setSelectedWorkshopId(null)}
                           className="text-text-muted hover:text-consorci-darkBlue transition-colors"
                         >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                       )}
                     </div>
-                    <h4 className="font-bold text-sm leading-tight text-consorci-darkBlue dark:text-consorci-lightBlue">{selectedWorkshop.title}</h4>
-                    <p className="text-[10px] font-bold text-text-secondary uppercase mt-1">{selectedWorkshop.sector}</p>
+                    <h4 className="font-medium text-[15px] leading-snug text-consorci-darkBlue">{selectedWorkshop.title}</h4>
+                    <p className="text-[11px] font-medium text-text-muted mt-1 uppercase tracking-tight">{selectedWorkshop.sector}</p>
                   </div>
 
                   {/* Form Fields */}
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">Referring Teacher</label>
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <label className="block text-[12px] font-medium text-text-primary px-1">Referring Teachers</label>
                       <div className="space-y-2">
                         <select
                           value={teacher1Id}
                           onChange={(e) => setTeacher1Id(e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
+                          className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                           required
                         >
-                          <option value="">Select the Main Referent *</option>
+                          <option value="">Select main referent *</option>
                           {teachers.map(t => (
                             <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
                           ))}
@@ -414,10 +414,10 @@ export default function RequestsPage() {
                         <select
                           value={teacher2Id}
                           onChange={(e) => setTeacher2Id(e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
+                          className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                           required
                         >
-                          <option value="">Select the Second Referent *</option>
+                          <option value="">Select second referent *</option>
                           {teachers.map(t => (
                             <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
                           ))}
@@ -425,32 +425,32 @@ export default function RequestsPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Nº Expected Students</label>
+                    <div className="space-y-3">
+                      <label className="block text-[12px] font-medium text-text-primary px-1">Approx. Students</label>
                       <input
                         type="number"
                         value={approxStudents}
                         onChange={(e) => setApproxStudents(e.target.value === '' ? '' : parseInt(e.target.value))}
                         placeholder="Ex: 4"
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
+                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                         min="1"
                         max={selectedWorkshop.modality === 'C' ? 4 : 100}
                         required
                       />
                       {selectedWorkshop.modality === 'C' && (
-                        <p className="mt-1.5 text-[9px] text-orange-600 font-bold italic bg-orange-50 p-1.5 border border-orange-100">
-                          * Maximum 4 students per project in Modality C.
+                        <p className="mt-2 text-[11px] text-orange-600 font-medium italic bg-orange-500/5 p-2 border border-orange-200/30">
+                          * Maximum 4 students in Modality C.
                         </p>
                       )}
                     </div>
 
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Reason for Request (Optional)</label>
+                    <div className="space-y-3">
+                      <label className="block text-[12px] font-medium text-text-primary px-1">Reason for request</label>
                       <textarea
                         value={comments}
                         onChange={(e) => setComments(e.target.value)}
                         placeholder="Brief explanation of student profile..."
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700 min-h-[80px] resize-none"
+                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none min-h-[100px] resize-none appearance-none"
                       />
                     </div>
                   </div>
@@ -458,20 +458,20 @@ export default function RequestsPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className={`w-full py-4 rounded-none font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${submitting
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-[#00426B] text-white hover:bg-[#0775AB] shadow-md hover:shadow-lg active:translate-y-0.5'
+                    className={`w-full py-4 font-medium text-[13px] flex items-center justify-center gap-3 transition-all ${submitting
+                      ? 'bg-background-subtle text-text-muted cursor-not-allowed'
+                      : 'bg-consorci-darkBlue text-white hover:bg-black active:scale-[0.98]'
                       }`}
                   >
                     {submitting ? (
                       <>
                         <div className="animate-spin h-3.5 w-3.5 border-2 border-white/20 border-t-white"></div>
-                        <span>Processing...</span>
+                        <span>Processing request...</span>
                       </>
                     ) : (
                       <>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={editingRequestId ? "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" : "M12 19l9 2-9-18-9 18 9-2zm0 0v-8"} />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={editingRequestId ? "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" : "M12 19l9 2-9-18-9 18 9-2zm0 0v-8"} />
                         </svg>
                         <span>{editingRequestId ? 'Update Request' : 'Send Request'}</span>
                       </>

@@ -24,8 +24,8 @@ export default function AdminReportsPage() {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen justify-center items-center">
-                <div className="animate-spin h-10 w-10 border-b-2 border-primary"></div>
+            <div className="flex min-h-screen justify-center items-center bg-background-surface">
+                <div className="animate-spin h-8 w-8 border-b-2 border-consorci-darkBlue"></div>
             </div>
         );
     }
@@ -44,38 +44,38 @@ export default function AdminReportsPage() {
 
                 {/* General Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div className="bg-white p-8 border shadow-sm flex flex-col items-center justify-center text-center">
-                        <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4">Student Experience</span>
-                        <span className="text-5xl font-black text-blue-900">{(generalAvg?.experienceRating || 0).toFixed(1)}</span>
-                        <div className="w-full mt-4 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-900" style={{ width: `${(generalAvg?.experienceRating || 0) * 10}%` }}></div>
+                    <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
+                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">Student Experience</span>
+                        <span className="text-4xl font-medium text-text-primary">{(generalAvg?.experienceRating || 0).toFixed(1)}</span>
+                        <div className="w-full mt-6 h-1.5 bg-background-subtle overflow-hidden">
+                            <div className="h-full bg-consorci-darkBlue" style={{ width: `${(generalAvg?.experienceRating || 0) * 10}%` }}></div>
                         </div>
                     </div>
-                    <div className="bg-white p-8 border shadow-sm flex flex-col items-center justify-center text-center">
-                        <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4">Teacher Satisfaction</span>
-                        <span className="text-5xl font-black text-blue-900">{(generalAvg?.teacherRating || 0).toFixed(1)}</span>
-                        <div className="w-full mt-4 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-900" style={{ width: `${(generalAvg?.teacherRating || 0) * 10}%` }}></div>
+                    <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
+                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">Teacher Satisfaction</span>
+                        <span className="text-4xl font-medium text-text-primary">{(generalAvg?.teacherRating || 0).toFixed(1)}</span>
+                        <div className="w-full mt-6 h-1.5 bg-background-subtle overflow-hidden">
+                            <div className="h-full bg-consorci-darkBlue" style={{ width: `${(generalAvg?.teacherRating || 0) * 10}%` }}></div>
                         </div>
                     </div>
                     {/* Mocks for additional metrics */}
-                    <div className="bg-white p-8 border shadow-sm flex flex-col items-center justify-center text-center">
-                        <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4">Workshops Completed</span>
-                        <span className="text-5xl font-black text-gray-900">84%</span>
-                        <p className="text-[10px] font-black uppercase text-green-600 mt-2">+5% vs 2023</p>
+                    <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
+                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">Workshops Completed</span>
+                        <span className="text-4xl font-medium text-text-primary">84%</span>
+                        <p className="text-[12px] font-medium text-green-600 mt-4 opacity-80">+5% vs 2023</p>
                     </div>
-                    <div className="bg-white p-8 border shadow-sm flex flex-col items-center justify-center text-center">
-                        <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4">Student Participation</span>
-                        <span className="text-5xl font-black text-gray-900">1240</span>
-                        <p className="text-[10px] font-black uppercase text-blue-600 mt-2">Total enrollments</p>
+                    <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
+                        <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">Student Participation</span>
+                        <span className="text-4xl font-medium text-text-primary">1240</span>
+                        <p className="text-[12px] font-medium text-consorci-darkBlue mt-4 opacity-80">Total enrollments</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Vocational Impact */}
-                    <div className="lg:col-span-2 bg-white p-10 border shadow-sm">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-10">Vocational Impact Distribution</h3>
-                        <div className="space-y-6">
+                    <div className="lg:col-span-2 bg-background-surface p-12 border border-border-subtle">
+                        <h3 className="text-[17px] font-medium text-text-primary mb-12 tracking-tight">Vocational Impact Distribution</h3>
+                        <div className="space-y-10">
                             {impactDistribution.map((item: { vocationalImpact: string, _count: { _all: number } }) => {
                                 const total = impactDistribution.reduce((acc: number, curr: { _count: { _all: number } }) => acc + curr._count._all, 0);
                                 const percent = (item._count._all / total) * 100;
@@ -85,16 +85,17 @@ export default function AdminReportsPage() {
                                     'CONSIDERANT': 'Is considering it right now'
                                 };
                                 return (
-                                    <div key={item.vocationalImpact} className="space-y-2">
-                                        <div className="flex justify-between items-center text-sm font-bold">
-                                            <span className="text-gray-700">{labels[item.vocationalImpact] || item.vocationalImpact}</span>
-                                            <span className="text-blue-900">{percent.toFixed(0)}% ({item._count._all})</span>
+                                    <div key={item.vocationalImpact} className="space-y-4">
+                                        <div className="flex justify-between items-center text-[13px] font-medium">
+                                            <span className="text-text-primary">{labels[item.vocationalImpact] || item.vocationalImpact}</span>
+                                            <span className="text-consorci-darkBlue">{percent.toFixed(0)}% ({item._count._all})</span>
                                         </div>
-                                        <div className="w-full h-8 bg-gray-50 border-2 overflow-hidden flex">
+                                        <div className="w-full h-1.5 bg-background-subtle overflow-hidden">
                                             <div
-                                                className={`h-full transition-all duration-1000 ${item.vocationalImpact === 'SI' ? 'bg-green-500' :
-                                                    item.vocationalImpact === 'CONSIDERANT' ? 'bg-blue-600' : 'bg-gray-200'
-                                                    }`}
+                                                className={`h-full transition-all duration-1000 ${
+                                                    item.vocationalImpact === 'SI' ? 'bg-green-500' :
+                                                    item.vocationalImpact === 'CONSIDERANT' ? 'bg-consorci-darkBlue' : 'bg-text-muted opacity-20'
+                                                }`}
                                                 style={{ width: `${percent}%` }}
                                             ></div>
                                         </div>
@@ -105,8 +106,8 @@ export default function AdminReportsPage() {
                     </div>
 
                     {/* Top Workshops */}
-                    <div className="bg-black text-white p-10 shadow-2xl flex flex-col">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-10">Top Rated Workshops</h3>
+                    <div className="bg-background-subtle p-12 border border-border-subtle flex flex-col">
+                        <h3 className="text-[17px] font-medium text-text-primary mb-12 tracking-tight">Top Rated Workshops</h3>
                         <div className="space-y-8 flex-1">
                             {[
                                 { name: '3D Printing', score: 4.8 },
@@ -114,26 +115,26 @@ export default function AdminReportsPage() {
                                 { name: 'Web Design', score: 4.5 },
                                 { name: 'Electronics', score: 4.3 }
                             ].map((t, i) => (
-                                <div key={i} className="flex justify-between items-center border-b border-white/10 pb-4">
-                                    <span className="text-sm font-black italic">{t.name}</span>
-                                    <span className="text-blue-400 font-black">{t.score}</span>
+                                <div key={i} className="flex justify-between items-center border-b border-border-subtle pb-5">
+                                    <span className="text-[13px] font-medium text-text-primary">{t.name}</span>
+                                    <span className="text-consorci-darkBlue font-medium text-[13px]">{t.score}</span>
                                 </div>
                             ))}
                         </div>
-                        <button className="mt-12 w-full py-4 bg-white text-black font-black uppercase text-[10px] tracking-widest hover:bg-blue-400 transition-all">Download PDF Summary</button>
+                        <button className="mt-12 w-full py-4 bg-consorci-darkBlue text-white font-medium text-[13px] hover:bg-black transition-all active:scale-[0.98]">Download PDF summary</button>
                     </div>
                 </div>
 
                 {/* Quality Alert */}
-                <div className="p-8 bg-red-50 border-2 border-red-600 shadow-[8px_8px_0px_0px_rgba(220,38,38,0.1)] flex gap-6 items-center">
-                    <div className="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center shrink-0">
-                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <div className="p-8 bg-red-500/5 border border-red-500/20 flex gap-8 items-center">
+                    <div className="w-12 h-12 bg-red-600 text-white flex items-center justify-center shrink-0">
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     </div>
                     <div>
-                        <h4 className="text-xs font-black uppercase tracking-widest text-red-700 mb-1">Low Rating Alerts</h4>
-                        <p className="text-sm text-red-900/60 font-bold uppercase tracking-tighter italic">2 Workshops show satisfaction below 3.5. Review with the reference center is recommended.</p>
+                        <h4 className="text-[13px] font-medium text-red-700 mb-1">Low rating alerts</h4>
+                        <p className="text-[13px] text-red-900/60 font-medium">2 Workshops show satisfaction below 3.5. Review with the reference center is recommended.</p>
                     </div>
-                    <button className="ml-auto bg-red-600 text-white px-6 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg">View Details</button>
+                    <button className="ml-auto bg-red-600 text-white px-8 py-3.5 text-[13px] font-medium hover:bg-black transition-all active:scale-[0.98]">View details</button>
                 </div>
 
             </div>

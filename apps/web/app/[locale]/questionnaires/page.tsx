@@ -36,7 +36,9 @@ export default function AdminQuestionnairesPage() {
 
     if (loading) {
         return (
-            <Loading fullScreen message="Loading questionnaires..." />
+            <div className="flex min-h-screen justify-center items-center bg-background-surface">
+                <div className="animate-spin h-8 w-8 border-b-2 border-consorci-darkBlue"></div>
+            </div>
         );
     }
 
@@ -46,42 +48,43 @@ export default function AdminQuestionnairesPage() {
             subtitle="Manage dynamic form models and view responses."
         >
             <div className="w-full pb-20">
-                <div className="flex justify-between items-center mb-10">
-                    <h2 className="text-xl font-black uppercase tracking-tighter text-gray-800">Available Models</h2>
+                <div className="flex justify-between items-center mb-12">
+                    <h2 className="text-[18px] font-medium text-text-primary tracking-tight">Available Models</h2>
                     <button
                         onClick={() => router.push('/admin/questionnaires/builder')}
-                        className="bg-blue-900 text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg flex items-center gap-3 active:scale-95"
+                        className="bg-consorci-darkBlue text-white px-8 py-4 text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-3"
                     >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
                         New Questionnaire
                     </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {models.length === 0 ? (
-                        <div className="col-span-full bg-white p-20 border-2 border-dashed border-gray-100 text-center">
-                            <p className="text-gray-400 italic mb-6">No questionnaire models have been created yet.</p>
-                            <button onClick={() => router.push('/admin/questionnaires/builder')} className="text-blue-900 font-black uppercase text-xs tracking-widest hover:underline">Start now</button>
+                        <div className="col-span-full bg-background-surface p-24 border border-dashed border-border-subtle text-center">
+                            <p className="text-text-muted font-medium mb-8">No questionnaire models have been created yet.</p>
+                            <button onClick={() => router.push('/admin/questionnaires/builder')} className="text-consorci-darkBlue font-medium text-[13px] hover:underline">Create the first one</button>
                         </div>
                     ) : (
                         paginatedModels.map((m) => (
-                            <div key={m.modelId} className="bg-white p-8 border shadow-sm hover:shadow-xl transition-all group flex flex-col justify-between">
+                            <div key={m.modelId} className="bg-background-surface p-10 border border-border-subtle hover:border-consorci-darkBlue transition-all group flex flex-col justify-between">
                                 <div>
-                                    <div className="flex justify-between items-start mb-4">
-                                        <span className={`px-3 py-1 text-[8px] font-black uppercase tracking-widest ${m.target === 'STUDENT' ? 'bg-blue-100 text-blue-700' :
-                                            m.target === 'TEACHER' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
+                                    <div className="flex justify-between items-start mb-6">
+                                        <span className={`px-2.5 py-1 text-[11px] font-medium border ${
+                                            m.target === 'STUDENT' ? 'border-consorci-darkBlue/20 text-consorci-darkBlue bg-consorci-darkBlue/5' :
+                                            m.target === 'TEACHER' ? 'border-purple-500/20 text-purple-600 bg-purple-500/5' : 'border-orange-500/20 text-orange-600 bg-orange-500/5'
                                             }`}>
                                             {m.target}
                                         </span>
-                                        <span className="text-[10px] text-gray-300 font-bold">#{m.modelId}</span>
+                                        <span className="text-[12px] text-text-muted font-medium opacity-50">#{m.modelId}</span>
                                     </div>
-                                    <h3 className="text-lg font-black text-blue-900 mb-2 uppercase tracking-tighter group-hover:text-black transition-colors">{m.name}</h3>
-                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-6">{m._count?.questions || 0} Questions</p>
+                                    <h3 className="text-[17px] font-medium text-text-primary mb-3 tracking-tight group-hover:text-consorci-darkBlue transition-colors">{m.name}</h3>
+                                    <p className="text-[12px] text-text-muted font-medium mb-8">{m._count?.questions || 0} Questions</p>
                                 </div>
 
                                 <div className="flex gap-4">
-                                    <button className="flex-1 py-3 bg-gray-50 text-gray-500 font-black uppercase text-[10px] tracking-widest hover:bg-gray-100 transition-all border">Edit</button>
-                                    <button className="flex-1 py-3 bg-black text-white font-black uppercase text-[10px] tracking-widest hover:bg-blue-900 transition-all shadow-md">View Results</button>
+                                    <button className="flex-1 py-3.5 bg-background-subtle text-text-muted font-medium text-[13px] hover:bg-background-surface transition-all border border-border-subtle">Edit</button>
+                                    <button className="flex-1 py-3.5 bg-consorci-darkBlue text-white font-medium text-[13px] hover:bg-black transition-all active:scale-[0.98]">View results</button>
                                 </div>
                             </div>
                         ))
@@ -98,14 +101,14 @@ export default function AdminQuestionnairesPage() {
                 />
 
                 {/* Help section */}
-                <div className="mt-16 bg-blue-50 p-8 border-l-4 border-blue-900">
-                    <div className="flex gap-4">
-                        <div className="w-10 h-10 bg-blue-900 text-white flex items-center justify-center rounded-full shrink-0">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div className="mt-20 bg-background-subtle border border-border-subtle p-10">
+                    <div className="flex gap-6 items-start">
+                        <div className="w-10 h-10 bg-consorci-darkBlue text-white flex items-center justify-center shrink-0">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
                         <div>
-                            <h4 className="text-sm font-black text-blue-900 uppercase tracking-tighter mb-2">How do questionnaires work?</h4>
-                            <p className="text-xs text-blue-800/80 leading-relaxed font-bold italic uppercase tracking-tighter">
+                            <h4 className="text-[15px] font-medium text-text-primary mb-3">How do questionnaires work?</h4>
+                            <p className="text-[13px] text-text-muted leading-relaxed font-medium">
                                 Dynamic questionnaires can be sent to participants once the execution phase is finished. The data obtained automatically feeds the Evaluation Dashboard for Consortium administrators.
                             </p>
                         </div>

@@ -65,20 +65,20 @@ export default function AdminStatsPage() {
       <div className="space-y-8 animate-in fade-in duration-700">
 
         {/* Header Ribbon */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-background-surface p-6 text-text-primary shadow-sm border-l-8 border-consorci-darkBlue">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-background-surface p-8 text-text-primary border border-border-subtle">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <ShieldCheck className="w-5 h-5 text-consorci-lightBlue" />
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-consorci-lightBlue">
-                SECURE DATA HUB ACTIVE
+            <div className="flex items-center gap-3 mb-2">
+              <ShieldCheck className="w-5 h-5 text-consorci-darkBlue" strokeWidth={1.5} />
+              <div className="text-[12px] font-medium text-text-muted">
+                Secure Data Hub Active
               </div>
             </div>
-            <h2 className="text-xl font-black uppercase tracking-tight text-consorci-darkBlue">Management Statistics</h2>
+            <h2 className="text-2xl font-medium tracking-tight text-text-primary leading-none">Management Statistics</h2>
           </div>
           <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
             <div className="text-right">
-              <div className="text-[10px] font-black text-text-muted uppercase mb-0.5 tracking-tighter">Total Requests</div>
-              <div className="text-3xl font-black leading-none text-consorci-darkBlue">
+              <div className="text-[11px] font-medium text-text-muted mb-1">Total Requests</div>
+              <div className="text-4xl font-medium leading-none text-text-primary">
                 {statusStats.reduce((acc, s) => acc + s.total, 0)}
               </div>
             </div>
@@ -89,11 +89,11 @@ export default function AdminStatsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Status Distribution (Pie) */}
-          <div className="lg:col-span-1 flex flex-col bg-background-surface border border-border-subtle shadow-sm transition-all hover:shadow-md hover:border-consorci-lightBlue/30 group">
+          <div className="lg:col-span-1 flex flex-col bg-background-surface border border-border-subtle group">
             <div className="p-6 border-b border-border-subtle flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-consorci-actionBlue" />
-                <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Request Status</h3>
+                <PieChartIcon className="w-4 h-4 text-consorci-darkBlue" strokeWidth={1.5} />
+                <h3 className="text-[12px] font-medium text-text-primary">Request Status</h3>
               </div>
               <TrendingUp className="w-4 h-4 text-green-500 opacity-50 group-hover:opacity-100 transition-opacity" />
             </div>
@@ -101,9 +101,9 @@ export default function AdminStatsPage() {
               <StatusDistribution data={statusStats} />
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {statusStats.map((s, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-background-subtle p-2 border-l-2 border-consorci-darkBlue dark:border-consorci-lightBlue">
-                    <span className="text-[9px] font-bold text-text-secondary uppercase">{s.status}</span>
-                    <span className="text-xs font-black text-consorci-darkBlue dark:text-consorci-lightBlue">{s.total}</span>
+                  <div key={idx} className="flex items-center justify-between bg-background-subtle p-3 border-l-2 border-consorci-darkBlue">
+                    <span className="text-[11px] font-medium text-text-secondary">{s.status}</span>
+                    <span className="text-xs font-medium text-text-primary">{s.total}</span>
                   </div>
                 ))}
               </div>
@@ -111,10 +111,10 @@ export default function AdminStatsPage() {
           </div>
 
           {/* Workshop Popularity (Bar) */}
-          <div className="lg:col-span-2 flex flex-col bg-background-surface border border-border-subtle shadow-sm transition-all hover:shadow-md hover:border-consorci-lightBlue/30">
+          <div className="lg:col-span-2 flex flex-col bg-background-surface border border-border-subtle">
             <div className="p-6 border-b border-border-subtle flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-consorci-actionBlue" />
-              <h3 className="text-[10px] font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-widest">Global Workshop Demand</h3>
+              <BarChart3 className="w-4 h-4 text-consorci-darkBlue" strokeWidth={1.5} />
+              <h3 className="text-[12px] font-medium text-text-primary">Global Workshop Demand</h3>
             </div>
             <div className="p-6 flex-1">
               <WorkshopPopularity data={popularStats} />

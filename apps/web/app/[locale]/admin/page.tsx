@@ -108,23 +108,23 @@ export default function AdminDashboardPage() {
             <div
               key={section.path}
               onClick={() => router.push(section.path)}
-              className="group bg-background-surface p-8 md:p-10 border border-border-subtle cursor-pointer transition-all duration-300 hover:border-consorci-actionBlue hover:shadow-xl relative overflow-hidden"
+              className="group bg-background-surface p-10 border border-border-subtle cursor-pointer transition-all duration-300 hover:border-consorci-darkBlue active:scale-[0.98] relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 group-hover:bg-consorci-actionBlue transition-colors duration-300"></div>
+              <div className="absolute top-0 right-0 w-1 bg-consorci-darkBlue/10 group-hover:bg-consorci-darkBlue transition-colors h-full"></div>
 
-              <div className={`w-16 h-16 bg-background-subtle flex items-center justify-center mb-8 border border-border-subtle group-hover:bg-consorci-darkBlue group-hover:text-white transition-all duration-300`}>
-                <div className={`text-consorci-darkBlue group-hover:text-white`}>
+              <div className={`w-14 h-14 bg-background-subtle flex items-center justify-center mb-8 border border-border-subtle group-hover:border-consorci-darkBlue transition-all duration-300`}>
+                <div className={`text-consorci-darkBlue`}>
                   {section.icon}
                 </div>
               </div>
-              <h3 className="text-xl font-medium text-text-primary mb-3 uppercase tracking-tight">{section.title}</h3>
-              <p className="text-xs text-text-muted font-medium leading-relaxed uppercase tracking-wider">{section.description}</p>
+              <h3 className="text-[18px] font-medium text-text-primary mb-2 tracking-tight">{section.title}</h3>
+              <p className="text-[13px] text-text-muted font-medium leading-relaxed">{section.description}</p>
 
               <div className="mt-8 flex items-center">
-                <div className="flex items-center text-consorci-actionBlue font-bold text-[10px] uppercase tracking-[0.2em] group-hover:translate-x-2 transition-transform">
+                <div className="flex items-center text-consorci-darkBlue font-medium text-[11px] uppercase tracking-wider group-hover:translate-x-1 transition-transform">
                   {section.phase}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
               </div>
