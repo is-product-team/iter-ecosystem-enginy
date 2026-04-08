@@ -55,11 +55,12 @@ export default async function LocaleLayout({
                 position="top-right" 
                 offset={80}
                 toastOptions={{
-                  className: 'font-bold uppercase text-[10px] tracking-widest',
+                  className: 'text-[13px] font-medium transition-all',
                   style: {
                     borderRadius: '0px',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                    border: '1px solid var(--border-subtle)',
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
                     padding: '16px',
                   },
                 }}

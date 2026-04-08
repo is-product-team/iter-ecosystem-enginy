@@ -8,11 +8,13 @@ export const PRIMITIVES = {
   white: '#FFFFFF',
   black: '#000000',
   gray: '#CFD2D3', // Pantone 427 C / Cool Grey 1 U
-  slate: {
-    900: '#0F172A',
-    800: '#1E293B',
-    700: '#334155',
-    600: '#475569',
+  charcoal: {
+    950: '#0D0D0D',
+    900: '#171717',
+    800: '#212121',
+    700: '#2F2F2F',
+    600: '#424242',
+    500: '#676767',
   },
   neutral: {
     900: '#111827',
@@ -21,7 +23,7 @@ export const PRIMITIVES = {
     500: '#6B7280',
     200: '#E5E7EB',
     100: '#F3F4F6',
-    50: '#F9FAFB',
+    50: '#F7F8F9',
   },
   success: '#10B981',
   warning: '#F59E0B',
@@ -51,20 +53,20 @@ export const SEMANTICS = {
   },
   dark: {
     background: {
-      page: PRIMITIVES.slate[900],
-      surface: PRIMITIVES.slate[800],
-      subtle: PRIMITIVES.slate[700],
+      page: '#171717', // PRIMITIVES.charcoal[900]
+      surface: '#212121', // PRIMITIVES.charcoal[800]
+      subtle: '#2F2F2F', // PRIMITIVES.charcoal[700]
       brand: PRIMITIVES.primary,
     },
     text: {
-      primary: PRIMITIVES.neutral[100],
-      secondary: PRIMITIVES.neutral[200],
-      muted: PRIMITIVES.neutral[500],
+      primary: '#ECECEC', // Primary text
+      secondary: '#B4B4B4', // Secondary text
+      muted: '#676767', // Muted text
       inverse: PRIMITIVES.white,
       brand: PRIMITIVES.secondary,
     },
     border: {
-      subtle: PRIMITIVES.slate[700],
+      subtle: '#424242', // PRIMITIVES.charcoal[600]
       focus: PRIMITIVES.secondary,
     }
   }

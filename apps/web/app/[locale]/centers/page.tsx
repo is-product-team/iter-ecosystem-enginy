@@ -23,7 +23,7 @@ export default function CentersScreen() {
   const router = useRouter();
   const params = useParams();
   const locale = params?.locale || 'ca';
-  
+
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
       router.push(`/${locale}/login`);
@@ -38,7 +38,7 @@ export default function CentersScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -50,7 +50,7 @@ export default function CentersScreen() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const fetchCenters = useCallback(async () => {
@@ -75,7 +75,7 @@ export default function CentersScreen() {
 
   const filteredCenters = useMemo(() => {
     return centers.filter((center) => {
-      const matchesSearch = !searchQuery || 
+      const matchesSearch = !searchQuery ||
         center.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         center.centerCode.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -135,8 +135,8 @@ export default function CentersScreen() {
         setEditingCenter(null);
         setModalVisible(true);
       }}
-      className="flex items-center gap-2 px-6 py-3 text-white font-bold shadow-lg"
-      style={{ backgroundColor: THEME.colors.primary }}
+      className="flex items-center gap-2 px-6 py-3 text-white font-medium transition-all hover:bg-black active:scale-[0.98]"
+      style={{ backgroundColor: 'var(--consorci-darkBlue)' }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -146,8 +146,8 @@ export default function CentersScreen() {
   );
 
   return (
-    <DashboardLayout 
-      title={t('title')} 
+    <DashboardLayout
+      title={t('title')}
       subtitle={t('subtitle')}
       actions={headerActions}
     >
@@ -155,9 +155,9 @@ export default function CentersScreen() {
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-background-surface border border-border-subtle p-8">
         {/* Cercador */}
         <div className="flex-1">
-          <label className="block text-[10px] font-black text-text-primary uppercase tracking-[0.2em] mb-3">{t('search_label')}</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">Search by name or code</label>
           <div className="relative">
-            <input 
+            <input
               type="text"
               placeholder="Ej: Institut Pedralbes, 08012345..."
               value={searchQuery}
@@ -165,7 +165,7 @@ export default function CentersScreen() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-actionBlue focus:ring-0 text-sm font-bold text-text-primary placeholder:text-text-muted transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
             />
             <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -175,14 +175,14 @@ export default function CentersScreen() {
 
         {/* Acció: Netejar */}
         <div className="flex items-end">
-          <button 
+          <button
             onClick={() => {
               setSearchQuery("");
               setCurrentPage(1);
             }}
-            className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
+            className="w-full lg:w-auto px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-all border border-transparent h-[46px]"
           >
-            {tCommon('clear')}
+            Clear filters
           </button>
         </div>
       </div>
@@ -211,11 +211,11 @@ export default function CentersScreen() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">{t('table_center')}</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">{t('table_address')}</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">{t('table_email')}</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">{t('table_phone')}</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary text-right">{tCommon('actions')}</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Center</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Address</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Email</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Phone</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle">
@@ -229,29 +229,29 @@ export default function CentersScreen() {
                           </svg>
                         </div>
                         <div>
-                          <div className="text-sm font-black text-text-primary uppercase tracking-tight">{center.name}</div>
-                          <div className="text-[10px] font-bold text-text-muted uppercase tracking-tighter mt-0.5">{t('center_code')}: {center.centerCode}</div>
+                          <div className="text-sm font-medium text-text-primary tracking-tight">{center.name}</div>
+                          <div className="text-[10px] font-medium text-text-muted mt-0.5">Code: {center.centerCode}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
-                      {center.address || t('no_address')}
+                    <td className="px-6 py-5 text-[11px] font-medium text-text-primary">
+                      {center.address || "No address"}
                     </td>
-                    <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
+                    <td className="px-6 py-5 text-[11px] font-medium text-text-primary">
                       {center.contactEmail || "N/A"}
                     </td>
-                    <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
+                    <td className="px-6 py-5 text-[11px] font-medium text-text-primary">
                       {center.contactPhone || "N/A"}
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">
-                        <button 
+                        <button
                           onClick={() => handleEdit(center)}
-                          className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-consorci-darkBlue hover:bg-background-subtle transition-colors"
+                          className="px-4 py-2 text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors"
                         >
                           {tCommon('edit')}
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(center.centerId)}
                           className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
                         >
@@ -284,8 +284,8 @@ export default function CentersScreen() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <p className="text-text-primary font-black uppercase text-xs tracking-widest">{t('empty')}</p>
-          <p className="text-text-muted text-[10px] uppercase font-bold mt-1 tracking-widest">{t('empty_desc')}</p>
+          <p className="text-text-primary font-medium text-sm">No centers found</p>
+          <p className="text-text-muted text-[12px] font-medium mt-2">Try other search terms.</p>
         </div>
       )}
 
@@ -298,7 +298,7 @@ export default function CentersScreen() {
         onCenterSaved={handleCenterSaved}
         initialData={editingCenter}
       />
-      <ConfirmDialog 
+      <ConfirmDialog
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}

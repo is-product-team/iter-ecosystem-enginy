@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import getApi from '@/services/api';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface DocumentUploadProps {
   assignmentId: number;
@@ -23,6 +24,7 @@ export default function DocumentUpload({
   label,
   onUploadSuccess
 }: DocumentUploadProps) {
+  const t = useTranslations('Common');
   // --- Upload and Validation States ---
   const [uploading, setUploading] = useState(false); // Indicates if the HTTP upload to backend is in progress
   const [currentUrl, setCurrentUrl] = useState(initialUrl); // Current URL of the uploaded document
@@ -58,14 +60,14 @@ export default function DocumentUpload({
 
       setCurrentUrl(newUrl);
       if (newUrl) onUploadSuccess(newUrl);
-      toast.success(`${label} uploaded successfully.`);
+      toast.success(t('upload_success', { label }));
       
       // Clear error/blocking states after success
       setOverrideMode(false);
       setPendingFile(null);
     } catch (error) {
       console.error('Error uploading document:', error);
-      toast.error('Error uploading document.');
+      toast.error(t('error_upload'));
     } finally {
       setUploading(false);
     }
@@ -80,7 +82,7 @@ export default function DocumentUpload({
 
     // Basic format validation
     if (file.type !== 'application/pdf') {
-      toast.error('Only PDF files are allowed.');
+      toast.error(t('only_pdf_allowed'));
       return;
     }
 
@@ -100,7 +102,7 @@ export default function DocumentUpload({
 
       // Validation 1: Text content must match the upload slot type
       if (detectedType !== 'unknown' && detectedType !== expectedInIAPipeline) {
-        toast.error(`AI detects a different type: ${detectedType}.`);
+        toast.error(t('ai_mismatch', { type: detectedType }));
         setOverrideMode(true);
         setPendingFile(file);
         return;
@@ -114,7 +116,7 @@ export default function DocumentUpload({
         const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // We look for 3 signatures
 
         if (!hasSignatures) {
-          toast.error('AI has not detected the required signatures.');
+          toast.error(t('ai_no_signatures'));
           setOverrideMode(true);
           setPendingFile(file);
           return;
@@ -125,7 +127,7 @@ export default function DocumentUpload({
       await handleValidUpload(file);
     } catch (err) {
       console.error("AI Validation Error:", err);
-      toast.error('Error processing AI. You can force the upload.');
+      toast.error(t('ai_error'));
       setOverrideMode(true);
       setPendingFile(file);
     } finally {
@@ -135,25 +137,25 @@ export default function DocumentUpload({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-4 p-3 border border-gray-100 bg-gray-50/50 group hover:bg-white hover:border-consorci-lightBlue transition-all">
+      <div className="flex items-center justify-between gap-4 p-3 border border-border-subtle bg-background-surface group hover:bg-background-subtle transition-all">
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <span className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">{label}</span>
+            <span className="text-[10px] font-medium text-text-muted">{label}</span>
           </div>
           {currentUrl ? (
             <a
               href={`${process.env.NEXT_PUBLIC_API_URL}${currentUrl}`}
               target="_blank"
               rel="noopener noreferrer"
-              className={`text-[10px] font-bold flex items-center gap-1 mt-1 ${isValidated ? 'text-green-600' : 'text-consorci-darkBlue hover:text-consorci-lightBlue'}`}
+              className={`text-[11px] font-medium flex items-center gap-1 mt-1 ${isValidated ? 'text-green-600' : 'text-consorci-darkBlue hover:text-consorci-lightBlue'}`}
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              {isValidated ? 'DOCUMENT VALIDATED' : 'VIEW DOCUMENT'}
+              {isValidated ? t('document_validated') : t('view_document')}
             </a>
           ) : (
-            <span className="text-[10px] font-bold text-red-400 mt-1 uppercase">PENDING</span>
+            <span className="text-[11px] font-medium text-red-500 mt-1">{t('pending')}</span>
           )}
         </div>
 
@@ -161,16 +163,16 @@ export default function DocumentUpload({
           {overrideMode && pendingFile && (
             <button
               onClick={() => handleValidUpload(pendingFile)}
-              className="px-3 py-1 text-[8px] font-bold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition-all uppercase"
+              className="px-3 py-1 text-[10px] font-medium text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition-all"
             >
-              Force Manual Upload
+              {t('force_manual_upload')}
             </button>
           )}
           
-          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[9px] font-bold uppercase tracking-widest transition-all border ${
-            uploading || validatingAI ? 'bg-gray-50 border-gray-100 text-gray-300' : 'border-[#00426B] text-[#00426B] hover:bg-blue-50'
+          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[11px] font-medium transition-all border ${
+            uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
           }`}>
-            {uploading ? 'UPLOADING...' : validatingAI ? 'VALIDATING (AI)...' : currentUrl ? 'CHANGE' : 'ATTACH'}
+            {uploading ? t('uploading') : validatingAI ? t('validating_ai') : currentUrl ? t('change') : t('attach')}
             <input
               type="file"
               className="hidden"

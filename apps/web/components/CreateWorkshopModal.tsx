@@ -153,20 +153,20 @@ const CreateWorkshopModal = ({
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans transition-all duration-300">
-      <div className="bg-white w-full max-w-5xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all duration-300">
+      <div className="bg-background-surface w-full max-w-5xl border border-border-subtle overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
         {/* Header */}
-        <div className="bg-gray-50 px-8 py-5 flex justify-between items-center shrink-0 border-b border-gray-100">
+        <div className="bg-background-subtle px-8 py-5 flex justify-between items-center shrink-0 border-b border-border-subtle">
           <div>
-            <h2 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
-              {initialData ? tCommon("edit") : tCommon("new")}
+            <h2 className="text-xl font-medium text-text-primary">
+              {initialData ? "Edit Workshop" : "New Workshop"}
             </h2>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-              {t("workshop_config_subtitle")}
+            <p className="text-[11px] font-normal text-text-muted mt-1">
+              Workshop Configuration and Weekly Schedule
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-300 hover:text-[#00426B] transition-colors">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
 
@@ -174,29 +174,29 @@ const CreateWorkshopModal = ({
         <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
 
           {/* Left: Data */}
-          <div className="md:w-7/12 p-8 overflow-y-auto border-r border-gray-100 custom-scrollbar">
+          <div className="md:w-7/12 p-8 overflow-y-auto border-r border-border-subtle custom-scrollbar">
             <section className="mb-8">
-              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">{t('general_info')}</h3>
+              <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">General Information</h3>
 
               <div className="space-y-6">
                 <div className="group">
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('title')} <span className="text-red-400">*</span></label>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">Workshop Title <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all placeholder:text-gray-300 outline-none"
-                    placeholder={t('title_placeholder')}
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all placeholder:text-text-muted outline-none"
+                    placeholder="Enter the workshop name..."
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('sector')}</label>
+                    <label className="block text-[11px] font-medium text-text-primary mb-2">Professional Sector</label>
                     <select
                       value={sectorId}
                       onChange={(e) => setSectorId(Number(e.target.value))}
-                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all outline-none appearance-none"
                     >
                       <option value="">{t('select_sector')}</option>
                       {sectors.map((sector) => (
@@ -207,11 +207,11 @@ const CreateWorkshopModal = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('modality')} <span className="text-red-400">*</span></label>
+                    <label className="block text-[11px] font-medium text-text-primary mb-2">Modality <span className="text-red-500">*</span></label>
                     <select
                       value={modality}
                       onChange={(e) => setModality(e.target.value)}
-                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all outline-none appearance-none"
                     >
                       <option value="A">{t('modality_a')}</option>
                       <option value="B">{t('modality_b')}</option>
@@ -221,46 +221,46 @@ const CreateWorkshopModal = ({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('description')}</label>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">Description</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all placeholder:text-gray-300 outline-none custom-scrollbar"
-                    placeholder={t('description_placeholder')}
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all placeholder:text-text-muted outline-none custom-scrollbar"
+                    placeholder="Brief explanation of the content..."
                   />
                 </div>
               </div>
             </section>
 
             <section>
-              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">{t('technical_details')}</h3>
+              <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">Technical Details</h3>
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('duration')}</label>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">Duration (h)</label>
                   <input
                     type="number"
                     value={durationHours}
                     onChange={(e) => setDurationHours(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none md:appearance-none"
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all outline-none md:appearance-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('places')}</label>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">Places</label>
                   <input
                     type="number"
                     value={maxPlaces}
                     onChange={(e) => setMaxPlaces(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none md:appearance-none"
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all outline-none md:appearance-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('icon')}</label>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">Icon</label>
                   <div className="relative group/icon">
-                    <button className="w-full flex items-center justify-between px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] group-hover/icon:border-[#0775AB] transition-all">
+                    <button className="w-full flex items-center justify-between px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary group-hover/icon:border-consorci-darkBlue transition-all">
                       <span className="flex items-center gap-2">
                         <WorkshopIcon iconName={icon} className="w-5 h-5" />
-                        <span className="text-[9px] font-black uppercase tracking-widest">{icon}</span>
+                        <span className="text-[11px] font-medium">{icon}</span>
                       </span>
                     </button>
                     <div className="absolute top-full left-0 w-full bg-white border border-gray-200 shadow-xl hidden group-hover/icon:grid grid-cols-4 gap-1 p-3 z-20 animate-in fade-in slide-in-from-top-1 duration-150">
@@ -278,21 +278,20 @@ const CreateWorkshopModal = ({
           </div>
 
           {/* Right: Schedule */}
-          <div className="md:w-5/12 bg-[#F8FAFC] p-8 overflow-y-auto">
+          <div className="md:w-5/12 bg-background-subtle p-8 overflow-y-auto">
             <section>
-              <h3 className="text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                {t('schedule')}
+              <h3 className="text-[11px] font-medium text-text-primary mb-6 flex items-center gap-2 border-b border-border-subtle pb-3">
+                <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Weekly Schedule
               </h3>
 
-              <div className="bg-white p-6 shadow-sm border border-gray-100 mb-8 relative">
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-[#00426B]"></div>
-                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">{t('add_slot')}</h4>
+              <div className="bg-background-surface p-6 border border-border-subtle mb-8 relative">
+                <h4 className="text-[11px] font-medium text-text-muted mb-4 text-center">Add Time Slot</h4>
                 <div className="space-y-4">
                   <div>
                     <select
                       value={tempDay} onChange={(e) => setTempDay(parseInt(e.target.value))}
-                      className="w-full px-4 py-2.5 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
+                      className="w-full px-4 py-2.5 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                     >
                       <option value={1}>{t('monday')}</option>
                       <option value={2}>{t('tuesday')}</option>
@@ -303,29 +302,29 @@ const CreateWorkshopModal = ({
                   </div>
                   <div className="flex gap-4">
                     <div className="flex-1">
-                      <input type="time" value={tempStart} onChange={(e) => setTempStart(e.target.value)} className="w-full px-3 py-2 text-sm font-bold text-[#00426B] border border-gray-100 bg-[#F8FAFC] focus:border-[#0775AB] outline-none" />
+                      <input type="time" value={tempStart} onChange={(e) => setTempStart(e.target.value)} className="w-full px-3 py-2 text-sm font-medium text-text-primary border border-border-subtle bg-background-subtle focus:border-consorci-darkBlue outline-none" />
                     </div>
                     <span className="flex items-center text-gray-300">-</span>
                     <div className="flex-1">
-                      <input type="time" value={tempEnd} onChange={(e) => setTempEnd(e.target.value)} className="w-full px-3 py-2 text-sm font-bold text-[#00426B] border border-gray-100 bg-[#F8FAFC] focus:border-[#0775AB] outline-none" />
+                      <input type="time" value={tempEnd} onChange={(e) => setTempEnd(e.target.value)} className="w-full px-3 py-2 text-sm font-medium text-text-primary border border-border-subtle bg-background-subtle focus:border-consorci-darkBlue outline-none" />
                     </div>
                   </div>
                   <button
                     onClick={addScheduleSlot}
-                    className="w-full py-3 bg-[#EAEFF2] text-[#00426B] text-[9px] font-black uppercase tracking-[0.2em] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95"
+                    className="w-full py-3 bg-consorci-darkBlue text-white text-[11px] font-medium hover:bg-consorci-actionBlue transition-all active:scale-95"
                   >
                     + {t('add_day')}
                   </button>
                 </div>
               </div>
 
-              <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 px-1">{t('configured_days')}</h4>
+              <h4 className="text-[11px] font-medium text-text-muted mb-4 px-1">Configured Days</h4>
               <div className="space-y-3">
                 {schedule.map((slot, idx) => (
-                  <div key={idx} className="flex justify-between items-center bg-white border border-gray-100 p-4 shadow-sm hover:border-[#0775AB] transition-colors group">
+                  <div key={idx} className="flex justify-between items-center bg-background-surface border border-border-subtle p-4 hover:border-consorci-darkBlue transition-colors group">
                     <div className="flex flex-col">
-                      <span className="text-[11px] font-black text-[#00426B] uppercase tracking-tight">{daysMap[slot.dayOfWeek]}</span>
-                      <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{slot.startTime} - {slot.endTime}</span>
+                      <span className="text-[13px] font-medium text-text-primary">{daysMap[slot.dayOfWeek]}</span>
+                      <span className="text-[11px] font-normal text-text-muted mt-0.5">{slot.startTime} - {slot.endTime}</span>
                     </div>
                     <button onClick={() => removeScheduleSlot(idx)} className="text-gray-300 hover:text-[#F26178] transition-colors p-2 hover:bg-red-50 rounded-full">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -343,21 +342,21 @@ const CreateWorkshopModal = ({
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 border-t border-gray-100 px-8 py-5 flex justify-between items-center shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div className="bg-background-subtle border-t border-border-subtle px-8 py-5 flex justify-between items-center shrink-0">
           {error ? (
-            <div className="text-[#F26178] text-[10px] font-black uppercase tracking-widest">{error}</div>
+            <div className="text-red-500 text-[11px] font-medium">{error}</div>
           ) : (
-            <div className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">{t('review_data')}</div>
+            <div className="text-text-muted text-[11px] font-normal">Review data before saving.</div>
           )}
 
           <div className="flex gap-4">
-            <button onClick={onClose} className="px-6 py-3 text-[10px] font-black text-gray-400 hover:text-gray-600 uppercase tracking-widest transition-colors">
-              {tCommon('cancel')}
+            <button onClick={onClose} className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors">
+              Cancel
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="px-10 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#0775AB] shadow-xl disabled:opacity-50 disabled:shadow-none transition-all active:scale-95"
+              className="px-10 py-3 bg-consorci-darkBlue text-white text-[12px] font-medium hover:bg-consorci-actionBlue disabled:opacity-50 transition-all active:scale-[0.98]"
             >
               {loading ? (
                 <div className="flex items-center gap-2">

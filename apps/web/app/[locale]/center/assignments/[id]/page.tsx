@@ -27,7 +27,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
   const [loading, setLoading] = useState(true);
   const paramsNav = useParams();
   const locale = paramsNav?.locale || 'ca';
-  
+
   const router = useRouter();
 
   useEffect(() => {
@@ -71,38 +71,38 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
   if (loading || !assignment) return <Loading fullScreen message={t('loading_msg')} />;
 
-  const allDocumentsValidated = assignment.enrollments && assignment.enrollments.length > 0 && assignment.enrollments.every((ins: Enrollment) => 
-    ins.isPedagogicalAgreementValidated && 
-    ins.isMobilityAuthorizationValidated && 
+  const allDocumentsValidated = assignment.enrollments && assignment.enrollments.length > 0 && assignment.enrollments.every((ins: Enrollment) =>
+    ins.isPedagogicalAgreementValidated &&
+    ins.isMobilityAuthorizationValidated &&
     ins.isImageRightsValidated
   );
 
   return (
-    <DashboardLayout 
-      title={`${t('title_prefix')}${assignment.workshop?.title}`} 
+    <DashboardLayout
+      title={`Workshop: ${assignment.workshop?.title}`}
       subtitle={
-        <div className="flex flex-col gap-4 mt-6">
-          <div className="flex items-center gap-3">
-            <div className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border-2 border-gray-100 bg-white text-[#00426B]">
+        <div className="flex flex-col gap-6 mt-8">
+          <div className="flex items-center gap-4">
+            <div className="px-4 py-1 text-[11px] font-medium border border-border-subtle bg-background-subtle text-text-primary">
               {getStatusLabel(assignment.status)}
             </div>
-            <div className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest bg-[#00426B] text-white">
-              {t('modality_prefix')}{assignment.workshop?.modality}
+            <div className="px-4 py-1 text-[11px] font-medium bg-consorci-darkBlue text-white">
+              Modality {assignment.workshop?.modality}
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-6 p-6 bg-[#F8FAFC] border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-10 p-8 bg-background-subtle border border-border-subtle mb-10">
             <div className="flex flex-col">
-              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('referent_label')}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black text-[#00426B] uppercase">{assignment.teacher1?.name}</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-xs font-black text-[#00426B] uppercase">{assignment.teacher2?.name}</span>
+              <span className="text-[11px] font-medium text-text-muted uppercase tracking-widest mb-2">Teaching Team Referent</span>
+              <div className="flex items-center gap-3">
+                <span className="text-[13px] font-medium text-text-primary">{assignment.teacher1?.name}</span>
+                <span className="text-text-muted opacity-30">•</span>
+                <span className="text-[13px] font-medium text-text-primary">{assignment.teacher2?.name}</span>
               </div>
             </div>
-            <div className="h-8 w-[1px] bg-gray-200 hidden sm:block"></div>
+            <div className="h-10 w-[1px] bg-border-subtle hidden sm:block"></div>
             <div className="flex flex-col">
-              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('center_label')}</span>
-              <span className="text-xs font-black text-[#00426B] uppercase">{assignment.center?.name}</span>
+              <span className="text-[11px] font-medium text-text-muted uppercase tracking-widest mb-2">Educational Center</span>
+              <span className="text-[13px] font-medium text-text-primary">{assignment.center?.name}</span>
             </div>
           </div>
         </div>
@@ -110,23 +110,20 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     >
       <div className="pb-20">
         {/* SECTION: PARTICIPATING STUDENTS */}
-        <section className="bg-white border border-gray-200 shadow-sm overflow-hidden mb-8">
-          <div className="p-10 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gradient-to-r from-[#F8FAFC] to-white">
+        <section className="bg-background-surface border border-border-subtle overflow-hidden mb-12">
+          <div className="p-10 border-b border-border-subtle flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-background-subtle">
             <div>
-              <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">{t('students_title')}</h3>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                {t('students_subtitle', { 
-                  occupied: assignment.enrollments?.length || 0,
-                  total: assignment.request?.approxStudents || assignment.workshop?.maxPlaces || 20
-                })}
+              <h3 className="text-xl font-medium text-text-primary tracking-tight">Participating Students</h3>
+              <p className="text-[12px] font-medium text-text-muted mt-2">
+                {assignment.enrollments?.length || 0} of {assignment.request?.approxStudents || assignment.workshop?.maxPlaces || 20} seats occupied.
               </p>
             </div>
-            <button 
-              onClick={() => router.push(`/${locale}/center/assignments/${id}/students`)}
-              className="bg-[#00426B] text-white px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#0775AB] transition-all flex items-center gap-3 shadow-xl"
+            <button
+              onClick={() => router.push(`/center/assignments/${id}/students`)}
+              className="bg-consorci-darkBlue text-white px-8 py-4 text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-3"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
-              {t('nominal_register_btn')}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
+              Nominal Register
             </button>
           </div>
 
@@ -135,20 +132,19 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
               <div key={ins.enrollmentId} className="p-8 hover:bg-gray-50/50 transition-colors">
                 <div className="flex flex-col lg:flex-row gap-10 items-start lg:items-center">
                   {/* Student Info */}
-                  <div className="flex items-center gap-6 min-w-[280px]">
-                    <Avatar 
-                      url={ins.student.photoUrl} 
-                      name={`${ins.student.fullName} ${ins.student.lastName}`} 
-                      id={ins.student.studentId} 
-                      type="student" 
+                  <div className="flex items-center gap-6 min-w-[300px]">
+                    <Avatar
+                      url={ins.student.photoUrl}
+                      name={`${ins.student.fullName} ${ins.student.lastName}`}
+                      id={ins.student.studentId}
+                      type="student"
                       size="lg"
-                      className="shadow-md"
                     />
                     <div>
-                      <p className="text-base font-black text-[#00426B] uppercase tracking-tight leading-none">
+                      <p className="text-[15px] font-medium text-text-primary tracking-tight leading-none mb-2">
                         {ins.student.fullName} {ins.student.lastName}
                       </p>
-                      <p className="text-[10px] font-bold text-[#4197CB] uppercase tracking-widest mt-2 bg-blue-50 px-2 py-0.5 inline-block border border-blue-100">
+                      <p className="text-[11px] font-medium text-text-muted bg-background-subtle px-2 py-0.5 inline-block border border-border-subtle">
                         {ins.student.grade} • {ins.student.idalu}
                       </p>
                     </div>
@@ -156,45 +152,43 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
                   {/* Documents */}
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                    <DocumentUpload 
+                    <DocumentUpload
                       assignmentId={parseInt(id)}
                       enrollmentId={ins.enrollmentId}
                       documentType="pedagogical_agreement"
                       initialUrl={ins.pedagogicalAgreementUrl}
                       isValidated={ins.isPedagogicalAgreementValidated}
                       label={t('docs.pedagogical_agreement')}
-                      onUploadSuccess={() => {}}
+                      onUploadSuccess={() => { }}
                     />
-                    <DocumentUpload 
+                    <DocumentUpload
                       assignmentId={parseInt(id)}
                       enrollmentId={ins.enrollmentId}
                       documentType="mobility_authorization"
                       initialUrl={ins.mobilityAuthorizationUrl}
                       isValidated={ins.isMobilityAuthorizationValidated}
                       label={t('docs.mobility_authorization')}
-                      onUploadSuccess={() => {}}
+                      onUploadSuccess={() => { }}
                     />
-                    <DocumentUpload 
+                    <DocumentUpload
                       assignmentId={parseInt(id)}
                       enrollmentId={ins.enrollmentId}
                       documentType="image_rights"
                       initialUrl={ins.imageRightsUrl}
                       isValidated={ins.isImageRightsValidated}
                       label={t('docs.image_rights')}
-                      onUploadSuccess={() => {}}
+                      onUploadSuccess={() => { }}
                     />
                   </div>
 
                   {/* Actions */}
                   <div className="shrink-0">
-                    <button 
-                      onClick={() => {
-                        if (confirm(tCommon('delete_confirm_msg'))) handleRemoveStudent(ins.student.studentId);
-                      }}
-                      className="p-3 text-gray-200 hover:text-red-500 hover:bg-red-50 transition-all rounded-full"
-                      title={tCommon('delete')}
+                    <button
+                      onClick={() => handleRemoveStudent(ins.student.studentId)}
+                      className="p-3 text-text-muted hover:text-red-500 hover:bg-red-500/5 transition-all"
+                      title="Remove student"
                     >
-                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                   </div>
                 </div>
@@ -202,14 +196,14 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
             ))}
 
             {(!assignment.enrollments || assignment.enrollments.length === 0) && (
-              <div className="p-20 text-center bg-white">
-                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              <div className="p-20 text-center bg-background-surface">
+                <div className="w-20 h-20 bg-background-subtle flex items-center justify-center mx-auto mb-8 border border-border-subtle">
+                  <svg className="w-10 h-10 text-text-muted opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 </div>
-                <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">{t('no_students')}</p>
-                <button 
-                  onClick={() => router.push(`/${locale}/center/assignments/${id}/students`)}
-                  className="text-[#4197CB] font-black text-[10px] uppercase tracking-widest hover:text-[#00426B] transition-colors"
+                <p className="text-[13px] font-medium text-text-muted mb-6">No students assigned yet</p>
+                <button
+                  onClick={() => router.push(`/center/assignments/${id}/students`)}
+                  className="text-consorci-darkBlue font-medium text-[13px] hover:underline transition-colors"
                 >
                   {t('no_students_hint')}
                 </button>
@@ -217,36 +211,35 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
             )}
           </div>
         </section>
-        
+
         {/* ACTION: FINALIZE REGISTRATION */}
         {assignment.status !== 'IN_PROGRESS' && assignment.status !== 'COMPLETED' && (
-          <div className={`p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm border ${
-            allDocumentsValidated ? 'bg-green-50 border-green-100' : 'bg-blue-50 border-blue-100'
-          }`}>
+          <div className={`p-10 flex flex-col md:flex-row items-center justify-between gap-8 border ${allDocumentsValidated ? 'bg-green-500/5 border-green-500/20' : 'bg-background-subtle border-border-subtle'
+            }`}>
             <div>
-              <h4 className={`text-lg font-black uppercase ${allDocumentsValidated ? 'text-green-700' : 'text-[#00426B]'}`}>
-                {allDocumentsValidated ? t('finalize_section.ready_title') : t('finalize_section.not_ready_title')}
+              <h4 className={`text-lg font-medium ${allDocumentsValidated ? 'text-green-600' : 'text-text-primary'}`}>
+                {allDocumentsValidated ? ' Everything ready to start' : 'Confirm Documentation'}
               </h4>
-              <p className="text-xs text-gray-600 mt-1 max-w-xl">
-                {allDocumentsValidated 
-                  ? t('finalize_section.ready_desc')
-                  : t('finalize_section.not_ready_desc')
+              <p className="text-[13px] text-text-muted mt-2 max-w-xl">
+                {allDocumentsValidated
+                  ? "All data and documents have been validated. You can now confirm the final registration to activate the workshop."
+                  : "Once all data and documents are validated, you can confirm the final registration."
                 }
               </p>
             </div>
             {allDocumentsValidated && (
-              <button 
+              <button
                 onClick={async () => {
-                  if(!confirm(t('finalize_section.confirm_dialog'))) return;
+                  if (!confirm(t('finalize_section.confirm_dialog'))) return;
                   try {
                     await assignmentService.confirmRegistration(parseInt(id));
                     toast.success(t('finalize_section.success'));
                     window.location.reload();
-                  } catch(_e) {
+                  } catch (_e) {
                     toast.error(tCommon('save_error'));
                   }
                 }}
-                className="px-8 py-4 bg-green-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl"
+                className="px-8 py-4 bg-green-600 text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
               >
                 {t('finalize_section.confirm_btn')}
               </button>
@@ -265,22 +258,22 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                 {t('close_section.desc')}
               </p>
             </div>
-            <button 
+            <button
               onClick={async () => {
                 const pendingEvaluations = assignment.enrollments?.filter(e => !e.hasTeacherEvaluation).length || 0;
-                
+
                 if (pendingEvaluations > 0) {
                   toast.error(t('close_section.pending_evals_error', { count: pendingEvaluations }));
                   return;
                 }
 
-                if(!confirm(t('close_section.confirm_dialog'))) return;
+                if (!confirm(t('close_section.confirm_dialog'))) return;
                 try {
                   const api = getApi();
                   await api.post(`/assignments/${id}/close`);
                   toast.success(t('close_section.success'));
                   window.location.reload();
-                } catch(_e: any) {
+                } catch (_e: any) {
                   const message = _e.response?.data?.error || t('close_section.error');
                   toast.error(message);
                 }

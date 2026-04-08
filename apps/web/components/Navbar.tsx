@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import notificationService from '@/services/notificationService';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const Navbar: React.FC = () => {
   const t = useTranslations('Navigation');
@@ -16,6 +17,7 @@ const Navbar: React.FC = () => {
   const params = useParams();
   const locale = params?.locale || 'ca';
   const [unreadCount, setUnreadCount] = useState(0);
+  const t = useTranslations('Common');
 
   useEffect(() => {
     if (user) {
@@ -47,31 +49,32 @@ const Navbar: React.FC = () => {
 
   const navLinks = [
     { label: t('home'), path: getHomePath(), show: true },
-    { label: t('notifications'), path: `/${locale}/center/notifications`, show: true, isNotifications: true },
-    { label: t('calendar'), path: `/${locale}/calendar`, show: true },
+    { label: t('notifications'), path: `/center/notifications`, show: true, isNotifications: true },
+    { label: t('calendar'), path: `/calendar`, show: true },
+    { label: t('profile'), path: `/profile`, show: true },
   ];
 
   return (
-    <div className="sticky top-0 z-50 bg-background-surface border-t-4 border-t-consorci-darkBlue border-b border-b-border-subtle">
+    <div className="sticky top-0 z-50 bg-background-surface/80 backdrop-blur-md border-b border-border-subtle">
       <div className="max-w-[1440px] mx-auto container-responsive">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href={getHomePath()} className="flex items-center">
-              <Image 
-                src="/logo.png" 
-                alt="Iter Logo" 
+              <Image
+                src="/logo.png"
+                alt="Iter Logo"
                 width={40}
                 height={40}
                 priority
-                className="w-10 h-10 object-contain block dark:hidden" 
+                className="w-10 h-10 object-contain block dark:hidden"
               />
-              <Image 
-                src="/logo-invers.png" 
-                alt="Iter Logo" 
+              <Image
+                src="/logo-invers.png"
+                alt="Iter Logo"
                 width={40}
                 height={40}
                 priority
-                className="w-10 h-10 object-contain hidden dark:block" 
+                className="w-10 h-10 object-contain hidden dark:block"
               />
             </Link>
           </div>
@@ -82,17 +85,16 @@ const Navbar: React.FC = () => {
                 <Link
                   key={link.path}
                   href={link.path}
-                  className={`h-full flex items-center px-4 text-[11px] font-bold uppercase tracking-widest transition-all border-b-2 ${
-                    pathname === link.path 
-                      ? 'border-consorci-darkBlue text-text-primary' 
-                      : 'border-transparent text-text-muted hover:text-text-primary hover:bg-background-subtle'
-                  }`}
+                  className={`h-full flex items-center px-4 text-[13px] font-medium transition-all border-b-2 ${pathname === link.path
+                      ? 'border-consorci-darkBlue text-text-primary'
+                      : 'border-transparent text-text-muted hover:text-text-primary'
+                    }`}
                 >
                   <span className="relative">
                     {link.label}
                     {link.isNotifications && unreadCount > 0 && (
                       <span className="absolute -top-3 -right-4 flex h-4 w-4">
-                        <span className="relative inline-flex h-4 w-4 bg-consorci-pinkRed text-[8px] font-bold items-center justify-center text-white">
+                        <span className="relative inline-flex h-4 w-4 bg-consorci-pinkRed text-[9px] font-medium items-center justify-center text-white">
                           {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
                       </span>
@@ -104,19 +106,19 @@ const Navbar: React.FC = () => {
 
             <div className="flex items-center border-l border-border-subtle pl-8 h-8 my-auto gap-6">
               <div className="flex flex-col items-end">
-                <span className="text-consorci-darkBlue text-[11px] font-black uppercase tracking-widest mb-0.5">
-                  {user.fullName}
+                <span className="text-text-primary text-[13px] font-medium mb-0.5">
+                  {user?.fullName || ''}
                 </span>
-                <span className="text-text-primary text-[10px] font-bold uppercase tracking-widest">
-                  {user.center?.name || 'Educational center'}
+                <span className="text-text-secondary text-[11px] font-normal">
+                  {user?.center?.name || t('educational_center')}
                 </span>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 truncate max-w-[180px]">
-                  {user.role?.name} {user.center?.centerCode ? `• ${user.center.centerCode}` : ''}
+                <span className="text-[11px] font-normal text-text-muted mt-0.5 truncate max-w-[180px]">
+                  {user?.role?.name} {user?.center?.centerCode ? `• ${user.center.centerCode}` : ''}
                 </span>
               </div>
               <button
                 onClick={logout}
-                className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[10px] font-bold uppercase tracking-widest px-5 py-2 transition-all"
+                className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[12px] font-medium px-5 py-2 transition-all active:scale-[0.98]"
               >
                 {t('logout')}
               </button>
