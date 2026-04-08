@@ -20,9 +20,7 @@ describe('VisionService', () => {
     } as any;
 
     const mockResponse = {
-      message: {
-        content: 'I see a handwritten signature in the designated box.'
-      }
+      response: 'YES, I can clearly see a signature.'
     };
 
     (global.fetch as any).mockResolvedValue({
@@ -36,16 +34,16 @@ describe('VisionService', () => {
     expect(result.metadata.hasSignature).toBe(true);
   });
 
-  it('should fail if not a PDF', async () => {
+  it('should fail if not a PDF or supported image', async () => {
     const mockFile = {
-      originalname: 'documento.jpg',
+      originalname: 'documento.txt',
       size: 5000,
     } as any;
 
     const result = await service.validateDocument(mockFile);
     
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain('Invalid file format. AI expects PDF structure.');
+    expect(result.errors).toContain('Unsupported file format. Please upload PDF or images.');
   });
 
   it('should detect missing signature if AI content does not mention it', async () => {
@@ -56,9 +54,7 @@ describe('VisionService', () => {
     } as any;
 
     const mockResponse = {
-      message: {
-        content: 'The signature box is completely empty.'
-      }
+      response: 'NO, the signature box is completely empty.'
     };
 
     (global.fetch as any).mockResolvedValue({
@@ -70,6 +66,6 @@ describe('VisionService', () => {
     
     expect(result.valid).toBe(false);
     expect(result.metadata.hasSignature).toBe(false);
-    expect(result.errors).toContain("Signature not detected in the 'signature_box' region.");
+    expect(result.errors).toContain("Handwritten signature not detected in the expected region.");
   });
 });
