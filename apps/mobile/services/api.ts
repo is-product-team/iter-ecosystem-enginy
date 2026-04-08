@@ -87,7 +87,7 @@ const getBaseURL = () => {
   if (url.endsWith('/')) {
     url = url.slice(0, -1);
   }
-  return url.endsWith('/api') ? url : `${url}/api`;
+  return url;
 };
 
 const api = axios.create({
