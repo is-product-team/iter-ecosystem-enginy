@@ -1,82 +1,68 @@
-# Developer Guide: Getting Started
+# Getting Started
 
-Welcome to the **Iter Ecosystem** development team. This guide will help you set up your local environment and understand the core tools used in our daily workflow.
+Welcome to the **Iter Ecosystem**. This guide will help you set up your local environment and get the system running in minutes using the recommended Docker-first approach.
 
-## 1. Prerequisites
+## 📋 Prerequisites
 
-Ensure you have the following installed on your host machine:
-- **Docker & Docker Compose**: For running the backend and database.
-- **Node.js (v22)**: For local scripts and mobile development.
-- **Git**: For version control.
+Before starting, ensure you have the following installed:
+- **Docker & Docker Desktop** (v20.10+)
+- **Git**
+- **Node.js (v22)** - *Optional, only needed for local scripts or mobile development.*
 
-## 2. Initial Setup
+## 🚀 Quick Start (Docker)
+
+The fastest way to run the entire ecosystem (API, Web, Database) is using Docker Compose.
 
 1.  **Clone the Repository**:
     ```bash
     git clone https://github.com/iter-ecosystem/enginy.git
     cd enginy
     ```
-2.  **Environment Variables**:
-    Copy the example environment files into the appropriate app directories.
+
+2.  **Environment Setup**:
+    Copy the example environment files:
     ```bash
     cp apps/api/.env.example apps/api/.env
     cp apps/web/.env.example apps/web/.env
     ```
-3.  **Boot the System**:
-    You can run the ecosystem either via Docker (recommended for full stack) or natively using Turborepo.
 
-    **Option A: Docker Compose (Full Stack)**
+3.  **Boot the Ecosystem**:
     ```bash
-    docker compose up
+    docker compose up --build
     ```
-    *Note: The first run will take some time as the `setup` service installs dependencies and initializes the database.*
+    *Note: The first run will automatically install dependencies and seed the database. This may take a few minutes.*
 
-    **Option B: Local Native (Turborepo)**
-    If you prefer to run the Node servers natively on your machine:
-    1. Install all monorepo dependencies:
-       ```bash
-       npm install
-       ```
-    2. Initialize the Postgres database (ensure you have a local standard DB running as specified in `.env`):
-       ```bash
-       npm run db:push
-       npm run db:generate
-       npm run db:seed
-       ```
-    3. Start the Web and API servers concurrently:
-       ```bash
-       npm run dev
-       ```
+## 🔗 Service Map
 
-## 3. Development Workflow
+Once the containers are running, you can access the services at the following URLs:
 
-### Web & API
-The Web (Next.js) and API (Express) services run inside Docker with hot-reloading enabled.
-- **API URL**: [http://localhost:3000](http://localhost:3000)
-- **Web UI URL**: [http://localhost:8002](http://localhost:8002)
+| Service | Local URL | Description |
+| :--- | :--- | :--- |
+| **Web UI** | [http://localhost:8002](http://localhost:8002) | Main Next.js frontend. |
+| **API Server** | [http://localhost:3000](http://localhost:3000) | Express backend and health checks. |
+| **DB Adminer** | [http://localhost:8080](http://localhost:8080) | Visual database manager (Credentials in `.env`). |
 
-### Mobile (Expo)
-The mobile application runs on your host machine to facilitate connection with real devices or simulators.
-1.  Navigate to the mobile directory: `cd apps/mobile`.
-2.  Install dependencies: `npm install`.
-3.  Start Expo: `npx expo start`.
-4.  Scan the QR code with the **Expo Go** app.
+## 🛠️ Common Operations
 
-## 4. Database Management
+### Seeding the Database
+The database is seeded automatically on first run, but you can re-seed manually if needed:
+```bash
+docker compose exec setup npm run db:seed --filter=api
+```
 
-We use **Prisma** as our ORM. 
-- **DB Viewer**: A local Adminer instance is available at [http://localhost:8080](http://localhost:8080).
-- **Schema Updates**: To apply schema changes during development:
-    ```bash
-    docker compose exec api npx prisma db push
-    ```
+### Viewing Logs
+To see logs from a specific service (e.g., the API):
+```bash
+docker compose logs -f api
+```
 
-## 5. Coding Standards
-
-- **TypeScript**: Mandatory for all packages.
-- **Design Tokens**: Never hardcode colors. Refer to `packages/shared/theme.ts`.
-- **OpenSpec**: Every feature must follow the [OpenSpec Workflow](./openspec-workflow.md).
+### Mobile Development (Expo)
+If you are working on the mobile app, run it natively on your host:
+1. `cd apps/mobile`
+2. `npm install`
+3. `npx expo start`
 
 ---
 
-*For detailed architectural information, refer to the [System Overview](../architecture/system-overview.md).*
+> [!TIP]
+> For detailed login credentials and roles, see the **[Auth & Roles](./auth-and-roles.md)** guide.

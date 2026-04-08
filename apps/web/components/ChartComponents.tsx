@@ -25,25 +25,26 @@ export const StatusDistribution = ({ data }: { data: { status: string, total: nu
         <div className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2F4F7" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
                     <XAxis
                         dataKey="name"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 10, fontWeight: 'bold', fill: '#00426B' }}
+                        tick={{ fontSize: 10, fontWeight: 500, fill: 'var(--text-muted)' }}
                     />
                     <YAxis
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 10, fontWeight: 'bold', fill: '#00426B' }}
+                        tick={{ fontSize: 10, fontWeight: 500, fill: 'var(--text-muted)' }}
                     />
                     <Tooltip
-                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #CFD2D3', fontSize: '11px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', fontSize: '11px', color: 'var(--text-primary)', borderRadius: '0px' }}
+                        itemStyle={{ color: 'var(--text-primary)' }}
                         cursor={{ fill: 'transparent' }}
                     />
-                    <Bar dataKey="total" radius={[4, 4, 0, 0]} barSize={40}>
+                    <Bar dataKey="total" radius={0} barSize={40}>
                         {chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={index === 0 ? '#4197CB' : index === 1 ? '#0775AB' : '#00426B'} />
+                            <Cell key={`cell-${index}`} fill={index === 0 ? 'var(--consorci-darkBlue)' : index === 1 ? 'var(--consorci-actionBlue)' : 'var(--text-muted)'} />
                         ))}
                     </Bar>
                 </BarChart>
@@ -63,29 +64,30 @@ export const WorkshopPopularity = ({ data }: { data: { _id: string, totalStudent
         <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2F4F7" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
                     <XAxis
                         dataKey="name"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 10, fontWeight: 'bold', fill: '#00426B' }}
+                        tick={{ fontSize: 10, fontWeight: 500, fill: 'var(--text-muted)' }}
                     />
                     <YAxis
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 10, fontWeight: 'bold', fill: '#00426B' }}
+                        tick={{ fontSize: 10, fontWeight: 500, fill: 'var(--text-muted)' }}
                     />
                     <Tooltip
-                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #CFD2D3', fontSize: '11px' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', fontSize: '11px', color: 'var(--text-primary)', borderRadius: '0px' }}
+                        itemStyle={{ color: 'var(--text-primary)' }}
                     />
-                    <Legend wrapperStyle={{ fontSize: '10px', fontWeight: 'black', textTransform: 'uppercase', paddingTop: '20px' }} />
+                    <Legend wrapperStyle={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)', paddingTop: '20px' }} />
                     <Line
                         type="monotone"
                         dataKey="students"
-                        stroke="#0775AB"
-                        strokeWidth={3}
-                        dot={{ r: 6, fill: '#00426B', strokeWidth: 2, stroke: '#fff' }}
-                        activeDot={{ r: 8, fill: '#0775AB' }}
+                        stroke="var(--consorci-darkBlue)"
+                        strokeWidth={2}
+                        dot={{ r: 4, fill: 'var(--consorci-darkBlue)', strokeWidth: 0 }}
+                        activeDot={{ r: 6, fill: 'var(--consorci-actionBlue)', strokeWidth: 0 }}
                         name="Number of Participants"
                     />
                 </LineChart>
@@ -93,4 +95,3 @@ export const WorkshopPopularity = ({ data }: { data: { _id: string, totalStudent
         </div>
     );
 };
-

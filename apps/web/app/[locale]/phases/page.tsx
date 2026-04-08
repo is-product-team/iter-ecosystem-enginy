@@ -84,8 +84,8 @@ export default function PhaseManagementPage() {
               </svg>
             </div>
             <div>
-              <h3 className="font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase text-[10px] tracking-widest mb-1">Temporal Control Panel</h3>
-              <p className="text-sm text-text-secondary font-medium leading-relaxed">
+              <h3 className="font-medium text-consorci-darkBlue text-[12px] mb-2">Temporal Control Panel</h3>
+              <p className="text-sm text-text-secondary font-normal leading-relaxed">
                 Each phase enables specific functionalities for center coordinators.
                 You can activate a phase to force the application and test workflows.
               </p>
@@ -108,17 +108,17 @@ export default function PhaseManagementPage() {
                 <div className="p-8 flex flex-col md:flex-row justify-between gap-8">
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 border border-border-subtle flex items-center justify-center bg-background-subtle text-xs font-black text-text-muted">
+                      <div className="w-10 h-10 border border-border-subtle flex items-center justify-center bg-background-subtle text-xs font-medium text-text-muted">
                         {phase.order}
                       </div>
                       <div>
-                        <h3 className="text-lg font-black text-consorci-darkBlue dark:text-consorci-lightBlue uppercase tracking-tight">{phase.name}</h3>
+                        <h3 className="text-xl font-medium text-text-primary tracking-tight">{phase.name}</h3>
                         {phase.isActive ? (
-                          <span className="inline-block mt-1 px-2 py-0.5 bg-consorci-darkBlue text-white text-[9px] font-black uppercase tracking-widest">
+                          <span className="inline-block mt-2 px-2 py-0.5 bg-consorci-darkBlue text-white text-[10px] font-medium">
                             Phase Active
                           </span>
                         ) : (
-                          <span className="inline-block mt-1 px-2 py-0.5 bg-background-subtle text-text-muted text-[9px] font-black uppercase tracking-widest">
+                          <span className="inline-block mt-2 px-2 py-0.5 bg-background-subtle text-text-muted text-[10px] font-medium border border-border-subtle">
                             Not Active
                           </span>
                         )}
@@ -131,27 +131,27 @@ export default function PhaseManagementPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 bg-background-subtle border border-border-subtle">
                       <div>
-                        <label className="text-[9px] font-black text-text-muted uppercase tracking-widest mb-2 flex items-center gap-2">
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <label className="text-[12px] font-medium text-text-muted mb-2 flex items-center gap-2">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                           Opening Date
                         </label>
                         <input
                           type="date"
                           value={phase.startDate.split('T')[0]}
                           onChange={(e) => updatePhaseDate(phase.phaseId, 'startDate', e.target.value)}
-                          className="w-full bg-background-surface border border-border-subtle text-xs font-bold text-text-primary px-4 py-3 focus:outline-none focus:border-consorci-darkBlue rounded-none shadow-sm"
+                          className="w-full bg-background-surface border border-border-subtle text-sm font-medium text-text-primary px-4 py-3 focus:outline-none focus:border-consorci-darkBlue appearance-none"
                         />
                       </div>
                       <div>
-                        <label className="text-[9px] font-black text-text-muted uppercase tracking-widest mb-2 flex items-center gap-2">
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <label className="text-[12px] font-medium text-text-muted mb-2 flex items-center gap-2">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                           Closing Date
                         </label>
                         <input
                           type="date"
                           value={phase.endDate.split('T')[0]}
                           onChange={(e) => updatePhaseDate(phase.phaseId, 'endDate', e.target.value)}
-                          className="w-full bg-background-surface border border-border-subtle text-xs font-bold text-text-primary px-4 py-3 focus:outline-none focus:border-consorci-darkBlue rounded-none shadow-sm"
+                          className="w-full bg-background-surface border border-border-subtle text-sm font-medium text-text-primary px-4 py-3 focus:outline-none focus:border-consorci-darkBlue appearance-none"
                         />
                       </div>
                     </div>
@@ -161,9 +161,9 @@ export default function PhaseManagementPage() {
                     <button
                       onClick={() => togglePhase(phase.phaseId, phase.isActive)}
                       disabled={updating === phase.phaseId}
-                      className={`w-full py-5 font-black text-[10px] uppercase tracking-widest transition-all ${phase.isActive
+                      className={`w-full py-5 font-medium text-[13px] transition-all ${phase.isActive
                           ? 'bg-background-subtle text-text-muted border border-border-subtle cursor-not-allowed'
-                          : 'bg-consorci-darkBlue text-white hover:bg-consorci-actionBlue hover:shadow-lg active:translate-y-0.5'
+                          : 'bg-consorci-darkBlue text-white hover:bg-black active:scale-[0.98]'
                         }`}
                     >
                       {updating === phase.phaseId
@@ -177,7 +177,7 @@ export default function PhaseManagementPage() {
                       }
                     </button>
                       {!phase.isActive && (
-                        <p className="mt-3 text-[9px] text-text-muted font-bold uppercase text-center tracking-tighter">
+                        <p className="mt-4 text-[11px] text-text-muted font-medium text-center">
                           Activation is immediate
                         </p>
                       )}

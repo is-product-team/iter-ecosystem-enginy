@@ -3,19 +3,19 @@
 @tailwind utilities;
 
 :root {
-  /* Light Mode (Institutional) */
+  /* Light Mode (Premium Minimalist) */
   --bg-page: #f7f8f9;
   --bg-surface: #ffffff;
-  --bg-subtle: #f2f2f3;
+  --bg-subtle: #f3f4f6;
   
   --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
   --text-inverse: #ffffff;
   
   --border-subtle: #e5e7eb;
 
-  /* Brand Colors (Keep fixed for now as primitives) */
+  /* Brand Colors (Refined) */
   --consorci-dark-blue: #00426b;
   --consorci-light-blue: #4197cb;
   --consorci-light-gray: #cfd2d3;
@@ -25,19 +25,17 @@
 }
 
 .dark {
-  /* Dark Mode (High Contrast Slate) */
-  --bg-page: #0f172a;
-  --bg-surface: #1e293b;
-  --bg-subtle: #334155;
+  /* Dark Mode (ChatGPT Style - Neutral Black) */
+  --bg-page: #171717;
+  --bg-surface: #212121;
+  --bg-subtle: #2f2f2f;
   
-  --text-primary: #f3f4f6;
-  --text-secondary: #e5e7eb;
-  --text-muted: #9ca3af;
+  --text-primary: #ececec;
+  --text-secondary: #b4b4b4;
+  --text-muted: #676767;
   --text-inverse: #ffffff;
   
-  --border-subtle: #334155;
-
-  /* Adjust brand colors for dark mode if necessary, but prompt says "prioriza el uso de variables semánticas" */
+  --border-subtle: #424242;
 }
 
 
@@ -55,46 +53,47 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: 700;
-  color: var(--text-primary); /* Changed from dark blue to primary text for better visibility in dark mode */
+  font-weight: 500;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
-  text-transform: uppercase;
+  text-transform: none; /* Removed uppercase for a more professional/Apple feel */
 }
 
 /* Institutional Design System */
+/* Institutional Redesign - Minimalist Sharp */
 * {
-  border-radius: 0;
-  box-shadow: none; /* Remove all shadows for a serious look */
+  border-radius: 0 !important;
+  box-shadow: none !important; /* Remove all shadows per user request */
 }
 
 .btn-primary {
-  @apply bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white font-bold uppercase text-[11px] tracking-[0.2em] py-4 px-10 transition-colors;
+  @apply bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white font-medium py-4 px-10 transition-all active:scale-[0.98];
 }
 
 .btn-secondary {
-  @apply bg-background-surface border-2 border-consorci-darkBlue hover:bg-background-subtle text-consorci-darkBlue font-bold uppercase text-[11px] tracking-[0.2em] py-4 px-10 transition-colors;
+  @apply bg-background-surface border border-consorci-darkBlue hover:bg-background-subtle text-consorci-darkBlue font-medium py-4 px-10 transition-all active:scale-[0.98];
 }
 
 .card-institutional {
-  @apply bg-background-surface border-2 border-border-subtle p-8 transition-colors hover:border-consorci-lightBlue;
+  @apply bg-background-surface border border-border-subtle p-8 transition-colors hover:border-consorci-lightBlue;
 }
 
 .header-label {
-  @apply text-[11px] font-bold uppercase tracking-[0.3em] text-text-primary mb-8 flex items-center gap-4;
+  @apply text-[11px] font-medium text-text-primary mb-8 flex items-center gap-4;
 }
 
 .header-label::before {
   content: '';
-  @apply w-12 h-1.5 bg-consorci-actionBlue;
+  @apply w-12 h-1 bg-consorci-actionBlue;
 }
 
 /* Sidebar Specifics */
 .sidebar-card-dark {
-  @apply bg-consorci-darkBlue p-10 text-white;
+  @apply bg-background-surface p-10 text-text-primary border-b border-border-subtle;
 }
 
 .sidebar-card-light {
-  @apply bg-background-surface border-2 border-border-subtle p-10;
+  @apply bg-background-surface border border-border-subtle p-10;
 }
 
 

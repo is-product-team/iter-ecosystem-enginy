@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
+import { useTranslations, useLocale } from 'next-intl';
 
 
 import phaseService, { Phase } from '@/services/phaseService';
@@ -14,6 +15,9 @@ export default function CenterDashboard() {
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loadingPhases, setLoadingPhases] = useState(true);
   const router = useRouter();
+  const t = useTranslations('Center');
+  const tc = useTranslations('Common');
+  const locale = useLocale();
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
@@ -53,14 +57,14 @@ export default function CenterDashboard() {
 
   return (
     <DashboardLayout
-      title={`Center Dashboard: ${user.center?.name || 'Educational'}`}
-      subtitle="Iter workshop management process."
+      title={t('dashboard.title', { name: user.center?.name || tc('general') })}
+      subtitle={t('dashboard.subtitle')}
     >
       {/* Institutional Section Timeline */}
       <section className="bg-background-surface border-2 border-border-subtle p-12 mb-12 relative overflow-hidden">
 
-        <h3 className="header-label">
-          Iter 25-26 Program Status
+        <h3 className="text-[12px] font-medium text-text-muted mb-8 text-center tracking-widest uppercase">
+          {t('dashboard.status_title')}
         </h3>
 
         <div className="relative pt-4">
@@ -69,29 +73,29 @@ export default function CenterDashboard() {
 
           <div className="flex flex-col md:flex-row justify-between items-start gap-y-12 gap-x-8">
             {loadingPhases ? (
-              <div className="w-full py-8 text-center uppercase text-[10px] font-bold tracking-widest text-[#00426B]">Loading calendar...</div>
+              <div className="w-full py-8 text-center text-[12px] font-medium text-text-muted">{tc('loading_calendar')}</div>
             ) : (
               phases.map((phase) => (
                 <div key={phase.phaseId} className="relative flex flex-col items-center text-center flex-1 group">
                   {/* Square with number */}
                   <div
-                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border-2 transition-all ${phase.isActive
+                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border transition-all ${phase.isActive
                       ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
                       : 'bg-background-surface text-text-muted border-border-subtle'
                       }`}
                   >
-                    <span className="text-base font-bold">
+                    <span className="text-base font-medium">
                       {phase.order}
                     </span>
                   </div>
 
                   {/* Name and Date */}
-                  <h4 className={`font-black text-[10px] uppercase tracking-[0.1em] mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue' : 'text-text-muted'}`}>
+                  <h4 className={`text-[12px] font-medium tracking-tight mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue font-medium' : 'text-text-muted'}`}>
                     {phase.name}
                   </h4>
 
-                  <div className={`text-[10px] font-bold px-4 py-2 border-2 ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
-                    {new Date(phase.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }).toUpperCase()}
+                  <div className={`text-[11px] font-medium px-4 py-2 border ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
+                    {new Date(phase.startDate).toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { day: 'numeric', month: 'short' })}
                   </div>
                 </div>
               ))
@@ -105,55 +109,55 @@ export default function CenterDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
           {[
             {
-              title: "Student Management",
-              text: "Add students from your center",
+              title: t('Students.title'),
+              text: t('Students.description'),
               icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
               path: "/center/students",
               active: isPhaseActive(PHASES.PLANNING) || isPhaseActive(PHASES.APPLICATION),
-              phase: "General"
+              phase: tc('general')
             },
             {
-              title: "Teacher Management",
-              text: "Add teachers from your center",
+              title: t('Teachers.title'),
+              text: t('Teachers.description'),
               icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
               path: "/center/teachers",
               active: true,
-              phase: "General"
+              phase: tc('general')
             },
             {
-              title: "Request Workshops",
-              text: "Request the workshops you want with the necessary places.",
+              title: t('Requests.title'),
+              text: t('Requests.description'),
               icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
               path: "/center/requests",
               active: isPhaseActive(PHASES.APPLICATION),
-              phase: "Phase 1"
+              phase: `${tc('phase')} 1`
             },
             {
-              title: "Assignments",
-              text: "Assign students with the necessary documentation to previously requested workshops.",
+              title: t('Assignments.title'),
+              text: t('Assignments.description'),
               icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01",
               path: "/center/assignments",
               active: isPhaseActive(PHASES.PLANNING),
-              phase: "Phase 2"
+              phase: `${tc('phase')} 2`
             },
             {
-              title: "Session Management",
-              text: "Add your teachers to the assigned workshops",
+              title: t('Sessions.title'),
+              text: t('Sessions.description'),
               icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
               path: "/center/sessions",
               active: isPhaseActive(PHASES.EXECUTION),
-              phase: "Phase 3"
+              phase: `${tc('phase')} 3`
             },
           ].map((item, idx) => (
             <div
               key={idx}
               onClick={() => item.active && router.push(item.path)}
               className={`group bg-background-surface p-8 md:p-10 border transition-all duration-300 relative overflow-hidden ${item.active
-                ? 'border-border-subtle cursor-pointer hover:border-consorci-actionBlue hover:shadow-xl'
+                ? 'border-border-subtle cursor-pointer hover:border-consorci-darkBlue'
                 : 'border-border-subtle opacity-60 cursor-not-allowed'
                 }`}
             >
-              <div className={`absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${item.active ? 'group-hover:bg-consorci-actionBlue' : ''
+              <div className={`absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${item.active ? 'group-hover:bg-consorci-darkBlue' : ''
                 }`}></div>
 
               <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-border-subtle transition-all duration-300 ${item.active
@@ -167,19 +171,19 @@ export default function CenterDashboard() {
                 </div>
               </div>
 
-              <h3 className={`text-xl font-medium mb-3 uppercase tracking-tight ${item.active ? 'text-consorci-darkBlue' : 'text-text-muted'
+              <h3 className={`text-xl font-medium mb-3 tracking-tight ${item.active ? 'text-text-primary' : 'text-text-muted'
                 }`}>
                 {item.title}
               </h3>
 
-              <p className="text-xs text-text-muted font-medium leading-relaxed uppercase tracking-wider">
+              <p className="text-xs text-text-muted font-normal leading-relaxed">
                 {item.text}
               </p>
 
               <div className="mt-8 flex items-center">
-                <div className={`flex items-center font-bold text-[10px] uppercase tracking-[0.2em] transition-transform ${item.active ? 'text-consorci-actionBlue group-hover:translate-x-2' : 'text-text-muted'
+                <div className={`flex items-center font-medium text-[11px] transition-transform ${item.active ? 'text-consorci-darkBlue group-hover:translate-x-2' : 'text-text-muted'
                   }`}>
-                  {item.active ? item.phase : "Module closed"}
+                  {item.active ? item.phase : tc('module_closed')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
                   </svg>
