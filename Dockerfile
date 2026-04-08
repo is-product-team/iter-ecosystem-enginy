@@ -4,6 +4,9 @@ RUN apk add --no-cache libc6-compat openssl
 RUN corepack enable
 ENV COREPACK_ENABLE=1
 ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000
 WORKDIR /app
 
 # Stage 2: Pruner (Separa dependencias de Web y API)
@@ -20,7 +23,7 @@ ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
-RUN npm install --ignore-scripts
+RUN npm ci --ignore-scripts
 COPY --from=pruner /app/out/full/ .
 RUN npx turbo run build --filter=web
 
@@ -41,7 +44,7 @@ CMD ["node", "apps/web/server.js"]
 FROM base AS builder-api
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
-RUN npm install --ignore-scripts
+RUN npm ci --ignore-scripts
 COPY --from=pruner /app/out/full/ .
 WORKDIR /app/apps/api
 RUN npx prisma generate
