@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import logoImg from '@/public/logo.png';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
@@ -77,7 +78,7 @@ export default function LoginPage() {
         <div className="text-center mb-12">
           <div className="w-32 h-32 bg-background-surface flex items-center justify-center mx-auto mb-6">
             <Image
-              src="/logo.png"
+              src={logoImg}
               alt="Iter Logo"
               width={128}
               height={128}
