@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { REQUEST_STATUSES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -16,6 +17,10 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from "@/components/Pagination";
 
 export default function AdminRequestsPage() {
+  const t = useTranslations('RequestsPage');
+  const tCommon = useTranslations('Common');
+  const tForm = useTranslations('Forms');
+
   const { user, loading: authLoading } = useAuth();
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
@@ -65,7 +70,7 @@ export default function AdminRequestsPage() {
       setCenters(fetchedCenters);
     } catch (err) {
       console.error(err);
-      setError('Could not load data.');
+      setError(tCommon('loading_error'));
     } finally {
       setLoading(false);
     }
@@ -85,16 +90,16 @@ export default function AdminRequestsPage() {
   const handleApprove = (requestId: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Approve Request',
-      message: 'Are you sure you want to approve this request and generate the assignment immediately?',
+      title: t('request_approve_title'),
+      message: t('request_approve_msg'),
       onConfirm: async () => {
         try {
           await requestService.updateStatus(requestId, REQUEST_STATUSES.APPROVED);
           await assignmentService.createFromRequest(requestId);
           await fetchData();
-          toast.success('Request approved and assignment generated successfully.');
+          toast.success(t('request_approved_success'));
         } catch (err) {
-          toast.error('Error in the approval process.');
+          toast.error(tCommon('save_error'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -104,16 +109,16 @@ export default function AdminRequestsPage() {
   const handleReject = async (requestId: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Reject Request',
-      message: 'Are you sure you want to reject this request? This action cannot be undone.',
+      title: t('request_reject_title'),
+      message: t('request_reject_msg'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await requestService.updateStatus(requestId, REQUEST_STATUSES.REJECTED);
           await fetchData();
-          toast.success('Request rejected.');
+          toast.success(t('request_rejected_success'));
         } catch (err) {
-          toast.error('Error rejecting the request.');
+          toast.error(tCommon('save_error'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -123,23 +128,23 @@ export default function AdminRequestsPage() {
   const handleRunTetris = () => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Run Automatic Assignment',
-      message: 'This action will process all pending approved requests and generate assignments for all centers. Continue?',
+      title: t('run_tetris_title'),
+      message: t('run_tetris_msg'),
       onConfirm: async () => {
         setLoading(true);
         try {
           const result = await assignmentService.runTetris() as { assignmentsCreated: number };
-          toast.success(`Assignment completed: ${result.assignmentsCreated} new assignments.`);
+          toast.success(t('tetris_success', { count: result.assignmentsCreated }));
           await fetchData();
         } catch (err: unknown) {
           const errorMessage = (err as { response?: { data?: { error?: string } }, message?: string })?.response?.data?.error 
             || (err as Error).message 
             || 'Unknown error';
-          toast.error('Error running Tetris: ' + errorMessage);
+          toast.error(tCommon('save_error') + ': ' + errorMessage);
         } finally {
           setLoading(false);
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
         }
-        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
     });
   };
@@ -167,12 +172,12 @@ export default function AdminRequestsPage() {
         studentsAprox: editFormData.approxStudents,
         comments: editFormData.comments
       });
-      toast.success('Request updated successfully.');
+      toast.success(tCommon('save_success'));
       setIsEditModalOpen(false);
       setEditingRequest(null);
       await fetchData();
     } catch (err) {
-      toast.error('Error updating the request.');
+      toast.error(tCommon('save_error'));
     }
   };
 
@@ -222,13 +227,13 @@ export default function AdminRequestsPage() {
   );
 
   if (authLoading || !user) {
-    return <Loading fullScreen message="Verifying admin credentials..." />;
+    return <Loading fullScreen message={tCommon('loading')} />;
   }
 
   return (
     <DashboardLayout
-      title="Request Management"
-      subtitle="Monitor and manage educational center requests for the current course."
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       {/* Filter Section */}
       <div className="space-y-6 mb-8">
@@ -236,11 +241,11 @@ export default function AdminRequestsPage() {
           <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Search Workshop</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('search_workshop')}</label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Ex: Robotics, Cinema..."
+                  placeholder={tForm('description_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 focus:border-[#00426B] outline-none text-xs font-bold"
@@ -253,13 +258,13 @@ export default function AdminRequestsPage() {
 
             {/* Center Filter */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Educational Center</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('educational_center')}</label>
               <select
                 value={selectedCenterId}
                 onChange={(e) => setSelectedCenterId(e.target.value)}
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:border-[#00426B] outline-none text-xs font-bold"
               >
-                <option value="">All centers</option>
+                <option value="">{t('all_centers')}</option>
                 {centers.map(c => (
                   <option key={c.centerId} value={c.centerId}>{c.name}</option>
                 ))}
@@ -268,16 +273,16 @@ export default function AdminRequestsPage() {
 
             {/* Modality Filter */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Modality</label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{tForm('modality')}</label>
               <select
                 value={selectedModality}
                 onChange={(e) => setSelectedModality(e.target.value)}
                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 focus:border-[#00426B] outline-none text-xs font-bold"
               >
-                <option value="">All modalities</option>
-                <option value="A">Modality A (Complete group)</option>
-                <option value="B">Modality B (Half group)</option>
-                <option value="C">Modality C (Individual projects)</option>
+                <option value="">{t('all_modalities')}</option>
+                <option value="A">{t('mod_a')}</option>
+                <option value="B">{t('mod_b')}</option>
+                <option value="C">{t('mod_c')}</option>
               </select>
             </div>
           </div>
@@ -293,14 +298,14 @@ export default function AdminRequestsPage() {
                 <path d="M11.5 2L14 9L21 11.5L14 14L11.5 21L9 14L2 11.5L9 9L11.5 2Z" />
                 <path d="M19 14L20.2 17.5L23.7 18.7L20.2 19.9L19 23.4L17.8 19.9L14.3 18.7L17.8 17.5L19 14Z" />
               </svg>
-              Automatic Assignment
+              {t('automatic_assignment')}
             </button>
           </div>
         </div>
       </div>
 
       {loading ? (
-        <Loading message="Syncing requests..." />
+        <Loading message={t('syncing')} />
       ) : error ? (
         <div className="bg-red-50 border-l-4 border-red-500 p-6">
           <p className="text-red-700 font-bold text-sm">{error}</p>
@@ -330,11 +335,11 @@ export default function AdminRequestsPage() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Center / Date</th>
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Teachers</th>
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Students</th>
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
-                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('table_center_date')}</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('table_teachers')}</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">{t('table_students')}</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('table_status')}</th>
+                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">{t('table_actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -361,9 +366,9 @@ export default function AdminRequestsPage() {
                           </td>
                           <td className="px-6 py-4 text-right">
                             {r.status === REQUEST_STATUSES.REJECTED ? (
-                              <span className="text-[9px] font-bold text-gray-300 uppercase italic">Rejected</span>
+                              <span className="text-[9px] font-bold text-gray-300 uppercase italic">{t('rejected_status')}</span>
                             ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
-                                <span className="text-[9px] font-bold text-gray-300 uppercase italic">Assigned</span>
+                                <span className="text-[9px] font-bold text-gray-300 uppercase italic">{t('assigned_status')}</span>
                             ) : (
                               <div className="flex justify-end gap-2">
                                 <button
@@ -373,21 +378,21 @@ export default function AdminRequestsPage() {
                                   <svg className="w-3 h-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                   </svg>
-                                  Edit
+                                  {tCommon('edit')}
                                 </button>
                                 {r.status === REQUEST_STATUSES.PENDING && (
                                   <button
                                     onClick={() => handleApprove(r.requestId)}
                                     className="px-3 py-1.5 bg-[#00426B] text-white text-[9px] font-black uppercase tracking-widest hover:bg-[#0775AB]"
                                   >
-                                    Approve
+                                    {t('approve')}
                                   </button>
                                 )}
                                 <button
                                   onClick={() => handleReject(r.requestId)}
                                   className="px-3 py-1.5 border border-red-200 text-red-600 text-[9px] font-black uppercase tracking-widest hover:bg-red-50"
                                 >
-                                  Reject
+                                  {t('reject')}
                                 </button>
                               </div>
                             )}
@@ -412,17 +417,17 @@ export default function AdminRequestsPage() {
         </div>
       ) : (
         <div className="bg-white border border-dashed border-gray-200 p-20 text-center">
-          <p className="text-gray-400 text-xs font-black uppercase tracking-widest">No requests found with the applied filters</p>
+          <p className="text-gray-400 text-xs font-black uppercase tracking-widest">{t('no_requests')}</p>
         </div>
       )}
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white max-w-md w-full p-6 shadow-2xl border-t-4 border-[#00426B]">
-            <h3 className="text-lg font-black text-[#00426B] uppercase mb-4">Edit Request</h3>
+            <h3 className="text-lg font-black text-[#00426B] uppercase mb-4">{t('edit_request')}</h3>
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Number of Students</label>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('num_students')}</label>
                 <input
                   type="number"
                   min="1"
@@ -432,7 +437,7 @@ export default function AdminRequestsPage() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Comments</label>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('comments')}</label>
                 <textarea
                   className="w-full border border-gray-300 p-2 text-sm text-gray-600 focus:border-[#00426B] outline-none h-24 resize-none"
                   value={editFormData.comments}
@@ -445,13 +450,13 @@ export default function AdminRequestsPage() {
                   onClick={() => setIsEditModalOpen(false)}
                   className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-100"
                 >
-                  Cancel
+                  {tCommon('cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB]"
                 >
-                  Save Changes
+                  {t('save_changes')}
                 </button>
               </div>
             </form>

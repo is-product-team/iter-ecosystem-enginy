@@ -3,9 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 const Breadcrumbs: React.FC = () => {
   const pathname = usePathname();
+  const t = useTranslations('Navigation');
   
   // No mostrar breadcrumbs en la raíz o en login
   if (pathname === '/' || pathname === '/login') return null;
@@ -17,20 +19,18 @@ const Breadcrumbs: React.FC = () => {
   // Filter out locale from display segments but keep it for path generation
   const displaySegments = isLocaleInPath ? pathSegments.slice(1) : pathSegments;
 
-  // Mapping of segments to readable names
-  const segmentMap: Record<string, string> = {
-    admin: 'Home',
-    center: 'Home',
-    workshops: 'Workshops',
-    centers: 'Centers',
-    requests: 'Requests',
-    phases: 'Phases',
-    calendar: 'Calendar',
-    students: 'Students',
-    teachers: 'Teachers',
-    assignments: 'Assignments',
-    sessions: 'Sessions',
-    notifications: 'Notifications'
+  // Mapping of segments to translation keys
+  const getLabel = (segment: string) => {
+    // Treat 'admin' or 'center' as 'home' in the breadcrumb context
+    if (segment === 'admin' || segment === 'center') return t('home');
+    
+    // Attempt to translate the segment name
+    try {
+      return t(segment);
+    } catch {
+      // Fallback to capitalized segment name if translation key is missing
+      return segment.charAt(0).toUpperCase() + segment.slice(1);
+    }
   };
 
   return (
@@ -43,7 +43,7 @@ const Breadcrumbs: React.FC = () => {
             : `/${displaySegments.slice(0, index + 1).join('/')}`;
             
           const isLast = index === displaySegments.length - 1;
-          const label = segmentMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
+          const label = getLabel(segment);
 
           return (
             <React.Fragment key={path}>

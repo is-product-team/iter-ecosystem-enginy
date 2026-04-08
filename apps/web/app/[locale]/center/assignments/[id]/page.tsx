@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { getUser, User } from '@/lib/auth';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -18,17 +19,21 @@ const DocumentUpload = dynamic(() => import('@/components/DocumentUpload'), { ss
 type ViewMode = 'workshop' | 'selection';
 
 export default function AssignmentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const t = useTranslations('AssignmentDetailPage');
+  const tCommon = useTranslations('Common');
   const { id } = use(params);
   const [_user, setUser] = useState<User | null>(null);
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
+  const paramsNav = useParams();
+  const locale = paramsNav?.locale || 'ca';
   
   const router = useRouter();
 
   useEffect(() => {
     const currentUser = getUser();
     if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
       return;
     }
     setUser(currentUser);
@@ -38,8 +43,8 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
         const resAssig = await assignmentService.getById(parseInt(id));
         setAssignment(resAssig);
       } catch (_error) {
-        toast.error('Error loading data.');
-        router.push('/center/assignments');
+        toast.error(tCommon('loading_error'));
+        router.push(`/${locale}/center/assignments`);
       } finally {
         setLoading(false);
       }
@@ -54,24 +59,17 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
       const currentIds = assignment.enrollments?.map((i: Enrollment) => i.studentId) || [];
       const updated = await assignmentService.updateEnrollments(parseInt(id), currentIds.filter((id: number) => id !== studentId));
       setAssignment(updated);
-      toast.success('Student removed successfully.');
+      toast.success(t('remove_student_success'));
     } catch (error) {
-      toast.error('Error removing student.');
+      toast.error(tCommon('save_error'));
     }
   };
 
   const getStatusLabel = (status: string) => {
-    const maps: Record<string, string> = {
-      'DATA_ENTRY': 'PENDING MANAGEMENT',
-      'PROVISIONAL': 'PROVISIONAL',
-      'VALIDATED': 'CONFIRMED',
-      'IN_PROGRESS': 'IN EXECUTION',
-      'COMPLETED': 'COMPLETED'
-    };
-    return maps[status] || status.replace('_', ' ');
+    return t(`status.${status}`) || status.replace('_', ' ');
   };
 
-  if (loading || !assignment) return <Loading fullScreen message="Loading workshop details..." />;
+  if (loading || !assignment) return <Loading fullScreen message={t('loading_msg')} />;
 
   const allDocumentsValidated = assignment.enrollments && assignment.enrollments.length > 0 && assignment.enrollments.every((ins: Enrollment) => 
     ins.isPedagogicalAgreementValidated && 
@@ -81,7 +79,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
   return (
     <DashboardLayout 
-      title={`WORKSHOP MANAGEMENT: ${assignment.workshop?.title}`} 
+      title={`${t('title_prefix')}${assignment.workshop?.title}`} 
       subtitle={
         <div className="flex flex-col gap-4 mt-6">
           <div className="flex items-center gap-3">
@@ -89,12 +87,12 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
               {getStatusLabel(assignment.status)}
             </div>
             <div className="px-4 py-1.5 text-[9px] font-black uppercase tracking-widest bg-[#00426B] text-white">
-              MODALITY {assignment.workshop?.modality}
+              {t('modality_prefix')}{assignment.workshop?.modality}
             </div>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-6 p-6 bg-[#F8FAFC] border border-gray-200">
             <div className="flex flex-col">
-              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Teaching Team Referent</span>
+              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('referent_label')}</span>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-black text-[#00426B] uppercase">{assignment.teacher1?.name}</span>
                 <span className="text-gray-300">•</span>
@@ -103,7 +101,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
             </div>
             <div className="h-8 w-[1px] bg-gray-200 hidden sm:block"></div>
             <div className="flex flex-col">
-              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Educational Center</span>
+              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('center_label')}</span>
               <span className="text-xs font-black text-[#00426B] uppercase">{assignment.center?.name}</span>
             </div>
           </div>
@@ -115,17 +113,20 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
         <section className="bg-white border border-gray-200 shadow-sm overflow-hidden mb-8">
           <div className="p-10 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gradient-to-r from-[#F8FAFC] to-white">
             <div>
-              <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">Participating Students</h3>
+              <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">{t('students_title')}</h3>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                {assignment.enrollments?.length || 0} of {assignment.request?.approxStudents || assignment.workshop?.maxPlaces || 20} seats occupied.
+                {t('students_subtitle', { 
+                  occupied: assignment.enrollments?.length || 0,
+                  total: assignment.request?.approxStudents || assignment.workshop?.maxPlaces || 20
+                })}
               </p>
             </div>
             <button 
-              onClick={() => router.push(`/center/assignments/${id}/students`)}
+              onClick={() => router.push(`/${locale}/center/assignments/${id}/students`)}
               className="bg-[#00426B] text-white px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#0775AB] transition-all flex items-center gap-3 shadow-xl"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
-              Nominal Register
+              {t('nominal_register_btn')}
             </button>
           </div>
 
@@ -161,7 +162,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       documentType="pedagogical_agreement"
                       initialUrl={ins.pedagogicalAgreementUrl}
                       isValidated={ins.isPedagogicalAgreementValidated}
-                      label="Pedagogical Agreement"
+                      label={t('docs.pedagogical_agreement')}
                       onUploadSuccess={() => {}}
                     />
                     <DocumentUpload 
@@ -170,7 +171,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       documentType="mobility_authorization"
                       initialUrl={ins.mobilityAuthorizationUrl}
                       isValidated={ins.isMobilityAuthorizationValidated}
-                      label="Mobility Auth"
+                      label={t('docs.mobility_authorization')}
                       onUploadSuccess={() => {}}
                     />
                     <DocumentUpload 
@@ -179,7 +180,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                       documentType="image_rights"
                       initialUrl={ins.imageRightsUrl}
                       isValidated={ins.isImageRightsValidated}
-                      label="Image Rights"
+                      label={t('docs.image_rights')}
                       onUploadSuccess={() => {}}
                     />
                   </div>
@@ -187,9 +188,11 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                   {/* Actions */}
                   <div className="shrink-0">
                     <button 
-                      onClick={() => handleRemoveStudent(ins.student.studentId)}
+                      onClick={() => {
+                        if (confirm(tCommon('delete_confirm_msg'))) handleRemoveStudent(ins.student.studentId);
+                      }}
                       className="p-3 text-gray-200 hover:text-red-500 hover:bg-red-50 transition-all rounded-full"
-                      title="Remove student"
+                      title={tCommon('delete')}
                     >
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
@@ -203,12 +206,12 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                   <svg className="w-10 h-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 </div>
-                <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">No students assigned yet</p>
+                <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">{t('no_students')}</p>
                 <button 
-                  onClick={() => router.push(`/center/assignments/${id}/students`)}
+                  onClick={() => router.push(`/${locale}/center/assignments/${id}/students`)}
                   className="text-[#4197CB] font-black text-[10px] uppercase tracking-widest hover:text-[#00426B] transition-colors"
                 >
-                  Click here to start the nominal registration
+                  {t('no_students_hint')}
                 </button>
               </div>
             )}
@@ -222,30 +225,30 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
           }`}>
             <div>
               <h4 className={`text-lg font-black uppercase ${allDocumentsValidated ? 'text-green-700' : 'text-[#00426B]'}`}>
-                {allDocumentsValidated ? '✓ Everything ready to start' : 'Confirm Documentation'}
+                {allDocumentsValidated ? t('finalize_section.ready_title') : t('finalize_section.not_ready_title')}
               </h4>
               <p className="text-xs text-gray-600 mt-1 max-w-xl">
                 {allDocumentsValidated 
-                  ? "All documentation has been validated. You can now confirm the final registration to activate the workshop." 
-                  : "Once all documentation is validated, you can confirm the final registration."
+                  ? t('finalize_section.ready_desc')
+                  : t('finalize_section.not_ready_desc')
                 }
               </p>
             </div>
             {allDocumentsValidated && (
               <button 
                 onClick={async () => {
-                  if(!confirm("Confirm registration?")) return;
+                  if(!confirm(t('finalize_section.confirm_dialog'))) return;
                   try {
                     await assignmentService.confirmRegistration(parseInt(id));
-                    toast.success("Registration confirmed!");
+                    toast.success(t('finalize_section.success'));
                     window.location.reload();
                   } catch(_e) {
-                    toast.error("Error confirming.");
+                    toast.error(tCommon('save_error'));
                   }
                 }}
                 className="px-8 py-4 bg-green-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl"
               >
-                Confirm and Generate Sessions
+                {t('finalize_section.confirm_btn')}
               </button>
             )}
           </div>
@@ -256,10 +259,10 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
           <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm border bg-indigo-50 border-indigo-100 mt-8">
             <div>
               <h4 className="text-lg font-black uppercase text-indigo-700">
-                Close Workshop
+                {t('close_section.title')}
               </h4>
               <p className="text-xs text-gray-600 mt-1 max-w-xl">
-                Once all sessions and competence evaluations are completed, you can close the workshop. This action will automatically generate the attendance certificates.
+                {t('close_section.desc')}
               </p>
             </div>
             <button 
@@ -267,24 +270,24 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                 const pendingEvaluations = assignment.enrollments?.filter(e => !e.hasTeacherEvaluation).length || 0;
                 
                 if (pendingEvaluations > 0) {
-                  toast.error(`Cannot close assignment. There are ${pendingEvaluations} pending evaluations.`);
+                  toast.error(t('close_section.pending_evals_error', { count: pendingEvaluations }));
                   return;
                 }
 
-                if(!confirm("Are you sure you want to close this workshop? This action is irreversible and will generate the completion certificates.")) return;
+                if(!confirm(t('close_section.confirm_dialog'))) return;
                 try {
                   const api = getApi();
                   await api.post(`/assignments/${id}/close`);
-                  toast.success("Workshop closed and certificates generated successfully!");
+                  toast.success(t('close_section.success'));
                   window.location.reload();
                 } catch(_e: any) {
-                  const message = _e.response?.data?.error || "Error closing the workshop.";
+                  const message = _e.response?.data?.error || t('close_section.error');
                   toast.error(message);
                 }
               }}
               className="px-8 py-4 bg-indigo-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition"
             >
-              Close Workshop
+              {t('close_section.confirm_btn')}
             </button>
           </div>
         )}

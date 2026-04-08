@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -14,6 +15,9 @@ import Avatar from '@/components/Avatar';
 import Pagination from '@/components/Pagination';
 
 export default function StudentsCRUD() {
+  const t = useTranslations('StudentsPage');
+  const tCommon = useTranslations('Common');
+
   const { user, loading: authLoading } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +25,7 @@ export default function StudentsCRUD() {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [formData, setFormData] = useState({ fullName: '', lastName: '', idalu: '', grade: '' });
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCourse, setSelectedCourse] = useState("All courses");
+  const [selectedCourse, setSelectedCourse] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   
@@ -68,7 +72,7 @@ export default function StudentsCRUD() {
       a.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.idalu.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesCourse = selectedCourse === "All courses" || a.grade === selectedCourse;
+    const matchesCourse = selectedCourse === "All" || a.grade === selectedCourse;
     
     return matchesSearch && matchesCourse;
   });
@@ -90,17 +94,17 @@ export default function StudentsCRUD() {
     try {
       if (editingStudent) {
         await studentService.update(editingStudent.studentId, formData);
-        toast.success("Student updated successfully.");
+        toast.success(tCommon('save_success'));
       } else {
         await studentService.create(formData);
-        toast.success("Student created successfully.");
+        toast.success(tCommon('save_success'));
       }
       setIsModalOpen(false);
       setEditingStudent(null);
       setFormData({ fullName: '', lastName: '', idalu: '', grade: '' });
       loadStudents();
     } catch (err: unknown) {
-      toast.error((err as Error).message || "Error saving student.");
+      toast.error(tCommon('save_error'));
     }
   };
 
@@ -113,16 +117,16 @@ export default function StudentsCRUD() {
   const handleDelete = (id: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Student',
-      message: 'Are you sure you want to delete this student? This action cannot be undone.',
+      title: t('delete_title'),
+      message: t('delete_msg'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await studentService.delete(id);
           loadStudents();
-          toast.success("Student deleted.");
+          toast.success(tCommon('delete_success'));
         } catch (err) {
-          toast.error("Error deleting student.");
+          toast.error(tCommon('delete_error'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -135,24 +139,24 @@ export default function StudentsCRUD() {
       className="bg-[#00426B] text-white px-6 py-3 font-black uppercase text-[10px] tracking-widest hover:bg-[#0775AB] transition-all flex items-center gap-2 shadow-lg"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-      New Student
+      {t('new_student')}
     </button>
   );
 
   return (
     <DashboardLayout 
-      title="Student Management" 
-      subtitle="Manage students from your educational center and their nominal data."
+      title={t('title')} 
+      subtitle={t('subtitle')}
       actions={headerActions}
     >
       {/* Filters Panel */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
         <div className="flex-1">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Search by name or IDALU</label>
+          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">{t('search_label')}</label>
           <div className="relative">
             <input 
               type="text"
-              placeholder="Ex: Joan García, 1234567..."
+              placeholder={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all"
@@ -164,13 +168,13 @@ export default function StudentsCRUD() {
         </div>
 
         <div className="lg:w-64">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Filter by course</label>
+          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">{t('filter_course')}</label>
           <select 
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
             className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] appearance-none"
           >
-            <option value="All courses">All courses</option>
+            <option value="All">{t('all_courses')}</option>
             {uniqueCourses.map(c => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -179,10 +183,10 @@ export default function StudentsCRUD() {
 
         <div className="flex items-end">
           <button 
-            onClick={() => { setSearchQuery(""); setSelectedCourse("All courses"); }}
+            onClick={() => { setSearchQuery(""); setSelectedCourse("All"); }}
             className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
           >
-            Clear
+            {tCommon('clear')}
           </button>
         </div>
       </div>
@@ -195,10 +199,10 @@ export default function StudentsCRUD() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Student Information</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Identification (IDALU)</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Course / Level</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Actions</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">{t('table_info')}</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">{t('table_idalu')}</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">{t('table_course')}</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">{tCommon('table_actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -228,7 +232,7 @@ export default function StudentsCRUD() {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">
-                        <button onClick={() => handleEdit(a)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Edit</button>
+                        <button onClick={() => handleEdit(a)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">{tCommon('edit')}</button>
                         <button onClick={() => handleDelete(a.studentId)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
@@ -241,8 +245,8 @@ export default function StudentsCRUD() {
           </div>
           {filteredStudents.length === 0 && !loading && (
             <div className="p-20 text-center">
-              <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No students found</p>
-              <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Try other search terms.</p>
+              <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">{t('no_students')}</p>
+              <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">{t('adjust_search')}</p>
             </div>
           )}
 
@@ -265,10 +269,10 @@ export default function StudentsCRUD() {
             <div className="bg-gray-50 px-8 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
               <div>
                 <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
-                  {editingStudent ? 'Edit Student' : 'New Student'}
+                  {editingStudent ? t('edit_student_title') : t('create_student_title')}
                 </h3>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                  {editingStudent ? 'Modify student data' : 'Enter the data for the new student'}
+                  {editingStudent ? t('modify_data') : t('enter_data')}
                 </p>
               </div>
               <button 
@@ -291,7 +295,7 @@ export default function StudentsCRUD() {
                     className="shadow-xl ring-4 ring-white"
                   />
                   <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95">
-                    Change Photo
+                    {t('change_photo')}
                     <input 
                       type="file" 
                       className="hidden" 
@@ -306,11 +310,11 @@ export default function StudentsCRUD() {
                             const res = await api.post(`/upload/profile/student/${editingStudent.studentId}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
-                            toast.success("Photo updated.");
+                            toast.success(t('photo_success'));
                             loadStudents();
                             setEditingStudent({ ...editingStudent, photoUrl: res.data.photoUrl });
                           } catch (err: unknown) {
-                            toast.error("Error uploading photo.");
+                            toast.error(t('upload_error'));
                           }
                         }
                       }}
@@ -321,7 +325,7 @@ export default function StudentsCRUD() {
 
               <form onSubmit={handleSubmit} id="student-form" className="p-8 space-y-6">
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Student name</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('name_label')}</label>
                   <input 
                     type="text" value={formData.fullName} 
                     onChange={e => setFormData({...formData, fullName: e.target.value})}
@@ -329,7 +333,7 @@ export default function StudentsCRUD() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Surnames</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('surnames_label')}</label>
                   <input 
                     type="text" value={formData.lastName} 
                     onChange={e => setFormData({...formData, lastName: e.target.value})}
@@ -337,7 +341,7 @@ export default function StudentsCRUD() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">IDALU Code</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('idalu_label')}</label>
                   <input 
                     type="text" value={formData.idalu} 
                     onChange={e => setFormData({...formData, idalu: e.target.value})}
@@ -345,7 +349,7 @@ export default function StudentsCRUD() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Course / Level (Ex: 4th ESO)</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('course_label')}</label>
                   <input 
                     type="text" value={formData.grade} 
                     onChange={e => setFormData({...formData, grade: e.target.value})}
@@ -356,8 +360,8 @@ export default function StudentsCRUD() {
             </div>
 
             <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
-              <button type="submit" form="student-form" className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg active:scale-95">Save Student</button>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">{tCommon('cancel')}</button>
+              <button type="submit" form="student-form" className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg active:scale-95">{t('save_btn')}</button>
             </div>
           </div>
         </div>

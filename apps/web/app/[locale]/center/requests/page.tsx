@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { THEME, REQUEST_STATUSES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -13,6 +14,8 @@ import WorkshopIcon from '@/components/WorkshopIcon';
 import Pagination from "@/components/Pagination";
 
 export default function RequestsPage() {
+  const t = useTranslations('CenterRequestsPage');
+  const tCommon = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -61,7 +64,7 @@ export default function RequestsPage() {
       setRequests(fetchedRequests);
     } catch (err) {
       console.error(err);
-      setError('Could not load necessary data.');
+      setError(tCommon('loading_error'));
     } finally {
       setLoading(false);
     }
@@ -136,19 +139,19 @@ export default function RequestsPage() {
     setError(null);
 
     if (selectedWorkshop.modality === 'C' && approxStudents !== '' && Number(approxStudents) > 4) {
-      setError('In Modality C, the maximum number of students is 4.');
+      setError(t('max_students_alert'));
       setSubmitting(false);
       return;
     }
 
     if (!teacher1Id || !teacher2Id) {
-      setError('You must select two referring teachers.');
+      setError(t('referents_required'));
       setSubmitting(false);
       return;
     }
 
     if (teacher1Id === teacher2Id) {
-      setError('The two referring teachers must be different.');
+      setError(t('referents_different'));
       setSubmitting(false);
       return;
     }
@@ -180,20 +183,20 @@ export default function RequestsPage() {
       router.refresh();
 
     } catch (err: unknown) {
-      setError((err as Error).message || 'Error sending request.');
+      setError((err as Error).message || t('send_error'));
     } finally {
       setSubmitting(false);
     }
   };
 
   if (authLoading || !user) {
-    return <Loading fullScreen message="Verifying coordinator permissions..." />;
+    return <Loading fullScreen message={tCommon('status')} />;
   }
 
   return (
     <DashboardLayout
-      title="Request Workshops"
-      subtitle="Manage workshop requests for your educational center"
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Section: Catalog */}
@@ -211,14 +214,14 @@ export default function RequestsPage() {
               </svg>
               <input
                 type="text"
-                placeholder="Search workshop or sector..."
+                placeholder={t('search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] focus:ring-1 focus:ring-[#00426B] text-sm transition-all"
               />
             </div>
             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">
-              {filteredWorkshops.length} Workshops available
+              {t('num_workshops', { count: filteredWorkshops.length })}
             </div>
           </div>
 
@@ -227,16 +230,17 @@ export default function RequestsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider w-12 text-center">Mod</th>
-                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider">Workshop / Sector</th>
-                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider text-right">Status / Action</th>
+                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider w-12 text-center">{t('table_mod')}</th>
+                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider">{t('table_workshop')}</th>
+                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider">{t('table_referents')}</th>
+                  <th className="px-6 py-4 text-[11px] font-black text-[#00426B] uppercase tracking-wider text-right">{t('table_status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={3} className="px-6 py-12">
-                      <Loading message="Loading catalog..." />
+                    <td colSpan={4} className="px-6 py-12">
+                      <Loading message={tCommon('loading')} />
                     </td>
                   </tr>
                 ) : filteredWorkshops.length > 0 ? (
@@ -294,7 +298,7 @@ export default function RequestsPage() {
                                 }}
                                 className="text-[10px] font-black border border-yellow-400 bg-yellow-50 px-3 py-1 text-yellow-600 uppercase tracking-widest hover:bg-yellow-100 transition-colors"
                               >
-                                Edit
+                                {t('edit_btn')}
                               </button>
                             ) : (
                               <span className={`text-[10px] font-black border px-2 py-1 uppercase tracking-widest ${existingRequest.status === REQUEST_STATUSES.APPROVED
@@ -305,10 +309,10 @@ export default function RequestsPage() {
                               </span>
                             )
                           ) : isSelected ? (
-                            <span className="text-[10px] font-black border border-[#00426B] px-2 py-1 text-[#00426B] uppercase tracking-widest bg-blue-50">Selected</span>
+                            <span className="text-[10px] font-black border border-[#00426B] px-2 py-1 text-[#00426B] uppercase tracking-widest bg-blue-50">{t('selected_label')}</span>
                           ) : (
                             !editingRequestId && (
-                              <span className="text-[10px] font-black border border-transparent group-hover:border-gray-300 px-2 py-1 text-gray-300 uppercase tracking-widest transition-all group-hover:text-gray-400">Select</span>
+                              <span className="text-[10px] font-black border border-transparent group-hover:border-gray-300 px-2 py-1 text-gray-300 uppercase tracking-widest transition-all group-hover:text-gray-400">{t('select_btn')}</span>
                             )
                           )}
                         </td>
@@ -317,8 +321,8 @@ export default function RequestsPage() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={3} className="px-6 py-12 text-center">
-                      <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">No workshops found</p>
+                    <td colSpan={4} className="px-6 py-12 text-center">
+                      <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{tCommon('empty_desc')}</p>
                     </td>
                   </tr>
                 )}
@@ -331,7 +335,7 @@ export default function RequestsPage() {
             onPageChange={setCurrentPage}
             totalItems={filteredWorkshops.length}
             currentItemsCount={paginatedWorkshops.length}
-            itemName="workshops"
+            itemName={t('table_workshop')}
           />
         </div>
 
@@ -343,14 +347,14 @@ export default function RequestsPage() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                {editingRequestId ? 'Edit Request' : 'New Request'}
+                {editingRequestId ? t('edit_request') : t('new_request')}
               </h3>
               {editingRequestId && (
                 <button
                   onClick={cancelEdit}
                   className="text-[10px] text-gray-400 hover:text-red-500 font-bold uppercase tracking-wide"
                 >
-                  Cancel
+                  {t('cancel_btn')}
                 </button>
               )}
             </div>
@@ -360,7 +364,7 @@ export default function RequestsPage() {
                 <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 text-red-700 dark:text-red-400">
                   <p className="text-[11px] font-bold uppercase tracking-wide mb-1 flex items-center gap-2">
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
-                    Error in the request
+                    {t('error_title')}
                   </p>
                   <p className="text-xs">{error}</p>
                 </div>
@@ -374,7 +378,7 @@ export default function RequestsPage() {
                     </svg>
                   </div>
                   <p className="text-xs font-bold text-text-muted uppercase tracking-widest px-6">
-                    Select a workshop from the list to start
+                    {t('select_workshop')}
                   </p>
                 </div>
               ) : (
@@ -400,7 +404,7 @@ export default function RequestsPage() {
                   {/* Form Fields */}
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">Referring Teacher</label>
+                      <label className="block text-[10px] font-black text-text-muted uppercase tracking-widest mb-1.5">{t('referents_label')}</label>
                       <div className="space-y-2">
                         <select
                           value={teacher1Id}
@@ -408,7 +412,7 @@ export default function RequestsPage() {
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
                           required
                         >
-                          <option value="">Select the Main Referent *</option>
+                          <option value="">{t('referent1_placeholder')}</option>
                           {teachers.map(t => (
                             <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
                           ))}
@@ -419,7 +423,7 @@ export default function RequestsPage() {
                           className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
                           required
                         >
-                          <option value="">Select the Second Referent *</option>
+                          <option value="">{t('referent2_placeholder')}</option>
                           {teachers.map(t => (
                             <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
                           ))}
@@ -428,12 +432,12 @@ export default function RequestsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Nº Expected Students</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">{t('num_students_label')}</label>
                       <input
                         type="number"
                         value={approxStudents}
                         onChange={(e) => setApproxStudents(e.target.value === '' ? '' : parseInt(e.target.value))}
-                        placeholder="Ex: 4"
+                        placeholder={t('num_students_placeholder')}
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700"
                         min="1"
                         max={selectedWorkshop.modality === 'C' ? 4 : 100}
@@ -441,17 +445,17 @@ export default function RequestsPage() {
                       />
                       {selectedWorkshop.modality === 'C' && (
                         <p className="mt-1.5 text-[9px] text-orange-600 font-bold italic bg-orange-50 p-1.5 border border-orange-100">
-                          * Maximum 4 students per project in Modality C.
+                          {t('modality_c_hint')}
                         </p>
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Reason for Request (Optional)</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">{t('reason_label')}</label>
                       <textarea
                         value={comments}
                         onChange={(e) => setComments(e.target.value)}
-                        placeholder="Brief explanation of student profile..."
+                        placeholder={t('reason_placeholder')}
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-none focus:outline-none focus:border-[#00426B] text-sm font-bold text-gray-700 min-h-[80px] resize-none"
                       />
                     </div>
@@ -468,14 +472,14 @@ export default function RequestsPage() {
                     {submitting ? (
                       <>
                         <div className="animate-spin h-3.5 w-3.5 border-2 border-white/20 border-t-white"></div>
-                        <span>Processing...</span>
+                        <span>{t('processing')}</span>
                       </>
                     ) : (
                       <>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={editingRequestId ? "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" : "M12 19l9 2-9-18-9 18 9-2zm0 0v-8"} />
                         </svg>
-                        <span>{editingRequestId ? 'Update Request' : 'Send Request'}</span>
+                        <span>{editingRequestId ? t('update_btn') : t('send_btn')}</span>
                       </>
                     )}
                   </button>

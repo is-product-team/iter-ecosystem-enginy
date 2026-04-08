@@ -5,6 +5,7 @@ import workshopService, { Workshop } from "../services/workshopService";
 import sectorService, { Sector } from "../services/sectorService";
 import WorkshopIcon, { SVG_ICONS } from "./WorkshopIcon";
 import Loading from "./Loading";
+import { useTranslations } from "next-intl";
 
 type CreateWorkshopModalProps = {
   visible: boolean;
@@ -25,6 +26,9 @@ const CreateWorkshopModal = ({
   onWorkshopCreated,
   initialData,
 }: CreateWorkshopModalProps) => {
+  const t = useTranslations('Forms');
+  const tCommon = useTranslations('Common');
+
   const [title, setTitle] = useState("");
   const [sectorId, setSectorId] = useState<number | "">("");
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -46,7 +50,7 @@ const CreateWorkshopModal = ({
   const [tempEnd, setTempEnd] = useState("11:00");
 
   const daysMap: Record<number, string> = {
-    1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday'
+    1: t('monday'), 2: t('tuesday'), 3: t('wednesday'), 4: t('thursday'), 5: t('friday')
   };
 
   useEffect(() => {
@@ -105,7 +109,7 @@ const CreateWorkshopModal = ({
 
   const handleSubmit = async () => {
     if (!title || !modality) {
-      setError("Fields marked with * are required.");
+      setError(t('required_fields'));
       return;
     }
     setLoading(true);
@@ -139,7 +143,7 @@ const CreateWorkshopModal = ({
       onClose();
     } catch (err) {
       setError(
-        (err as { response?: { data?: { error?: string } } }).response?.data?.error || "Error saving workshop. Check the data."
+        (err as { response?: { data?: { error?: string } } }).response?.data?.error || tCommon('save_error')
       );
     } finally {
       setLoading(false);
@@ -155,10 +159,10 @@ const CreateWorkshopModal = ({
         <div className="bg-gray-50 px-8 py-5 flex justify-between items-center shrink-0 border-b border-gray-100">
           <div>
             <h2 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
-              {initialData ? "Edit Workshop" : "New Workshop"}
+              {initialData ? tCommon("edit") : tCommon("new")}
             </h2>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-              Workshop Configuration and Weekly Schedule
+              {t("workshop_config_subtitle")}
             </p>
           </div>
           <button onClick={onClose} className="text-gray-300 hover:text-[#00426B] transition-colors">
@@ -172,29 +176,29 @@ const CreateWorkshopModal = ({
           {/* Left: Data */}
           <div className="md:w-7/12 p-8 overflow-y-auto border-r border-gray-100 custom-scrollbar">
             <section className="mb-8">
-              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">General Information</h3>
+              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">{t('general_info')}</h3>
 
               <div className="space-y-6">
                 <div className="group">
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Workshop Title <span className="text-red-400">*</span></label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('title')} <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all placeholder:text-gray-300 outline-none"
-                    placeholder="Enter the workshop name..."
+                    placeholder={t('title_placeholder')}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Professional Sector</label>
+                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('sector')}</label>
                     <select
                       value={sectorId}
                       onChange={(e) => setSectorId(Number(e.target.value))}
                       className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
                     >
-                      <option value="">Select a sector...</option>
+                      <option value="">{t('select_sector')}</option>
                       {sectors.map((sector) => (
                         <option key={sector.sectorId} value={sector.sectorId}>
                           {sector.name}
@@ -203,37 +207,37 @@ const CreateWorkshopModal = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Modality <span className="text-red-400">*</span></label>
+                    <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('modality')} <span className="text-red-400">*</span></label>
                     <select
                       value={modality}
                       onChange={(e) => setModality(e.target.value)}
                       className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all outline-none appearance-none"
                     >
-                      <option value="A">Modality A (3 Quarters)</option>
-                      <option value="B">Modality B (2 Quarters)</option>
-                      <option value="C">Modality C (1 Quarter)</option>
+                      <option value="A">{t('modality_a')}</option>
+                      <option value="B">{t('modality_b')}</option>
+                      <option value="C">{t('modality_c')}</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Description</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('description')}</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
                     className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] transition-all placeholder:text-gray-300 outline-none custom-scrollbar"
-                    placeholder="Brief explanation of the content..."
+                    placeholder={t('description_placeholder')}
                   />
                 </div>
               </div>
             </section>
 
             <section>
-              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">Technical Details</h3>
+              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 border-b border-gray-50 pb-3">{t('technical_details')}</h3>
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Duration (h)</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('duration')}</label>
                   <input
                     type="number"
                     value={durationHours}
@@ -242,7 +246,7 @@ const CreateWorkshopModal = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Places</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('places')}</label>
                   <input
                     type="number"
                     value={maxPlaces}
@@ -251,7 +255,7 @@ const CreateWorkshopModal = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Icon</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('icon')}</label>
                   <div className="relative group/icon">
                     <button className="w-full flex items-center justify-between px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] group-hover/icon:border-[#0775AB] transition-all">
                       <span className="flex items-center gap-2">
@@ -278,23 +282,23 @@ const CreateWorkshopModal = ({
             <section>
               <h3 className="text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                Weekly Schedule
+                {t('schedule')}
               </h3>
 
               <div className="bg-white p-6 shadow-sm border border-gray-100 mb-8 relative">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-[#00426B]"></div>
-                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Add Slot</h4>
+                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">{t('add_slot')}</h4>
                 <div className="space-y-4">
                   <div>
                     <select
                       value={tempDay} onChange={(e) => setTempDay(parseInt(e.target.value))}
                       className="w-full px-4 py-2.5 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] outline-none appearance-none"
                     >
-                      <option value={1}>Monday</option>
-                      <option value={2}>Tuesday</option>
-                      <option value={3}>Wednesday</option>
-                      <option value={4}>Thursday</option>
-                      <option value={5}>Friday</option>
+                      <option value={1}>{t('monday')}</option>
+                      <option value={2}>{t('tuesday')}</option>
+                      <option value={3}>{t('wednesday')}</option>
+                      <option value={4}>{t('thursday')}</option>
+                      <option value={5}>{t('friday')}</option>
                     </select>
                   </div>
                   <div className="flex gap-4">
@@ -310,12 +314,12 @@ const CreateWorkshopModal = ({
                     onClick={addScheduleSlot}
                     className="w-full py-3 bg-[#EAEFF2] text-[#00426B] text-[9px] font-black uppercase tracking-[0.2em] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95"
                   >
-                    + Add Day
+                    + {t('add_day')}
                   </button>
                 </div>
               </div>
 
-              <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 px-1">Configured Days</h4>
+              <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 px-1">{t('configured_days')}</h4>
               <div className="space-y-3">
                 {schedule.map((slot, idx) => (
                   <div key={idx} className="flex justify-between items-center bg-white border border-gray-100 p-4 shadow-sm hover:border-[#0775AB] transition-colors group">
@@ -330,7 +334,7 @@ const CreateWorkshopModal = ({
                 ))}
                 {schedule.length === 0 && (
                   <div className="text-center py-10 border border-dashed border-gray-200 text-gray-300 text-[10px] font-bold uppercase tracking-widest bg-white">
-                    No days configured yet
+                    {t('no_days')}
                   </div>
                 )}
               </div>
@@ -343,12 +347,12 @@ const CreateWorkshopModal = ({
           {error ? (
             <div className="text-[#F26178] text-[10px] font-black uppercase tracking-widest">{error}</div>
           ) : (
-            <div className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Review data before saving.</div>
+            <div className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">{t('review_data')}</div>
           )}
 
           <div className="flex gap-4">
             <button onClick={onClose} className="px-6 py-3 text-[10px] font-black text-gray-400 hover:text-gray-600 uppercase tracking-widest transition-colors">
-              Cancel
+              {tCommon('cancel')}
             </button>
             <button
               onClick={handleSubmit}
@@ -358,9 +362,9 @@ const CreateWorkshopModal = ({
               {loading ? (
                 <div className="flex items-center gap-2">
                   <Loading size="sm" white message="" />
-                  Saving...
+                  {t('saving')}
                 </div>
-              ) : 'Save Workshop'}
+              ) : t('save_workshop')}
             </button>
           </div>
         </div>

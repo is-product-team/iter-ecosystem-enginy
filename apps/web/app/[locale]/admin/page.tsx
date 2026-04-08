@@ -2,11 +2,13 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect } from 'react';
 import Loading from '@/components/Loading';
 
 export default function AdminDashboardPage() {
+  const t = useTranslations('Dashboards.admin');
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -26,8 +28,8 @@ export default function AdminDashboardPage() {
 
   const sections = [
     {
-      title: 'Workshop Management',
-      description: 'Create, modify or delete workshops for centers.',
+      title: t('sections.workshops.title'),
+      description: t('sections.workshops.description'),
       path: `/${locale}/workshops`,
       phase: 'General',
       icon: (
@@ -38,8 +40,8 @@ export default function AdminDashboardPage() {
       color: 'blue'
     },
     {
-      title: 'Center Management',
-      description: 'Create, modify or delete centers.',
+      title: t('sections.centers.title'),
+      description: t('sections.centers.description'),
       path: `/${locale}/centers`,
       phase: 'General',
       icon: (
@@ -50,8 +52,8 @@ export default function AdminDashboardPage() {
       color: 'red'
     },
     {
-      title: 'Course Phases',
-      description: 'Configure dates and status of the course phases.',
+      title: t('sections.phases.title'),
+      description: t('sections.phases.description'),
       path: `/${locale}/phases`,
       phase: 'Configuration',
       icon: (
@@ -62,8 +64,8 @@ export default function AdminDashboardPage() {
       color: 'purple'
     },
     {
-      title: 'Statistics',
-      description: 'Advanced analysis of system usage, most requested workshops and system activity.',
+      title: t('sections.stats.title'),
+      description: t('sections.stats.description'),
       path: `/${locale}/stats`,
       phase: 'Global',
       icon: (
@@ -74,8 +76,8 @@ export default function AdminDashboardPage() {
       color: 'green'
     },
     {
-      title: 'Center Requests',
-      description: 'View center requests and assign workshops.',
+      title: t('sections.requests.title'),
+      description: t('sections.requests.description'),
       path: `/${locale}/requests`,
       phase: 'Phase 1',
       icon: (
@@ -86,8 +88,8 @@ export default function AdminDashboardPage() {
       color: 'orange'
     },
     {
-      title: 'Document Verification',
-      description: 'Validate documentation presented by centers (Pedagogical Agreement, Mobility, etc).',
+      title: t('sections.verifications.title'),
+      description: t('sections.verifications.description'),
       path: `/${locale}/verifications`,
       phase: 'Phase 2',
       icon: (
@@ -101,8 +103,8 @@ export default function AdminDashboardPage() {
 
   return (
     <DashboardLayout
-      title="Admin Dashboard"
-      subtitle="Welcome to the Iter control center. Manage workshops, centers, and requests from this panel."
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       <div className="flex justify-center w-full pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">

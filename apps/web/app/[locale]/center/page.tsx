@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -10,6 +11,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import phaseService, { Phase } from '@/services/phaseService';
 
 export default function CenterDashboard() {
+  const t = useTranslations('Dashboards.center');
   const { user, loading: authLoading } = useAuth();
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loadingPhases, setLoadingPhases] = useState(true);
@@ -55,14 +57,14 @@ export default function CenterDashboard() {
 
   return (
     <DashboardLayout
-      title={`Center Dashboard: ${user.center?.name || 'Educational'}`}
-      subtitle="Iter workshop management process."
+      title={`${t('title')}: ${user.center?.name || 'Educational'}`}
+      subtitle={t('subtitle')}
     >
       {/* Institutional Section Timeline */}
       <section className="bg-background-surface border-2 border-border-subtle p-12 mb-12 relative overflow-hidden">
 
         <h3 className="header-label">
-          Iter 25-26 Program Status
+          {t('timeline_title')}
         </h3>
 
         <div className="relative pt-4">
@@ -71,7 +73,7 @@ export default function CenterDashboard() {
 
           <div className="flex flex-col md:flex-row justify-between items-start gap-y-12 gap-x-8">
             {loadingPhases ? (
-              <div className="w-full py-8 text-center uppercase text-[10px] font-bold tracking-widest text-[#00426B]">Loading calendar...</div>
+              <div className="w-full py-8 text-center uppercase text-[10px] font-bold tracking-widest text-[#00426B]">{t('loading_calendar')}</div>
             ) : (
               phases.map((phase) => (
                 <div key={phase.phaseId} className="relative flex flex-col items-center text-center flex-1 group">
@@ -93,7 +95,7 @@ export default function CenterDashboard() {
                   </h4>
 
                   <div className={`text-[10px] font-bold px-4 py-2 border-2 ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
-                    {new Date(phase.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }).toUpperCase()}
+                    {new Date(phase.startDate).toLocaleDateString(locale, { day: 'numeric', month: 'short' }).toUpperCase()}
                   </div>
                 </div>
               ))
@@ -107,44 +109,44 @@ export default function CenterDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
           {[
             {
-              title: "Student Management",
-              text: "Add students from your center",
+              title: t('sections.students.title'),
+              text: t('sections.students.description'),
               icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
               path: `/${locale}/center/students`,
               active: isPhaseActive(PHASES.PLANNING) || isPhaseActive(PHASES.APPLICATION),
-              phase: "General"
+              phase: t('sections.general')
             },
             {
-              title: "Teacher Management",
-              text: "Add teachers from your center",
+              title: t('sections.teachers.title'),
+              text: t('sections.teachers.description'),
               icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
               path: `/${locale}/center/teachers`,
               active: true,
-              phase: "General"
+              phase: t('sections.general')
             },
             {
-              title: "Request Workshops",
-              text: "Request the workshops you want with the necessary places.",
+              title: t('sections.requests.title'),
+              text: t('sections.requests.description'),
               icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
               path: `/${locale}/center/requests`,
               active: isPhaseActive(PHASES.APPLICATION),
-              phase: "Phase 1"
+              phase: t('sections.phase1')
             },
             {
-              title: "Assignments",
-              text: "Assign students with the necessary documentation to previously requested workshops.",
+              title: t('sections.assignments.title'),
+              text: t('sections.assignments.description'),
               icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2h2a2 2 0 002 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01",
               path: `/${locale}/center/assignments`,
               active: isPhaseActive(PHASES.PLANNING),
-              phase: "Phase 2"
+              phase: t('sections.phase2')
             },
             {
-              title: "Session Management",
-              text: "Add your teachers to the assigned workshops",
+              title: t('sections.sessions.title'),
+              text: t('sections.sessions.description'),
               icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
               path: `/${locale}/center/sessions`,
               active: isPhaseActive(PHASES.EXECUTION),
-              phase: "Phase 3"
+              phase: t('sections.phase3')
             },
           ].map((item, idx) => (
             <div
@@ -181,7 +183,7 @@ export default function CenterDashboard() {
               <div className="mt-8 flex items-center">
                 <div className={`flex items-center font-bold text-[10px] uppercase tracking-[0.2em] transition-transform ${item.active ? 'text-consorci-actionBlue group-hover:translate-x-2' : 'text-text-muted'
                   }`}>
-                  {item.active ? item.phase : "Module closed"}
+                  {item.active ? item.phase : t('sections.closed_module')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
                   </svg>

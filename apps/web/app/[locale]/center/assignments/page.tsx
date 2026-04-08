@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { getUser, User } from '@/lib/auth';
 import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -14,12 +15,15 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from "@/components/Pagination";
 
 export default function AssignmentsPage() {
+  const t = useTranslations('AssignmentsPage');
+  const tCommon = useTranslations('Common');
+
   const [user, setUser] = useState<User | null>(null);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All statuses");
+  const [statusFilter, setStatusFilter] = useState("All");
   
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -87,7 +91,7 @@ export default function AssignmentsPage() {
       a.workshop?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.center?.name?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesStatus = statusFilter === "All statuses" || a.status === statusFilter;
+    const matchesStatus = statusFilter === "All" || a.status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -109,8 +113,8 @@ export default function AssignmentsPage() {
 
   return (
     <DashboardLayout
-      title="Assigned Workshops"
-      subtitle="View and manage the planning of your workshops."
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       <div className="w-full">
         {/* Filters Panel */}
@@ -119,7 +123,7 @@ export default function AssignmentsPage() {
             <div className="flex-1 w-full space-y-4">
               <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#00426B] mb-4 flex items-center gap-3">
                 <div className="w-8 h-1 bg-[#0775AB]"></div>
-                Search and Filters
+                {t('search_filters')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative group">
@@ -127,7 +131,7 @@ export default function AssignmentsPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="SEARCH BY WORKSHOP OR CENTER..."
+                    placeholder={t('search_placeholder')}
                     className="w-full pl-10 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#4197CB] text-[11px] font-bold uppercase tracking-widest text-[#00426B] transition-all outline-none"
                   />
                   <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-4 h-4 w-4 text-[#00426B]/40 group-focus-within:text-[#4197CB] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -139,17 +143,17 @@ export default function AssignmentsPage() {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="w-full px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#4197CB] text-[11px] font-bold uppercase tracking-widest text-[#00426B] transition-all outline-none appearance-none"
                 >
-                  <option value="All statuses">All statuses</option>
-                  <option value="IN_PROGRESS">In progress / Accepted</option>
-                  <option value="COMPLETED">Completed</option>
+                  <option value="All">{t('all_statuses')}</option>
+                  <option value="IN_PROGRESS">{t('in_progress')}</option>
+                  <option value="COMPLETED">{t('completed')}</option>
                 </select>
               </div>
             </div>
             <button 
-              onClick={() => { setSearchQuery(""); setStatusFilter("All statuses"); }}
+              onClick={() => { setSearchQuery(""); setStatusFilter("All"); }}
               className="px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#00426B] hover:bg-[#EAEFF2] transition-all border-2 border-transparent hover:border-[#00426B]"
             >
-              Clear
+              {tCommon('clear')}
             </button>
           </div>
         </div>
@@ -161,11 +165,11 @@ export default function AssignmentsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b-2 border-gray-100">
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Assigned Workshop</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Center</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Planning</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Status</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] text-right">Actions</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">{t('table_workshop')}</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">{t('table_center')}</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">{t('table_planning')}</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">{t('table_status')}</th>
+                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] text-right">{t('table_actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -173,16 +177,16 @@ export default function AssignmentsPage() {
                   <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
                     <td className="px-10 py-10">
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#4197CB] mb-2">WORKSHOP IDENTIFIER</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#4197CB] mb-2">{t('workshop_id')}</span>
                         <span className="text-base font-extrabold text-[#00426B] uppercase tracking-tight leading-tight">{a.workshop?.title}</span>
                       </div>
                     </td>
                     <td className="px-10 py-10">
-                      <span className="text-[11px] font-bold text-[#00426B] uppercase">{a.center?.name || 'Not assigned'}</span>
+                      <span className="text-[11px] font-bold text-[#00426B] uppercase">{a.center?.name || t('not_assigned')}</span>
                     </td>
                     <td className="px-10 py-10">
                       <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                        Start: {a.startDate ? new Date(a.startDate).toLocaleDateString() : '—'}
+                        {t('start_date', { date: a.startDate ? new Date(a.startDate).toLocaleDateString() : '—' })}
                       </div>
                     </td>
                     <td className="px-10 py-10">
@@ -199,7 +203,7 @@ export default function AssignmentsPage() {
                         onClick={() => router.push(`/${locale}/center/assignments/${a.assignmentId}`)}
                         className="btn-primary py-2 px-6 text-[10px]"
                       >
-                        Manage
+                        {t('manage_btn')}
                       </button>
                     </td>
                   </tr>
@@ -209,8 +213,8 @@ export default function AssignmentsPage() {
             
             {filteredAssignments.length === 0 && (
               <div className="p-20 text-center">
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">No assignments found</p>
-                <p className="text-[9px] font-bold text-gray-300 uppercase mt-2">Try adjusting the search filters.</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('no_assignments')}</p>
+                <p className="text-[9px] font-bold text-gray-300 uppercase mt-2">{t('adjust_filters')}</p>
               </div>
             )}
             
@@ -228,16 +232,16 @@ export default function AssignmentsPage() {
         {/* Incidents Section (Only available in Phase 3) */}
         {isPhaseActive(PHASES.EXECUTION) && (
           <section className="mt-16 bg-white p-8 border border-gray-200">
-            <h3 className="text-xl font-black text-[#00426B] mb-4 uppercase tracking-tighter">Incidents and Vacancies Management</h3>
+            <h3 className="text-xl font-black text-[#00426B] mb-4 uppercase tracking-tighter">{t('incidents_title')}</h3>
             <p className="text-[10px] font-bold text-gray-400 mb-6 uppercase tracking-widest">
-              REPORT BEHAVIOR PROBLEMS OR REQUEST VACANT PLACES.
+              {t('incidents_subtitle')}
             </p>
 
             <div className="flex gap-4">
               <input
                 id="incident-input"
                 type="text"
-                placeholder="Describe the problem..."
+                placeholder={t('incident_placeholder')}
                 className="flex-1 px-4 py-4 bg-[#F8FAFC] border-none text-[11px] font-bold uppercase tracking-wider text-[#00426B] focus:ring-2 focus:ring-[#F26178] outline-none transition-all"
               />
               <button
@@ -250,11 +254,11 @@ export default function AssignmentsPage() {
                     description: input.value
                   });
                   input.value = '';
-                  toast.success('Incident reported. The CEB will review it soon.');
+                  toast.success(t('incident_success'));
                 }}
                 className="px-8 py-4 bg-[#F26178] text-white font-black uppercase text-[10px] tracking-widest hover:bg-[#D94E64] transition-all"
               >
-                Report Incident
+                {t('report_btn')}
               </button>
             </div>
           </section>

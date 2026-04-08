@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { THEME, ROLES } from "@iter/shared";
 import WorkshopIcon from "../../../components/WorkshopIcon";
@@ -13,6 +14,10 @@ import Pagination from "@/components/Pagination";
 import workshopService, { Workshop } from "@/services/workshopService";
 
 export default function WorkshopAdminPage() {
+  const t = useTranslations('WorkshopsPage');
+  const tForm = useTranslations('Forms');
+  const tCommon = useTranslations('Common');
+
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -29,8 +34,8 @@ export default function WorkshopAdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSector, setSelectedSector] = useState("All sectors");
-  const [selectedModality, setSelectedModality] = useState("All modalities");
+  const [selectedSector, setSelectedSector] = useState(tForm('all_sectors'));
+  const [selectedModality, setSelectedModality] = useState(tForm('all_modalities'));
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
@@ -70,7 +75,7 @@ export default function WorkshopAdminPage() {
       setWorkshops(data);
       setError(null);
     } catch (err) {
-      setError("Could not load workshops.");
+      setError(tCommon('loading_error'));
       console.error(err);
     }
   }, []);
@@ -90,11 +95,11 @@ export default function WorkshopAdminPage() {
   const filteredWorkshops = useMemo(() => {
     return workshops.filter((workshop) => {
       const matchesSearch = !searchQuery || workshop.title?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesSector = selectedSector === "All sectors" || workshop.sector === selectedSector;
-      const matchesModality = selectedModality === "All modalities" || workshop.modality === selectedModality;
+      const matchesSector = selectedSector === tForm("all_sectors") || workshop.sector === selectedSector;
+      const matchesModality = selectedModality === tForm("all_modalities") || workshop.modality === selectedModality;
       return matchesSearch && matchesSector && matchesModality;
     });
-  }, [workshops, searchQuery, selectedSector, selectedModality]);
+  }, [workshops, searchQuery, selectedSector, selectedModality, tForm]);
 
   // useEffect(() => {
   //   setCurrentPage(1);
@@ -108,13 +113,13 @@ export default function WorkshopAdminPage() {
 
   const uniqueSectors = useMemo(() => {
     const sectors = Array.from(new Set(workshops.map(w => w.sector))).filter(Boolean);
-    return ["All sectors", ...sectors.sort()];
-  }, [workshops]);
+    return [tForm("all_sectors"), ...sectors.sort()];
+  }, [workshops, tForm]);
 
   const uniqueModalities = useMemo(() => {
     const modalities = Array.from(new Set(workshops.map(w => w.modality))).filter(Boolean);
-    return ["All modalities", ...modalities.sort()];
-  }, [workshops]);
+    return [tForm("all_modalities"), ...modalities.sort()];
+  }, [workshops, tForm]);
 
   const handleWorkshopSaved = (savedWorkshop: Workshop) => {
     setWorkshops((prev) => {
@@ -125,7 +130,7 @@ export default function WorkshopAdminPage() {
       return [savedWorkshop, ...prev];
     });
     setEditingWorkshop(null);
-    toast.success("Workshop saved successfully.");
+    toast.success(tCommon('save_success'));
   };
 
   const handleEdit = (workshop: Workshop) => {
@@ -136,16 +141,16 @@ export default function WorkshopAdminPage() {
   const handleDelete = (id: string) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Workshop',
-      message: 'Are you sure you want to delete this workshop? This action will permanently remove the workshop from the catalog.',
+      title: tCommon('delete_confirm_title'),
+      message: tCommon('delete_confirm_msg'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await workshopService.delete(id);
           setWorkshops((prev) => prev.filter((w) => w._id !== id));
-          toast.success("Workshop deleted successfully.");
+          toast.success(tCommon('delete_success'));
         } catch (err) {
-          toast.error("Error deleting workshop.");
+          toast.error(tCommon('delete_error'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -168,21 +173,21 @@ export default function WorkshopAdminPage() {
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
       </svg>
-      New Workshop  
+      {t('new')}
     </button>
   );
 
   return (
     <DashboardLayout 
-      title="Workshops Management" 
-      subtitle="Creation, editing, and supervision of the official Iter catalog."
+      title={t('title')} 
+      subtitle={t('subtitle')}
       actions={headerActions}
     >
       {/* Filters Panel */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-background-surface border border-border-subtle p-8">
         {/* Text Search */}
         <div className="flex-1">
-          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">Search by title</label>
+          <label className="block text-[10px] font-bold text-text-primary uppercase tracking-[0.2em] mb-3">{tForm('search_by_title')}</label>
           <div className="relative">
             <input 
               type="text"
@@ -230,12 +235,12 @@ export default function WorkshopAdminPage() {
           <button 
             onClick={() => {
               setSearchQuery("");
-              setSelectedSector("All sectors");
-              setSelectedModality("All modalities");
+              setSelectedSector(tForm("all_sectors"));
+              setSelectedModality(tForm("all_modalities"));
             }}
             className="w-full lg:w-auto px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
           >
-            Clear
+            {tCommon('clear')}
           </button>
         </div>
       </div>
@@ -246,15 +251,15 @@ export default function WorkshopAdminPage() {
       ) : filteredWorkshops.length > 0 ? (
         <div className="bg-background-surface border border-border-subtle overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Workshop Information</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Classification</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">Details and Capacity</th>
-                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary text-right">Actions</th>
-                </tr>
-              </thead>
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr className="bg-background-subtle border-b border-border-subtle">
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">{t('table_info')}</th>
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">{t('table_classification')}</th>
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary">{t('table_details')}</th>
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-text-primary text-right">{tCommon('actions')}</th>
+          </tr>
+        </thead>
               <tbody className="divide-y divide-border-subtle">
                 {paginatedWorkshops.map((workshop) => (
                   <tr key={workshop._id} className="hover:bg-background-subtle transition-colors group">
@@ -291,7 +296,7 @@ export default function WorkshopAdminPage() {
                           onClick={() => handleEdit(workshop)}
                           className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-consorci-darkBlue hover:bg-background-subtle transition-colors"
                         >
-                          Edit
+                          {tCommon('edit')}
                         </button>
                         <button 
                           onClick={() => handleDelete(workshop._id)}
@@ -326,8 +331,8 @@ export default function WorkshopAdminPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <p className="text-text-primary font-bold uppercase text-xs tracking-widest">No workshops found</p>
-          <p className="text-text-muted text-[10px] uppercase font-bold mt-1 tracking-widest">Try other search terms.</p>
+          <p className="text-text-primary font-bold uppercase text-xs tracking-widest">{t('empty')}</p>
+          <p className="text-text-muted text-[10px] uppercase font-bold mt-1 tracking-widest">{t('empty_desc')}</p>
         </div>
       )}
 

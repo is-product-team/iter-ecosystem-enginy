@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -14,6 +15,9 @@ import getApi from '@/services/api';
 import Pagination from "@/components/Pagination";
 
 export default function TeachersCRUD() {
+  const t = useTranslations('TeachersPage');
+  const tCommon = useTranslations('Common');
+
   const { user, loading: authLoading } = useAuth();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,17 +87,17 @@ export default function TeachersCRUD() {
     try {
       if (editingTeacher) {
         await teacherService.update(editingTeacher.teacherId, formData);
-        toast.success("Teacher updated successfully.");
+        toast.success(tCommon('save_success'));
       } else {
         await teacherService.create(formData);
-        toast.success("Teacher created successfully.");
+        toast.success(tCommon('save_success'));
       }
       setIsModalOpen(false);
       setEditingTeacher(null);
       setFormData({ name: '', contact: '', password: '' });
       loadTeachers();
     } catch (err: unknown) {
-      toast.error((err as Error).message || "Error saving teacher.");
+      toast.error(tCommon('save_error'));
     }
   };
 
@@ -106,16 +110,16 @@ export default function TeachersCRUD() {
   const handleDelete = (id: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Teacher',
-      message: 'Are you sure you want to delete this teacher? Their access to the mobile App will also be removed.',
+      title: t('delete_title'),
+      message: t('delete_msg'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await teacherService.delete(id);
           loadTeachers();
-          toast.success("Teacher deleted.");
+          toast.success(tCommon('delete_success'));
         } catch (err) {
-          toast.error("Error deleting teacher.");
+          toast.error(tCommon('delete_error'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -127,24 +131,24 @@ export default function TeachersCRUD() {
       className="bg-[#00426B] text-white px-6 py-3 font-black uppercase text-[10px] tracking-widest hover:bg-[#0775AB] transition-all flex items-center gap-2 shadow-lg"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-      New Teacher
+      {t('new_teacher')}
     </button>
   );
 
   return (
     <DashboardLayout
-      title="Teacher Management"
-      subtitle="Manage the referring teachers of your educational center."
+      title={t('title')}
+      subtitle={t('subtitle')}
       actions={headerActions}
     >
       {/* Filters Panel */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
         <div className="flex-1">
-          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">Search by name or contact</label>
+          <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-[0.2em] mb-3">{t('search_label')}</label>
           <div className="relative">
             <input
               type="text"
-              placeholder="Ex: Manuel Pérez, manuel@escolaurgell.cat..."
+              placeholder={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-gray-100 focus:border-[#0775AB] focus:ring-0 text-sm font-bold text-[#00426B] placeholder:text-gray-300 transition-all"
@@ -160,7 +164,7 @@ export default function TeachersCRUD() {
             onClick={() => setSearchQuery("")}
             className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
           >
-            Clear
+            {tCommon('clear')}
           </button>
         </div>
       </div>
@@ -174,9 +178,9 @@ export default function TeachersCRUD() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-[#F8FAFC] border-b border-gray-200">
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Teacher</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">Contact</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">Actions</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">{t('table_teacher')}</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B]">{t('table_contact')}</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#00426B] text-right">{tCommon('table_actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -202,7 +206,7 @@ export default function TeachersCRUD() {
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex justify-end items-center gap-2">
-                          <button onClick={() => handleEdit(p)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">Edit</button>
+                          <button onClick={() => handleEdit(p)} className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#EAEFF2] transition-colors">{tCommon('edit')}</button>
                           <button onClick={() => handleDelete(p.teacherId)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all">
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
@@ -215,8 +219,8 @@ export default function TeachersCRUD() {
             </div>
             {filteredTeachers.length === 0 && (
               <div className="p-20 text-center">
-                <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">No teachers found</p>
-                <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">Try other search terms.</p>
+                <p className="text-[#00426B] font-black uppercase text-xs tracking-widest">{t('no_teachers')}</p>
+                <p className="text-gray-400 text-[10px] uppercase font-bold mt-1 tracking-widest">{t('adjust_search')}</p>
               </div>
             )}
           </div>
@@ -240,10 +244,10 @@ export default function TeachersCRUD() {
             <div className="bg-gray-50 px-8 py-5 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
               <div>
                 <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tight">
-                  {editingTeacher ? 'Edit Teacher' : 'New Teacher'}
+                  {editingTeacher ? t('edit_teacher_title') : t('create_teacher_title')}
                 </h3>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-                  {editingTeacher ? 'Modify teacher data' : 'Enter data for the new teacher'}
+                  {editingTeacher ? t('modify_data') : t('enter_data')}
                 </p>
               </div>
               <button
@@ -266,7 +270,7 @@ export default function TeachersCRUD() {
                     className="shadow-xl ring-4 ring-white"
                   />
                   <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-[#00426B] hover:bg-[#00426B] hover:text-white transition-all shadow-sm active:scale-95">
-                    Change Photo
+                    {t('change_photo')}
                     <input
                       type="file"
                       className="hidden"
@@ -281,7 +285,7 @@ export default function TeachersCRUD() {
                             const res = await api.post(`/upload/profile/user/${editingTeacher.user.userId}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
-                            toast.success("Photo updated.");
+                            toast.success(t('photo_success'));
                             loadTeachers();
                             // Update local state for immediate feedback
                             setEditingTeacher({
@@ -289,7 +293,7 @@ export default function TeachersCRUD() {
                               user: { ...editingTeacher.user, photoUrl: res.data.photoUrl }
                             } as Teacher);
                           } catch (err) {
-                            toast.error("Error uploading photo.");
+                            toast.error(t('upload_error'));
                           }
                         } else if (!editingTeacher.user?.userId) {
                           toast.error("Cannot upload photo to a teacher without a linked user.");
@@ -302,7 +306,7 @@ export default function TeachersCRUD() {
 
               <form onSubmit={handleSubmit} id="teacher-form" className="p-8 space-y-6">
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Full name</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('name_label')}</label>
                   <input
                     type="text" value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -310,7 +314,7 @@ export default function TeachersCRUD() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">Contact info (Main Email)</label>
+                  <label className="block text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2">{t('contact_label')}</label>
                   <input
                     type="email" value={formData.contact}
                     onChange={e => setFormData({ ...formData, contact: e.target.value })}
@@ -323,25 +327,25 @@ export default function TeachersCRUD() {
                 {!editingTeacher && (
                   <div>
                     <label className="text-[10px] font-black text-[#00426B] uppercase tracking-widest mb-2 flex justify-between">
-                      Password (App Access)
+                      {t('password_label')}
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="text-[#0775AB] hover:underline normal-case font-bold"
                       >
-                        {showPassword ? 'Hide' : 'View'}
+                        {showPassword ? t('hide_pwd') : t('show_pwd')}
                       </button>
                     </label>
                     <input
                       type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={e => setFormData({ ...formData, password: e.target.value })}
-                      placeholder="Password for the mobile App"
+                      placeholder={t('pwd_placeholder')}
                       className="w-full px-4 py-3 bg-[#F8FAFC] border border-gray-100 text-sm font-bold text-[#00426B] focus:border-[#0775AB] focus:ring-1 focus:ring-[#0775AB] outline-none transition-all"
                       required={!editingTeacher}
                     />
                     <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-tight">
-                      This will be the password that the teacher will use to enter the App.
+                      {t('pwd_hint')}
                     </p>
                   </div>
                 )}
@@ -349,8 +353,8 @@ export default function TeachersCRUD() {
             </div>
 
             <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">Cancel</button>
-              <button type="submit" form="teacher-form" className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg active:scale-95">Save Teacher</button>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">{tCommon('cancel')}</button>
+              <button type="submit" form="teacher-form" className="flex-1 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-all shadow-lg active:scale-95">{t('save_btn')}</button>
             </div>
           </div>
         </div>

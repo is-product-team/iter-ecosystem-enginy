@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import notificationService from '@/services/notificationService';
 import { useEffect, useState } from 'react';
 
 const Navbar: React.FC = () => {
+  const t = useTranslations('Navigation');
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const params = useParams();
@@ -44,9 +46,9 @@ const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { label: 'Home', path: getHomePath(), show: true },
-    { label: 'Notifications', path: `/${locale}/center/notifications`, show: true, isNotifications: true },
-    { label: 'Calendar', path: `/${locale}/calendar`, show: true },
+    { label: t('home'), path: getHomePath(), show: true },
+    { label: t('notifications'), path: `/${locale}/center/notifications`, show: true, isNotifications: true },
+    { label: t('calendar'), path: `/${locale}/calendar`, show: true },
   ];
 
   return (
@@ -116,7 +118,7 @@ const Navbar: React.FC = () => {
                 onClick={logout}
                 className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[10px] font-bold uppercase tracking-widest px-5 py-2 transition-all"
               >
-                Logout
+                {t('logout')}
               </button>
             </div>
           </div>

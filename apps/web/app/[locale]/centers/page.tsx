@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { THEME, ROLES } from "@iter/shared";
 import DashboardLayout from "../../../components/DashboardLayout";
@@ -15,6 +16,9 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
 
 export default function CentersScreen() {
+  const t = useTranslations('CentersPage');
+  const tCommon = useTranslations('Common');
+
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -56,7 +60,7 @@ export default function CentersScreen() {
       setCenters(list);
       setError(null);
     } catch (err) {
-      setError("Could not load centers.");
+      setError(tCommon('loading_error'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -94,7 +98,7 @@ export default function CentersScreen() {
       return [saved, ...prev];
     });
     setEditingCenter(null);
-    toast.success("Center saved successfully.");
+    toast.success(tCommon('save_success'));
   };
 
   const handleEdit = (center: Center) => {
@@ -105,16 +109,16 @@ export default function CentersScreen() {
   const handleDelete = (id: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Center',
-      message: 'Are you sure you want to delete this center? All associated data will be deleted.',
+      title: tCommon('delete_confirm_title'),
+      message: tCommon('delete_confirm_msg'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await centerService.delete(id);
           setCenters((prev) => prev.filter((c) => c.centerId !== id));
-          toast.success("Center deleted successfully.");
+          toast.success(tCommon('delete_success'));
         } catch (err) {
-          toast.error("Error deleting center.");
+          toast.error(tCommon('delete_error'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -137,21 +141,21 @@ export default function CentersScreen() {
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
       </svg>
-      New Center
+      {t('new')}
     </button>
   );
 
   return (
     <DashboardLayout 
-      title="Centers Management" 
-      subtitle="Administration of educational centers participating in Iter."
+      title={t('title')} 
+      subtitle={t('subtitle')}
       actions={headerActions}
     >
       {/* Panell de Filtres */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-background-surface border border-border-subtle p-8">
         {/* Cercador */}
         <div className="flex-1">
-          <label className="block text-[10px] font-black text-text-primary uppercase tracking-[0.2em] mb-3">Search by name or code</label>
+          <label className="block text-[10px] font-black text-text-primary uppercase tracking-[0.2em] mb-3">{t('search_label')}</label>
           <div className="relative">
             <input 
               type="text"
@@ -178,7 +182,7 @@ export default function CentersScreen() {
             }}
             className="w-full lg:w-auto px-6 py-3 text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 h-[46px]"
           >
-            Clear
+            {tCommon('clear')}
           </button>
         </div>
       </div>
@@ -200,18 +204,18 @@ export default function CentersScreen() {
 
       {/* Centers Table */}
       {loading ? (
-        <Loading message="Loading centers..." />
+        <Loading message={t('loading')} />
       ) : filteredCenters.length > 0 ? (
         <div className="bg-background-surface border border-border-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">Center</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">Address</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">Email</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">Phone</th>
-                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary text-right">Actions</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">{t('table_center')}</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">{t('table_address')}</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">{t('table_email')}</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary">{t('table_phone')}</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-primary text-right">{tCommon('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle">
@@ -226,12 +230,12 @@ export default function CentersScreen() {
                         </div>
                         <div>
                           <div className="text-sm font-black text-text-primary uppercase tracking-tight">{center.name}</div>
-                          <div className="text-[10px] font-bold text-text-muted uppercase tracking-tighter mt-0.5">CODE: {center.centerCode}</div>
+                          <div className="text-[10px] font-bold text-text-muted uppercase tracking-tighter mt-0.5">{t('center_code')}: {center.centerCode}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
-                      {center.address || "No address"}
+                      {center.address || t('no_address')}
                     </td>
                     <td className="px-6 py-5 text-[11px] font-bold text-text-primary">
                       {center.contactEmail || "N/A"}
@@ -245,7 +249,7 @@ export default function CentersScreen() {
                           onClick={() => handleEdit(center)}
                           className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-consorci-darkBlue hover:bg-background-subtle transition-colors"
                         >
-                          Edit
+                          {tCommon('edit')}
                         </button>
                         <button 
                           onClick={() => handleDelete(center.centerId)}
@@ -280,8 +284,8 @@ export default function CentersScreen() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <p className="text-text-primary font-black uppercase text-xs tracking-widest">No centers found</p>
-          <p className="text-text-muted text-[10px] uppercase font-bold mt-1 tracking-widest">Try other search terms.</p>
+          <p className="text-text-primary font-black uppercase text-xs tracking-widest">{t('empty')}</p>
+          <p className="text-text-muted text-[10px] uppercase font-bold mt-1 tracking-widest">{t('empty_desc')}</p>
         </div>
       )}
 
