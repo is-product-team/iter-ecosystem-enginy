@@ -13,11 +13,11 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
 import getApi from '@/services/api';
 import Pagination from "@/components/Pagination";
-import { useTranslations } from 'next-intl';
 
 export default function TeachersCRUD() {
-  const t = useTranslations('TeachersPage');
-  const tCommon = useTranslations('Common');
+  const t = useTranslations('Center.Teachers');
+  const tc = useTranslations('Common');
+  const ta = useTranslations('Auth.login');
 
   const { user, loading: authLoading } = useAuth();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -29,9 +29,6 @@ export default function TeachersCRUD() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const t = useTranslations('Center.Teachers');
-  const tc = useTranslations('Common');
-  const ta = useTranslations('Auth.login');
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{

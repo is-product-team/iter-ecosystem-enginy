@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { THEME, ROLES } from "@iter/shared";
 import WorkshopIcon from "../../../components/WorkshopIcon";
@@ -12,17 +12,14 @@ import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
 import workshopService, { Workshop } from "@/services/workshopService";
-import { useTranslations } from 'next-intl';
 
 export default function WorkshopAdminPage() {
-  const t = useTranslations('WorkshopsPage');
+  const t = useTranslations('Admin.Workshops');
+  const tc = useTranslations('Common');
   const tForm = useTranslations('Forms');
-  const tCommon = useTranslations('Common');
 
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const t = useTranslations('Admin.Workshops');
-  const tc = useTranslations('Common');
 
   const [editingWorkshop, setEditingWorkshop] = useState<Workshop | null>(null);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);

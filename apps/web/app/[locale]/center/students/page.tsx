@@ -13,12 +13,11 @@ import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
 import Pagination from '@/components/Pagination';
-import { useTranslations } from 'next-intl';
 
 export default function StudentsCRUD() {
-  const t = useTranslations('StudentsPage');
-  const tCommon = useTranslations('Common');
-
+  const t = useTranslations('Center.Students');
+  const tc = useTranslations('Common');
+  
   const { user, loading: authLoading } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,8 +25,6 @@ export default function StudentsCRUD() {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [formData, setFormData] = useState({ fullName: '', lastName: '', idalu: '', grade: '' });
   const [searchQuery, setSearchQuery] = useState("");
-  const t = useTranslations('Center.Students');
-  const tc = useTranslations('Common');
   const [selectedCourse, setSelectedCourse] = useState(t("all_courses"));
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;

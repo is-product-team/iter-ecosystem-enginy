@@ -289,6 +289,34 @@
         "delete_ok": "Aviso eliminado.",
         "delete_error": "Error al eliminar el aviso."
       }
+    },
+    "Monitoring": {
+      "title": "Monitorización Operativa (Fase 3)",
+      "subtitle": "Estado de la ejecución de talleres y asistencia en tu centro.",
+      "KPI": {
+        "sessions_today": "Sesiones Hoy",
+        "pending_attendance": "Hojas Pendientes",
+        "active_assignments": "Talleres en Marcha",
+        "incidents": "Incidencias Activas"
+      },
+      "Assignments": {
+        "title": "Estado de los Talleres",
+        "progress": "Progreso",
+        "health": "Salud de la Asistencia",
+        "view_details": "Gestionar Sesiones",
+        "no_staff": "⚠️ Sin profesor asignado",
+        "attendance_ok": "Asistencia al día",
+        "attendance_warning": "Faltan hojas por rellenar"
+      },
+      "Today": {
+        "title": "Agenda de Hoy",
+        "no_sessions": "No hay sesiones programadas para hoy."
+      },
+      "Incidents": {
+        "title": "Últimas Incidencias",
+        "report_new": "Informar Incidencia",
+        "no_incidents": "No hay incidencias reportadas."
+      }
     }
   },
   "Common": {
@@ -326,7 +354,7 @@
     "error_upload": "Error al subir el documento.",
     "only_pdf_allowed": "Solo se permiten archivos PDF.",
     "ai_mismatch": "La IA detecta un tipo diferente: {type}.",
-    "ai_no_signatures": "La IA no ha detectado las firmas requeridas.",
+    "ai_no_signatures": "La IA no ha detectat las firmas requeridas.",
     "ai_error": "Error al procesar la IA. Puedes forzar la subida.",
     "showing": "Mostrando",
     "of": "de",
@@ -346,9 +374,9 @@
     "actions": "Acciones",
     "edit": "Editar",
     "delete": "Eliminar",
-    "cancel": "Cancelar",
     "save": "Guardar",
     "confirm": "Confirmar",
+    "cancel": "Cancelar",
     "modality_label": "Modalidad {modality}",
     "places_label": "{count} Plazas",
     "duration_label": "{hours}h",
@@ -362,7 +390,16 @@
     "hide": "Ocultar",
     "table_info": "Información",
     "table_idalu": "IDALU",
-    "table_course": "Curso"
+    "table_course": "Curso",
+    "clear": "Limpiar",
+    "details": "Detalles",
+    "status": "Estado",
+    "loading_error": "No se ha podido cargar la información",
+    "delete_success": "Elemento eliminado correctamente.",
+    "delete_error": "Se ha producido un error al eliminar el elemento.",
+    "delete_confirm_title": "Confirmar eliminación",
+    "delete_confirm_msg": "¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer.",
+    "new": "Nuevo"
   },
   "Calendar": {
     "loading_auth": "Sincronizando tu calendario...",
@@ -548,8 +585,9 @@
     "students": "Alumnos",
     "teachers": "Profesores",
     "assignments": "Asignaciones",
-    "sessions": "Sesiones",
-    "profile": "Perfil"
+    "sessions": "Sessions",
+    "profile": "Perfil",
+    "monitoring": "Monitorización"
   },
   "Dashboards": {
     "admin": {
@@ -627,30 +665,6 @@
       "issued": "Emitido",
       "pdf_not_implemented": "La generación de PDF no está implementada en esta demo."
     }
-  },
-  "Common": {
-    "edit": "Editar",
-    "delete": "Eliminar",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "actions": "Acciones",
-    "clear": "Limpiar",
-    "details": "Detalles",
-    "status": "Estado",
-    "loading": "Cargando...",
-    "loading_error": "No se ha podido cargar la información",
-    "save_success": "Cambios guardados correctamente.",
-    "save_error": "Se ha producido un error al guardar los cambios.",
-    "delete_success": "Elemento eliminado correctamente.",
-    "delete_error": "Se ha producido un error al eliminar el elemento.",
-    "delete_confirm_title": "Confirmar eliminación",
-    "delete_confirm_msg": "¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer.",
-    "new": "Nuevo",
-    "showing": "Mostrando",
-    "of": "de",
-    "previous": "Anterior",
-    "next": "Siguiente",
-    "page": "Página"
   },
   "Forms": {
     "search": "Buscar...",

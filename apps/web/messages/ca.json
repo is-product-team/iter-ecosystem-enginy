@@ -289,6 +289,34 @@
         "delete_ok": "Avís eliminat.",
         "delete_error": "Error en eliminar l'avís."
       }
+    },
+    "Monitoring": {
+      "title": "Monitorització Operativa (Fase 3)",
+      "subtitle": "Estat de l'execució de tallers i assistència en el teu centre.",
+      "KPI": {
+        "sessions_today": "Sessions Avui",
+        "pending_attendance": "Fulls Pendents",
+        "active_assignments": "Tallers en Marxa",
+        "incidents": "Incidències Actives"
+      },
+      "Assignments": {
+        "title": "Estat dels Tallers",
+        "progress": "Progrés",
+        "health": "Salut de l'Asistència",
+        "view_details": "Gestionar Sessions",
+        "no_staff": "⚠️ Sense professor assignat",
+        "attendance_ok": "Asistència al dia",
+        "attendance_warning": "Falten fulls per omplir"
+      },
+      "Today": {
+        "title": "Agenda d'Avui",
+        "no_sessions": "No hi ha sessions programades per avui."
+      },
+      "Incidents": {
+        "title": "Últimes Incidències",
+        "report_new": "Informar Incidència",
+        "no_incidents": "No hi ha incidències reportades."
+      }
     }
   },
   "Common": {
@@ -346,7 +374,6 @@
     "actions": "Accions",
     "edit": "Editar",
     "delete": "Eliminar",
-    "cancel": "Cancel·lar",
     "save": "Desar",
     "confirm": "Confirmar",
     "modality_label": "Modalitat {modality}",
@@ -362,7 +389,16 @@
     "hide": "Amagar",
     "table_info": "Informació",
     "table_idalu": "IDALU",
-    "table_course": "Curs"
+    "table_course": "Curs",
+    "clear": "Netejar",
+    "details": "Detalls",
+    "status": "Estat",
+    "loading_error": "No s'ha pogut carregar la informació",
+    "delete_success": "Element eliminat correctament.",
+    "delete_error": "S'ha produït un error en eliminar l'element.",
+    "delete_confirm_title": "Confirmar eliminació",
+    "delete_confirm_msg": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
+    "new": "Nou"
   },
   "Calendar": {
     "loading_auth": "Sincronitzant el teu calendari...",
@@ -549,7 +585,8 @@
     "teachers": "Professors",
     "assignments": "Assignacions",
     "sessions": "Sessions",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "monitoring": "Monitorització"
   },
   "Dashboards": {
     "admin": {
@@ -627,30 +664,6 @@
       "issued": "Emès",
       "pdf_not_implemented": "La generació de PDF no està implementada en aquesta demo."
     }
-  },
-  "Common": {
-    "edit": "Editar",
-    "delete": "Eliminar",
-    "save": "Guardar",
-    "cancel": "Cancel·lar",
-    "actions": "Accions",
-    "clear": "Netejar",
-    "details": "Detalls",
-    "status": "Estat",
-    "loading": "Carregant...",
-    "loading_error": "No s'ha pogut carregar la informació",
-    "save_success": "Canvis guardats correctament.",
-    "save_error": "S'ha produït un error en guardar els canvis.",
-    "delete_success": "Element eliminat correctament.",
-    "delete_error": "S'ha produït un error en eliminar l'element.",
-    "delete_confirm_title": "Confirmar eliminació",
-    "delete_confirm_msg": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
-    "new": "Nou",
-    "showing": "Mostrant",
-    "of": "de",
-    "previous": "Anterior",
-    "next": "Següent",
-    "page": "Pàgina"
   },
   "Forms": {
     "search": "Cercar...",

@@ -2,24 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
-import { useTranslations, useLocale } from 'next-intl';
 
 
 import phaseService, { Phase } from '@/services/phaseService';
 
 export default function CenterDashboard() {
-  const t = useTranslations('Dashboards.center');
+  const t = useTranslations('Center');
+  const tc = useTranslations('Common');
+  const locale = useLocale();
   const { user, loading: authLoading } = useAuth();
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loadingPhases, setLoadingPhases] = useState(true);
   const router = useRouter();
-  const t = useTranslations('Center');
-  const tc = useTranslations('Common');
-  const locale = useLocale();
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {

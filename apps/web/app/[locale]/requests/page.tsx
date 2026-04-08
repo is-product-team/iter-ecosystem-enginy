@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { REQUEST_STATUSES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -14,12 +14,11 @@ import api from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import Pagination from "@/components/Pagination";
-import { useTranslations } from 'next-intl';
+import Pagination from '@/components/Pagination';
 
 export default function AdminRequestsPage() {
-  const t = useTranslations('RequestsPage');
-  const tCommon = useTranslations('Common');
+  const t = useTranslations('Admin.Requests');
+  const tc = useTranslations('Common');
   const tForm = useTranslations('Forms');
 
   const { user, loading: authLoading } = useAuth();
@@ -29,8 +28,6 @@ export default function AdminRequestsPage() {
   const [_phases, _setPhases] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const t = useTranslations('Admin.Requests');
-  const tc = useTranslations('Common');
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState('');

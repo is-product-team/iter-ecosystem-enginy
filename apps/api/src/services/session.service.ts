@@ -132,17 +132,73 @@ export class SessionService {
 
         if (hasAttendance > 0) return;
 
-        // Delete existing sessions
+        // 1. Fetch current sessions with staff before deleting
+        const existingSessions = await prisma.session.findMany({
+            where: { assignmentId },
+            include: { staff: true },
+            orderBy: { sessionDate: 'asc' }
+        });
+
+        const staffToRestore = existingSessions.map(s => s.staff.map(t => t.userId));
+
+        // 2. Delete existing sessions
         await prisma.session.deleteMany({
             where: { assignmentId }
         });
 
-        // Create new ones
-        await prisma.session.createMany({
-            data: sessionDates.map(date => ({
+        // 3. Create new ones and restore staff
+        for (let i = 0; i < sessionDates.length; i++) {
+            const newSession = await prisma.session.create({
+                data: {
+                    assignmentId,
+                    sessionDate: sessionDates[i]
+                }
+            });
+
+            // Restore staff if any existed for this session index
+            if (staffToRestore[i] && staffToRestore[i].length > 0) {
+                await prisma.sessionTeacher.createMany({
+                    data: staffToRestore[i].map(userId => ({
+                        sessionId: newSession.sessionId,
+                        userId
+                    }))
+                });
+            }
+        }
+    }
+
+    /**
+     * Calculates the "health" of an assignment's attendance.
+     * Returns the percentage of elapsed sessions that have recorded attendance.
+     */
+    static async getAttendanceHealth(assignmentId: number): Promise<{ percentage: number; pendingCount: number; totalSessions: number }> {
+        const totalSessions = await prisma.session.count({ where: { assignmentId } });
+        if (totalSessions === 0) return { percentage: 100, pendingCount: 0, totalSessions: 0 };
+
+        const now = new Date();
+        const elapsedSessions = await prisma.session.findMany({
+            where: {
                 assignmentId,
-                sessionDate: date
-            }))
+                sessionDate: { lte: now }
+            },
+            select: { sessionId: true, sessionDate: true }
         });
+
+        if (elapsedSessions.length === 0) return { percentage: 100, pendingCount: 0, totalSessions };
+
+        const attendanceRecs = await prisma.attendance.groupBy({
+            by: ['sessionDate'],
+            where: {
+                enrollment: { assignmentId },
+                sessionDate: { in: elapsedSessions.map(s => s.sessionDate) }
+            },
+            _count: { attendanceId: true }
+        });
+
+        const recordedCount = attendanceRecs.length;
+        const pendingCount = elapsedSessions.length - recordedCount;
+        const percentage = Math.round((recordedCount / elapsedSessions.length) * 100);
+
+        return { percentage, pendingCount, totalSessions };
     }
 }
