@@ -410,8 +410,8 @@ export default function AdminRequestsPage() {
           />
         </div>
       ) : (
-        <div className="bg-white border border-dashed border-gray-200 p-20 text-center">
-          <p className="text-gray-400 text-xs font-black uppercase tracking-widest">{t('no_requests')}</p>
+        <div className="bg-background-surface border border-dashed border-border-subtle p-20 text-center">
+          <p className="text-text-muted text-xs font-black uppercase tracking-widest">{t('no_requests')}</p>
         </div>
       )}
       {/* Edit Modal */}

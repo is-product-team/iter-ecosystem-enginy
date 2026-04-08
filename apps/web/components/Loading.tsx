@@ -22,7 +22,7 @@ const Loading: React.FC<LoadingProps> = ({
   };
 
   const ringColor = white ? 'text-white' : 'text-consorci-darkBlue';
-  const dotColor = white ? 'bg-white' : 'bg-consorci-darkBlue';
+  const dotColor = white ? 'bg-white' : 'bg-consorci-darkBlue dark:bg-text-primary';
   const textColor = white ? 'text-white/60' : 'text-text-muted';
 
   const content = (

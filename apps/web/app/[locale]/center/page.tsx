@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
-import DLayout from '@/components/DashboardLayout';
+import DashboardLayout from '@/components/DashboardLayout';
 import { useTranslations, useLocale } from 'next-intl';
 
 
@@ -56,13 +56,13 @@ export default function CenterDashboard() {
   }
 
   return (
-    <DLayout
+    <DashboardLayout
       title={t('dashboard.title', { name: user.center?.name || tc('general') })}
       subtitle={t('dashboard.subtitle')}
     >
       <div className="w-full pb-20 space-y-12">
         {/* Institutional Section Timeline */}
-      <section className="bg-background-surface border-2 border-border-subtle p-12 mb-12 relative overflow-hidden">
+      <section className="bg-background-surface border border-border-subtle p-12 mb-12 relative overflow-hidden">
 
         <h3 className="text-[12px] font-medium text-text-muted mb-8 text-center tracking-widest uppercase">
           {t('dashboard.status_title')}
@@ -192,18 +192,6 @@ export default function CenterDashboard() {
         </div>
       </div>
     </div>
-  </DLayout>
-  );
-}
-="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </DLayout>
+    </DashboardLayout>
   );
 }
