@@ -105,7 +105,7 @@ export default function AdminDashboardPage() {
       title={t('dashboard.title')}
       subtitle={t('dashboard.welcome')}
     >
-      <div className="flex justify-center w-full pb-12">
+      <div className="w-full pb-20 space-y-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
           {sections.map((section) => (
             <div

@@ -80,7 +80,7 @@ export default function ProfilePage() {
       title={t('title')}
       subtitle={t('subtitle')}
     >
-      <div className="max-w-4xl mx-auto pb-20">
+      <div className="w-full pb-20 space-y-12">
         {/* Profile Header Card */}
         <div className="bg-background-surface border border-border-subtle p-12 mb-10 flex flex-col md:flex-row items-center gap-10">
           <Avatar 

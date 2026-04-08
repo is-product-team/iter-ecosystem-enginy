@@ -60,7 +60,8 @@ export default function CenterDashboard() {
       title={t('dashboard.title', { name: user.center?.name || tc('general') })}
       subtitle={t('dashboard.subtitle')}
     >
-      {/* Institutional Section Timeline */}
+      <div className="w-full pb-20 space-y-12">
+        {/* Institutional Section Timeline */}
       <section className="bg-background-surface border-2 border-border-subtle p-12 mb-12 relative overflow-hidden">
 
         <h3 className="text-[12px] font-medium text-text-muted mb-8 text-center tracking-widest uppercase">

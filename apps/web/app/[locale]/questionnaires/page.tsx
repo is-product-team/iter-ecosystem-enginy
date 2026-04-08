@@ -47,11 +47,12 @@ export default function AdminQuestionnairesPage() {
 
     return (
         <DashboardLayout
-            title={t('title')}
-            subtitle={t('subtitle')}
+          title={t('title')}
+          subtitle={t('subtitle')}
         >
-            <div className="w-full pb-20">
-                <div className="flex justify-between items-center mb-12">
+          <div className="w-full pb-20 space-y-12">
+            <div className="flex justify-between items-center mb-12">
+
                     <h2 className="text-[18px] font-medium text-text-primary tracking-tight">{t('available_models')}</h2>
                     <button
                         onClick={() => router.push('/admin/questionnaires/builder')}
