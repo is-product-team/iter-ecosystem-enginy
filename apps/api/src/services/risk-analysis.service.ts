@@ -26,12 +26,12 @@ export class RiskAnalysisService {
         const recentAttendance = await prisma.attendance.findMany({
             where: {
                 enrollment: {
-                    id_student: studentId 
+                    studentId: studentId 
                 }
             },
             orderBy: {
-                data_sessio: 'desc'
-            } as any, // Cast to any to bypass the lint if it still complains about the orderBy type
+                sessionDate: 'desc'
+            },
             take: 5
         });
 
@@ -40,9 +40,9 @@ export class RiskAnalysisService {
             let absences = 0;
             let lates = 0;
 
-            recentAttendance.forEach((a: any) => {
-                if (a.estat === 'Absència' || a.estat === 'Absència Justificada') absences++;
-                if (a.estat === 'Retard') lates++;
+            recentAttendance.forEach((a) => {
+                if (a.status === 'ABSENT' || a.status === 'JUSTIFIED_ABSENCE') absences++;
+                if (a.status === 'LATE') lates++;
             });
 
             // Heavy penalty for frequent absences (>60%)
@@ -65,10 +65,10 @@ export class RiskAnalysisService {
             where: {
                 evaluation: {
                     enrollment: {
-                        id_student: studentId
+                        studentId: studentId
                     }
                 },
-                puntuacio: { lt: 3 }
+                score: { lt: 3 }
             }
         });
 
