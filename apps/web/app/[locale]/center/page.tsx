@@ -158,9 +158,6 @@ export default function CenterDashboard() {
                 : 'border-border-subtle opacity-60 cursor-not-allowed'
                 }`}
             >
-              <div className={`absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${item.active ? 'group-hover:bg-consorci-darkBlue' : ''
-                }`}></div>
-
               <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-border-subtle transition-all duration-300 ${item.active
                 ? 'bg-background-subtle text-consorci-darkBlue dark:text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white'
                 : 'bg-background-subtle text-text-muted'
@@ -187,6 +184,18 @@ export default function CenterDashboard() {
                   {item.active ? item.phase : tc('module_closed')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </DLayout>
+  );
+}
+="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
               </div>
