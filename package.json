@@ -19,7 +19,7 @@
     "db:seed": "turbo run db:seed",
     "db:studio": "turbo run studio",
     "test": "turbo run test",
-    "verify": "turbo run type-check test --filter=api --filter=web"
+    "verify": "turbo run lint type-check test --filter=api --filter=web"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.16",
