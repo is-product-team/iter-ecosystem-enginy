@@ -9,7 +9,19 @@
     "branding": "Consorci d'Educació de Barcelona",
     "call": "Llamar",
     "coming_soon": "Próximamente",
-    "no_description": "Sin descripción disponible"
+    "no_description": "Sin descripción disponible",
+    "practical_workshop": "Taller Práctico",
+    "session": "Sesión",
+    "time": "Horario",
+    "all_day": "Todo el día",
+    "room": "Aula / Espacio",
+    "assigned_group": "Grupo Asignado",
+    "practice_group": "Grupo de prácticas",
+    "session_objectives": "Objetivos de la Sesión",
+    "address": "Dirección del Centro",
+    "workshop_evaluated": "Taller Evaluado",
+    "evaluate_workshop": "Evaluar Taller",
+    "status": "Estado"
   },
   "Auth": {
     "logout": {
@@ -83,6 +95,10 @@
     "manage_session": "Gestionar Sesión",
     "view_details": "Ver Detalles",
     "no_upcoming_workshops": "No tienes talleres próximos",
+    "overview": "Resumen del Dashboard",
+    "current_phase_label": "Fase Actual",
+    "total_workshops": "Total de Talleres",
+    "next_session_label": "Próxima Sesión",
     "active": "Activo",
     "loading_data": "Cargando datos",
     "evaluate_finished_workshop": "Evaluar taller finalizado",
@@ -141,5 +157,19 @@
     "no_referents_assigned": "No hay referentes asignados a este taller todavía.",
     "no_contacts_yet": "Todavía no tienes contactos de coordinación.",
     "group_chat_instruction": "Pronto podrás chatear directamente con el equipo de coordinación del centro."
+  },
+  "Session": {
+    "title_attendance": "Sesión - Asistencia",
+    "title_work": "Sesión - Seguimiento",
+    "attendance_header": "Registro de Sesión",
+    "attendance_instruction": "Marca la asistencia de cada alumno antes de empezar el seguimiento técnico.",
+    "work_header": "Seguimiento de Sesión",
+    "work_instruction": "Evalúa el progreso de las competencias durante el taller.",
+    "observations_label": "Observaciones de la sesión",
+    "observations_placeholder": "Añade cualquier incidencia o comentario relevante...",
+    "finish_and_send": "Finalizar y Enviar Lista",
+    "attendance_sent_success": "Lista de asistencia enviada correctamente",
+    "manage_session": "Gestionar Sesión",
+    "error_loading_students": "No se ha podido cargar la lista de alumnos"
   }
 }

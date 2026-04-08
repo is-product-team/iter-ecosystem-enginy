@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
 
@@ -15,35 +15,87 @@ const AttendanceSegmentedControl: React.FC<AttendanceSegmentedControlProps> = ({
   disabled
 }) => {
   const options = [
-    { label: 'PRESENT', value: 'PRESENT', icon: 'checkmark-circle', activeColor: THEME.colors.success },
-    { label: 'ABSENT', value: 'ABSENT', icon: 'close-circle', activeColor: THEME.colors.error },
-    { label: 'LATE', value: 'LATE', icon: 'time', activeColor: THEME.colors.warning }
-  ] as const;
+    { 
+      label: 'PRESENT', 
+      value: 'PRESENT', 
+      icon: 'checkmark', 
+      iconBg: '#48A461', 
+      iconColor: '#FFFFFF' 
+    },
+    { 
+      label: 'ABSENT', 
+      value: 'ABSENT', 
+      icon: 'close', 
+      iconBg: '#F8A4A4', 
+      iconColor: '#991B1B' 
+    },
+    { 
+      label: 'LATE', 
+      value: 'LATE', 
+      icon: 'L', 
+      iconBg: '#CB9C2A', 
+      iconColor: '#FFFFFF' 
+    }
+  ];
 
   return (
-    <View className="flex-row bg-background-subtle p-1 rounded-2xl border border-border-subtle">
+    <View style={{ 
+      flexDirection: 'row', 
+      gap: 10, // Apretamos un poco el gap para ganar ancho de botón
+      width: '100%',
+    }}>
       {options.map((opt) => {
         const isActive = currentStatus === opt.value;
         return (
-          <TouchableOpacity
+          <Pressable
             key={opt.value}
             onPress={() => !disabled && onStatusChange(opt.value)}
             disabled={disabled}
-            activeOpacity={0.7}
-            className={`flex-1 flex-row items-center justify-center py-3 rounded-xl ${isActive ? 'bg-background-surface shadow-sm' : ''}`}
+            style={({ pressed }) => [
+              {
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: 20,
+                borderRadius: 20,
+                backgroundColor: '#F3F4F6',
+                borderWidth: isActive ? 1.5 : 0,
+                borderColor: THEME.colors.primary,
+                opacity: pressed ? 0.8 : 1,
+              }
+            ]}
           >
-            <Ionicons 
-              name={opt.icon as any} 
-              size={16} 
-              color={isActive ? opt.activeColor : THEME.colors.text.muted} 
-            />
+            <View style={{ 
+              width: 36, 
+              height: 36, 
+              borderRadius: 18, 
+              backgroundColor: opt.iconBg, 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              marginBottom: 12
+            }}>
+              {opt.icon === 'L' ? (
+                <Text style={{ color: opt.iconColor, fontWeight: '900', fontSize: 18 }}>L</Text>
+              ) : (
+                <Ionicons 
+                    name={opt.icon as any} 
+                    size={20} 
+                    color={opt.iconColor} 
+                />
+              )}
+            </View>
             <Text 
-              className={`text-[10px] font-bold ml-2 tracking-widest ${isActive ? 'text-text-primary' : 'text-text-muted'}`}
-              style={{ fontFamily: THEME.fonts.primary }}
+              style={{
+                fontSize: 12,
+                fontWeight: 'bold',
+                letterSpacing: 0.5,
+                color: '#000000',
+                fontFamily: THEME.fonts.primary
+              }}
             >
               {opt.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>

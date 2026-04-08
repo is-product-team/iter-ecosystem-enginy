@@ -210,23 +210,23 @@ export default function DashboardScreen() {
 
         <View className="px-6">
           <StatusCard
-            title="Dashboard Overview"
+            title={t('Dashboard.overview')}
             percentage={assignments.length > 0 ? Math.round(((assignments.length - pendingAssignments.length) / assignments.length) * 100) : 0}
-            primaryLabel="Current Phase"
+            primaryLabel={t('Dashboard.current_phase_label')}
             primaryMetric={activePhaseName || t('Dashboard.loading_data')}
-            secondaryLabel="Total Workshops"
+            secondaryLabel={t('Dashboard.total_workshops')}
             secondaryMetric={`${assignments.length}`}
             footerMetrics={[
               {
                 icon: "school",
                 iconColor: "#4197CB",
-                label: "Status",
-                value: "Active"
+                label: t('Common.status'),
+                value: t('Dashboard.active')
               },
               {
                 icon: "time",
                 iconColor: "#F26178",
-                label: "Next Session",
+                label: t('Dashboard.next_session_label'),
                 value: nextWorkshop?.startTime || "N/A"
               }
             ]}

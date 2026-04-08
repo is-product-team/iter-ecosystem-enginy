@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, TextInput } from 'react-native';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -119,23 +119,64 @@ export default function SessionScreen() {
           headerBackTitle: t('Common.back'),
           headerShadowVisible: false,
           headerStyle: { backgroundColor: THEME.colors.background },
+          headerTitleStyle: { 
+            fontFamily: THEME.fonts.primary, 
+            fontWeight: '800',
+            fontSize: 17 
+          }
         }} 
       />
       
       {showSuccess && (
-          <View className="absolute top-4 left-6 right-6 z-50 bg-emerald-500 p-4 rounded-2xl flex-row items-center shadow-lg">
+          <View style={{
+            position: 'absolute',
+            top: 20,
+            left: 24,
+            right: 24,
+            zIndex: 50,
+            backgroundColor: THEME.colors.success,
+            padding: 16,
+            borderRadius: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            shadowColor: THEME.colors.success,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.3,
+            shadowRadius: 12,
+            elevation: 8,
+          }}>
               <Ionicons name="checkmark-circle" size={24} color="white" />
-              <Text className="text-white font-bold ml-3">{t('Session.attendance_sent_success')}</Text>
+              <Text style={{ 
+                color: 'white', 
+                fontWeight: '800', 
+                marginLeft: 12,
+                fontSize: 14,
+                fontFamily: THEME.fonts.primary
+              }}>{t('Session.attendance_sent_success')}</Text>
           </View>
       )}
 
-      <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 24, paddingBottom: 120 }}>
+      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 24, paddingBottom: 120 }}>
          
-         <View className="mb-8">
-            <Text className="text-text-primary text-2xl font-extrabold mb-2" style={{ fontFamily: THEME.fonts.primary }}>
+         <View style={{ marginBottom: 40, marginTop: 12, paddingHorizontal: 8 }}>
+            <Text style={{ 
+              color: THEME.colors.text.primary, 
+              fontSize: 34, 
+              fontWeight: '900', 
+              marginBottom: 12,
+              fontFamily: THEME.fonts.primary,
+              letterSpacing: -1
+            }}>
                 {sessionMode === 'ATTENDANCE' ? t('Session.attendance_header') : t('Session.work_header')}
             </Text>
-            <Text className="text-text-muted text-sm font-medium leading-5">
+            <Text style={{ 
+              color: THEME.colors.text.muted, 
+              fontSize: 15, 
+              fontWeight: '400', 
+              lineHeight: 24,
+              fontFamily: THEME.fonts.primary,
+              maxWidth: '90%'
+            }}>
                 {sessionMode === 'ATTENDANCE' 
                     ? t('Session.attendance_instruction') 
                     : t('Session.work_instruction')}
@@ -172,32 +213,60 @@ export default function SessionScreen() {
       </ScrollView>
 
       {sessionMode === 'ATTENDANCE' && (
-        <View className="absolute bottom-0 left-0 right-0 p-6 bg-background-page/80">
-            <TouchableOpacity 
+        <View style={{ 
+          position: 'absolute', 
+          bottom: 30, 
+          left: 20, 
+          right: 20, 
+          paddingBottom: insets.bottom / 2,
+        }}>
+            <Pressable 
                 onPress={submitAttendance}
                 disabled={submitting || isSubmitted}
-                activeOpacity={0.8}
-                className={`w-full h-16 rounded-3xl items-center justify-center shadow-xl ${submitting || isSubmitted ? 'bg-background-subtle' : 'bg-primary shadow-slate-300'}`}
+                style={({ pressed }) => [
+                  {
+                    width: '100%',
+                    height: 68,
+                    borderRadius: 22,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: submitting || isSubmitted ? '#CBD5E1' : '#0F172A',
+                    opacity: pressed ? 0.9 : 1,
+                    // Shadow Pro (Sutil y profunda)
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 12 },
+                    shadowOpacity: submitting || isSubmitted ? 0 : 0.15,
+                    shadowRadius: 20,
+                    elevation: 8,
+                  }
+                ]}
             >
                 {submitting ? (
                     <ActivityIndicator color="white" />
                 ) : (
-                    <Text className="text-white text-base font-bold tracking-widest uppercase">
+                    <Text style={{ 
+                      color: 'white', 
+                      fontSize: 16, 
+                      fontWeight: 'bold', 
+                      letterSpacing: 2,
+                      textTransform: 'uppercase'
+                    }}>
                         {t('Session.finish_and_send')}
                     </Text>
                 )}
-            </TouchableOpacity>
+            </Pressable>
         </View>
       )}
 
       {sessionMode === 'WORK' && !isSubmitted && (
           <View className="absolute bottom-6 right-6">
-              <TouchableOpacity 
+              <Pressable 
                 onPress={() => setSessionMode('ATTENDANCE')}
                 className="w-14 h-14 bg-white rounded-full items-center justify-center shadow-lg border border-border-subtle"
+                style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
               >
                   <Ionicons name="list" size={24} color={THEME.colors.primary} />
-              </TouchableOpacity>
+              </Pressable>
           </View>
       )}
     </View>
