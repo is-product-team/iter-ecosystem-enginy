@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
-import DashboardLayout from '@/components/DashboardLayout';
+import DLayout from '@/components/DashboardLayout';
 import { useTranslations, useLocale } from 'next-intl';
 
 
@@ -56,7 +56,7 @@ export default function CenterDashboard() {
   }
 
   return (
-    <DashboardLayout
+    <DLayout
       title={t('dashboard.title', { name: user.center?.name || tc('general') })}
       subtitle={t('dashboard.subtitle')}
     >
@@ -162,7 +162,7 @@ export default function CenterDashboard() {
                 }`}></div>
 
               <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-border-subtle transition-all duration-300 ${item.active
-                ? 'bg-background-subtle text-consorci-darkBlue group-hover:bg-consorci-darkBlue group-hover:text-white'
+                ? 'bg-background-subtle text-consorci-darkBlue dark:text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white'
                 : 'bg-background-subtle text-text-muted'
                 }`}>
                 <div className={item.active ? 'group-hover:text-white' : ''}>
@@ -194,6 +194,7 @@ export default function CenterDashboard() {
           ))}
         </div>
       </div>
-    </DashboardLayout>
+    </div>
+  </DLayout>
   );
 }
