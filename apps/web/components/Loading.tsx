@@ -21,16 +21,14 @@ const Loading: React.FC<LoadingProps> = ({
     lg: 'w-24 h-24'
   };
 
-  const ringColor = white ? 'text-white' : 'text-[#00426B]';
-  const dotColor = white ? 'bg-white' : 'bg-[#0775AB]';
-  const glowColor = white ? 'bg-white/10' : 'bg-[#00426B]/5';
-  const textColor = white ? 'text-white/80' : 'text-[#00426B]/80';
+  const ringColor = white ? 'text-white' : 'text-consorci-darkBlue';
+  const dotColor = white ? 'bg-white' : 'bg-consorci-darkBlue';
+  const textColor = white ? 'text-white/60' : 'text-text-muted';
 
   const content = (
     <div className="flex flex-col items-center justify-center gap-6">
       <div className={`relative ${sizeClasses[size]}`}>
-        {/* Outer Glow */}
-        <div className={`absolute inset-0 ${glowColor} rounded-full blur-xl animate-pulse`}></div>
+        {/* Outer Glow Removed for Minimalist Look */}
 
         {/* Modern Circular Spinner */}
         <svg className="w-full h-full animate-spin" viewBox="0 0 50 50">
@@ -38,32 +36,32 @@ const Loading: React.FC<LoadingProps> = ({
             className={`${ringColor} opacity-10`}
             cx="25"
             cy="25"
-            r="20"
+            r="22"
             stroke="currentColor"
-            strokeWidth="4"
+            strokeWidth="2"
             fill="none"
           />
           <path
             className={ringColor}
             fill="none"
             stroke="currentColor"
-            strokeWidth="4"
+            strokeWidth="2"
             strokeLinecap="round"
-            d="M25,5 A20,20 0 0,1 45,25"
+            d="M25,3 A22,22 0 0,1 47,25"
           />
         </svg>
 
         {/* Inner Pulsing Circle */}
         {size !== 'sm' && (
           <div
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 ${dotColor} rounded-full shadow-lg animate-pulse`}
+            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 ${dotColor} animate-pulse`}
             style={{ animationDuration: '2s' }}
           ></div>
         )}
       </div>
 
       {message && size !== 'sm' && (
-        <p className={`text-[10px] font-bold uppercase tracking-[0.4em] ${textColor} drop-shadow-sm`}>
+        <p className={`text-[12px] font-medium ${textColor}`}>
           {message}
         </p>
       )}
@@ -72,7 +70,7 @@ const Loading: React.FC<LoadingProps> = ({
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-[#F2F2F3] z-[9999] flex items-center justify-center">
+      <div className="fixed inset-0 bg-background-page z-[9999] flex items-center justify-center">
         {content}
       </div>
     );

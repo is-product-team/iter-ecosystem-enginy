@@ -112,12 +112,11 @@ export default function AssignmentsPage() {
     >
       <div className="w-full">
         {/* Filters Panel */}
-        <div className="bg-white border-2 border-gray-100 p-8 mb-10 shadow-sm relative overflow-hidden">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-            <div className="flex-1 w-full space-y-4">
-              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#00426B] mb-4 flex items-center gap-3">
-                <div className="w-8 h-1 bg-[#0775AB]"></div>
-                Search and Filters
+        <div className="bg-background-surface border border-border-subtle p-10 mb-10">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+            <div className="flex-1 w-full space-y-6">
+              <h3 className="text-[14px] font-medium text-text-primary">
+                Search assignments
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative group">
@@ -125,17 +124,17 @@ export default function AssignmentsPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="SEARCH BY WORKSHOP OR CENTER..."
-                    className="w-full pl-10 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#4197CB] text-[11px] font-bold uppercase tracking-widest text-[#00426B] transition-all outline-none"
+                    placeholder="Search by workshop or center..."
+                    className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all outline-none"
                   />
-                  <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-4 h-4 w-4 text-[#00426B]/40 group-focus-within:text-[#4197CB] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-4 h-4.5 w-4.5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-4 py-4 bg-gray-50 border-2 border-transparent focus:border-[#4197CB] text-[11px] font-bold uppercase tracking-widest text-[#00426B] transition-all outline-none appearance-none"
+                  className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all outline-none appearance-none"
                 >
                   <option value="All statuses">All statuses</option>
                   <option value="IN_PROGRESS">In progress / Accepted</option>
@@ -145,9 +144,9 @@ export default function AssignmentsPage() {
             </div>
             <button 
               onClick={() => { setSearchQuery(""); setStatusFilter("All statuses"); }}
-              className="px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#00426B] hover:bg-[#EAEFF2] transition-all border-2 border-transparent hover:border-[#00426B]"
+              className="px-8 py-3.5 text-[13px] font-medium text-text-muted hover:text-text-primary transition-all"
             >
-              Clear
+              Clear filters
             </button>
           </div>
         </div>
@@ -155,47 +154,47 @@ export default function AssignmentsPage() {
         {loading ? (
           <Loading />
         ) : (
-          <div className="bg-white border-2 border-gray-100 shadow-sm overflow-hidden">
-            <table className="w-full text-left border-collapse">
+          <div className="bg-background-surface border border-border-subtle overflow-hidden">
+            <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50 border-b-2 border-gray-100">
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Assigned Workshop</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Center</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Planning</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Status</th>
-                  <th className="px-10 py-8 text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] text-right">Actions</th>
+                <tr className="bg-background-subtle border-b border-border-subtle">
+                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary">Assigned Workshop</th>
+                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary">Center</th>
+                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary">Planning</th>
+                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary">Status</th>
+                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border-subtle">
                 {paginatedAssignments.map(a => (
                   <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
-                    <td className="px-10 py-10">
+                    <td className="px-10 py-8">
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#4197CB] mb-2">WORKSHOP IDENTIFIER</span>
-                        <span className="text-base font-extrabold text-[#00426B] uppercase tracking-tight leading-tight">{a.workshop?.title}</span>
+                        <span className="text-[11px] font-medium text-consorci-darkBlue mb-1">WORKSHOP IDENTIFIER</span>
+                        <span className="text-[15px] font-medium text-text-primary tracking-tight leading-tight">{a.workshop?.title}</span>
                       </div>
                     </td>
-                    <td className="px-10 py-10">
-                      <span className="text-[11px] font-bold text-[#00426B] uppercase">{a.center?.name || 'Not assigned'}</span>
+                    <td className="px-10 py-8">
+                      <span className="text-[13px] font-medium text-text-primary">{a.center?.name || 'Not assigned'}</span>
                     </td>
-                    <td className="px-10 py-10">
-                      <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                    <td className="px-10 py-8">
+                      <div className="text-[13px] text-text-muted">
                         Start: {a.startDate ? new Date(a.startDate).toLocaleDateString() : '—'}
                       </div>
                     </td>
-                    <td className="px-10 py-10">
-                      <span className={`text-[10px] font-black uppercase px-3 py-1 border-2 ${
-                        a.status === 'VALIDATED' ? 'border-green-100 bg-green-50 text-green-700' :
-                        a.status === 'DATA_ENTRY' ? 'border-orange-100 bg-orange-50 text-orange-700' :
-                        'border-gray-100 text-gray-400'
+                    <td className="px-10 py-8">
+                      <span className={`text-[11px] font-medium px-3 py-1 border ${
+                        a.status === 'VALIDATED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
+                        a.status === 'DATA_ENTRY' ? 'border-orange-500/20 bg-orange-500/5 text-orange-600' :
+                        'border-border-subtle bg-background-subtle text-text-muted'
                       }`}>
                         {a.status}
                       </span>
                     </td>
-                    <td className="px-10 py-10 text-right">
+                    <td className="px-10 py-8 text-right">
                       <button
                         onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
-                        className="btn-primary py-2 px-6 text-[10px]"
+                        className="bg-consorci-darkBlue text-white py-2 px-6 text-[12px] font-medium transition-all hover:bg-black active:scale-[0.98]"
                       >
                         Manage
                       </button>
@@ -207,8 +206,8 @@ export default function AssignmentsPage() {
             
             {filteredAssignments.length === 0 && (
               <div className="p-20 text-center">
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">No assignments found</p>
-                <p className="text-[9px] font-bold text-gray-300 uppercase mt-2">Try adjusting the search filters.</p>
+                <p className="text-text-primary font-medium text-sm">No assignments found</p>
+                <p className="text-text-muted text-[12px] font-medium mt-2">Try adjusting the search filters.</p>
               </div>
             )}
             
@@ -225,10 +224,10 @@ export default function AssignmentsPage() {
 
         {/* Incidents Section (Only available in Phase 3) */}
         {isPhaseActive(PHASES.EXECUTION) && (
-          <section className="mt-16 bg-white p-8 border border-gray-200">
-            <h3 className="text-xl font-black text-[#00426B] mb-4 uppercase tracking-tighter">Incidents and Vacancies Management</h3>
-            <p className="text-[10px] font-bold text-gray-400 mb-6 uppercase tracking-widest">
-              REPORT BEHAVIOR PROBLEMS OR REQUEST VACANT PLACES.
+          <section className="mt-16 bg-background-surface p-10 border border-border-subtle">
+            <h3 className="text-xl font-medium text-text-primary mb-3">Incidents and Vacancies Management</h3>
+            <p className="text-[13px] font-medium text-text-muted mb-8">
+              Report behavior problems or request vacant places for your workshops.
             </p>
 
             <div className="flex gap-4">
@@ -236,7 +235,7 @@ export default function AssignmentsPage() {
                 id="incident-input"
                 type="text"
                 placeholder="Describe the problem..."
-                className="flex-1 px-4 py-4 bg-[#F8FAFC] border-none text-[11px] font-bold uppercase tracking-wider text-[#00426B] focus:ring-2 focus:ring-[#F26178] outline-none transition-all"
+                className="flex-1 px-4 py-4 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
               />
               <button
                 onClick={async () => {
@@ -250,7 +249,7 @@ export default function AssignmentsPage() {
                   input.value = '';
                   toast.success('Incident reported. The CEB will review it soon.');
                 }}
-                className="px-8 py-4 bg-[#F26178] text-white font-black uppercase text-[10px] tracking-widest hover:bg-[#D94E64] transition-all"
+                className="px-8 py-4 bg-[#F26178] text-white font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98]"
               >
                 Report Incident
               </button>

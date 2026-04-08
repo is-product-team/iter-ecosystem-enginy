@@ -4,6 +4,9 @@ RUN apk add --no-cache libc6-compat openssl
 RUN corepack enable
 ENV COREPACK_ENABLE=1
 ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000
 WORKDIR /app
 
 # Stage 2: Pruner (Separa dependencias de Web y API)
@@ -15,7 +18,6 @@ RUN turbo prune api --docker
 
 # --- BUILDER WEB ---
 FROM base AS builder-web
-ENV NODE_ENV=production
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY --from=pruner /app/out/json/ .
@@ -32,6 +34,7 @@ ENV HOSTNAME="0.0.0.0"
 WORKDIR /app
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder-web /app/apps/web/public ./public
 COPY --from=builder-web /app/apps/web/public ./apps/web/public
 USER node
 EXPOSE 3000
