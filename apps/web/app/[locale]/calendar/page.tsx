@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { ROLES } from "@iter/shared";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -20,6 +21,7 @@ interface Phase {
 }
 
 export default function CalendarPage() {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [activePhase, setActivePhase] = useState<Phase | null>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -107,7 +109,7 @@ export default function CalendarPage() {
               // Si tiene assignmentId, navegar al detalle
               if (e.metadata?.assignmentId) {
                 const baseUrl = user?.role.name === ROLES.ADMIN ? '/admin/assignments' : '/center/assignments';
-                window.location.href = `${baseUrl}/${e.metadata.assignmentId}`;
+                router.push(`${baseUrl}/${e.metadata.assignmentId}`);
               }
             }}
           />

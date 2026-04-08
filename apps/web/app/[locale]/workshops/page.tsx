@@ -285,7 +285,7 @@ export default function WorkshopAdminPage() {
                     <td className="px-6 py-6">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
-                          {tc("duration_label", { hours: workshop.technicalDetails?.durationHours })} • {tc("places_label", { count: workshop.technicalDetails?.maxPlaces })}
+                          {tc("duration_label", { hours: workshop.technicalDetails?.durationHours ?? 0 })} • {tc("places_label", { count: workshop.technicalDetails?.maxPlaces ?? 0 })}
                         </div>
                         <div className="text-[12px] text-text-muted font-medium line-clamp-1 max-w-[240px] opacity-70">
                           {workshop.technicalDetails?.description}
