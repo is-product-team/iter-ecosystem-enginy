@@ -4,6 +4,9 @@ RUN apk add --no-cache libc6-compat openssl
 RUN corepack enable
 ENV COREPACK_ENABLE=1
 ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000
 WORKDIR /app
 
 # Stage 2: Pruner (Separa dependencias de Web y API)
