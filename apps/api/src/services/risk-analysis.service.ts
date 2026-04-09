@@ -48,15 +48,15 @@ export class RiskAnalysisService {
             // Heavy penalty for frequent absences (>60%)
             if (absences >= 3) {
                 riskScore += 50;
-                factors.push('High volume of recent absences detected');
+                factors.push('Detectado un alto volumen de ausencias recientes');
             } else if (absences >= 1) {
                 riskScore += 20;
-                factors.push('Occasional absences recorded');
+                factors.push('Se han registrado ausencias ocasionales');
             }
 
             if (lates >= 3) {
                 riskScore += 15;
-                factors.push('Persistent punctuality issues');
+                factors.push('Problemas persistentes de puntualidad');
             }
         }
 
@@ -76,7 +76,7 @@ export class RiskAnalysisService {
             // Normalized weight: max 30 points from performance
             const deduction = Math.min(lowEvals.length * 8, 30);
             riskScore += deduction;
-            factors.push(`${lowEvals.length} low competency evaluation scores`);
+            factors.push(`${lowEvals.length} evaluaciones de competencia bajas`);
         }
 
         // Cap score
@@ -106,8 +106,8 @@ export class RiskAnalysisService {
 
         await createNotificationInternal({
             centerId: student.id_center_origin,
-            title: `⚠️ Alert: High Dropout Risk - ${student.nom} ${student.cognoms}`,
-            message: `Identified ${score}% risk level. Primary factors: ${factors.join(', ')}. Immediate pedagogical intervention is recommended.`,
+            title: `⚠️ Alerta: Riesgo de Abandono - ${student.nom} ${student.cognoms}`,
+            message: `Identificado un nivel de riesgo del ${score}%. Factores principales: ${factors.join(', ')}. Se recomienda intervención pedagógica inmediata.`,
             type: 'SYSTEM',
             importance: 'URGENT'
         });

@@ -28,11 +28,11 @@ export class VisionService {
 
         // 1. Basic File Validation
         if (!filename.endsWith('.pdf') && !filename.endsWith('.jpg') && !filename.endsWith('.png')) {
-            errors.push("Unsupported file format. Please upload PDF or images.");
+            errors.push("Formato de archivo no soportado. Por favor, sube PDF o imágenes.");
         }
 
         if (file.size < 1000) {
-            errors.push("Document appears to be empty (less than 1KB).");
+            errors.push("El documento parece estar vacío (menos de 1KB).");
         }
 
         if (errors.length > 0) {
@@ -48,7 +48,7 @@ export class VisionService {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: this.model,
-                    prompt: "Check this document for a handwriting signature. Is there a signature in the signature box? Answer with 'YES' or 'NO' and provide a confidence score from 0 to 1.",
+                    prompt: "Verifica si este documento tiene una firma manuscrita. ¿Hay una firma en el recuadro de firma? Responde con 'YES' o 'NO' y proporciona una puntuación de confianza de 0 a 1.",
                     images: [base64Image],
                     stream: false
                 })
@@ -62,7 +62,7 @@ export class VisionService {
             const hasSignature = textResponse.includes('YES');
             
             if (!hasSignature) {
-                errors.push("Handwritten signature not detected in the expected region.");
+                errors.push("Firma manuscrita no detectada en la región esperada.");
             }
 
             return {
@@ -80,7 +80,7 @@ export class VisionService {
             // Fallback for safety in private environment
             return {
                 valid: false,
-                errors: ["Local AI vision engine is currently unavailable."],
+                errors: ["El motor de visión de IA local no está disponible actualmente."],
                 metadata: { detectedType: 'unknown', hasSignature: false, confidence: 0 }
             };
         }

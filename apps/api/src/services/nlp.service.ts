@@ -30,14 +30,14 @@ export class NLPService {
 
         try {
             const prompt = `
-            Task: Extract student attendance and competence evaluation from teacher feedback.
-            Context: The project Iter uses 3 documents: Pedagogical Agreement, Nominal Register, and Competence Evaluation.
-            Output: JSON only.
+            Tarea: Extraer el estado de asistencia del estudiante y la evaluación de competencias a partir del feedback del profesor.
+            Contexto: El proyecto Iter utiliza 3 documentos: Acuerdo Pedagógico, Registro Nominal y Evaluación de Competencias.
+            Salida: Solo JSON.
             
-            Schema:
+            Esquema:
             {
               "attendanceStatus": "PRESENT" | "LATE" | "ABSENT" | "JUSTIFIED_ABSENCE" | null,
-              "competenceUpdate": { "competenceName": "Transversal", "score": 1-5, "reason": "Short summary" } | null
+              "competenceUpdate": { "competenceName": "Transversal", "score": 1-5, "reason": "Breve resumen" } | null
             }
 
             Input: "${text}"

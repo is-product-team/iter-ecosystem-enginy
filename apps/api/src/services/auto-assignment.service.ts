@@ -37,11 +37,11 @@ export class AutoAssignmentService {
         });
 
         if (requests.length === 0) {
-            console.log('ℹ️ AutoAssignmentService: No approved requests of Modality C found that are not yet assigned.');
-            return { message: 'No requests found to process.' };
+            console.log('ℹ️ AutoAssignmentService: No se han encontrado solicitudes aprobadas de Modalidad C que no estén asignadas todavía.');
+            return { message: 'No se encontraron solicitudes para procesar.' };
         }
 
-        console.log(`🚀 AutoAssignmentService: Processing ${requests.length} requests of Modality C...`);
+        console.log(`🚀 AutoAssignmentService: Procesando ${requests.length} solicitudes de Modalidad C...`);
 
         // 2. Group Requests by Workshop
         const workshopMap = new Map<number, typeof requests>();
@@ -68,10 +68,10 @@ export class AutoAssignmentService {
             const occupiedPlaces = existingAssignments.reduce((sum: number, a: any) => sum + (a.enrollments?.length || 0), 0);
             const remainingCapacity = workshop.maxPlaces - occupiedPlaces;
 
-            console.log(`📊 AutoAssignment: Workshop ID ${workshopId} (${workshop.title}): Capacity: ${workshop.maxPlaces}, Occupied: ${occupiedPlaces}, Remaining: ${remainingCapacity}`);
+            console.log(`📊 AutoAssignment: Taller ID ${workshopId} (${workshop.title}): Capacidad: ${workshop.maxPlaces}, Ocupado: ${occupiedPlaces}, Restante: ${remainingCapacity}`);
 
             if (remainingCapacity <= 0) {
-                console.warn(`🚫 AutoAssignment: Workshop ${workshopId} is full. Skipping.`);
+                console.warn(`🚫 AutoAssignment: El taller ${workshopId} está lleno. Omitiendo.`);
                 continue;
             }
 
