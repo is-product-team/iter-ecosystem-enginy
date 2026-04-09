@@ -10,7 +10,7 @@ export const authRateLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: {
-    error: 'Massa intents des de la mateixa IP, torna-ho a provar d\'aquí a 15 minuts.',
+    error: 'Too many attempts from this IP, please try again in 15 minutes.',
   },
 });
 

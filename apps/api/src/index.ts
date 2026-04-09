@@ -41,7 +41,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('CORS Policy: Origin not allowed'));
+      callback(new Error('Política CORS: Origen no permitido'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -63,15 +63,15 @@ app.use(errorHandler);
 const PORT = env.PORT;
 
 const server = app.listen(PORT, async () => {
-  logger.info(`🚀 Server ready on port: ${PORT}`);
-  logger.info(`🌍 Environment: ${env.NODE_ENV}`);
+  logger.info(`🚀 Servidor listo en el puerto: ${PORT}`);
+  logger.info(`🌍 Entorno: ${env.NODE_ENV}`);
   
   // Conexión PostgreSQL (Opcional en el arranque)
   try {
     await prisma.$queryRaw`SELECT 1`;
-    logger.info(`🗄️  DATABASE STATUS: Connected to PostgreSQL`);
+    logger.info(`🗄️  ESTADO BD: Conectado a PostgreSQL`);
   } catch (_e) {
-    logger.error(`🗄️  DATABASE STATUS: PostgreSQL Connection failed`);
+    logger.error(`🗄️  ESTADO BD: Conexión a PostgreSQL fallida`);
   }
 
   // Start Background Services
@@ -79,11 +79,11 @@ const server = app.listen(PORT, async () => {
 });
 
 process.on('SIGINT', async () => {
-  logger.info('Shutting down server...');
+  logger.info('Apagando servidor...');
   ReminderService.stop();
   await prisma.$disconnect();
   server.close(() => {
-    logger.info('Server closed');
+    logger.info('Servidor cerrado');
     process.exit(0);
   });
 });

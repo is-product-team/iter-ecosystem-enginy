@@ -54,6 +54,7 @@ export default function AdminStatsPage() {
     if (user) {
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
 
   if (authLoading || !user || loading) {
