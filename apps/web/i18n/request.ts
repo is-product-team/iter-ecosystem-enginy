@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation';
 
 export default getRequestConfig(async ({ locale }) => {
   // En Next.js 15+ locale puede ser undefined en algunos contextos
-  // We prioritize 'en' as the default language for the ecosystem
-  const currentLocale = locale || 'en';
+  // We prioritize 'es' as the default language for the ecosystem
+  const currentLocale = locale || 'es';
   
   return {
     locale: currentLocale,
