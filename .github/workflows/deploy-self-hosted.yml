@@ -44,13 +44,9 @@ jobs:
           docker pull mirror.gcr.io/library/node:22-alpine
           docker tag mirror.gcr.io/library/node:22-alpine node:22-alpine
 
-      - name: 🔑 Create Unified Environment File from Secrets
+      - name: 🔑 Create Unified Environment File from Secret
         run: |
-          # Combinar todos los secretos en un único .env en la raíz
-          echo "# Production Environment" > .env
-          echo "${{ secrets.PROD_API_ENV }}" >> .env
-          echo "${{ secrets.PROD_WEB_ENV }}" >> .env
-          echo "${{ secrets.PROD_MOBILE_ENV }}" >> .env
+          echo "${{ secrets.PROD_ENV }}" > .env
 
       - name: 🐳 Deploy with Docker Compose
         run: |
