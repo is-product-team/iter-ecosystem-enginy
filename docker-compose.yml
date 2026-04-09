@@ -97,7 +97,7 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: npx turbo dev --filter=web
+    command: npx turbo dev --filter=@iter/web
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
