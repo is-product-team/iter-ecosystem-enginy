@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
@@ -10,7 +7,6 @@ import logger from './lib/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import prisma from './lib/prisma.js';
 import { ReminderService } from './services/reminder.service.js';
-
 import { env } from './config/env.js';
 
 const app = express();
