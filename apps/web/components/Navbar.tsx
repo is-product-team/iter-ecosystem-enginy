@@ -9,9 +9,6 @@ import { ROLES } from '@iter/shared';
 import notificationService from '@/services/notificationService';
 import { useEffect, useState } from 'react';
 
-import logoImg from '@/public/logo.png';
-import logoInversImg from '@/public/logo-invers.png';
-
 const Navbar: React.FC = () => {
   const t = useTranslations('Navigation');
   const commonT = useTranslations('Common');
@@ -51,7 +48,6 @@ const Navbar: React.FC = () => {
 
   const navLinks = [
     { label: t('home'), path: getHomePath(), show: true },
-    { label: t('monitoring'), path: `/${locale}/center/monitoring`, show: isCoordinator },
     { label: t('notifications'), path: `/${locale}/center/notifications`, show: true, isNotifications: true },
     { label: t('calendar'), path: `/${locale}/calendar`, show: true },
     { label: t('profile'), path: `/${locale}/profile`, show: true },
@@ -61,36 +57,16 @@ const Navbar: React.FC = () => {
     <div className="sticky top-0 z-50 bg-background-surface/80 backdrop-blur-md border-b border-border-subtle">
       <div className="max-w-[1440px] mx-auto container-responsive">
         <div className="flex justify-between h-16">
+          {/* Left Side: Main Navigation */}
           <div className="flex items-center">
-            <Link href={getHomePath()} className="flex items-center">
-              <Image 
-                src={logoImg} 
-                alt="Iter Logo" 
-                width={40}
-                height={40}
-                priority
-                className="w-10 h-10 object-contain block dark:hidden"
-              />
-              <Image 
-                src={logoInversImg} 
-                alt="Iter Logo" 
-                width={40}
-                height={40}
-                priority
-                className="w-10 h-10 object-contain hidden dark:block"
-              />
-            </Link>
-          </div>
-
-          <div className="flex items-center">
-            <nav className="hidden md:flex items-center h-full mr-8">
+            <nav className="flex items-center h-full space-x-2">
               {navLinks.filter(link => link.show).map((link) => (
                 <Link
                   key={link.path}
                   href={link.path}
-                  className={`h-full flex items-center px-4 text-[13px] font-medium transition-all border-b-2 ${pathname === link.path
-                      ? 'border-consorci-darkBlue text-text-primary'
-                      : 'border-transparent text-text-muted hover:text-text-primary'
+                  className={`h-full flex items-center px-4 text-[13px] font-medium transition-all ${pathname === link.path
+                      ? 'text-text-primary'
+                      : 'text-text-muted hover:text-text-primary'
                     }`}
                 >
                   <span className="relative">
@@ -106,7 +82,10 @@ const Navbar: React.FC = () => {
                 </Link>
               ))}
             </nav>
+          </div>
 
+          {/* Right Side: User Profile & Logout */}
+          <div className="flex items-center">
             <div className="flex items-center border-l border-border-subtle pl-8 h-8 my-auto gap-6">
               <div className="flex flex-col items-end">
                 <span className="text-text-primary text-[13px] font-medium mb-0.5">
