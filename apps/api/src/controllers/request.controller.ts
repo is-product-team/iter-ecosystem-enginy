@@ -239,11 +239,20 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
   const { status } = req.body;
 
   try {
+    const requestIdInt = parseInt(id as string);
+    const oldRequest = await prisma.request.findUnique({
+      where: { requestId: requestIdInt }
+    });
+
     const updated = await prisma.request.update({
-      where: { requestId: parseInt(id as string) },
+      where: { requestId: requestIdInt },
       data: { status: status as RequestStatus },
       include: { workshop: true }
     });
+
+    if (oldRequest) {
+      await logStatusChange(requestIdInt, oldRequest.status, updated.status, req.user?.userId);
+    }
 
     await createNotificationInternal({
       centerId: updated.centerId,
@@ -259,3 +268,21 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error updating the status' });
   }
 };
+
+/**
+ * HELPER: Log status changes
+ */
+async function logStatusChange(requestId: number, oldState: string, newState: string, userId: number = 0) {
+  if (oldState === newState) return;
+  try {
+    await prisma.auditLog.create({
+      data: {
+        userId: userId, // 0 for system if not provided
+        action: `Status change for request ${requestId} from ${oldState} to ${newState}`,
+        details: { requestId, oldState, newState }
+      }
+    });
+  } catch (e) {
+    console.error("Error logging status change:", e);
+  }
+}

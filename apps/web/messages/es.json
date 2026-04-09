@@ -884,7 +884,7 @@
     "selected_label": "Seleccionado",
     "edit_btn": "Editar"
   },
-  "AssignmentDetailPage": {
+  "AssignmentWorkshopsPage": {
     "title_prefix": "GESTIÓN DEL TALLER: ",
     "modality_prefix": "MODALIDAD ",
     "referent_label": "Equipo Docente Referente",
@@ -895,13 +895,29 @@
     "no_students": "Aún no hay alumnos asignados",
     "no_students_hint": "Haz clic aquí para comenzar el registro nominal",
     "remove_student_success": "Alumno eliminado correctamente.",
+    "remove_student_tooltip": "Eliminar alumno",
     "loading_msg": "Cargando detalles del taller...",
     "status": {
-      "DATA_ENTRY": "PENDIENTE GESTIÓN",
       "PROVISIONAL": "PROVISIONAL",
+      "PUBLISHED": "PUBLICADO",
+      "DATA_ENTRY": "PENDIENTE GESTIÓN",
+      "DATA_SUBMITTED": "DATOS ENVIADOS",
       "VALIDATED": "CONFIRMADO",
+      "READY_TO_START": "LISTO PARA EMPEZAR",
+      "VACANT": "VACANTE",
       "IN_PROGRESS": "EN EJECUCIÓN",
-      "COMPLETED": "FINALIZADO"
+      "COMPLETED": "FINALIZADO",
+      "CANCELLED": "CANCELADO",
+      "provisional": "Provisional",
+      "published": "Publicado",
+      "data_entry": "Pendiente gestión",
+      "data_submitted": "Datos enviados",
+      "validated": "Confirmado",
+      "ready_to_start": "Listo para empezar",
+      "vacant": "Vacante",
+      "in_progress": "En ejecución",
+      "completed": "Finalizado",
+      "cancelled": "Cancelado"
     },
     "docs": {
       "pedagogical_agreement": "Acuerdo Pedagógico",

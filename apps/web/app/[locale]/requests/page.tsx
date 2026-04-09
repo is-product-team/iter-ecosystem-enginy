@@ -152,12 +152,12 @@ export default function AdminRequestsPage() {
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRequest, setEditingRequest] = useState<Request | null>(null);
-  const [editFormData, setEditFormData] = useState({ approxStudents: 0, comments: '' });
+  const [editFormData, setEditFormData] = useState({ studentsAprox: 0, comments: '' });
 
   const handleEditClick = (request: Request) => {
     setEditingRequest(request);
     setEditFormData({
-      approxStudents: request.studentsAprox || 0,
+      studentsAprox: request.studentsAprox || 0,
       comments: request.comments || ''
     });
     setIsEditModalOpen(true);
@@ -169,7 +169,7 @@ export default function AdminRequestsPage() {
 
     try {
       await requestService.update(editingRequest.requestId, {
-        studentsAprox: editFormData.approxStudents,
+        studentsAprox: editFormData.studentsAprox,
         comments: editFormData.comments
       });
       toast.success(t('success_update'));
@@ -428,8 +428,8 @@ export default function AdminRequestsPage() {
                   type="number"
                   min="1"
                   className="w-full bg-background-subtle border border-border-subtle p-3 text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none"
-                  value={editFormData.approxStudents || ''}
-                  onChange={(e) => setEditFormData({ ...editFormData, approxStudents: e.target.value === '' ? 0 : parseInt(e.target.value) })}
+                  value={editFormData.studentsAprox || ''}
+                  onChange={(e) => setEditFormData({ ...editFormData, studentsAprox: e.target.value === '' ? 0 : parseInt(e.target.value) })}
                 />
               </div>
               <div className="space-y-2">

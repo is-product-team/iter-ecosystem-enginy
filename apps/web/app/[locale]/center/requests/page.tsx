@@ -24,7 +24,7 @@ export default function RequestsPage() {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<string | null>(null);
   const [editingRequestId, setEditingRequestId] = useState<number | null>(null);
 
-  const [approxStudents, setApproxStudents] = useState<number | ''>('');
+  const [studentsAprox, setStudentsAprox] = useState<number | ''>('');
   const [teacher1Id, setTeacher1Id] = useState<string>('');
   const [teacher2Id, setTeacher2Id] = useState<string>('');
   const [comments, setComments] = useState('');
@@ -98,7 +98,7 @@ export default function RequestsPage() {
   useEffect(() => {
     if (selectedWorkshopId && !editingRequestId) {
       // Default reset if just selecting a new workshop
-      setApproxStudents('');
+      setStudentsAprox('');
       setTeacher1Id('');
       setTeacher2Id('');
       setComments('');
@@ -114,7 +114,7 @@ export default function RequestsPage() {
       setSelectedWorkshopId(workshop._id);
     }
 
-    setApproxStudents(request.studentsAprox || '');
+    setStudentsAprox(request.studentsAprox || '');
     setComments(request.comments || '');
     setTeacher1Id(request.teacher1Id ? request.teacher1Id.toString() : '');
     setTeacher2Id(request.teacher2Id ? request.teacher2Id.toString() : '');
@@ -124,7 +124,7 @@ export default function RequestsPage() {
   const cancelEdit = () => {
     setEditingRequestId(null);
     setSelectedWorkshopId(null);
-    setApproxStudents('');
+    setStudentsAprox('');
     setComments('');
     setTeacher1Id('');
     setTeacher2Id('');
@@ -138,7 +138,7 @@ export default function RequestsPage() {
     setSubmitting(true);
     setError(null);
 
-    if (selectedWorkshop.modality === 'C' && approxStudents !== '' && Number(approxStudents) > 4) {
+    if (selectedWorkshop.modality === 'C' && studentsAprox !== '' && Number(studentsAprox) > 4) {
       setError(t('max_students_alert'));
       setSubmitting(false);
       return;
@@ -160,7 +160,7 @@ export default function RequestsPage() {
       if (editingRequestId) {
         // Update
         await requestService.update(editingRequestId, {
-          studentsAprox: Number(approxStudents),
+          studentsAprox: Number(studentsAprox),
           comments,
           teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
           teacher2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
@@ -169,7 +169,7 @@ export default function RequestsPage() {
         // Create
         await requestService.create({
           workshopId: parseInt(selectedWorkshopId),
-          studentsAprox: Number(approxStudents),
+          studentsAprox: Number(studentsAprox),
           comments,
           teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
           teacher2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
@@ -434,8 +434,8 @@ export default function RequestsPage() {
                       <label className="block text-[12px] font-medium text-text-primary px-1">Approx. Students</label>
                       <input
                         type="number"
-                        value={approxStudents}
-                        onChange={(e) => setApproxStudents(e.target.value === '' ? '' : parseInt(e.target.value))}
+                        value={studentsAprox}
+                        onChange={(e) => setStudentsAprox(e.target.value === '' ? '' : parseInt(e.target.value))}
                         placeholder="Ex: 4"
                         className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                         min="1"

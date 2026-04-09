@@ -884,7 +884,7 @@
     "selected_label": "Seleccionat",
     "edit_btn": "Editar"
   },
-  "AssignmentDetailPage": {
+  "AssignmentWorkshopsPage": {
     "title_prefix": "GESTIÓ DEL TALLER: ",
     "modality_prefix": "MODALITAT ",
     "referent_label": "Equip Docent Referent",
@@ -895,13 +895,29 @@
     "no_students": "Encara no hi ha alumnes assignats",
     "no_students_hint": "Fes clic aquí per començar el registre nominal",
     "remove_student_success": "Alumne eliminat correctament.",
+    "remove_student_tooltip": "Eliminar alumne",
     "loading_msg": "Carregant detalls del taller...",
     "status": {
-      "DATA_ENTRY": "PENDENT GESTIÓ",
       "PROVISIONAL": "PROVISIONAL",
+      "PUBLISHED": "PUBLICAT",
+      "DATA_ENTRY": "PENDENT GESTIÓ",
+      "DATA_SUBMITTED": "DADES ENVIADES",
       "VALIDATED": "CONFIRMAT",
+      "READY_TO_START": "LLEST PER COMENÇAR",
+      "VACANT": "VACANT",
       "IN_PROGRESS": "EN EXECUCIÓ",
-      "COMPLETED": "FINALITZAT"
+      "COMPLETED": "FINALITZAT",
+      "CANCELLED": "CANCEL·LAT",
+      "provisional": "Provisional",
+      "published": "Publicat",
+      "data_entry": "Pendent gestió",
+      "data_submitted": "Dades enviades",
+      "validated": "Confirmat",
+      "ready_to_start": "Llest per començar",
+      "vacant": "Vacant",
+      "in_progress": "En execució",
+      "completed": "Finalitzat",
+      "cancelled": "Cancel·lat"
     },
     "docs": {
       "pedagogical_agreement": "Acord Pedagògic",
