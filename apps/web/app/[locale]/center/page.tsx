@@ -60,8 +60,9 @@ export default function CenterDashboard() {
       title={t('dashboard.title', { name: user.center?.name || tc('general') })}
       subtitle={t('dashboard.subtitle')}
     >
-      {/* Institutional Section Timeline */}
-      <section className="bg-background-surface border-2 border-border-subtle p-12 mb-12 relative overflow-hidden">
+      <div className="w-full pb-20 space-y-12">
+        {/* Institutional Section Timeline */}
+      <section className="bg-background-surface border border-border-subtle p-12 mb-12 relative overflow-hidden">
 
         <h3 className="text-[12px] font-medium text-text-muted mb-8 text-center tracking-widest uppercase">
           {t('dashboard.status_title')}
@@ -157,11 +158,8 @@ export default function CenterDashboard() {
                 : 'border-border-subtle opacity-60 cursor-not-allowed'
                 }`}
             >
-              <div className={`absolute top-0 right-0 w-16 h-16 bg-background-subtle -mr-8 -mt-8 rotate-45 transition-colors duration-300 ${item.active ? 'group-hover:bg-consorci-darkBlue' : ''
-                }`}></div>
-
               <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-border-subtle transition-all duration-300 ${item.active
-                ? 'bg-background-subtle text-consorci-darkBlue group-hover:bg-consorci-darkBlue group-hover:text-white'
+                ? 'bg-background-subtle text-consorci-darkBlue dark:text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white'
                 : 'bg-background-subtle text-text-muted'
                 }`}>
                 <div className={item.active ? 'group-hover:text-white' : ''}>
@@ -193,6 +191,7 @@ export default function CenterDashboard() {
           ))}
         </div>
       </div>
+    </div>
     </DashboardLayout>
   );
 }

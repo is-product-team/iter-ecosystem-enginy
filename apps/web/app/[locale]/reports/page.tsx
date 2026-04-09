@@ -52,14 +52,14 @@ export default function AdminReportsPage() {
                         <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">{t('student_exp')}</span>
                         <span className="text-4xl font-medium text-text-primary">{(generalAvg?.experienceRating || 0).toFixed(1)}</span>
                         <div className="w-full mt-6 h-1.5 bg-background-subtle overflow-hidden">
-                            <div className="h-full bg-consorci-darkBlue" style={{ width: `${(generalAvg?.experienceRating || 0) * 10}%` }}></div>
+                            <div className="h-full bg-consorci-darkBlue dark:bg-consorci-lightBlue" style={{ width: `${(generalAvg?.experienceRating || 0) * 10}%` }}></div>
                         </div>
                     </div>
                     <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
                         <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">{t('teacher_sat')}</span>
                         <span className="text-4xl font-medium text-text-primary">{(generalAvg?.teacherRating || 0).toFixed(1)}</span>
                         <div className="w-full mt-6 h-1.5 bg-background-subtle overflow-hidden">
-                            <div className="h-full bg-consorci-darkBlue" style={{ width: `${(generalAvg?.teacherRating || 0) * 10}%` }}></div>
+                            <div className="h-full bg-consorci-darkBlue dark:bg-consorci-lightBlue" style={{ width: `${(generalAvg?.teacherRating || 0) * 10}%` }}></div>
                         </div>
                     </div>
                     {/* Mocks for additional metrics */}

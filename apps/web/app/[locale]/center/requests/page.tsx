@@ -205,7 +205,7 @@ export default function RequestsPage() {
           <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row gap-6 items-center">
             <div className="relative flex-1 group w-full">
               <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

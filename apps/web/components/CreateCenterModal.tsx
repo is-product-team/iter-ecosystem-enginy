@@ -202,7 +202,7 @@ const CreateCenterModal = ({
           </button>
           <button
             className={`px-8 py-3 text-[12px] font-medium text-white transition-all active:scale-[0.98] ${loading
-              ? "bg-gray-300 cursor-not-allowed"
+              ? "bg-background-subtle text-text-muted cursor-not-allowed"
               : "bg-consorci-darkBlue hover:bg-consorci-actionBlue"
               }`}
             onClick={handleSubmit}
