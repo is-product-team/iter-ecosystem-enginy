@@ -72,7 +72,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
       case 'deadline': return 'calendar-event-card event-deadline';
       case 'assignment': return 'calendar-event-card event-assignment';
       case 'session': return 'calendar-event-card event-session';
-      default: return 'calendar-event-card bg-gray-100 border-gray-400 text-gray-700';
+      default: return 'calendar-event-card bg-background-subtle border-border-subtle text-text-secondary';
     }
   };
 

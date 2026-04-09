@@ -300,7 +300,7 @@ const CreateWorkshopModal = ({
                     <div className="flex-1">
                       <input type="time" value={tempStart} onChange={(e) => setTempStart(e.target.value)} className="w-full px-3 py-2 text-sm font-medium text-text-primary border border-border-subtle bg-background-subtle focus:border-consorci-darkBlue outline-none" />
                     </div>
-                    <span className="flex items-center text-gray-300">-</span>
+                    <span className="flex items-center text-text-muted">-</span>
                     <div className="flex-1">
                       <input type="time" value={tempEnd} onChange={(e) => setTempEnd(e.target.value)} className="w-full px-3 py-2 text-sm font-medium text-text-primary border border-border-subtle bg-background-subtle focus:border-consorci-darkBlue outline-none" />
                     </div>
@@ -322,7 +322,7 @@ const CreateWorkshopModal = ({
                       <span className="text-[13px] font-medium text-text-primary">{daysMap[slot.dayOfWeek]}</span>
                       <span className="text-[11px] font-normal text-text-muted mt-0.5">{slot.startTime} - {slot.endTime}</span>
                     </div>
-                    <button onClick={() => removeScheduleSlot(idx)} className="text-gray-300 hover:text-[#F26178] transition-colors p-2 hover:bg-red-50 rounded-full">
+                    <button onClick={() => removeScheduleSlot(idx)} className="text-text-muted hover:text-consorci-pinkRed transition-colors p-2 hover:bg-red-500/5 rounded-full">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                   </div>
@@ -369,3 +369,5 @@ const CreateWorkshopModal = ({
 };
 
 export default CreateWorkshopModal;
+eWorkshopModal;
+Modal;

@@ -34,6 +34,7 @@ ENV HOSTNAME="0.0.0.0"
 WORKDIR /app
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder-web /app/apps/web/public ./public
 COPY --from=builder-web /app/apps/web/public ./apps/web/public
 USER node
 EXPOSE 3000
