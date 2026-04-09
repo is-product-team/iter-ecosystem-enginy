@@ -4,6 +4,7 @@ import { RequestStatus, Modality } from '@prisma/client';
 import { ROLES, REQUEST_STATUSES, PHASES } from '@iter/shared';
 import { isPhaseActive } from '../lib/phaseUtils.js';
 import { createNotificationInternal } from './notification.controller.js';
+import { RequestService } from '../services/request.service.js';
 
 // GET: View requests (Filters by center if COORDINATOR) with pagination
 export const getRequests = async (req: Request, res: Response) => {
@@ -88,34 +89,28 @@ export const createRequest = async (req: Request, res: Response) => {
   // --- PHASE VERIFICATION ---
   const phaseStatus = await isPhaseActive(PHASES.APPLICATION);
   if (!phaseStatus.isActive) {
-    let errorMessage = 'The workshop request period is not active.';
+    let errorMessage = `The workshop request period ('${PHASES.APPLICATION}') is not currently active.`;
     if (!phaseStatus.phaseActiveFlag) {
-      errorMessage = 'The request phase has been deactivated by the administrator.';
+      errorMessage = `The request phase ('${PHASES.APPLICATION}') has been deactivated by the administrator manually.`;
     } else if (!phaseStatus.isWithinDates) {
-      errorMessage = 'The deadline for requesting workshops has ended.';
+      const start = phaseStatus.phase?.startDate?.toLocaleDateString() || 'N/A';
+      const end = phaseStatus.phase?.endDate?.toLocaleDateString() || 'N/A';
+      errorMessage = `The deadline for requesting workshops has ended or hasn't started yet. Active period: ${start} to ${end}. Today: ${new Date().toLocaleDateString()}.`;
     }
     return res.status(403).json({ error: errorMessage });
   }
 
+  // --- TEACHER VALIDATION ---
+  const teacherCheck = await RequestService.verifyTeachersExist(parseInt(prof1Id), parseInt(prof2Id));
+  if (!teacherCheck.valid) {
+    return res.status(400).json({ error: teacherCheck.error });
+  }
+
   // --- MODALITY C VALIDATIONS (PROGRAM RULES) ---
   if (modality === Modality.C) {
-    if (studentsAprox > 4) {
-      return res.status(400).json({ error: 'In Modality C, the maximum is 4 students from the same institute per project.' });
-    }
-
-    // Check total limit of 12 students for the center in Modality C
-    const requestsC = await prisma.request.findMany({
-      where: {
-        centerId: centerId,
-        modality: Modality.C
-      }
-    });
-
-    const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.studentsAprox || 0), 0);
-    if (totalStudentsC + parseInt(studentsAprox) > 12) {
-      return res.status(400).json({
-        error: `Limit exceeded. The institute already has ${totalStudentsC} students in Modality C projects. The maximum total allowed is 12.`
-      });
+    const modalityCheck = await RequestService.validateModalityCRules(centerId, parseInt(studentsAprox));
+    if (!modalityCheck.valid) {
+      return res.status(400).json({ error: modalityCheck.error });
     }
   }
 
@@ -191,37 +186,29 @@ export const updateRequest = async (req: Request, res: Response) => {
     if (role !== ROLES.ADMIN) {
       const phaseStatus = await isPhaseActive(PHASES.APPLICATION);
       if (!phaseStatus.isActive) {
-        let errorMessage = 'The workshop request period is not active.';
+        let errorMessage = `The workshop request period ('${PHASES.APPLICATION}') is not currently active.`;
         if (!phaseStatus.phaseActiveFlag) {
-          errorMessage = 'The request phase has been deactivated by the administrator.';
+          errorMessage = `The request phase ('${PHASES.APPLICATION}') has been deactivated by the administrator manually.`;
         } else if (!phaseStatus.isWithinDates) {
-          errorMessage = 'The deadline for requesting workshops has ended.';
+          const start = phaseStatus.phase?.startDate?.toLocaleDateString() || 'N/A';
+          const end = phaseStatus.phase?.endDate?.toLocaleDateString() || 'N/A';
+          errorMessage = `The deadline for requesting workshops has ended or hasn't started yet. Active period: ${start} to ${end}. Today: ${new Date().toLocaleDateString()}.`;
         }
         return res.status(403).json({ error: errorMessage });
       }
     }
 
+    // --- TEACHER VALIDATION ---
+    const teacherCheck = await RequestService.verifyTeachersExist(prof1Id ? parseInt(prof1Id) : undefined, prof2Id ? parseInt(prof2Id) : undefined);
+    if (!teacherCheck.valid) {
+      return res.status(400).json({ error: teacherCheck.error });
+    }
+
     // --- MODALITY C VALIDATIONS (PROGRAM RULES) ---
-    if (existingRequest.modality === Modality.C && studentsAprox !== undefined) {
-      const newStudents = parseInt(studentsAprox);
-      if (newStudents > 4) {
-        return res.status(400).json({ error: 'In Modality C, the maximum is 4 students from the same institute per project.' });
-      }
-
-      // Check total limit of 12 students (excluding the current quantity of this request)
-      const requestsC = await prisma.request.findMany({
-        where: {
-          centerId: existingRequest.centerId,
-          modality: Modality.C,
-          requestId: { not: requestId } // Exclude the current one
-        }
-      });
-
-      const totalStudentsC = requestsC.reduce((sum: number, p: any) => sum + (p.studentsAprox || 0), 0);
-      if (totalStudentsC + newStudents > 12) {
-        return res.status(400).json({
-          error: `Limit exceeded. The institute already has ${totalStudentsC} students in other Modality C projects. With this change (${newStudents}), it would exceed the maximum of 12.`
-        });
+    if ((modality === Modality.C || existingRequest.modality === Modality.C) && studentsAprox !== undefined) {
+      const modalityCheck = await RequestService.validateModalityCRules(existingRequest.centerId, parseInt(studentsAprox), requestId);
+      if (!modalityCheck.valid) {
+        return res.status(400).json({ error: modalityCheck.error });
       }
     }
 

@@ -376,6 +376,7 @@
     "delete": "Eliminar",
     "save": "Desar",
     "confirm": "Confirmar",
+    "cancel": "Cancel·lar",
     "modality_label": "Modalitat {modality}",
     "places_label": "{count} Places",
     "duration_label": "{hours}h",

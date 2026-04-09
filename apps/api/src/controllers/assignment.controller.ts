@@ -9,6 +9,9 @@ import fs from 'fs';
 import path from 'path';
 import { z } from 'zod';
 import { SessionService } from '../services/session.service.js';
+import { PDFService } from '../services/pdf.service.js';
+
+const MIN_ATTENDANCE_PERCENTAGE = 80;
 
 // Schema for bulk attendance update
 const AttendanceUpdateSchema = z.array(z.object({
@@ -247,13 +250,15 @@ export const getIssuesByCenter = async (req: Request, res: Response) => {
 
 // POST: Create issue
 export const createIssue = async (req: Request, res: Response) => {
-  const { centerId, description } = req.body;
+  const { centerId, description, assignmentId, sessionId } = req.body;
   try {
     const newIssue = await prisma.issue.create({
       data: {
         centerId: parseInt(centerId),
-        description: description
-      }
+        description: description,
+        assignmentId: assignmentId ? parseInt(assignmentId) : undefined,
+        sessionId: sessionId ? parseInt(sessionId) : undefined
+      } as any
     });
     res.status(201).json(newIssue);
   } catch (error) {
@@ -389,7 +394,7 @@ export const createEnrollments = async (req: Request, res: Response) => {
   const { studentIds } = req.body;
 
   try {
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx) => {
       // 1. Verify existence of the assignment
       const assignment = await tx.assignment.findUnique({
         where: { assignmentId: assignmentId },
@@ -407,11 +412,11 @@ export const createEnrollments = async (req: Request, res: Response) => {
       }
 
       // 3. Synchronize enrollments
-      const currentIds = assignment.enrollments.map((i: any) => i.studentId);
-      const newIds = studentIds.map((id: any) => parseInt(id));
+      const currentIds = assignment.enrollments.map(i => i.studentId);
+      const newIds = (studentIds as (string | number)[]).map(id => parseInt(id as string));
 
-      const toAdd = newIds.filter((id: number) => !currentIds.includes(id));
-      const toRemove = currentIds.filter((id: number) => !newIds.includes(id));
+      const toAdd = newIds.filter((id) => !currentIds.includes(id));
+      const toRemove = currentIds.filter((id) => !newIds.includes(id));
 
       if (toRemove.length > 0) {
         await tx.enrollment.deleteMany({
@@ -435,7 +440,7 @@ export const createEnrollments = async (req: Request, res: Response) => {
       await tx.assignmentChecklist.updateMany({
         where: {
           assignmentId: assignmentId,
-          stepName: { contains: 'Nominal Registration' }
+          stepName: { contains: 'Nominal Register' } // Sincronizado con el servicio
         },
         data: {
           isCompleted: true,
@@ -592,78 +597,40 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
 export const confirmLegalRegistration = async (req: Request, res: Response) => {
   const { assignmentId } = req.params;
   try {
-    // 1. Mark enrollments as confirmed
-    const enrollments = await prisma.enrollment.findMany({ where: { assignmentId: parseInt(assignmentId as string) } });
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Mark enrollments as confirmed
+      const enrollments = await tx.enrollment.findMany({ where: { assignmentId: parseInt(assignmentId as string) } });
 
-    for (const enrollment of enrollments) {
-      const docsStatus = (enrollment.docsStatus as any) || {};
-      await prisma.enrollment.update({
-        where: { enrollmentId: enrollment.enrollmentId },
-        data: {
-          docsStatus: {
-            ...docsStatus,
-            cebRegistrationConfirmed: true
-          }
-        }
-      });
-    }
-
-    // 2. Get workshop data to generate sessions
-    const assignment = await prisma.assignment.findUnique({
-      where: { assignmentId: parseInt(assignmentId as string) },
-      include: { workshop: true }
-    });
-
-    if (!assignment || !assignment.workshop) {
-      return res.status(404).json({ error: 'Assignment not found' });
-    }
-
-    // 3. Generate sessions if they don't exist
-    const existingSessions = await prisma.session.count({
-      where: { assignmentId: parseInt(assignmentId as string) }
-    });
-
-    if (existingSessions === 0) {
-      const schedule = assignment.workshop.executionDays as any[];
-
-      // 3.1 Get dates of Phase 3
-      const { phase: phase3 } = await isPhaseActive(PHASES.EXECUTION);
-
-      if (phase3 && Array.isArray(schedule) && schedule.length > 0) {
-        const startDate = new Date(Math.max(new Date().getTime(), phase3.startDate.getTime()));
-        const endDate = phase3.endDate;
-
-        // Iterate by weeks from startDate to endDate
-        const currentPointer = new Date(startDate);
-        let _i = 0; // Initialize session number counter
-        while (currentPointer <= endDate) {
-          for (const slot of schedule) {
-            const sessionDate = new Date(currentPointer);
-
-            // Calculate desired day of week for this session
-            const currentDay = sessionDate.getDay();
-            const daysUntil = (slot.dayOfWeek + 7 - currentDay) % 7;
-            sessionDate.setDate(sessionDate.getDate() + daysUntil);
-
-            // Verify we are still within the phase range
-            if (sessionDate >= startDate && sessionDate <= endDate) {
-              // Create the session
-              await prisma.session.create({
-                data: {
-                  assignmentId: assignment.assignmentId,
-                  sessionDate: sessionDate,
-                  startTime: slot.startTime,
-                  endTime: slot.endTime
-                }
-              });
-              _i++; // Increment session number
+      for (const enrollment of enrollments) {
+        const docsStatus = (enrollment.docsStatus as Record<string, any>) || {};
+        await tx.enrollment.update({
+          where: { enrollmentId: enrollment.enrollmentId },
+          data: {
+            docsStatus: {
+              ...docsStatus,
+              cebRegistrationConfirmed: true
             }
           }
-          // Advance to next week
-          currentPointer.setDate(currentPointer.getDate() + 7);
-        }
+        });
       }
-    }
+
+      // 2. Get workshop data to generate sessions
+      const assignment = await tx.assignment.findUnique({
+        where: { assignmentId: parseInt(assignmentId as string) },
+        include: { workshop: true }
+      });
+
+      if (!assignment || !assignment.workshop) {
+        throw new Error('Assignment or workshop not found');
+      }
+
+      // 3. Generate sessions using SessionService
+      await SessionService.syncSessionsForAssignment(assignment.assignmentId);
+
+      return assignment;
+    });
+
+    const assignment = result;
 
     const oldAssignment = await prisma.assignment.findUnique({ where: { assignmentId: parseInt(assignmentId as string) } });
 
@@ -1129,7 +1096,17 @@ export const closeAssignment = async (req: Request, res: Response) => {
 
       const percentage = totalSessions > 0 ? (attendedCount / totalSessions) * 100 : 0;
 
-      if (percentage >= 80) {
+      if (percentage >= MIN_ATTENDANCE_PERCENTAGE) {
+        const studentName = `${enrollment.student.fullName} ${enrollment.student.lastName}`;
+        const fileName = `Certificado_${enrollment.studentId}_${assignmentId}.pdf`;
+        
+        await PDFService.generateCertificate(
+          studentName,
+          assignment.workshop.title,
+          new Date(),
+          fileName
+        );
+
         await prisma.certificate.upsert({
           where: {
             studentId_assignmentId: {

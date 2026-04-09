@@ -114,6 +114,7 @@ export class SessionService {
 
     /**
      * Synchronizes sessions for an assignment based on its workshop schedule.
+     * Uses a smart diffing algorithm to preserve existing sessions (and their staff/issues) if dates match.
      */
     static async syncSessionsForAssignment(assignmentId: number) {
         const assignment = await prisma.assignment.findUnique({
@@ -123,47 +124,100 @@ export class SessionService {
 
         if (!assignment || !assignment.startDate) return;
 
-        const scheduleData = assignment.workshop?.executionDays || [];
-        const sessionDates = this.generateDatesFromSchedule(assignment.startDate, scheduleData as any);
+        const scheduleData = assignment.workshop?.executionDays;
+        
+        // 1. Generate desired session dates and times
+        let desiredSessions: Array<{ date: Date; startTime?: string; endTime?: string }> = [];
+        
+        if (Array.isArray(scheduleData)) {
+            if (scheduleData.length > 0 && typeof scheduleData[0] === 'string') {
+                // Legacy format: string[]
+                const dates = this.generateDatesFromSchedule(assignment.startDate, scheduleData as string[]);
+                desiredSessions = dates.map(d => ({ date: d }));
+            } else {
+                // Object format: { dayOfWeek: number, startTime: string, endTime: string }[]
+                const { phase } = await prisma.phase.findFirst({
+                    where: { name: 'EXECUTION' }, // Assuming standard name
+                    select: { startDate: true, endDate: true }
+                }).then(p => ({ phase: p })) as any; // Fallback or use shared utility
 
-        const hasAttendance = await prisma.attendance.count({
-            where: { enrollment: { assignmentId } }
-        });
+                const startDate = assignment.startDate;
+                const endDate = assignment.endDate || phase?.endDate || addWeeks(startDate, 10);
 
-        if (hasAttendance > 0) return;
+                let current = startOfDay(startDate);
+                while (current <= endDate) {
+                    const dayOfWeek = getDay(current);
+                    const slots = (scheduleData as any[]).filter(s => s.dayOfWeek === dayOfWeek);
+                    
+                    for (const slot of slots) {
+                        desiredSessions.push({
+                            date: new Date(current),
+                            startTime: slot.startTime,
+                            endTime: slot.endTime
+                        });
+                    }
+                    current = addDays(current, 1);
+                    if (desiredSessions.length > 50) break; // Safety limit
+                }
+            }
+        }
 
-        // 1. Fetch current sessions with staff before deleting
+        if (desiredSessions.length === 0) return;
+
+        // 2. Fetch existing sessions
         const existingSessions = await prisma.session.findMany({
             where: { assignmentId },
-            include: { staff: true },
-            orderBy: { sessionDate: 'asc' }
+            include: { staff: true }
         });
 
-        const staffToRestore = existingSessions.map(s => s.staff.map(t => t.userId));
+        // 3. Diffing
+        const toDelete: number[] = [];
+        const toKeep = new Set<number>();
+        const toCreate: typeof desiredSessions = [];
 
-        // 2. Delete existing sessions
-        await prisma.session.deleteMany({
-            where: { assignmentId }
-        });
+        for (const desired of desiredSessions) {
+            const match = existingSessions.find(s => 
+                s.sessionDate.getTime() === desired.date.getTime() &&
+                s.startTime === (desired.startTime || null) &&
+                s.endTime === (desired.endTime || null)
+            );
 
-        // 3. Create new ones and restore staff
-        for (let i = 0; i < sessionDates.length; i++) {
-            const newSession = await prisma.session.create({
-                data: {
-                    assignmentId,
-                    sessionDate: sessionDates[i]
-                }
-            });
-
-            // Restore staff if any existed for this session index
-            if (staffToRestore[i] && staffToRestore[i].length > 0) {
-                await prisma.sessionTeacher.createMany({
-                    data: staffToRestore[i].map(userId => ({
-                        sessionId: newSession.sessionId,
-                        userId
-                    }))
-                });
+            if (match) {
+                toKeep.add(match.sessionId);
+            } else {
+                toCreate.push(desired);
             }
+        }
+
+        // Identify sessions to delete (those not in toKeep and that don't have attendance)
+        for (const existing of existingSessions) {
+            if (!toKeep.has(existing.sessionId)) {
+                // Check if it has attendance BEFORE deleting
+                const attendanceCount = await prisma.attendance.count({
+                    where: { enrollment: { assignmentId }, sessionDate: existing.sessionDate }
+                });
+                if (attendanceCount === 0) {
+                    toDelete.push(existing.sessionId);
+                }
+            }
+        }
+
+        // 4. Execute Changes
+        if (toDelete.length > 0) {
+            await prisma.session.deleteMany({
+                where: { sessionId: { in: toDelete } }
+            });
+        }
+
+        if (toCreate.length > 0) {
+            await prisma.session.createMany({
+                data: toCreate.map(s => ({
+                    assignmentId,
+                    sessionDate: s.date,
+                    startTime: s.startTime,
+                    endTime: s.endTime
+                }))
+            });
         }
     }
 
