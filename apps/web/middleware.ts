@@ -1,12 +1,8 @@
 import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
 
-export default createMiddleware({
-  // A list of all locales that are supported
-  locales: ['ca', 'es'],
+export default createMiddleware(routing);
 
-  // Used when no locale matches
-  defaultLocale: 'es'
-  });
 export const config = {
   matcher: [
     // Match all request paths except for the ones starting with:

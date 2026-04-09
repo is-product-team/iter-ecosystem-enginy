@@ -63,7 +63,7 @@ h6 {
 /* Institutional Redesign - Minimalist Sharp */
 * {
   border-radius: 0 !important;
-  box-shadow: none !important; /* Remove all shadows per user request */
+  box-shadow: none !important;
 }
 
 .btn-primary {

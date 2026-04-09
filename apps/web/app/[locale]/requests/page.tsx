@@ -237,63 +237,73 @@ export default function AdminRequestsPage() {
       subtitle={t('subtitle')}
     >
       {/* Filter Section */}
-      <div className="space-y-6 mb-8">
-        <div className="bg-white border border-gray-200 p-6 flex flex-col xl:flex-row gap-6 items-end">
-          <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="space-y-6 mb-12">
+        <div className="bg-background-surface border border-border-subtle p-8 flex flex-col xl:flex-row gap-8 items-end">
+          <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Search */}
-            <div className="space-y-2">
-              <label className="text-[12px] font-medium text-text-primary px-1">{tc('search_by_title')}</label>
-              <div className="relative">
+            <div className="space-y-2.5">
+              <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('search_by_title')}</label>
+              <div className="relative group">
                 <input
                   type="text"
                   placeholder={tc('search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted"
+                  className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
                 />
-                <svg className="absolute left-3 top-3 h-4 w-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg className="absolute left-4 top-4 h-4 w-4 text-text-muted group-focus-within:text-consorci-lightBlue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
             </div>
 
             {/* Center Filter */}
-            <div className="space-y-2">
-              <label className="text-[12px] font-medium text-text-primary px-1">{tc('educational_center')}</label>
-              <select
-                value={selectedCenterId}
-                onChange={(e) => setSelectedCenterId(e.target.value)}
-                className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
-              >
-                <option value="">{tc('all_centers')}</option>
-                {centers.map(c => (
-                  <option key={c.centerId} value={c.centerId}>{c.name}</option>
-                ))}
-              </select>
+            <div className="space-y-2.5">
+              <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('educational_center')}</label>
+              <div className="relative">
+                <select
+                  value={selectedCenterId}
+                  onChange={(e) => setSelectedCenterId(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary appearance-none transition-all"
+                >
+                  <option value="">{tc('all_centers')}</option>
+                  {centers.map(c => (
+                    <option key={c.centerId} value={c.centerId}>{c.name}</option>
+                  ))}
+                </select>
+                <svg className="absolute right-4 top-4 h-4 w-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
 
             {/* Modality Filter */}
-            <div className="space-y-2">
-              <label className="text-[12px] font-medium text-text-primary px-1">{tc('filter_by_modality')}</label>
-              <select
-                value={selectedModality}
-                onChange={(e) => setSelectedModality(e.target.value)}
-                className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
-              >
-                <option value="">{tc('all_modalities')}</option>
-                <option value="A">{tc('modality_label', { modality: 'A' })}</option>
-                <option value="B">{tc('modality_label', { modality: 'B' })}</option>
-                <option value="C">{tc('modality_label', { modality: 'C' })}</option>
-              </select>
+            <div className="space-y-2.5">
+              <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('filter_by_modality')}</label>
+              <div className="relative">
+                <select
+                  value={selectedModality}
+                  onChange={(e) => setSelectedModality(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary appearance-none transition-all"
+                >
+                  <option value="">{tc('all_modalities')}</option>
+                  <option value="A">{tc('modality_label', { modality: 'A' })}</option>
+                  <option value="B">{tc('modality_label', { modality: 'B' })}</option>
+                  <option value="C">{tc('modality_label', { modality: 'C' })}</option>
+                </select>
+                <svg className="absolute right-4 top-4 h-4 w-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div className="hidden xl:block w-px h-10 bg-gray-200 mx-2"></div>
+          <div className="hidden xl:block w-px h-12 bg-border-subtle mx-2"></div>
 
-          <div className="flex w-full xl:w-auto mt-4 xl:mt-0 px-1">
+          <div className="flex w-full xl:w-auto mt-4 xl:mt-0">
             <button
               onClick={handleRunTetris}
-              className="flex-1 xl:w-auto bg-consorci-darkBlue text-white px-8 py-3 text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center justify-center gap-3"
+              className="flex-1 xl:w-auto bg-consorci-darkBlue text-white px-8 py-3.5 text-[13px] font-semibold transition-all hover:bg-black hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M11.5 2L14 9L21 11.5L14 14L11.5 21L9 14L2 11.5L9 9L11.5 2Z" />
@@ -317,77 +327,96 @@ export default function AdminRequestsPage() {
             const currentRequests = workshopRequests[workshopId] || [];
             return (
               <section key={workshop._id} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center gap-4 mb-4 border-b border-border-subtle pb-6 mt-12">
-                  <div className="h-6 w-1 bg-consorci-darkBlue"></div>
-                  <div>
-                    <h3 className="text-xl font-medium text-text-primary tracking-tight">{workshop.title}</h3>
-                    <div className="flex items-center gap-4 mt-2">
-                      <span className="text-[11px] font-medium text-text-muted">{workshop.sector}</span>
-                      <span className={`text-[10px] font-medium px-2 py-0.5 border ${workshop.modality === 'A' ? 'border-green-200/50 bg-green-500/5 text-green-600' :
-                        workshop.modality === 'B' ? 'border-orange-200/50 bg-orange-500/5 text-orange-600' :
-                          'border-blue-200/50 bg-blue-500/5 text-blue-600'
-                        }`}>{tc('modality_label', { modality: workshop.modality })}</span>
+                <div className="flex items-center justify-between mb-6 pb-4 mt-16 border-b border-border-subtle/50">
+                  <div className="flex items-center gap-5">
+                    <div className="w-12 h-12 bg-consorci-darkBlue/5 dark:bg-consorci-lightBlue/10 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-consorci-darkBlue dark:text-consorci-lightBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-semibold text-text-primary tracking-tight leading-tight">{workshop.title}</h3>
+                      <div className="flex items-center gap-3 mt-1.5 font-medium">
+                        <span className="text-[12px] text-text-muted">{workshop.sector}</span>
+                        <span className="w-1 h-1 bg-text-muted/30 rounded-full"></span>
+                        <span className={`text-[10px] uppercase tracking-wider px-2.5 py-1 border ${workshop.modality === 'A' ? 'border-green-200/50 bg-green-500/10 text-green-600' :
+                          workshop.modality === 'B' ? 'border-orange-200/50 bg-orange-500/10 text-orange-600' :
+                            'border-blue-200/50 bg-blue-500/10 text-blue-600'
+                          }`}>{tc('modality_label', { modality: workshop.modality })}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="border border-gray-200 bg-white">
+                <div className="bg-background-surface border border-border-subtle overflow-hidden mb-8">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-background-subtle border-b border-border-subtle">
-                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_center_date')}</th>
-                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_teachers')}</th>
-                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-center">{t('table_students')}</th>
-                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
-                        <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{tc('actions')}</th>
+                      <tr className="bg-background-subtle/50 border-b border-border-subtle">
+                        <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_center_date')}</th>
+                        <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_teachers')}</th>
+                        <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest text-center">{t('table_students')}</th>
+                        <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_status')}</th>
+                        <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest text-right">{tc('actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border-subtle">
                       {currentRequests.map(r => (
-                        <tr key={r.requestId} className="hover:bg-background-subtle transition-colors">
-                          <td className="px-6 py-5">
-                            <div className="text-sm font-medium text-text-primary">{r.center?.name}</div>
-                            <div className="text-[11px] font-medium text-text-muted mt-1">{new Date(r.createdAt).toLocaleDateString()}</div>
+                        <tr key={r.requestId} className="hover:bg-background-subtle/30 transition-colors group">
+                          <td className="px-8 py-6">
+                            <div className="text-sm font-bold text-text-primary group-hover:text-consorci-darkBlue transition-colors">{r.center?.name}</div>
+                            <div className="text-[11px] font-semibold text-text-muted mt-1 px-2 py-0.5 bg-background-subtle inline-block">{new Date(r.createdAt).toLocaleDateString()}</div>
                           </td>
-                          <td className="px-6 py-4">
-                            <div className="text-xs font-medium text-gray-700">1. {r.teacher1?.name || (r.teacher1Id ? `${tc('teachers')} ${r.teacher1Id}` : '-')}</div>
-                            <div className="text-xs font-medium text-gray-700">2. {r.teacher2?.name || (r.teacher2Id ? `${tc('teachers')} ${r.teacher2Id}` : '-')}</div>
+                          <td className="px-8 py-6">
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
+                                <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">1</span>
+                                {r.teacher1?.name || (r.teacher1Id ? `${tc('teachers')} ${r.teacher1Id}` : '-')}
+                              </div>
+                              <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
+                                <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">2</span>
+                                {r.teacher2?.name || (r.teacher2Id ? `${tc('teachers')} ${r.teacher2Id}` : '-')}
+                              </div>
+                            </div>
                           </td>
-                          <td className="px-6 py-5 text-center">
-                            <span className="bg-background-subtle px-3 py-1.5 text-xs font-medium text-text-primary border border-border-subtle">{r.studentsAprox}</span>
+                          <td className="px-8 py-6 text-center">
+                            <span className="inline-flex items-center justify-center min-w-[36px] h-9 bg-background-subtle px-3 text-sm font-bold text-text-primary border border-border-subtle">{r.studentsAprox}</span>
                           </td>
-                          <td className="px-6 py-5">
-                            <span className={`text-[10px] font-medium px-2 py-1 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200/50 text-orange-600 bg-orange-500/5' :
-                              r.status === REQUEST_STATUSES.APPROVED ? 'border-green-200/50 text-green-600 bg-green-500/5' :
-                                'border-red-200/50 text-red-600 bg-red-500/5'
+                          <td className="px-8 py-6">
+                            <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200/50 text-orange-600 bg-orange-500/10' :
+                              r.status === REQUEST_STATUSES.APPROVED ? 'border-green-200/50 text-green-600 bg-green-500/10' :
+                                'border-red-200/50 text-red-600 bg-red-500/10'
                               }`}>
+                              <span className={`w-1.5 h-1.5 ${r.status === REQUEST_STATUSES.PENDING ? 'bg-orange-500' : r.status === REQUEST_STATUSES.APPROVED ? 'bg-green-500' : 'bg-red-500'}`}></span>
                               {r.status === REQUEST_STATUSES.PENDING ? tc('pending') : r.status === REQUEST_STATUSES.APPROVED ? t('assigned') : t('rejected')}
                             </span>
                           </td>
-                          <td className="px-6 py-5 text-right">
+                          <td className="px-8 py-6 text-right">
                             {r.status === REQUEST_STATUSES.REJECTED ? (
-                              <span className="text-[11px] font-medium text-text-muted italic">{t('rejected')}</span>
+                              <span className="text-[11px] font-bold text-text-muted/60 uppercase tracking-wider">{t('rejected')}</span>
                             ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
-                              <span className="text-[11px] font-medium text-text-muted italic">{t('assigned')}</span>
+                              <span className="text-[11px] font-bold text-consorci-lightBlue uppercase tracking-wider">{t('assigned')}</span>
                             ) : (
-                              <div className="flex justify-end gap-3">
+                              <div className="flex justify-end gap-2">
                                 <button
                                   onClick={() => handleEditClick(r)}
-                                  className="px-3 py-1.5 text-text-muted hover:text-consorci-darkBlue text-[12px] font-medium hover:underline transition-all flex items-center gap-1"
+                                  className="p-2 text-text-muted hover:text-consorci-darkBlue hover:bg-consorci-darkBlue/5 transition-all"
+                                  title={tc('edit')}
                                 >
-                                  {tc('edit')}
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                  </svg>
                                 </button>
                                 {r.status === REQUEST_STATUSES.PENDING && (
                                   <button
                                     onClick={() => handleApprove(r.requestId)}
-                                    className="px-4 py-1.5 bg-consorci-darkBlue text-white text-[12px] font-medium transition-all hover:bg-black"
+                                    className="px-4 py-2 bg-consorci-darkBlue text-white text-[11px] font-bold transition-all hover:bg-black active:scale-95"
                                   >
                                     {t('approve_btn')}
                                   </button>
                                 )}
                                 <button
                                   onClick={() => handleReject(r.requestId)}
-                                  className="px-3 py-1.5 text-red-500 hover:underline text-[12px] font-medium transition-all"
+                                  className="px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-500 text-[11px] font-bold transition-all hover:bg-red-500 hover:text-white"
                                 >
                                   {t('reject_btn')}
                                 </button>
@@ -419,39 +448,52 @@ export default function AdminRequestsPage() {
       )}
       {/* Edit Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-background-surface max-w-md w-full p-10 border border-border-subtle slide-in-from-bottom-4 animate-in duration-500">
-            <h3 className="text-xl font-medium text-text-primary tracking-tight mb-8">{t('edit_title')}</h3>
-            <form onSubmit={handleEditSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label className="block text-[12px] font-medium text-text-primary px-1">{t('num_students')}</label>
-                <input
-                  type="number"
-                  min="1"
-                  className="w-full bg-background-subtle border border-border-subtle p-3 text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none"
-                  value={editFormData.studentsAprox || ''}
-                  onChange={(e) => setEditFormData({ ...editFormData, studentsAprox: e.target.value === '' ? 0 : parseInt(e.target.value) })}
-                />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background-page/40 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="bg-background-surface max-w-lg w-full p-12 border border-border-subtle slide-in-from-bottom-8 animate-in duration-500">
+            <div className="flex flex-col items-center text-center mb-10">
+              <div className="w-16 h-16 bg-consorci-darkBlue/5 flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-consorci-darkBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
               </div>
-              <div className="space-y-2">
-                <label className="block text-[12px] font-medium text-text-primary px-1">{t('comments')}</label>
+              <h3 className="text-2xl font-bold text-text-primary tracking-tight">{t('edit_title')}</h3>
+              <p className="text-sm text-text-muted mt-2 font-medium">{tc('review_data')}</p>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-8">
+              <div className="space-y-2.5">
+                <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{t('num_students')}</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="1"
+                    className="w-full bg-background-subtle border border-border-subtle px-4 py-3.5 text-sm font-bold text-text-primary focus:border-consorci-lightBlue outline-none transition-all"
+                    value={editFormData.studentsAprox || ''}
+                    onChange={(e) => setEditFormData({ ...editFormData, studentsAprox: e.target.value === '' ? 0 : parseInt(e.target.value) })}
+                  />
+                  <div className="absolute right-4 top-3.5 text-xs font-bold text-text-muted pointer-events-none">ALUMNOS</div>
+                </div>
+              </div>
+              <div className="space-y-2.5">
+                <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{t('comments')}</label>
                 <textarea
-                  className="w-full bg-background-subtle border border-border-subtle p-3 text-sm text-text-primary focus:border-consorci-darkBlue outline-none h-32 resize-none"
+                  className="w-full bg-background-subtle border border-border-subtle px-4 py-3.5 text-sm text-text-primary font-medium focus:border-consorci-lightBlue outline-none h-40 resize-none transition-all"
+                  placeholder="Escribe aquí observaciones adicionales..."
                   value={editFormData.comments}
                   onChange={(e) => setEditFormData({ ...editFormData, comments: e.target.value })}
                 />
               </div>
-              <div className="flex justify-end gap-3 mt-10">
+              <div className="flex gap-4 pt-4">
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-6 py-2 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline"
+                  className="flex-1 py-4 text-[13px] font-bold text-text-muted hover:text-text-primary hover:bg-background-subtle transition-all"
                 >
                   {tc('cancel')}
                 </button>
                 <button
                   type="submit"
-                  className="px-8 py-2 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black"
+                  className="flex-[1.5] py-4 bg-consorci-darkBlue text-white text-[13px] font-bold transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {tc('save')}
                 </button>

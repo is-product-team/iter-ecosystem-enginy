@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import {
   Calendar,
@@ -125,7 +126,7 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-3 p-4 bg-white border border-border-subtle hover:border-text-primary transition-all group shadow-sm"
                 >
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" className="w-5 h-5" alt="Google" />
+                  <Image src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" className="w-5 h-5" alt="Google" width={20} height={20} />
                   <span className="text-[13px] font-medium text-text-primary">{t('google_btn')}</span>
                 </a>
 

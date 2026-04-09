@@ -51,7 +51,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     };
 
     fetchData();
-  }, [id, router]);
+  }, [id, router, locale, tCommon]);
 
   const handleRemoveStudent = async (studentId: number) => {
     try {

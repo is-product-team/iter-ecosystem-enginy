@@ -54,7 +54,7 @@ export default function TeachersCRUD() {
       return;
     }
     if (user) loadTeachers();
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   const loadTeachers = async () => {
     try {

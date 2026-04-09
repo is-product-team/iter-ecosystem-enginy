@@ -1,16 +1,16 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect, useState } from 'react';
 import Loading from '@/components/Loading';
 import Avatar from '@/components/Avatar';
+import LanguageSelector from '@/components/LanguageSelector';
 import { useTranslations, useLocale } from 'next-intl';
 import api from '@/services/api';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/routing';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -63,15 +63,11 @@ export default function ProfilePage() {
     }
   };
 
-  const changeLanguage = (newLocale: string) => {
-    // next-intl uses the locale as the first path segment
-    const newPath = pathname.replace(`/${currentLocale}`, `/${newLocale}`);
-    router.push(newPath);
-  };
 
-  if (authLoading || !user) {
+
+  if (!mounted || authLoading || !user) {
     return (
-      <Loading fullScreen message="Loading profile..." />
+      <Loading fullScreen message={authLoading ? "Verifying access..." : "Loading profile..."} />
     );
   }
 
@@ -193,24 +189,7 @@ export default function ProfilePage() {
                 {/* Language Selection */}
                 <div>
                   <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">Language</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { id: 'ca', label: 'Català' },
-                      { id: 'es', label: 'Castellano' }
-                    ].map((option) => (
-                      <button
-                        key={option.id}
-                        onClick={() => changeLanguage(option.id)}
-                        className={`px-4 py-2 text-[12px] font-medium border transition-all ${
-                          currentLocale === option.id 
-                            ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' 
-                            : 'bg-background-subtle border-border-subtle text-text-primary hover:border-text-primary'
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
+                  <LanguageSelector />
                 </div>
               </div>
             </div>
