@@ -10,6 +10,8 @@ import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import SyncCalendarModal from "@/components/calendar/SyncCalendarModal";
+import { Share2 } from "lucide-react";
 
 interface Phase {
   phaseId: number;
@@ -28,9 +30,11 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(false);
   const t = useTranslations('Calendar');
   const tc = useTranslations('Common');
+  const tSync = useTranslations('Sync');
 
   // Overlay states
   const [isLegendOpen, setIsLegendOpen] = useState(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
 
   const fetchCalendarData = useCallback(async (start: Date, end: Date) => {
     if (!user) return;
@@ -84,20 +88,28 @@ export default function CalendarPage() {
       <div className="w-full relative">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-3">
-            <div className={`w-3 h-3 ${activePhase ? 'bg-consorci-darkBlue' : 'bg-border-subtle'}`}></div>
             <div className="text-[13px] font-medium text-text-primary">
               {activePhase ? t('active_fase', { nom: activePhase.name }) : t('sync_phases')}
             </div>
           </div>
-          <button
-            onClick={() => setIsLegendOpen(true)}
-            className="px-6 py-2.5 bg-background-surface border border-border-subtle text-text-primary text-[13px] font-medium transition-all hover:bg-background-subtle active:scale-[0.98] flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {t('view_legend')}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsSyncModalOpen(true)}
+              className="px-6 py-2.5 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
+            >
+              <Share2 className="w-4 h-4" />
+              {tSync('title')}
+            </button>
+            <button
+              onClick={() => setIsLegendOpen(true)}
+              className="px-6 py-2.5 bg-background-surface border border-border-subtle text-text-primary text-[13px] font-medium transition-all hover:bg-background-subtle active:scale-[0.98] flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {t('view_legend')}
+            </button>
+          </div>
         </div>
 
         <div className="border border-border-subtle bg-background-surface">
@@ -116,56 +128,54 @@ export default function CalendarPage() {
         </div>
 
         {isLegendOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-background-surface border border-border-subtle w-full max-w-sm p-10 relative">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/20 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-background-surface/90 backdrop-blur-2xl border border-white/20 shadow-2xl w-full max-w-md p-12 relative rounded-3xl animate-in zoom-in-95 duration-300">
               <button
                 onClick={() => setIsLegendOpen(false)}
-                className="absolute top-8 right-8 text-text-muted hover:text-text-primary transition-colors"
+                className="absolute top-10 right-10 text-text-muted hover:text-text-primary transition-all p-2 hover:bg-background-subtle rounded-full"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
 
-              <h3 className="text-xl font-medium text-text-primary tracking-tight border-b border-border-subtle pb-6 mb-8">
+              <h3 className="text-2xl font-semibold text-text-primary tracking-tight mb-10">
                 {t('legend_title')}
               </h3>
 
-              <div className="space-y-6">
-                <div className="flex items-center gap-5 group cursor-default">
-                  <div className="w-5 h-5 bg-consorci-lightBlue"></div>
-                  <div>
-                    <span className="block text-[13px] font-medium text-text-primary transition-colors">{t('assignment_label')}</span>
-                    <span className="text-[12px] text-text-muted font-medium opacity-70">{t('assignment_desc')}</span>
+              <div className="space-y-10">
+                <div className="space-y-6">
+                  <span className="block text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] opacity-60">Activitats</span>
+                  
+                  <div className="flex items-start gap-5 group cursor-default">
+                    <div>
+                      <span className="block text-[14px] font-semibold text-text-primary">{t('assignment_label')}</span>
+                      <span className="text-[12px] text-text-muted font-medium opacity-70">{t('assignment_desc')}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-5 group cursor-default">
+                    <div>
+                      <span className="block text-[14px] font-semibold text-text-primary">{t('session_label')}</span>
+                      <span className="text-[12px] text-text-muted font-medium opacity-70">{t('session_desc')}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-5 group cursor-default">
-                  <div className="w-5 h-5 bg-consorci-yellow"></div>
-                  <div>
-                    <span className="block text-[13px] font-medium text-text-primary transition-colors">{t('session_label')}</span>
-                    <span className="text-[12px] text-text-muted font-medium opacity-70">{t('session_desc')}</span>
-                  </div>
-                </div>
-
-                <div className="pt-8 border-t border-border-subtle">
-                  <span className="block text-[10px] font-medium text-text-muted uppercase tracking-wider mb-6 opacity-60">{t('phases_label')}</span>
-                  <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+                <div className="pt-10 border-t border-border-subtle/30">
+                  <span className="block text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-6 opacity-60">{t('phases_label')}</span>
+                  <div className="grid grid-cols-2 gap-y-6 gap-x-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-3.5 h-3.5 bg-consorci-darkBlue"></div>
-                      <span className="text-[11px] font-medium text-text-primary">{t('phase_solicitud')}</span>
+                      <span className="text-[12px] font-semibold text-text-primary opacity-80">{t('phase_solicitud')}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-3.5 h-3.5 bg-consorci-actionBlue"></div>
-                      <span className="text-[11px] font-medium text-text-primary">{t('phase_planificacion')}</span>
+                      <span className="text-[12px] font-semibold text-text-primary opacity-80">{t('phase_planificacion')}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-3.5 h-3.5 bg-consorci-pinkRed"></div>
-                      <span className="text-[11px] font-medium text-text-primary">{t('phase_ejecucion')}</span>
+                      <span className="text-[12px] font-semibold text-text-primary opacity-80">{t('phase_ejecucion')}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-3.5 h-3.5 bg-consorci-beige"></div>
-                      <span className="text-[11px] font-medium text-text-primary">{t('phase_evaluacion')}</span>
+                      <span className="text-[12px] font-semibold text-text-primary opacity-80">{t('phase_evaluacion')}</span>
                     </div>
                   </div>
                 </div>
@@ -173,13 +183,18 @@ export default function CalendarPage() {
 
               <button
                 onClick={() => setIsLegendOpen(false)}
-                className="w-full mt-10 py-4 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-95"
+                className="w-full mt-12 py-4.5 bg-consorci-darkBlue text-white text-[14px] font-semibold rounded-2xl transition-all hover:bg-black hover:shadow-lg active:scale-[0.98]"
               >
                 {t('legend_ok')}
               </button>
             </div>
           </div>
         )}
+
+        <SyncCalendarModal 
+          isOpen={isSyncModalOpen}
+          onClose={() => setIsSyncModalOpen(false)}
+        />
       </div>
     </DashboardLayout>
   );

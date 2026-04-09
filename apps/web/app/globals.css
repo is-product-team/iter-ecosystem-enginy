@@ -112,6 +112,21 @@ h6 {
   }
 }
 
+/* Base Animations for Loading Component */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-in {
+  animation-duration: 400ms;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
 /* Calendar Event Redesign (Apple Calendar Style) */
 .calendar-event-card {
   @apply border-l-[3px] h-full flex items-center px-2 py-0.5 overflow-hidden transition-all shadow-sm;

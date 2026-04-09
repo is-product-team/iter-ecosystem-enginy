@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
+import Loading from '@/components/Loading';
 
 
 import phaseService, { Phase } from '@/services/phaseService';
@@ -13,6 +14,7 @@ import phaseService, { Phase } from '@/services/phaseService';
 export default function CenterDashboard() {
   const t = useTranslations('Center');
   const tc = useTranslations('Common');
+  const tNav = useTranslations('Navigation');
   const locale = useLocale();
   const { user, loading: authLoading } = useAuth();
   const [phases, setPhases] = useState<Phase[]>([]);
@@ -48,11 +50,7 @@ export default function CenterDashboard() {
   };
 
   if (authLoading || !user) {
-    return (
-      <div className="flex min-h-screen justify-center items-center bg-background-page">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-consorci-darkBlue mx-auto"></div>
-      </div>
-    );
+    return <Loading fullScreen message={tc('authenticating')} />;
   }
 
   return (
@@ -74,7 +72,7 @@ export default function CenterDashboard() {
 
           <div className="flex flex-col md:flex-row justify-between items-start gap-y-12 gap-x-8">
             {loadingPhases ? (
-              <div className="w-full py-8 text-center text-[12px] font-medium text-text-muted">{tc('loading_calendar')}</div>
+              <Loading message={tc('loading_calendar')} />
             ) : (
               phases.map((phase) => (
                 <div key={phase.phaseId} className="relative flex flex-col items-center text-center flex-1 group">
@@ -150,8 +148,8 @@ export default function CenterDashboard() {
               phase: `${tc('phase')} 3`
             },
             {
-              title: useTranslations('Navigation')('monitoring'),
-              text: useTranslations('Center')('Monitoring.subtitle'),
+              title: tNav('monitoring'),
+              text: t('Monitoring.subtitle'),
               icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
               path: `/${locale}/center/monitoring`,
               active: isPhaseActive(PHASES.EXECUTION),

@@ -925,6 +925,25 @@
       "pending_evals_error": "No se puede cerrar la asignación. Hay {count} evaluaciones pendientes.",
       "success": "¡Taller cerrado y certificados generados correctamente!",
       "error": "Error al cerrar el taller."
+    },
+    "Monitoring": {
+      "no_assignments": "No hay talleres activos en ejecución por ahora."
     }
+  },
+  "Sync": {
+    "title": "Sincronizar",
+    "modal_title": "Lleva tu calendario a todas partes",
+    "modal_subtitle": "Sincroniza tus sesiones e hitos de Iter con tu aplicación de calendario favorita.",
+    "google_btn": "Añadir a Google Calendar",
+    "apple_btn": "Añadir a Apple / Outlook",
+    "copy_btn": "Copiar enlace iCal",
+    "copy_success": "Enlace copiado al portapapeles",
+    "instructions_title": "¿Cómo funciona?",
+    "instructions_step1": "Haz clic en uno de los botones superiores para abrir tu aplicación de calendario.",
+    "instructions_step2": "Si prefieres hacerlo manualmente, copia el enlace iCal y pégalo como 'Suscripción por URL' en tu aplicación.",
+    "instructions_privacy": "Este enlace es privado y contiene tu agenda personal. No lo compartas.",
+    "regenerate_btn": "Generar nuevo enlace",
+    "regenerate_confirm": "¿Si generas un nuevo enlace, el anterior dejará de funcionar en todas tus aplicaciones. ¿Quieres continuar?",
+    "close": "Cerrar"
   }
 }

@@ -925,6 +925,25 @@
       "pending_evals_error": "No es pot tancar l'assignació. Hi ha {count} avaluacions pendents.",
       "success": "Taller tancat i certificats generats correctament!",
       "error": "Error en tancar el taller."
+    },
+    "Monitoring": {
+      "no_assignments": "No hi ha tallers actius en execució hores d'ara."
     }
+  },
+  "Sync": {
+    "title": "Sincronizar",
+    "modal_title": "Porta el teu calendari a tot arreu",
+    "modal_subtitle": "Sincronitza les teves sessions i fites d'Iter amb la teva aplicació de calendari preferida.",
+    "google_btn": "Afegir a Google Calendar",
+    "apple_btn": "Afegir a Apple / Outlook",
+    "copy_btn": "Copiar enllaç iCal",
+    "copy_success": "Enllaç copiat al porta-retalls",
+    "instructions_title": "Com funciona?",
+    "instructions_step1": "Fes clic en un dels botons superiors per obrir la teva aplicació de calendari.",
+    "instructions_step2": "Si prefereixes fer-ho manualment, copia l'enllaç iCal i enganxa'l com a 'Subscripció per URL' en la teva aplicació.",
+    "instructions_privacy": "Aquest enllaç és privat i conté la teva agenda personal. No el comparteixis.",
+    "regenerate_btn": "Generar nou enllaç",
+    "regenerate_confirm": "Si generes un nou enllaç, l'anterior deixarà de funcionar a totes les teves aplicacions. Vols continuar?",
+    "close": "Tancar"
   }
 }

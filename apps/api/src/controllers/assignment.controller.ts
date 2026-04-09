@@ -1,7 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES } from '@iter/shared';
-import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
 import { createNotificationInternal } from './notification.controller.js';
 import { VisionService } from '../services/vision.service.js';
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';

@@ -213,15 +213,46 @@ async function seedPhases() {
   ];
 
   for (const phase of phasesData) {
+    let startDate: Date;
+    let endDate: Date;
+    let isActive = false;
+
+    // Sequential dates logic
+    switch (phase.name) {
+      case PHASES.APPLICATION:
+        startDate = new Date(now.getFullYear(), now.getMonth() - 4, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() - 2, 0); // End of Month -2
+        break;
+      case PHASES.PLANNING:
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth(), 0); // End of Month -1
+        break;
+      case PHASES.EXECUTION:
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0); // End of Month +2
+        isActive = true; // Set current phase as active
+        break;
+      case PHASES.CLOSURE:
+      default:
+        startDate = new Date(now.getFullYear(), now.getMonth() + 3, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 5, 0); // End of Month +4
+        break;
+    }
+
     await prisma.phase.upsert({
       where: { name: phase.name },
-      update: { order: phase.order, isActive: phase.isActive },
+      update: { 
+        order: phase.order, 
+        isActive: isActive,
+        startDate,
+        endDate
+      },
       create: {
         name: phase.name,
         order: phase.order,
-        isActive: phase.isActive,
-        startDate: new Date(new Date().setMonth(now.getMonth() - 3)),
-        endDate: new Date(new Date().setMonth(now.getMonth() + 9)),
+        isActive: isActive,
+        startDate,
+        endDate,
       },
     });
   }

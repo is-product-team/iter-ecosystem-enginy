@@ -215,41 +215,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* App Synchronization */}
-            <div className="space-y-8">
-              <div className="border-b border-border-subtle pb-3">
-                <h3 className="text-[11px] font-bold text-text-primary uppercase tracking-[0.2em]">App Synchronization</h3>
-              </div>
-              
-              <div className="space-y-6 bg-background-surface border border-border-subtle p-8 shadow-sm">
-                <p className="text-[12px] text-text-muted leading-relaxed">
-                  Use this token to sync your account with the Iter mobile app. Keep this token private.
-                </p>
-                
-                {syncToken ? (
-                  <div className="flex flex-col gap-4">
-                    <div className="p-4 bg-background-subtle border border-border-subtle font-mono text-center break-all text-xs select-all">
-                      {syncToken}
-                    </div>
-                    <button 
-                      onClick={generateToken}
-                      disabled={loadingToken}
-                      className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-all text-left"
-                    >
-                      {loadingToken ? 'Generating...' : 'Regenerate Token'}
-                    </button>
-                  </div>
-                ) : (
-                  <button 
-                    onClick={generateToken}
-                    disabled={loadingToken}
-                    className="w-full py-3 border border-consorci-darkBlue text-consorci-darkBlue hover:bg-consorci-darkBlue hover:text-white text-[13px] font-medium transition-all"
-                  >
-                    {loadingToken ? 'Generating...' : 'Generate Sync Token'}
-                  </button>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       </div>

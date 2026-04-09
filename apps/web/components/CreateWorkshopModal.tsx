@@ -373,5 +373,3 @@ const CreateWorkshopModal = ({
 };
 
 export default CreateWorkshopModal;
-eWorkshopModal;
-Modal;

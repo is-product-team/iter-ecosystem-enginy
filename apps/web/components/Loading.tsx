@@ -5,63 +5,67 @@ import React from 'react';
 interface LoadingProps {
   fullScreen?: boolean;
   message?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'mini';
   white?: boolean;
 }
 
+/**
+ * Apple-Style Minimalist Loading Component
+ * Features a high-fidelity tick-based spinner and backdrop-blur overlays.
+ */
 const Loading: React.FC<LoadingProps> = ({
   fullScreen = false,
-  message = 'Carregant...',
+  message,
   size = 'md',
   white = false
 }) => {
   const sizeClasses = {
-    sm: 'w-5 h-5',
-    md: 'w-16 h-16',
-    lg: 'w-24 h-24'
+    mini: 'w-4 h-4',
+    sm: 'w-6 h-6',
+    md: 'w-10 h-10',
+    lg: 'w-14 h-14'
   };
 
-  const ringColor = white ? 'text-white' : 'text-consorci-darkBlue';
-  const dotColor = white ? 'bg-white' : 'bg-consorci-darkBlue dark:bg-text-primary';
-  const textColor = white ? 'text-white/60' : 'text-text-muted';
+  const spinnerColor = white ? 'stroke-white' : 'stroke-text-primary dark:stroke-white';
+  const textColor = white ? 'text-white/70' : 'text-text-muted';
 
   const content = (
-    <div className="flex flex-col items-center justify-center gap-6">
-      <div className={`relative ${sizeClasses[size]}`}>
-        {/* Outer Glow Removed for Minimalist Look */}
-
-        {/* Modern Circular Spinner */}
-        <svg className="w-full h-full animate-spin" viewBox="0 0 50 50">
-          <circle
-            className={`${ringColor} opacity-10`}
-            cx="25"
-            cy="25"
-            r="22"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="none"
-          />
-          <path
-            className={ringColor}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            d="M25,3 A22,22 0 0,1 47,25"
-          />
+    <div 
+      className="flex flex-col items-center justify-center gap-4"
+      role="status"
+      aria-live="polite"
+      aria-label={message || "Loading"}
+    >
+      <div className={`relative ${sizeClasses[size]} flex items-center justify-center`}>
+        {/* Apple Style Tick Spinner */}
+        <svg 
+          className="w-full h-full animate-spin [animation-duration:1s]" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {[...Array(8)].map((_, i) => (
+            <line
+              key={i}
+              x1="12"
+              y1="4.5"
+              x2="12"
+              y2="7"
+              className={spinnerColor}
+              strokeWidth="2"
+              strokeLinecap="round"
+              style={{
+                transform: `rotate(${i * 45}deg)`,
+                transformOrigin: '12px 12px',
+                opacity: 1 - (i * 0.12)
+              }}
+            />
+          ))}
         </svg>
-
-        {/* Inner Pulsing Circle */}
-        {size !== 'sm' && (
-          <div
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 ${dotColor} animate-pulse`}
-            style={{ animationDuration: '2s' }}
-          ></div>
-        )}
       </div>
 
-      {message && size !== 'sm' && (
-        <p className={`text-[12px] font-medium ${textColor}`}>
+      {message && size !== 'mini' && (
+        <p className={`text-[11px] font-medium uppercase tracking-[0.2em] ${textColor} animate-pulse duration-[2000ms]`}>
           {message}
         </p>
       )}
@@ -70,14 +74,14 @@ const Loading: React.FC<LoadingProps> = ({
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-background-page z-[9999] flex items-center justify-center">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background-page/60 dark:bg-black/40 backdrop-blur-md transition-all duration-500 animate-in fade-in">
         {content}
       </div>
     );
   }
 
   return (
-    <div className={`flex items-center justify-center ${size === 'sm' ? '' : 'w-full py-20'}`}>
+    <div className={`flex items-center justify-center w-full ${size === 'mini' ? '' : 'py-12'} animate-in fade-in duration-700`}>
       {content}
     </div>
   );

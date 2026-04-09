@@ -27,11 +27,7 @@ export default function AdminReportsPage() {
     }, []);
 
     if (loading) {
-        return (
-            <div className="flex min-h-screen justify-center items-center bg-background-surface">
-                <div className="animate-spin h-8 w-8 border-b-2 border-consorci-darkBlue"></div>
-            </div>
-        );
+        return <Loading fullScreen message={t('loading_data') || "Loading reports..."} />;
     }
 
     const { generalAvg, impactDistribution } = (metrics as { 

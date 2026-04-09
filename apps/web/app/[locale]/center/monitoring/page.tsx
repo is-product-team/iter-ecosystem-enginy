@@ -89,7 +89,7 @@ export default function MonitoringPage() {
             ))}
             {stats.assignments.length === 0 && (
               <div className="col-span-full py-12 text-center bg-background-subtle border border-dashed border-border-subtle text-text-muted text-[11px] font-medium uppercase tracking-widest">
-                No hi ha tallers actius en execució hores d'ara.
+                {t('no_assignments')}
               </div>
             )}
           </div>

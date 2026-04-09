@@ -470,7 +470,7 @@ export default function RequestsPage() {
                   >
                     {submitting ? (
                       <>
-                        <div className="animate-spin h-3.5 w-3.5 border-2 border-white/20 border-t-white"></div>
+                        <Loading size="mini" white />
                         <span>Processing request...</span>
                       </>
                     ) : (
