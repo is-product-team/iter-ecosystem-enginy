@@ -6,7 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME, PHASES } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
-import { getMyAssignments, getPhases } from '../../../services/api';
+import { getMyAssignments, getPhases, getNotifications } from '../../../services/api';
 
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
@@ -24,6 +24,7 @@ export default function DashboardScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWorkshop, setSelectedWorkshop] = useState<CalendarEvent | null>(null);
   const [userName, setUserName] = useState('Professor');
+  const [unreadCount, setUnreadCount] = useState(0);
   
   // 1. Helpers
   const isPhaseActive = (phaseName: string) => {
@@ -76,6 +77,11 @@ export default function DashboardScreen() {
         
         // Assignments API returns the array directly
         setAssignments(Array.isArray(assignmentsRes.data) ? assignmentsRes.data : []);
+
+        // 4. Fetch Notifications
+        const notifsRes = await getNotifications();
+        const unread = notifsRes.data.filter((n: any) => !n.isRead).length;
+        setUnreadCount(unread);
       } catch (error: any) {
         console.error("Error fetching dashboard data:", error);
         // Ensure state remains valid even on error
@@ -267,6 +273,31 @@ export default function DashboardScreen() {
                <Text className="text-text-muted font-medium text-sm" style={{ fontFamily: THEME.fonts.primary }}>{t('Dashboard.no_upcoming_workshops')}</Text>
             </View>
           )}
+
+          {/* Communications Section */}
+          <FeatureListModule
+            title={t('Coordination.collaboration')}
+            items={[
+              {
+                id: 'notifications',
+                title: t('Notifications.title'),
+                subtitle: unreadCount > 0 ? `${unreadCount} ${t('Notifications.empty').replace(t('Notifications.empty'), 'avisos pendents')}` : t('Notifications.empty'),
+                icon: 'notifications',
+                iconColor: '#F87171',
+                iconBgColor: '#450a0a',
+                onPress: () => router.push('/(professor)/notifications')
+              },
+              {
+                id: 'coordination',
+                title: t('Coordination.collaboration'),
+                subtitle: t('Coordination.teacher_space'),
+                icon: 'people',
+                iconColor: '#34D399',
+                iconBgColor: '#064e3b',
+                onPress: () => router.push('/(professor)/coordination')
+              }
+            ]}
+          />
 
           <View className="h-6" /> 
         </View>
