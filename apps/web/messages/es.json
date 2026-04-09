@@ -533,5 +533,27 @@
       "dark": "Oscuro",
       "system": "Sistema"
     }
+  },
+  "Services": {
+    "Risk": {
+      "alert_title": "Alerta: Riesgo de Abandono",
+      "alert_message": "Identificado un nivel de riesgo del {score}%. Factores principales: {factors}. Se recomienda intervención pedagógica inmediata.",
+      "factors": {
+        "absences": "Alto volumen de ausencias recientes",
+        "occasional": "Ausencias ocasionales registradas",
+        "lates": "Problemas persistentes de puntualidad",
+        "low_competency": "{count} evaluaciones de competencia bajas"
+      }
+    },
+    "Vision": {
+      "error_format": "Formato de archivo no soportado. Por favor, sube PDF o imágenes.",
+      "error_empty": "El documento parece estar vacío (menos de 1KB).",
+      "error_signature": "Firma manuscrita no detectada en la región esperada.",
+      "error_unavailable": "El motor de visión de IA local no está disponible actualmente."
+    },
+    "AutoAssignment": {
+      "no_requests": "No se encontraron solicitudes para procesar.",
+      "success": "Asignados {count} estudiantes al Centro {center} para el Taller {workshop}"
+    }
   }
 }
