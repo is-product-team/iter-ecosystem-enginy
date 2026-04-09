@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform, Linking, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Platform, Linking, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
@@ -19,9 +19,11 @@ export interface CalendarEvent {
 interface CalendarViewProps {
   events: CalendarEvent[];
   onEventClick?: (event: CalendarEvent) => void;
+  onMonthChange?: (date: Date) => void;
+  isLoading?: boolean;
 }
 
-const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => {
+const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMonthChange, isLoading }) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -35,8 +37,17 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
   const monthName = currentDate.toLocaleString('ca-ES', { month: 'long' });
   const year = currentDate.getFullYear();
 
-  const prevMonth = () => setCurrentDate(new Date(year, currentDate.getMonth() - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(year, currentDate.getMonth() + 1, 1));
+  const prevMonth = () => {
+    const newDate = new Date(year, currentDate.getMonth() - 1, 1);
+    setCurrentDate(newDate);
+    onMonthChange?.(newDate);
+  };
+  
+  const nextMonth = () => {
+    const newDate = new Date(year, currentDate.getMonth() + 1, 1);
+    setCurrentDate(newDate);
+    onMonthChange?.(newDate);
+  };
 
   const calendarDays = useMemo(() => {
     const totalDays = daysInMonth(year, currentDate.getMonth());
@@ -180,6 +191,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick }) => 
               );
             })}
           </View>
+          
+          {/* Subtle loading overlay on the grid */}
+          {isLoading && (
+            <View className="absolute inset-0 bg-white/30 items-center justify-center">
+              <ActivityIndicator color={THEME.colors.primary} />
+            </View>
+          )}
         </View>
       </View>
 

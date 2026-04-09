@@ -1,16 +1,16 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect, useState } from 'react';
 import Loading from '@/components/Loading';
 import Avatar from '@/components/Avatar';
+import LanguageSelector from '@/components/LanguageSelector';
 import { useTranslations, useLocale } from 'next-intl';
 import api from '@/services/api';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/routing';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -63,15 +63,11 @@ export default function ProfilePage() {
     }
   };
 
-  const changeLanguage = (newLocale: string) => {
-    // next-intl uses the locale as the first path segment
-    const newPath = pathname.replace(`/${currentLocale}`, `/${newLocale}`);
-    router.push(newPath);
-  };
 
-  if (authLoading || !user) {
+
+  if (!mounted || authLoading || !user) {
     return (
-      <Loading fullScreen message="Loading profile..." />
+      <Loading fullScreen message={authLoading ? "Verifying access..." : "Loading profile..."} />
     );
   }
 
@@ -80,7 +76,7 @@ export default function ProfilePage() {
       title={t('title')}
       subtitle={t('subtitle')}
     >
-      <div className="max-w-4xl mx-auto pb-20">
+      <div className="w-full pb-20 space-y-12">
         {/* Profile Header Card */}
         <div className="bg-background-surface border border-border-subtle p-12 mb-10 flex flex-col md:flex-row items-center gap-10">
           <Avatar 
@@ -193,63 +189,11 @@ export default function ProfilePage() {
                 {/* Language Selection */}
                 <div>
                   <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">Language</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { id: 'ca', label: 'Català' },
-                      { id: 'es', label: 'Castellano' }
-                    ].map((option) => (
-                      <button
-                        key={option.id}
-                        onClick={() => changeLanguage(option.id)}
-                        className={`px-4 py-2 text-[12px] font-medium border transition-all ${
-                          currentLocale === option.id 
-                            ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' 
-                            : 'bg-background-subtle border-border-subtle text-text-primary hover:border-text-primary'
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
+                  <LanguageSelector />
                 </div>
               </div>
             </div>
 
-            {/* App Synchronization */}
-            <div className="space-y-8">
-              <div className="border-b border-border-subtle pb-3">
-                <h3 className="text-[11px] font-bold text-text-primary uppercase tracking-[0.2em]">App Synchronization</h3>
-              </div>
-              
-              <div className="space-y-6 bg-background-surface border border-border-subtle p-8 shadow-sm">
-                <p className="text-[12px] text-text-muted leading-relaxed">
-                  Use this token to sync your account with the Iter mobile app. Keep this token private.
-                </p>
-                
-                {syncToken ? (
-                  <div className="flex flex-col gap-4">
-                    <div className="p-4 bg-background-subtle border border-border-subtle font-mono text-center break-all text-xs select-all">
-                      {syncToken}
-                    </div>
-                    <button 
-                      onClick={generateToken}
-                      disabled={loadingToken}
-                      className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-all text-left"
-                    >
-                      {loadingToken ? 'Generating...' : 'Regenerate Token'}
-                    </button>
-                  </div>
-                ) : (
-                  <button 
-                    onClick={generateToken}
-                    disabled={loadingToken}
-                    className="w-full py-3 border border-consorci-darkBlue text-consorci-darkBlue hover:bg-consorci-darkBlue hover:text-white text-[13px] font-medium transition-all"
-                  >
-                    {loadingToken ? 'Generating...' : 'Generate Sync Token'}
-                  </button>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       </div>

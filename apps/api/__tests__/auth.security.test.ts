@@ -84,7 +84,7 @@ describe('Auth Security Integration', () => {
         .send({ email: 'test2@example.com', password: 'password123' });
 
       expect(response.status).toBe(429);
-      expect(response.body.error).toContain('Massa intents');
+      expect(response.body.error).toContain('Too many attempts');
     });
   });
 });

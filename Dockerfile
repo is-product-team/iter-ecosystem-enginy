@@ -13,19 +13,18 @@ WORKDIR /app
 FROM base AS pruner
 RUN npm install -g turbo
 COPY . .
-RUN turbo prune web --docker
+RUN turbo prune @iter/web --docker
 RUN turbo prune api --docker
 
 # --- BUILDER WEB ---
 FROM base AS builder-web
-ENV NODE_ENV=production
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 RUN npm ci --ignore-scripts
 COPY --from=pruner /app/out/full/ .
-RUN npx turbo run build --filter=web
+RUN npx turbo run build --filter=@iter/web
 
 # --- RUNNER WEB (PRODUCCIÓN) ---
 FROM base AS runner-web
@@ -35,6 +34,7 @@ ENV HOSTNAME="0.0.0.0"
 WORKDIR /app
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder-web /app/apps/web/public ./public
 COPY --from=builder-web /app/apps/web/public ./apps/web/public
 USER node
 EXPOSE 3000

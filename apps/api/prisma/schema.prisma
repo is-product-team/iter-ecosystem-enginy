@@ -160,6 +160,7 @@ model Assignment {
   sessions       Session[]
   evaluations    Evaluation[]
   certificates   Certificate[]
+  issues         Issue[]
 
   @@index([startDate, endDate])
   @@map("assignacions")
@@ -196,6 +197,7 @@ model Session {
   startTime    String?          @map("hora_inici")
   endTime      String?          @map("hora_fi")
   staff        SessionTeacher[]
+  issues       Issue[]
 
   @@map("sessions")
 }
@@ -390,6 +392,11 @@ model Issue {
   center      Center   @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
   description String   @map("descripcio") @db.Text
   createdAt   DateTime @default(now()) @map("data_creacio")
+
+  assignmentId Int?        @map("id_assignacio")
+  assignment   Assignment? @relation(fields: [assignmentId], references: [assignmentId], onDelete: SetNull)
+  sessionId    Int?        @map("id_sessio")
+  session      Session?    @relation(fields: [sessionId], references: [sessionId], onDelete: SetNull)
 
   @@map("incidencies")
 }

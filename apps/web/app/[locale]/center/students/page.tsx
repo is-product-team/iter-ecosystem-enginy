@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -12,9 +13,11 @@ import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
 import Pagination from '@/components/Pagination';
-import { useTranslations } from 'next-intl';
 
 export default function StudentsCRUD() {
+  const t = useTranslations('Center.Students');
+  const tc = useTranslations('Common');
+  
   const { user, loading: authLoading } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,12 +25,10 @@ export default function StudentsCRUD() {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [formData, setFormData] = useState({ fullName: '', lastName: '', idalu: '', grade: '' });
   const [searchQuery, setSearchQuery] = useState("");
-  const t = useTranslations('Center.Students');
-  const tc = useTranslations('Common');
   const [selectedCourse, setSelectedCourse] = useState(t("all_courses"));
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -39,18 +40,20 @@ export default function StudentsCRUD() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
       return;
     }
     if (user) loadStudents();
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   const loadStudents = async () => {
     try {
@@ -64,13 +67,13 @@ export default function StudentsCRUD() {
   };
 
   const filteredStudents = students.filter(a => {
-    const matchesSearch = !searchQuery || 
+    const matchesSearch = !searchQuery ||
       a.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.idalu.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesCourse = selectedCourse === t("all_courses") || a.grade === selectedCourse;
-    
+
     return matchesSearch && matchesCourse;
   });
 
@@ -131,7 +134,7 @@ export default function StudentsCRUD() {
   };
 
   const headerActions = (
-    <button 
+    <button
       onClick={() => { setEditingStudent(null); setFormData({ fullName: '', lastName: '', idalu: '', grade: '' }); setIsModalOpen(true); }}
       className="bg-consorci-darkBlue text-white px-6 py-3 font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
     >
@@ -141,8 +144,8 @@ export default function StudentsCRUD() {
   );
 
   return (
-    <DashboardLayout 
-      title={t('title')} 
+    <DashboardLayout
+      title={t('title')}
       subtitle={t('description')}
       actions={headerActions}
     >
@@ -151,7 +154,7 @@ export default function StudentsCRUD() {
         <div className="flex-1">
           <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_placeholder')}</label>
           <div className="relative">
-            <input 
+            <input
               type="text"
               placeholder={tc('search_placeholder')}
               value={searchQuery}
@@ -166,7 +169,7 @@ export default function StudentsCRUD() {
 
         <div className="lg:w-64">
           <label className="block text-[12px] font-medium text-text-primary mb-3">{t('filter_course')}</label>
-          <select 
+          <select
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
             className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary appearance-none"
@@ -179,7 +182,7 @@ export default function StudentsCRUD() {
         </div>
 
         <div className="flex items-end">
-          <button 
+          <button
             onClick={() => { setSearchQuery(""); setSelectedCourse(t("all_courses")); }}
             className="w-full lg:w-auto px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-all border border-transparent h-[46px]"
           >
@@ -207,11 +210,11 @@ export default function StudentsCRUD() {
                   <tr key={a.studentId} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
-                        <Avatar 
-                          url={a.photoUrl} 
-                          name={`${a.fullName} ${a.lastName}`} 
-                          id={a.studentId} 
-                          type="student" 
+                        <Avatar
+                          url={a.photoUrl}
+                          name={`${a.fullName} ${a.lastName}`}
+                          id={a.studentId}
+                          type="student"
                           size="md"
                         />
                         <div>
@@ -272,7 +275,7 @@ export default function StudentsCRUD() {
                   {editingStudent ? t('edit_subtitle') : t('add_subtitle')}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-text-muted hover:text-text-primary transition-colors mt-1"
               >
@@ -283,18 +286,18 @@ export default function StudentsCRUD() {
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               {editingStudent && (
                 <div className="p-10 border-b border-border-subtle flex flex-col items-center gap-6">
-                  <Avatar 
-                    url={editingStudent.photoUrl} 
-                    name={`${editingStudent.fullName} ${editingStudent.lastName}`} 
-                    id={editingStudent.studentId} 
-                    type="student" 
+                  <Avatar
+                    url={editingStudent.photoUrl}
+                    name={`${editingStudent.fullName} ${editingStudent.lastName}`}
+                    id={editingStudent.studentId}
+                    type="student"
                     size="xl"
                   />
                   <label className="cursor-pointer bg-background-subtle border border-border-subtle px-6 py-2 text-[11px] font-medium text-text-primary hover:bg-background-surface transition-all active:scale-95">
                     {t('change_photo')}
-                    <input 
-                      type="file" 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      className="hidden"
                       accept="image/*"
                       onChange={async (e) => {
                         if (e.target.files?.[0]) {
@@ -322,33 +325,33 @@ export default function StudentsCRUD() {
               <form onSubmit={handleSubmit} id="student-form" className="p-10 space-y-8">
                 <div className="space-y-2">
                   <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_name')}</label>
-                  <input 
-                    type="text" value={formData.fullName} 
-                    onChange={e => setFormData({...formData, fullName: e.target.value})}
+                  <input
+                    type="text" value={formData.fullName}
+                    onChange={e => setFormData({ ...formData, fullName: e.target.value })}
                     className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_surnames')}</label>
-                  <input 
-                    type="text" value={formData.lastName} 
-                    onChange={e => setFormData({...formData, lastName: e.target.value})}
+                  <input
+                    type="text" value={formData.lastName}
+                    onChange={e => setFormData({ ...formData, lastName: e.target.value })}
                     className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_idalu')}</label>
-                  <input 
-                    type="text" value={formData.idalu} 
-                    onChange={e => setFormData({...formData, idalu: e.target.value})}
+                  <input
+                    type="text" value={formData.idalu}
+                    onChange={e => setFormData({ ...formData, idalu: e.target.value })}
                     className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all font-mono appearance-none" required
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_course')}</label>
-                  <input 
-                    type="text" value={formData.grade} 
-                    onChange={e => setFormData({...formData, grade: e.target.value})}
+                  <input
+                    type="text" value={formData.grade}
+                    onChange={e => setFormData({ ...formData, grade: e.target.value })}
                     className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
                   />
                 </div>
@@ -362,7 +365,7 @@ export default function StudentsCRUD() {
           </div>
         </div>
       )}
-      <ConfirmDialog 
+      <ConfirmDialog
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}

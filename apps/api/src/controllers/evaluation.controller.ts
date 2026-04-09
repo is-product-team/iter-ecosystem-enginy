@@ -21,7 +21,7 @@ export const getEnrollmentEvaluation = async (req: Request, res: Response) => {
 
 export const upsertEvaluation = async (req: Request, res: Response) => {
     try {
-        let { enrollmentId, studentId, assignmentId, observations, competencies, attendancePercentage, lateCount } = req.body;
+        let { enrollmentId, studentId, assignmentId, observations, competencies } = req.body;
 
         if (!enrollmentId) {
             if (studentId && assignmentId) {
@@ -50,9 +50,7 @@ export const upsertEvaluation = async (req: Request, res: Response) => {
             enrollmentId: parseInt(enrollmentId),
             assignmentId: parseInt(assignmentId),
             observations: observations || '',
-            competences: competencies || [], // Mapped to competences
-            attendancePercentage: attendancePercentage || 100, 
-            lateCount: lateCount || 0
+            competences: competencies || [], 
         };
 
         const result = await evaluationService.upsertEvaluation(dataToUpsert as any);
@@ -93,7 +91,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
     }
 
     try {
-        const nlpResult = nlpService.processText(text);
+        const nlpResult = await nlpService.processText(text);
 
         const enrollmentRecord = await prisma.enrollment.findFirst({
             where: {
@@ -136,36 +134,47 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
             }
         }
 
-        let competenceEval = null;
-        if (nlpResult.competenceUpdate && enrollmentRecord) {
-            const competence = await prisma.competence.findFirst({
-                where: { type: 'Transversal' }
+        const competenceEvals = [];
+
+        if (nlpResult.competenceUpdates && nlpResult.competenceUpdates.length > 0 && enrollmentRecord) {
+            let teacherEval = await prisma.evaluation.findUnique({
+                where: { enrollmentId: enrollmentRecord.enrollmentId }
             });
 
-            if (competence) {
-                let teacherEval = await prisma.evaluation.findUnique({
-                    where: { enrollmentId: enrollmentRecord.enrollmentId }
-                });
-
-                if (!teacherEval) {
-                    teacherEval = await prisma.evaluation.create({
-                        data: {
-                            enrollmentId: enrollmentRecord.enrollmentId,
-                            assignmentId: enrollmentRecord.assignmentId,
-                            attendancePercentage: 100,
-                            lateCount: 0,
-                            observations: 'Initialized by Voice Assistant'
-                        }
-                    });
-                }
-
-                competenceEval = await prisma.competenceEvaluation.create({
+            if (!teacherEval) {
+                teacherEval = await prisma.evaluation.create({
                     data: {
-                        evaluationId: teacherEval.evaluationId,
-                        competenceId: competence.competenceId,
-                        score: nlpResult.competenceUpdate.score
+                        enrollmentId: enrollmentRecord.enrollmentId,
+                        assignmentId: enrollmentRecord.assignmentId,
+                        attendancePercentage: 100,
+                        lateCount: 0,
+                        observations: 'Initialized by Voice Assistant'
                     }
                 });
+            }
+
+            for (const update of nlpResult.competenceUpdates) {
+                const competence = await prisma.competence.findFirst({
+                    where: { type: update.competenceName }
+                });
+
+                if (competence) {
+                    const compEval = await prisma.competenceEvaluation.upsert({
+                        where: {
+                            evaluationId_competenceId: {
+                                evaluationId: teacherEval.evaluationId,
+                                competenceId: competence.competenceId
+                            }
+                        },
+                        update: { score: update.score },
+                        create: {
+                            evaluationId: teacherEval.evaluationId,
+                            competenceId: competence.competenceId,
+                            score: update.score
+                        }
+                    });
+                    competenceEvals.push(compEval);
+                }
             }
         }
 
@@ -174,7 +183,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
             analysis: nlpResult,
             updates: {
                 attendance: attendanceRecord,
-                competenceEvaluation: competenceEval
+                competenceEvaluations: competenceEvals
             }
         });
 

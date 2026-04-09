@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { THEME, REQUEST_STATUSES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -13,6 +14,8 @@ import WorkshopIcon from '@/components/WorkshopIcon';
 import Pagination from "@/components/Pagination";
 
 export default function RequestsPage() {
+  const t = useTranslations('CenterRequestsPage');
+  const tCommon = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -21,7 +24,7 @@ export default function RequestsPage() {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<string | null>(null);
   const [editingRequestId, setEditingRequestId] = useState<number | null>(null);
 
-  const [approxStudents, setApproxStudents] = useState<number | ''>('');
+  const [studentsAprox, setStudentsAprox] = useState<number | ''>('');
   const [teacher1Id, setTeacher1Id] = useState<string>('');
   const [teacher2Id, setTeacher2Id] = useState<string>('');
   const [comments, setComments] = useState('');
@@ -35,19 +38,10 @@ export default function RequestsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
-  useEffect(() => {
-    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
-      router.push('/login');
-      return;
-    }
-
-    if (user) {
-      loadInitialData();
-    }
-  }, [user, authLoading, router]);
-
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     try {
       const [fetchedWorkshops, fetchedTeachers, fetchedRequests] = await Promise.all([
         workshopService.getAll(),
@@ -59,11 +53,22 @@ export default function RequestsPage() {
       setRequests(fetchedRequests);
     } catch (err) {
       console.error(err);
-      setError('Could not load necessary data.');
+      setError(tCommon('loading_error'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [tCommon]);
+
+  useEffect(() => {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
+      router.push(`/${locale}/login`);
+      return;
+    }
+
+    if (user) {
+      loadInitialData();
+    }
+  }, [user, authLoading, router, locale, loadInitialData]);
 
   const filteredWorkshops = useMemo(() => {
     let result = workshops;
@@ -93,7 +98,7 @@ export default function RequestsPage() {
   useEffect(() => {
     if (selectedWorkshopId && !editingRequestId) {
       // Default reset if just selecting a new workshop
-      setApproxStudents('');
+      setStudentsAprox('');
       setTeacher1Id('');
       setTeacher2Id('');
       setComments('');
@@ -109,7 +114,7 @@ export default function RequestsPage() {
       setSelectedWorkshopId(workshop._id);
     }
 
-    setApproxStudents(request.studentsAprox || '');
+    setStudentsAprox(request.studentsAprox || '');
     setComments(request.comments || '');
     setTeacher1Id(request.teacher1Id ? request.teacher1Id.toString() : '');
     setTeacher2Id(request.teacher2Id ? request.teacher2Id.toString() : '');
@@ -119,7 +124,7 @@ export default function RequestsPage() {
   const cancelEdit = () => {
     setEditingRequestId(null);
     setSelectedWorkshopId(null);
-    setApproxStudents('');
+    setStudentsAprox('');
     setComments('');
     setTeacher1Id('');
     setTeacher2Id('');
@@ -133,20 +138,20 @@ export default function RequestsPage() {
     setSubmitting(true);
     setError(null);
 
-    if (selectedWorkshop.modality === 'C' && approxStudents !== '' && Number(approxStudents) > 4) {
-      setError('In Modality C, the maximum number of students is 4.');
+    if (selectedWorkshop.modality === 'C' && studentsAprox !== '' && Number(studentsAprox) > 4) {
+      setError(t('max_students_alert'));
       setSubmitting(false);
       return;
     }
 
     if (!teacher1Id || !teacher2Id) {
-      setError('You must select two referring teachers.');
+      setError(t('referents_required'));
       setSubmitting(false);
       return;
     }
 
     if (teacher1Id === teacher2Id) {
-      setError('The two referring teachers must be different.');
+      setError(t('referents_different'));
       setSubmitting(false);
       return;
     }
@@ -155,7 +160,7 @@ export default function RequestsPage() {
       if (editingRequestId) {
         // Update
         await requestService.update(editingRequestId, {
-          studentsAprox: Number(approxStudents),
+          studentsAprox: Number(studentsAprox),
           comments,
           teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
           teacher2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
@@ -164,7 +169,7 @@ export default function RequestsPage() {
         // Create
         await requestService.create({
           workshopId: parseInt(selectedWorkshopId),
-          studentsAprox: Number(approxStudents),
+          studentsAprox: Number(studentsAprox),
           comments,
           teacher1Id: teacher1Id ? parseInt(teacher1Id) : undefined,
           teacher2Id: teacher2Id ? parseInt(teacher2Id) : undefined,
@@ -178,20 +183,20 @@ export default function RequestsPage() {
       router.refresh();
 
     } catch (err: unknown) {
-      setError((err as Error).message || 'Error sending request.');
+      setError((err as Error).message || t('send_error'));
     } finally {
       setSubmitting(false);
     }
   };
 
   if (authLoading || !user) {
-    return <Loading fullScreen message="Verifying coordinator permissions..." />;
+    return <Loading fullScreen message={tCommon('status')} />;
   }
 
   return (
     <DashboardLayout
-      title="Request Workshops"
-      subtitle="Manage workshop requests for your educational center"
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Section: Catalog */}
@@ -200,7 +205,7 @@ export default function RequestsPage() {
           <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row gap-6 items-center">
             <div className="relative flex-1 group w-full">
               <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -209,7 +214,7 @@ export default function RequestsPage() {
               </svg>
               <input
                 type="text"
-                placeholder="Search workshop or sector..."
+                placeholder={t('search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:outline-none focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all"
@@ -233,8 +238,8 @@ export default function RequestsPage() {
               <tbody className="divide-y divide-border-subtle">
                 {loading ? (
                   <tr>
-                    <td colSpan={3} className="px-6 py-12">
-                      <Loading message="Loading catalog..." />
+                    <td colSpan={4} className="px-6 py-12">
+                      <Loading message={tCommon('loading')} />
                     </td>
                   </tr>
                 ) : filteredWorkshops.length > 0 ? (
@@ -329,7 +334,7 @@ export default function RequestsPage() {
             onPageChange={setCurrentPage}
             totalItems={filteredWorkshops.length}
             currentItemsCount={paginatedWorkshops.length}
-            itemName="workshops"
+            itemName={t('table_workshop')}
           />
         </div>
 
@@ -341,14 +346,14 @@ export default function RequestsPage() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                {editingRequestId ? 'Edit Request' : 'New Request'}
+                {editingRequestId ? t('edit_request') : t('new_request')}
               </h3>
               {editingRequestId && (
                 <button
                   onClick={cancelEdit}
                   className="text-[11px] text-text-muted hover:text-red-500 font-medium"
                 >
-                  Cancel
+                  {t('cancel_btn')}
                 </button>
               )}
             </div>
@@ -358,7 +363,7 @@ export default function RequestsPage() {
                 <div className="mb-8 p-4 bg-red-500/5 border-l-2 border-red-500 text-red-600">
                   <p className="text-[12px] font-medium mb-1 flex items-center gap-2">
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
-                    Error in the request
+                    {t('error_title')}
                   </p>
                   <p className="text-[13px] opacity-90">{error}</p>
                 </div>
@@ -429,8 +434,8 @@ export default function RequestsPage() {
                       <label className="block text-[12px] font-medium text-text-primary px-1">Approx. Students</label>
                       <input
                         type="number"
-                        value={approxStudents}
-                        onChange={(e) => setApproxStudents(e.target.value === '' ? '' : parseInt(e.target.value))}
+                        value={studentsAprox}
+                        onChange={(e) => setStudentsAprox(e.target.value === '' ? '' : parseInt(e.target.value))}
                         placeholder="Ex: 4"
                         className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                         min="1"
@@ -465,7 +470,7 @@ export default function RequestsPage() {
                   >
                     {submitting ? (
                       <>
-                        <div className="animate-spin h-3.5 w-3.5 border-2 border-white/20 border-t-white"></div>
+                        <Loading size="mini" white />
                         <span>Processing request...</span>
                       </>
                     ) : (
@@ -473,7 +478,7 @@ export default function RequestsPage() {
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={editingRequestId ? "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" : "M12 19l9 2-9-18-9 18 9-2zm0 0v-8"} />
                         </svg>
-                        <span>{editingRequestId ? 'Update Request' : 'Send Request'}</span>
+                        <span>{editingRequestId ? t('update_btn') : t('send_btn')}</span>
                       </>
                     )}
                   </button>

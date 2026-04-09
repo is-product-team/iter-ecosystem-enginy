@@ -1,23 +1,24 @@
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
+import DashboardLayout from '@/components/DashboardLayout';
 import Loading from '@/components/Loading';
-import { useTranslations } from 'next-intl';
 
 export default function AdminDashboardPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const t = useTranslations('Admin');
   const tc = useTranslations('Common');
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const locale = useLocale();
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   if (authLoading || !user) {
     return (
@@ -105,7 +106,7 @@ export default function AdminDashboardPage() {
       title={t('dashboard.title')}
       subtitle={t('dashboard.welcome')}
     >
-      <div className="flex justify-center w-full pb-12">
+      <div className="w-full pb-20 space-y-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
           {sections.map((section) => (
             <div
@@ -113,10 +114,8 @@ export default function AdminDashboardPage() {
               onClick={() => router.push(section.path)}
               className="group bg-background-surface p-10 border border-border-subtle cursor-pointer transition-all duration-300 hover:border-consorci-darkBlue active:scale-[0.98] relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-1 bg-consorci-darkBlue/10 group-hover:bg-consorci-darkBlue transition-colors h-full"></div>
-
-              <div className={`w-14 h-14 bg-background-subtle flex items-center justify-center mb-8 border border-border-subtle group-hover:border-consorci-darkBlue transition-all duration-300`}>
-                <div className={`text-consorci-darkBlue`}>
+              <div className={`w-14 h-14 bg-background-subtle flex items-center justify-center mb-8 border border-border-subtle group-hover:border-consorci-darkBlue dark:group-hover:border-consorci-darkBlue transition-all duration-300 group-hover:bg-consorci-darkBlue dark:group-hover:bg-consorci-darkBlue`}>
+                <div className={`text-consorci-darkBlue dark:text-text-primary group-hover:text-white dark:group-hover:text-white transition-colors`}>
                   {section.icon}
                 </div>
               </div>

@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
@@ -10,38 +7,21 @@ import logger from './lib/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import prisma from './lib/prisma.js';
 import { ReminderService } from './services/reminder.service.js';
-
 import { env } from './config/env.js';
 
 const app = express();
 app.set('trust proxy', 1);
 
-const defaultAllowedOrigins = [
-  'https://projects.kore29.com',
-  'https://projects.kore29.com/iter',
-  'https://iter.kore29.com',
-  'http://localhost:8002',
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:8000',
-  'http://localhost:8081',
-  'http://127.0.0.1:8002',
-  'http://127.0.0.1:8000',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:3001',
-  'http://127.0.0.1:8081',
-];
-
-const allowedOrigins = env.CORS_ORIGIN.length > 0 
-  ? env.CORS_ORIGIN 
-  : defaultAllowedOrigins;
+const allowedOrigins = env.CORS_ORIGIN;
 
 app.use(cors({
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      logger.error(`[CORS] Rejected origin: ${origin}. Allowed: ${allowedOrigins.join(', ')}`);
       callback(new Error('CORS Policy: Origin not allowed'));
+      callback(new Error('Política CORS: Origen no permitido'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -63,15 +43,15 @@ app.use(errorHandler);
 const PORT = env.PORT;
 
 const server = app.listen(PORT, async () => {
-  logger.info(`🚀 Server ready on port: ${PORT}`);
-  logger.info(`🌍 Environment: ${env.NODE_ENV}`);
+  logger.info(`🚀 Servidor listo en el puerto: ${PORT}`);
+  logger.info(`🌍 Entorno: ${env.NODE_ENV}`);
   
   // Conexión PostgreSQL (Opcional en el arranque)
   try {
     await prisma.$queryRaw`SELECT 1`;
-    logger.info(`🗄️  DATABASE STATUS: Connected to PostgreSQL`);
+    logger.info(`🗄️  ESTADO BD: Conectado a PostgreSQL`);
   } catch (_e) {
-    logger.error(`🗄️  DATABASE STATUS: PostgreSQL Connection failed`);
+    logger.error(`🗄️  ESTADO BD: Conexión a PostgreSQL fallida`);
   }
 
   // Start Background Services
@@ -79,11 +59,11 @@ const server = app.listen(PORT, async () => {
 });
 
 process.on('SIGINT', async () => {
-  logger.info('Shutting down server...');
+  logger.info('Apagando servidor...');
   ReminderService.stop();
   await prisma.$disconnect();
   server.close(() => {
-    logger.info('Server closed');
+    logger.info('Servidor cerrado');
     process.exit(0);
   });
 });

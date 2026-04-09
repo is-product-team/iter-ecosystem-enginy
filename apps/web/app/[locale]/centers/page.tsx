@@ -3,7 +3,8 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { THEME, ROLES } from "@iter/shared";
 import DashboardLayout from "../../../components/DashboardLayout";
@@ -15,14 +16,19 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
 
 export default function CentersScreen() {
+  const t = useTranslations('CentersPage');
+  const tCommon = useTranslations('Common');
+
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  
+  const params = useParams();
+  const locale = params?.locale || 'ca';
+
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   const [editingCenter, setEditingCenter] = useState<Center | null>(null);
   const [centers, setCenters] = useState<Center[]>([]);
@@ -32,7 +38,7 @@ export default function CentersScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -44,7 +50,7 @@ export default function CentersScreen() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const fetchCenters = useCallback(async () => {
@@ -54,12 +60,12 @@ export default function CentersScreen() {
       setCenters(list);
       setError(null);
     } catch (err) {
-      setError("Could not load centers.");
+      setError(tCommon('loading_error'));
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [tCommon]);
 
   useEffect(() => {
     if (user && user.role.name === ROLES.ADMIN) {
@@ -69,7 +75,7 @@ export default function CentersScreen() {
 
   const filteredCenters = useMemo(() => {
     return centers.filter((center) => {
-      const matchesSearch = !searchQuery || 
+      const matchesSearch = !searchQuery ||
         center.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         center.centerCode.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -92,7 +98,7 @@ export default function CentersScreen() {
       return [saved, ...prev];
     });
     setEditingCenter(null);
-    toast.success("Center saved successfully.");
+    toast.success(tCommon('save_success'));
   };
 
   const handleEdit = (center: Center) => {
@@ -103,16 +109,16 @@ export default function CentersScreen() {
   const handleDelete = (id: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Center',
-      message: 'Are you sure you want to delete this center? All associated data will be deleted.',
+      title: tCommon('delete_confirm_title'),
+      message: tCommon('delete_confirm_msg'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await centerService.delete(id);
           setCenters((prev) => prev.filter((c) => c.centerId !== id));
-          toast.success("Center deleted successfully.");
+          toast.success(tCommon('delete_success'));
         } catch (err) {
-          toast.error("Error deleting center.");
+          toast.error(tCommon('delete_error'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
@@ -135,14 +141,14 @@ export default function CentersScreen() {
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
       </svg>
-      New Center
+      {t('new')}
     </button>
   );
 
   return (
-    <DashboardLayout 
-      title="Centers Management" 
-      subtitle="Administration of educational centers participating in Iter."
+    <DashboardLayout
+      title={t('title')}
+      subtitle={t('subtitle')}
       actions={headerActions}
     >
       {/* Panell de Filtres */}
@@ -151,7 +157,7 @@ export default function CentersScreen() {
         <div className="flex-1">
           <label className="block text-[12px] font-medium text-text-primary mb-3">Search by name or code</label>
           <div className="relative">
-            <input 
+            <input
               type="text"
               placeholder="Ej: Institut Pedralbes, 08012345..."
               value={searchQuery}
@@ -169,7 +175,7 @@ export default function CentersScreen() {
 
         {/* Acció: Netejar */}
         <div className="flex items-end">
-          <button 
+          <button
             onClick={() => {
               setSearchQuery("");
               setCurrentPage(1);
@@ -198,7 +204,7 @@ export default function CentersScreen() {
 
       {/* Centers Table */}
       {loading ? (
-        <Loading message="Loading centers..." />
+        <Loading message={t('loading')} />
       ) : filteredCenters.length > 0 ? (
         <div className="bg-background-surface border border-border-subtle overflow-hidden">
           <div className="overflow-x-auto">
@@ -239,13 +245,13 @@ export default function CentersScreen() {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex justify-end items-center gap-2">
-                        <button 
+                        <button
                           onClick={() => handleEdit(center)}
                           className="px-4 py-2 text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors"
                         >
-                          Edit
+                          {tCommon('edit')}
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(center.centerId)}
                           className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
                         >
@@ -292,7 +298,7 @@ export default function CentersScreen() {
         onCenterSaved={handleCenterSaved}
         initialData={editingCenter}
       />
-      <ConfirmDialog 
+      <ConfirmDialog
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}

@@ -11,7 +11,8 @@ export type * from '@prisma/client';
 export const ROLES = {
   ADMIN: 'ADMIN',
   COORDINATOR: 'COORDINATOR',
-  TEACHER: 'TEACHER'
+  TEACHER: 'TEACHER',
+  STUDENT: 'STUDENT'
 } as const;
 
 export type RoleTag = typeof ROLES[keyof typeof ROLES];
@@ -57,6 +58,15 @@ export const PHASES = {
   CLOSURE: 'Closure'
 } as const;
 
+// Standardized checklist steps for Phase 2
+export const CHECKLIST_STEPS = {
+  DESIGNATE_TEACHERS: 'DESIGNATE_TEACHERS',
+  INPUT_STUDENTS: 'INPUT_STUDENTS',
+  NOMINAL_REGISTRATION: 'NOMINAL_REGISTRATION',
+  CONFIRM_REGISTRATION: 'CONFIRM_REGISTRATION',
+  PEDAGOGICAL_AGREEMENT: 'PEDAGOGICAL_AGREEMENT'
+} as const;
+
 export const PHASES_TIMELINE = [
   { id: 'PRESENTATION', name: PHASES.APPLICATION, date: CALENDAR.PRESENTATION_MEETING },
   { id: 'DEMAND', name: 'Demand Submission', date: CALENDAR.DEMAND_LIMIT },
@@ -94,7 +104,7 @@ export const StudentSchema = z.object({
 export const RequestSchema = z.object({
   centerId: z.number().int(),
   workshopId: z.number().int(),
-  approxStudents: z.number().int().min(1).max(100),
+  studentsAprox: z.number().int().min(1).max(100),
   comments: z.string().optional()
 });
 

@@ -1,3 +1,4 @@
+
 export interface ValidationResult {
     valid: boolean;
     errors: string[];
@@ -9,48 +10,79 @@ export interface ValidationResult {
 }
 
 export class VisionService {
+    private ollamaHost: string;
+    private model: string;
+
+    constructor() {
+        this.ollamaHost = process.env.OLLAMA_HOST || 'http://ollama:11434';
+        this.model = process.env.AI_MODEL_VISION || 'moondream';
+    }
 
     /**
-     * Simulates AI analysis of a document buffer.
-     * In a real systems, this would send the buffer to AWS Textract or extensive OCR.
+     * Analyzes a document using Local Vision AI (Moondream2).
+     * Specialized for 4GB RAM stack.
      */
     async validateDocument(file: Express.Multer.File): Promise<ValidationResult> {
         const errors: string[] = [];
         const filename = file.originalname.toLowerCase();
 
-        // Mock Logic for Demo:
-        // 1. Simulate "Processing time"
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // 2. Check File Type (Mocking "Visual Structure Analysis")
-        if (!filename.endsWith('.pdf')) {
-            errors.push("Invalid file format. AI expects PDF structure.");
+        // 1. Basic File Validation
+        if (!filename.endsWith('.pdf') && !filename.endsWith('.jpg') && !filename.endsWith('.png')) {
+            errors.push("Formato de archivo no soportado. Por favor, sube PDF o imágenes.");
         }
 
-        // 3. Check for "Signature" (Mocking "Object Detection")
-        // Rule: We assume files named "signed" or "firmado" have signatures. 
-        // Or files larger than 10KB (implies content).
-        // Files named "blank" or "error" will fail.
-
-        let hasSignature = true;
-        if (filename.includes('unsigned') || filename.includes('blank') || filename.includes('error')) {
-            hasSignature = false;
-            errors.push("Signature not detected in the 'signature_box' region.");
+        if (file.size < 1000) {
+            errors.push("El documento parece estar vacío (menos de 1KB).");
         }
 
-        if (file.size < 1000) { // < 1KB
-            hasSignature = false;
-            errors.push("Document appears to be empty.");
+        if (errors.length > 0) {
+            return { valid: false, errors, metadata: { detectedType: 'unknown', hasSignature: false, confidence: 0 } };
         }
 
-        return {
-            valid: errors.length === 0,
-            errors,
-            metadata: {
-                detectedType: 'Acord_Pedagogic_v2', // Mocked detection
-                hasSignature,
-                confidence: hasSignature ? 0.98 : 0.12
+        try {
+            // Convert buffer to Base64 for Ollama
+            const base64Image = file.buffer.toString('base64');
+
+            const response = await fetch(`${this.ollamaHost}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: this.model,
+                    prompt: "Verifica si este documento tiene una firma manuscrita. ¿Hay una firma en el recuadro de firma? Responde con 'YES' o 'NO' y proporciona una puntuación de confianza de 0 a 1.",
+                    images: [base64Image],
+                    stream: false
+                })
+            });
+
+            if (!response.ok) throw new Error('Ollama vision connection failed');
+
+            const data = await response.json() as any;
+            const textResponse = data.response.toUpperCase();
+
+            const hasSignature = textResponse.includes('YES');
+            
+            if (!hasSignature) {
+                errors.push("Firma manuscrita no detectada en la región esperada.");
             }
-        };
+
+            return {
+                valid: errors.length === 0,
+                errors,
+                metadata: {
+                    detectedType: 'Pedagogical_Agreement_v2',
+                    hasSignature,
+                    confidence: hasSignature ? 0.95 : 0.05
+                }
+            };
+
+        } catch (error) {
+            console.error('❌ VisionService Local AI Error:', error);
+            // Fallback for safety in private environment
+            return {
+                valid: false,
+                errors: ["El motor de visión de IA local no está disponible actualmente."],
+                metadata: { detectedType: 'unknown', hasSignature: false, confidence: 0 }
+            };
+        }
     }
 }

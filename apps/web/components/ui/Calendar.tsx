@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { enUS } from 'date-fns/locale';
+import Loading from '../Loading';
 
 export interface CalendarEvent {
   id: string;
@@ -72,7 +73,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
       case 'deadline': return 'calendar-event-card event-deadline';
       case 'assignment': return 'calendar-event-card event-assignment';
       case 'session': return 'calendar-event-card event-session';
-      default: return 'calendar-event-card bg-gray-100 border-gray-400 text-gray-700';
+      default: return 'calendar-event-card bg-background-subtle border-border-subtle text-text-secondary';
     }
   };
 
@@ -106,7 +107,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
               {monthName} <span className="text-text-muted font-normal">{year}</span>
             </h2>
             {isLoading && (
-              <div className="animate-spin rounded-full h-5 w-5 border-2 border-consorci-lightBlue border-t-transparent"></div>
+              <Loading size="sm" />
             )}
           </div>
           <div className="flex bg-background-subtle p-1.5 gap-1.5 border border-border-subtle">
@@ -203,15 +204,15 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
                         <button
                           key={event.id}
                           onClick={(e) => { e.stopPropagation(); onEventClick?.(event); }}
-                          className={`absolute h-full pointer-events-auto flex items-center transition-transform hover:scale-[1.01] active:scale-[0.99] ${event.colorClass || getEventStyles(event.type)}`}
+                          className={`absolute h-full pointer-events-auto flex items-center transition-all hover:scale-[1.02] hover:shadow-md active:scale-[0.98] rounded-lg shadow-sm px-2 ${event.colorClass || getEventStyles(event.type)}`}
                           style={{
                             left: `${(event.start * 100) / 7}%`,
-                            width: `calc(${(event.span * 100) / 7}% - 4px)`,
-                            marginLeft: '2px',
-                            marginRight: '2px',
+                            width: `calc(${(event.span * 100) / 7}% - 6px)`,
+                            marginLeft: '3px',
+                            marginRight: '3px',
                           }}
                         >
-                          <span className="calendar-event-title">
+                          <span className="text-[10px] font-bold truncate tracking-tight">
                             {event.title}
                           </span>
                         </button>
@@ -225,54 +226,78 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
         </div>
       </div>
 
-      {/* Agenda Side Panel */}
-      <div className="w-full xl:w-[400px] bg-background-surface flex flex-col">
-        <div className="p-8 border-b border-border-subtle">
-          <h3 className="text-[11px] font-medium text-text-muted mb-4">
-            DAY DETAIL
-          </h3>
-          <p className="text-xl font-medium text-text-primary">
-            {format(selectedDate, "eeee, MMMM do", { locale: enUS })}
-          </p>
+      {/* Agenda Side Panel - Apple Style */}
+      <div className="w-full xl:w-[400px] bg-background-surface/80 backdrop-blur-md flex flex-col border-l border-border-subtle">
+        <div className="p-10 border-b border-border-subtle">
+          <div className="flex items-baseline gap-2 mb-1">
+            <span className="text-5xl font-light text-text-primary tracking-tighter">
+              {format(selectedDate, "d")}
+            </span>
+            <div className="flex flex-col">
+              <span className="text-lg font-semibold text-text-primary tracking-tight leading-none mb-1">
+                {format(selectedDate, "MMMM", { locale: enUS })}
+              </span>
+              <span className="text-sm font-medium text-text-muted tracking-wide leading-none uppercase">
+                {format(selectedDate, "eeee", { locale: enUS })}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-auto p-8 flex flex-col gap-4">
+        <div className="flex-1 overflow-auto p-6 flex flex-col gap-2">
           {selectedDayEvents.length === 0 ? (
-            <div className="py-20 text-center flex flex-col items-center opacity-30">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p className="text-xs font-medium text-text-muted italic">No activity</p>
+            <div className="py-24 text-center flex flex-col items-center animate-in fade-in zoom-in duration-500">
+              <div className="w-16 h-16 bg-background-subtle rounded-full flex items-center justify-center mb-6 opacity-40">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-[13px] font-medium text-text-muted tracking-tight opacity-50">No hi ha activitat planificada</p>
             </div>
           ) : (
-            selectedDayEvents.map(event => (
-              <div
-                key={event.id}
-                onClick={() => onEventClick?.(event)}
-                className="group p-5 border border-border-subtle hover:border-consorci-darkBlue transition-all cursor-pointer bg-background-subtle/30"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-1.5 h-6 shrink-0" style={{ backgroundColor: getEventColorRaw(event.type) }}></div>
-                  <span className="text-[10px] font-medium text-text-muted">{event.type}</span>
+            <div className="space-y-1">
+              {selectedDayEvents.map((event, idx) => (
+                <div key={event.id}>
+                  <div
+                    onClick={() => onEventClick?.(event)}
+                    className="group px-4 py-5 transition-all duration-300 cursor-pointer hover:bg-background-subtle rounded-2xl active:scale-[0.98]"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-bold text-text-muted tracking-[0.15em] uppercase opacity-70">
+                            {event.type}
+                          </span>
+                          {event.metadata?.hour && (
+                            <span className="text-[11px] font-semibold text-consorci-darkBlue/80 flex items-center gap-1.5">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {event.metadata.hour}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="text-[15px] font-semibold text-text-primary group-hover:text-consorci-darkBlue transition-colors leading-snug">
+                          {event.title}
+                        </h4>
+                        {event.metadata?.center && (
+                          <div className="mt-2 text-[12px] font-medium text-text-muted flex items-center gap-1.5 opacity-80">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {event.metadata.center}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {idx < selectedDayEvents.length - 1 && (
+                    <div className="mx-4 h-px bg-border-subtle"></div>
+                  )}
                 </div>
-                <h4 className="text-base font-medium text-text-primary group-hover:text-consorci-darkBlue transition-colors leading-tight">
-                  {event.title}
-                </h4>
-                {event.metadata?.hour && (
-                  <div className="mt-4 flex items-center gap-2 text-[11px] font-medium text-consorci-darkBlue">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {event.metadata.hour}
-                  </div>
-                )}
-                {event.metadata?.center && (
-                  <div className="mt-1 text-[11px] font-normal text-text-muted truncate">
-                    📍 {event.metadata.center}
-                  </div>
-                )}
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>

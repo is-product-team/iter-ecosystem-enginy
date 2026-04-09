@@ -1,6 +1,8 @@
-import { REQUEST_STATUSES } from '@iter/shared';
-import { RequestStatus, Modality, AssignmentStatus } from '@prisma/client';
+import { RequestStatus, AssignmentStatus } from '@prisma/client';
 import prisma from '../lib/prisma.js';
+import { isPhaseActive } from '../lib/phaseUtils.js';
+import { PHASES, REQUEST_STATUSES } from '@iter/shared';
+import { SessionService } from './session.service.js';
 
 interface PendingCenter {
     centerId: number;
@@ -24,7 +26,6 @@ export class AutoAssignmentService {
         const requests = await prisma.request.findMany({
             where: {
                 status: { in: [REQUEST_STATUSES.APPROVED, REQUEST_STATUSES.PENDING] as RequestStatus[] },
-                modality: Modality.C,
                 assignment: null
             },
             include: {
@@ -37,11 +38,12 @@ export class AutoAssignmentService {
         });
 
         if (requests.length === 0) {
-            console.log('ℹ️ AutoAssignmentService: No approved requests of Modality C found that are not yet assigned.');
-            return { message: 'No requests found to process.' };
+            console.log('ℹ️ AutoAssignmentService: No se han encontrado solicitudes aprobadas de Modalidad C que no estén asignadas todavía.');
+            return { message: 'No se encontraron solicitudes para procesar.' };
         }
 
-        console.log(`🚀 AutoAssignmentService: Processing ${requests.length} requests of Modality C...`);
+        console.log(`🚀 AutoAssignmentService: Processing ${requests.length} requests...`);
+        console.log(`🚀 AutoAssignmentService: Procesando ${requests.length} solicitudes de Modalidad C...`);
 
         // 2. Group Requests by Workshop
         const workshopMap = new Map<number, typeof requests>();
@@ -68,10 +70,10 @@ export class AutoAssignmentService {
             const occupiedPlaces = existingAssignments.reduce((sum: number, a: any) => sum + (a.enrollments?.length || 0), 0);
             const remainingCapacity = workshop.maxPlaces - occupiedPlaces;
 
-            console.log(`📊 AutoAssignment: Workshop ID ${workshopId} (${workshop.title}): Capacity: ${workshop.maxPlaces}, Occupied: ${occupiedPlaces}, Remaining: ${remainingCapacity}`);
+            console.log(`📊 AutoAssignment: Taller ID ${workshopId} (${workshop.title}): Capacidad: ${workshop.maxPlaces}, Ocupado: ${occupiedPlaces}, Restante: ${remainingCapacity}`);
 
             if (remainingCapacity <= 0) {
-                console.warn(`🚫 AutoAssignment: Workshop ${workshopId} is full. Skipping.`);
+                console.warn(`🚫 AutoAssignment: El taller ${workshopId} está lleno. Omitiendo.`);
                 continue;
             }
 
@@ -148,43 +150,29 @@ export class AutoAssignmentService {
             data: { status: REQUEST_STATUSES.APPROVED as RequestStatus }
         });
 
+        // Get default startDate from Phase 3 if not provided
+        const { phase } = await isPhaseActive(PHASES.EXECUTION);
+        const startDate = phase?.startDate || new Date();
+
         const assignment = await prisma.assignment.create({
             data: {
                 requestId: center.requestId,
                 centerId: center.centerId,
                 workshopId: workshopId,
                 status: AssignmentStatus.PUBLISHED,
+                startDate: startDate,
                 checklist: {
                     create: [
                         { stepName: 'Assign Reference Teachers', isCompleted: false },
-                        { stepName: 'Upload Nominal Register (Excel)', isCompleted: true },
-                        { stepName: 'Pedagogical Agreement (Modality C)', isCompleted: false }
+                        { stepName: 'Nominal Register (Excel)', isCompleted: false },
+                        { stepName: 'Pedagogical Agreement', isCompleted: false }
                     ]
                 }
             }
         });
 
-        const workshop = await prisma.workshop.findUnique({ where: { workshopId: workshopId } });
-        if (workshop && workshop.executionDays) {
-            const schedule = workshop.executionDays as any[];
-            if (Array.isArray(schedule) && schedule.length > 0) {
-                await prisma.session.createMany({
-                    data: schedule.map(slot => {
-                        const d = new Date();
-                        d.setDate(d.getDate() + 1);
-                        while (d.getDay() !== slot.dayOfWeek) {
-                            d.setDate(d.getDate() + 1);
-                        }
-                        return {
-                            assignmentId: assignment.assignmentId,
-                            sessionDate: d,
-                            startTime: (slot as any).startTime,
-                            endTime: (slot as any).endTime
-                        };
-                    })
-                });
-            }
-        }
+        // Use SessionService for robust session generation
+        await SessionService.syncSessionsForAssignment(assignment.assignmentId);
 
         console.log(`✅ AutoAssignment: Assigned ${center.assignedCount} students to Center ${center.centerId} for Workshop ${workshopId}`);
     }

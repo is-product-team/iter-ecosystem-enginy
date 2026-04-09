@@ -5,22 +5,26 @@ services:
     container_name: iter_postgres
     restart: always
     env_file:
-      - apps/api/.env
+      - .env
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-root}
-      POSTGRES_DB: ${POSTGRES_DB:-iter_db}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT_EXTERNAL}:${DB_PORT_INTERNAL}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - iter-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-iter_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 200M
 
   # Adminer (Visualizador DB)
   adminer:
@@ -28,7 +32,7 @@ services:
     container_name: iter_adminer
     restart: always
     ports:
-      - "${ADMINER_PORT:-8080}:8080"
+      - "${ADMINER_PORT_EXTERNAL}:8080"
     networks:
       - iter-network
 
@@ -44,11 +48,15 @@ services:
       - node_modules_cache:/app/node_modules
     command: sh -c "npm install && npx turbo db:generate --filter=api && npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss && npx turbo db:seed --filter=api"
     env_file:
-      - apps/api/.env
+      - .env
     depends_on:
       - db
     networks:
       - iter-network
+    deploy:
+      resources:
+        limits:
+          memory: 500M
 
   # Backend API (Dev)
   api:
@@ -62,19 +70,25 @@ services:
       - .:/app
       - node_modules_cache:/app/node_modules
     ports:
-      - "${API_PORT:-3000}:${PORT:-3000}"
+      - "${API_PORT_EXTERNAL}:${API_PORT_INTERNAL}"
     env_file:
-      - apps/api/.env
+      - .env
+    environment:
+      - PORT=${API_PORT_INTERNAL}
     depends_on:
       setup:
         condition: service_completed_successfully
     networks:
       - iter-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-3000}/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${API_PORT_INTERNAL}/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 800M
 
   # Frontend Web (Dev)
   web:
@@ -83,26 +97,45 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: npx turbo dev --filter=web
+    command: npx turbo dev --filter=@iter/web
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
     ports:
-      - "${WEB_PORT:-8002}:${PORT:-3000}"
+      - "${WEB_PORT_EXTERNAL}:${WEB_PORT_INTERNAL}"
+    env_file:
+      - .env
     environment:
       - NEXT_TELEMETRY_DISABLED=1
-    env_file:
-      - apps/web/.env
+      - PORT=${WEB_PORT_INTERNAL}
     depends_on:
       setup:
         condition: service_completed_successfully
     networks:
       - iter-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-3000}/"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:${WEB_PORT_INTERNAL}/"]
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # IA Local (Especializada en documentos)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: iter_ollama
+    restart: always
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - iter-network
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
 
 networks:
   iter-network:
@@ -111,3 +144,4 @@ networks:
 volumes:
   postgres_data:
   node_modules_cache:
+  ollama_data:

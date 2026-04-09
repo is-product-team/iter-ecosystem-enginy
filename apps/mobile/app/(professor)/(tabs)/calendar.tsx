@@ -1,31 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { THEME } from '@iter/shared';
 import { getCalendar } from '../../../services/api';
 import CalendarView, { CalendarEvent } from '../../../components/CalendarView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 
 export default function CalendarTabScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRangeFetching, setIsRangeFetching] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const calendarRes = await getCalendar();
-        setCalendarEvents(calendarRes.data);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+  const fetchRangeData = useCallback(async (date: Date) => {
+    // Calculate start and end of month
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    // Start of month (subtract 7 days to catch overlapping assignments)
+    const start = new Date(year, month, 1 - 7);
+    // End of month (add 7 days)
+    const end = new Date(year, month + 1, 7);
+
+    const startStr = start.toISOString().split('T')[0];
+    const endStr = end.toISOString().split('T')[0];
+
+    setIsRangeFetching(true);
+    try {
+      const calendarRes = await getCalendar(startStr, endStr);
+      setCalendarEvents(calendarRes.data);
+    } catch (err) {
+      console.error("Error fetching range data:", err);
+    } finally {
+      setIsRangeFetching(false);
+      setLoading(false);
+    }
   }, []);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchRangeData(new Date());
+  }, [fetchRangeData]);
 
   if (loading) {
     return (
@@ -49,9 +67,12 @@ export default function CalendarTabScreen() {
 
       <CalendarView 
         events={calendarEvents} 
+        isLoading={isRangeFetching}
+        onMonthChange={fetchRangeData}
         onEventClick={(event) => {
           if (event.type === 'assignment' && event.metadata?.assignmentId) {
-            // Optional: Implement direct navigation
+             // Navigate to assignment details
+             router.push(`/assignment/${event.metadata.assignmentId}`);
           }
         }}
       />

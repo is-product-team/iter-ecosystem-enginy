@@ -18,6 +18,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
+    // Safety timeout: ensure loading is cleared even if the process hangs
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
     // Migration helper: clear legacy user data
     if (typeof window !== 'undefined') {
       const userStr = localStorage.getItem('user');
@@ -29,12 +34,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const currentUser = getAuthUser();
-    Promise.resolve().then(() => {
-      if (currentUser) {
-        setUser(currentUser);
-      }
-      setLoading(false);
-    });
+    
+    // Resolve user state
+    if (currentUser) {
+      setUser(currentUser);
+    }
+    setLoading(false);
+    clearTimeout(safetyTimeout);
   }, []);
 
   const login = (userData: User) => {

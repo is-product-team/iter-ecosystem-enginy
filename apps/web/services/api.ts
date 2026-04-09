@@ -1,11 +1,12 @@
 import axios, { AxiosInstance } from 'axios';
+import { env } from '@/config/env';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const isServer = typeof window === 'undefined';
+const API_URL = isServer && env.INTERNAL_API_URL 
+  ? env.INTERNAL_API_URL 
+  : env.NEXT_PUBLIC_API_URL;
+
 const basePath = process.env.NODE_ENV === 'production' ? '/iter' : '';
-
-if (!API_URL) {
-  console.warn('⚠️ NEXT_PUBLIC_API_URL is not defined. API calls might fail.');
-}
 
 /**
  * Global API Instance configured for Cookie-based Auth

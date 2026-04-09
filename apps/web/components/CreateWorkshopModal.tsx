@@ -5,6 +5,7 @@ import workshopService, { Workshop } from "../services/workshopService";
 import sectorService, { Sector } from "../services/sectorService";
 import WorkshopIcon, { SVG_ICONS } from "./WorkshopIcon";
 import Loading from "./Loading";
+import { useTranslations } from "next-intl";
 
 type CreateWorkshopModalProps = {
   visible: boolean;
@@ -25,6 +26,9 @@ const CreateWorkshopModal = ({
   onWorkshopCreated,
   initialData,
 }: CreateWorkshopModalProps) => {
+  const t = useTranslations('Forms');
+  const tCommon = useTranslations('Common');
+
   const [title, setTitle] = useState("");
   const [sectorId, setSectorId] = useState<number | "">("");
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -46,7 +50,7 @@ const CreateWorkshopModal = ({
   const [tempEnd, setTempEnd] = useState("11:00");
 
   const daysMap: Record<number, string> = {
-    1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday'
+    1: t('monday'), 2: t('tuesday'), 3: t('wednesday'), 4: t('thursday'), 5: t('friday')
   };
 
   useEffect(() => {
@@ -105,7 +109,7 @@ const CreateWorkshopModal = ({
 
   const handleSubmit = async () => {
     if (!title || !modality) {
-      setError("Fields marked with * are required.");
+      setError(t('required_fields'));
       return;
     }
     setLoading(true);
@@ -139,7 +143,7 @@ const CreateWorkshopModal = ({
       onClose();
     } catch (err) {
       setError(
-        (err as { response?: { data?: { error?: string } } }).response?.data?.error || "Error saving workshop. Check the data."
+        (err as { response?: { data?: { error?: string } } }).response?.data?.error || tCommon('save_error')
       );
     } finally {
       setLoading(false);
@@ -194,7 +198,7 @@ const CreateWorkshopModal = ({
                       onChange={(e) => setSectorId(Number(e.target.value))}
                       className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all outline-none appearance-none"
                     >
-                      <option value="">Select a sector...</option>
+                      <option value="">{t('select_sector')}</option>
                       {sectors.map((sector) => (
                         <option key={sector.sectorId} value={sector.sectorId}>
                           {sector.name}
@@ -209,9 +213,9 @@ const CreateWorkshopModal = ({
                       onChange={(e) => setModality(e.target.value)}
                       className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all outline-none appearance-none"
                     >
-                      <option value="A">Modality A (3 Quarters)</option>
-                      <option value="B">Modality B (2 Quarters)</option>
-                      <option value="C">Modality C (1 Quarter)</option>
+                      <option value="A">{t('modality_a')}</option>
+                      <option value="B">{t('modality_b')}</option>
+                      <option value="C">{t('modality_c')}</option>
                     </select>
                   </div>
                 </div>
@@ -289,18 +293,18 @@ const CreateWorkshopModal = ({
                       value={tempDay} onChange={(e) => setTempDay(parseInt(e.target.value))}
                       className="w-full px-4 py-2.5 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
                     >
-                      <option value={1}>Monday</option>
-                      <option value={2}>Tuesday</option>
-                      <option value={3}>Wednesday</option>
-                      <option value={4}>Thursday</option>
-                      <option value={5}>Friday</option>
+                      <option value={1}>{t('monday')}</option>
+                      <option value={2}>{t('tuesday')}</option>
+                      <option value={3}>{t('wednesday')}</option>
+                      <option value={4}>{t('thursday')}</option>
+                      <option value={5}>{t('friday')}</option>
                     </select>
                   </div>
                   <div className="flex gap-4">
                     <div className="flex-1">
                       <input type="time" value={tempStart} onChange={(e) => setTempStart(e.target.value)} className="w-full px-3 py-2 text-sm font-medium text-text-primary border border-border-subtle bg-background-subtle focus:border-consorci-darkBlue outline-none" />
                     </div>
-                    <span className="flex items-center text-gray-300">-</span>
+                    <span className="flex items-center text-text-muted">-</span>
                     <div className="flex-1">
                       <input type="time" value={tempEnd} onChange={(e) => setTempEnd(e.target.value)} className="w-full px-3 py-2 text-sm font-medium text-text-primary border border-border-subtle bg-background-subtle focus:border-consorci-darkBlue outline-none" />
                     </div>
@@ -309,7 +313,7 @@ const CreateWorkshopModal = ({
                     onClick={addScheduleSlot}
                     className="w-full py-3 bg-consorci-darkBlue text-white text-[11px] font-medium hover:bg-consorci-actionBlue transition-all active:scale-95"
                   >
-                    + Add Day
+                    + {t('add_day')}
                   </button>
                 </div>
               </div>
@@ -322,14 +326,14 @@ const CreateWorkshopModal = ({
                       <span className="text-[13px] font-medium text-text-primary">{daysMap[slot.dayOfWeek]}</span>
                       <span className="text-[11px] font-normal text-text-muted mt-0.5">{slot.startTime} - {slot.endTime}</span>
                     </div>
-                    <button onClick={() => removeScheduleSlot(idx)} className="text-gray-300 hover:text-[#F26178] transition-colors p-2 hover:bg-red-50 rounded-full">
+                    <button onClick={() => removeScheduleSlot(idx)} className="text-text-muted hover:text-consorci-pinkRed transition-colors p-2 hover:bg-red-500/5 rounded-full">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                   </div>
                 ))}
                 {schedule.length === 0 && (
                   <div className="text-center py-10 border border-dashed border-gray-200 text-gray-300 text-[10px] font-bold uppercase tracking-widest bg-white">
-                    No days configured yet
+                    {t('no_days')}
                   </div>
                 )}
               </div>
@@ -357,9 +361,9 @@ const CreateWorkshopModal = ({
               {loading ? (
                 <div className="flex items-center gap-2">
                   <Loading size="sm" white message="" />
-                  Saving...
+                  {t('saving')}
                 </div>
-              ) : 'Save Workshop'}
+              ) : t('save_workshop')}
             </button>
           </div>
         </div>

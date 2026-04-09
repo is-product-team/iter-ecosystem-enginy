@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import getApi from "@/services/api";
-import { THEME } from "@iter/shared";
 import Loading from "@/components/Loading";
 import { toast } from "sonner";
+import { Calendar, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 
 interface Phase {
   phaseId: number;
@@ -43,12 +43,13 @@ export default function PhaseManagementPage() {
   }, [user]);
 
   const togglePhase = async (id: number, currentActive: boolean) => {
+    if (currentActive) return; // Already active
     setUpdating(id);
     try {
       const api = getApi();
       await api.put(`/phases/${id}`, { isActive: !currentActive });
       await fetchPhases();
-      toast.success("Phase updated successfully.");
+      toast.success("Phase activated successfully.");
     } catch (error) {
       toast.error("Error updating the phase.");
     } finally {
@@ -71,116 +72,124 @@ export default function PhaseManagementPage() {
 
   return (
     <DashboardLayout
-      title="Iter Phase Management"
-      subtitle="Roadmap and status control of the current program"
+      title="Program Roadmap"
+      subtitle="Management and control of the academic phases"
     >
-      <div className="w-full space-y-8">
+      <div className="w-full pb-20 space-y-12">
         {/* Institutional Notice */}
-        <div className="bg-background-surface border border-consorci-darkBlue/20 p-6 rounded-none">
-          <div className="flex gap-4">
-            <div className="w-12 h-12 bg-consorci-darkBlue flex items-center justify-center text-white shrink-0">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-medium text-consorci-darkBlue text-[12px] mb-2">Temporal Control Panel</h3>
-              <p className="text-sm text-text-secondary font-normal leading-relaxed">
-                Each phase enables specific functionalities for center coordinators.
-                You can activate a phase to force the application and test workflows.
-              </p>
-            </div>
+        <div className="bg-background-surface border border-border-subtle p-10 flex flex-col md:flex-row items-start md:items-center gap-8">
+          <div className="w-14 h-14 bg-background-subtle flex items-center justify-center border border-border-subtle shrink-0">
+            <Clock className="w-6 h-6 text-consorci-darkBlue dark:text-text-primary" strokeWidth={1.5} />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-[13px] font-medium text-text-muted mb-2 uppercase tracking-wider">Temporal Control System</h3>
+            <p className="text-[15px] text-text-primary font-medium leading-relaxed max-w-3xl">
+              Phases dictate the available tools for coordinators. 
+              Activating a phase shifts the entire platform context for all educational centers.
+            </p>
           </div>
         </div>
 
         {loading ? (
-          <Loading message="Syncing phases..." />
+          <Loading message="Synchronizing roadmap..." />
         ) : (
-          <div className="grid gap-6">
+          <div className="space-y-8">
             {phases.sort((a, b) => a.order - b.order).map((phase) => (
               <div
                 key={phase.phaseId}
-                className={`border bg-background-surface ${phase.isActive
-                    ? 'border-l-8 border-consorci-darkBlue border-t-border-subtle border-r-border-subtle border-b-border-subtle'
-                    : 'border-l-8 border-border-subtle border-t-border-subtle border-r-border-subtle border-b-border-subtle opacity-70'
-                  }`}
+                className={`group bg-background-surface border transition-all duration-300 ${
+                  phase.isActive 
+                    ? 'border-consorci-darkBlue ring-1 ring-consorci-darkBlue/5' 
+                    : 'border-border-subtle opacity-80'
+                }`}
               >
-                <div className="p-8 flex flex-col md:flex-row justify-between gap-8">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 border border-border-subtle flex items-center justify-center bg-background-subtle text-xs font-medium text-text-muted">
-                        {phase.order}
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-medium text-text-primary tracking-tight">{phase.name}</h3>
-                        {phase.isActive ? (
-                          <span className="inline-block mt-2 px-2 py-0.5 bg-consorci-darkBlue text-white text-[10px] font-medium">
-                            Phase Active
-                          </span>
-                        ) : (
-                          <span className="inline-block mt-2 px-2 py-0.5 bg-background-subtle text-text-muted text-[10px] font-medium border border-border-subtle">
-                            Not Active
-                          </span>
-                        )}
+                <div className="p-10 flex flex-col lg:flex-row justify-between gap-12">
+                  <div className="flex-1 space-y-8">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-6">
+                        <div className={`w-12 h-12 flex items-center justify-center text-[15px] font-medium border transition-colors ${
+                          phase.isActive 
+                            ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' 
+                            : 'bg-background-subtle text-text-muted border-border-subtle'
+                        }`}>
+                          {phase.order}
+                        </div>
+                        <div>
+                          <h3 className="text-[20px] font-medium text-text-primary tracking-tight">{phase.name}</h3>
+                          <div className="flex items-center gap-3 mt-2">
+                            {phase.isActive ? (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-consorci-darkBlue/5 border border-consorci-darkBlue/20 text-consorci-darkBlue text-[11px] font-medium uppercase tracking-wider">
+                                <CheckCircle2 className="w-3 h-3" />
+                                Currently Active
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-background-subtle border border-border-subtle text-text-muted text-[11px] font-medium uppercase tracking-wider">
+                                <AlertCircle className="w-3 h-3" />
+                                Inactive
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <p className="text-xs text-text-secondary font-medium mb-8 max-w-2xl leading-relaxed">
+                    <p className="text-[14px] text-text-secondary font-medium leading-relaxed max-w-2xl">
                       {phase.description}
                     </p>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 bg-background-subtle border border-border-subtle">
-                      <div>
-                        <label className="text-[12px] font-medium text-text-muted mb-2 flex items-center gap-2">
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">
+                      <div className="space-y-3">
+                        <label className="flex items-center gap-2 text-[11px] font-medium text-text-muted uppercase tracking-widest">
+                          <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
                           Opening Date
                         </label>
                         <input
                           type="date"
                           value={phase.startDate.split('T')[0]}
                           onChange={(e) => updatePhaseDate(phase.phaseId, 'startDate', e.target.value)}
-                          className="w-full bg-background-surface border border-border-subtle text-sm font-medium text-text-primary px-4 py-3 focus:outline-none focus:border-consorci-darkBlue appearance-none"
+                          className="w-full bg-background-subtle border border-border-subtle text-[13px] font-medium text-text-primary px-5 py-3.5 focus:outline-none focus:border-consorci-darkBlue transition-all"
                         />
                       </div>
-                      <div>
-                        <label className="text-[12px] font-medium text-text-muted mb-2 flex items-center gap-2">
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      <div className="space-y-3">
+                        <label className="flex items-center gap-2 text-[11px] font-medium text-text-muted uppercase tracking-widest">
+                          <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
                           Closing Date
                         </label>
                         <input
                           type="date"
                           value={phase.endDate.split('T')[0]}
                           onChange={(e) => updatePhaseDate(phase.phaseId, 'endDate', e.target.value)}
-                          className="w-full bg-background-surface border border-border-subtle text-sm font-medium text-text-primary px-4 py-3 focus:outline-none focus:border-consorci-darkBlue appearance-none"
+                          className="w-full bg-background-subtle border border-border-subtle text-[13px] font-medium text-text-primary px-5 py-3.5 focus:outline-none focus:border-consorci-darkBlue transition-all"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="md:w-56 flex flex-col justify-center border-l border-border-subtle pl-8">
+                  <div className="lg:w-72 flex flex-col justify-center lg:border-l border-border-subtle lg:pl-12">
                     <button
                       onClick={() => togglePhase(phase.phaseId, phase.isActive)}
-                      disabled={updating === phase.phaseId}
-                      className={`w-full py-5 font-medium text-[13px] transition-all ${phase.isActive
-                          ? 'bg-background-subtle text-text-muted border border-border-subtle cursor-not-allowed'
+                      disabled={updating === phase.phaseId || phase.isActive}
+                      className={`w-full py-5 text-[12px] font-medium uppercase tracking-widest transition-all ${
+                        phase.isActive
+                          ? 'bg-background-subtle text-text-muted border border-border-subtle cursor-default'
                           : 'bg-consorci-darkBlue text-white hover:bg-black active:scale-[0.98]'
-                        }`}
+                      }`}
                     >
                       {updating === phase.phaseId
                         ? (
-                          <div className="flex items-center justify-center gap-2">
-                            <div className="w-3 h-3 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
-                            Processing
+                          <div className="flex items-center justify-center gap-3">
+                            <Loading size="mini" white />
+                            Processing...
                           </div>
                         )
-                        : (phase.isActive ? 'Phase Activated' : 'Activate this Phase')
+                        : (phase.isActive ? 'Active' : 'Activate Phase')
                       }
                     </button>
-                      {!phase.isActive && (
-                        <p className="mt-4 text-[11px] text-text-muted font-medium text-center">
-                          Activation is immediate
-                        </p>
-                      )}
+                    {!phase.isActive && (
+                      <p className="mt-4 text-[10px] text-text-muted font-medium text-center italic opacity-60">
+                        Activation overrides the current program state
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

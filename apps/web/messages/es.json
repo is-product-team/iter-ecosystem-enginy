@@ -289,6 +289,34 @@
         "delete_ok": "Aviso eliminado.",
         "delete_error": "Error al eliminar el aviso."
       }
+    },
+    "Monitoring": {
+      "title": "Monitorización Operativa (Fase 3)",
+      "subtitle": "Estado de la ejecución de talleres y asistencia en tu centro.",
+      "KPI": {
+        "sessions_today": "Sesiones Hoy",
+        "pending_attendance": "Hojas Pendientes",
+        "active_assignments": "Talleres en Marcha",
+        "incidents": "Incidencias Activas"
+      },
+      "Assignments": {
+        "title": "Estado de los Talleres",
+        "progress": "Progreso",
+        "health": "Salud de la Asistencia",
+        "view_details": "Gestionar Sesiones",
+        "no_staff": "⚠️ Sin profesor asignado",
+        "attendance_ok": "Asistencia al día",
+        "attendance_warning": "Faltan hojas por rellenar"
+      },
+      "Today": {
+        "title": "Agenda de Hoy",
+        "no_sessions": "No hay sesiones programadas para hoy."
+      },
+      "Incidents": {
+        "title": "Últimas Incidencias",
+        "report_new": "Informar Incidencia",
+        "no_incidents": "No hay incidencias reportadas."
+      }
     }
   },
   "Common": {
@@ -326,7 +354,7 @@
     "error_upload": "Error al subir el documento.",
     "only_pdf_allowed": "Solo se permiten archivos PDF.",
     "ai_mismatch": "La IA detecta un tipo diferente: {type}.",
-    "ai_no_signatures": "La IA no ha detectado las firmas requeridas.",
+    "ai_no_signatures": "La IA no ha detectat las firmas requeridas.",
     "ai_error": "Error al procesar la IA. Puedes forzar la subida.",
     "showing": "Mostrando",
     "of": "de",
@@ -346,9 +374,9 @@
     "actions": "Acciones",
     "edit": "Editar",
     "delete": "Eliminar",
-    "cancel": "Cancelar",
     "save": "Guardar",
     "confirm": "Confirmar",
+    "cancel": "Cancelar",
     "modality_label": "Modalidad {modality}",
     "places_label": "{count} Plazas",
     "duration_label": "{hours}h",
@@ -362,7 +390,16 @@
     "hide": "Ocultar",
     "table_info": "Información",
     "table_idalu": "IDALU",
-    "table_course": "Curso"
+    "table_course": "Curso",
+    "clear": "Limpiar",
+    "details": "Detalles",
+    "status": "Estado",
+    "loading_error": "No se ha podido cargar la información",
+    "delete_success": "Elemento eliminado correctamente.",
+    "delete_error": "Se ha producido un error al eliminar el elemento.",
+    "delete_confirm_title": "Confirmar eliminación",
+    "delete_confirm_msg": "¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer.",
+    "new": "Nuevo"
   },
   "Calendar": {
     "loading_auth": "Sincronizando tu calendario...",
@@ -532,6 +569,419 @@
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema"
+    }
+  },
+  "Navigation": {
+    "home": "Inicio",
+    "notifications": "Avisos",
+    "calendar": "Calendario",
+    "logout": "Salir",
+    "workshops": "Talleres",
+    "centers": "Centros",
+    "requests": "Peticiones",
+    "phases": "Fases",
+    "stats": "Estadísticas",
+    "verifications": "Verificaciones",
+    "students": "Alumnos",
+    "teachers": "Profesores",
+    "assignments": "Asignaciones",
+    "sessions": "Sessions",
+    "profile": "Perfil",
+    "monitoring": "Monitorización"
+  },
+  "Dashboards": {
+    "admin": {
+      "title": "Panel de Administración",
+      "subtitle": "Gestión global de centros, talleres y evaluaciones del programa.",
+      "sections": {
+        "workshops": {
+          "title": "Gestión de Talleres",
+          "description": "Crea, modifica o elimina talleres para los centros."
+        },
+        "centers": {
+          "title": "Gestión de Centros",
+          "description": "Crea, modifica o elimina centros educativos."
+        },
+        "phases": {
+          "title": "Fases del Curso",
+          "description": "Configura las fechas y estados de las fases del curso."
+        },
+        "stats": {
+          "title": "Estadísticas",
+          "description": "Análisis avanzado del uso del sistema y actividad."
+        },
+        "requests": {
+          "title": "Peticiones de Centros",
+          "description": "Consulta las peticiones y asigna talleres."
+        },
+        "verifications": {
+          "title": "Verificación de Documentos",
+          "description": "Valida la documentación presentada por los centros."
+        }
+      }
+    },
+    "center": {
+      "title": "Panel del Centro",
+      "subtitle": "Gestión del proceso de talleres Iter.",
+      "timeline_title": "Estado del Programa Iter 25-26",
+      "loading_calendar": "Cargando calendario...",
+      "sections": {
+        "students": {
+          "title": "Gestión de Alumnos",
+          "description": "Añade alumnos de tu centro"
+        },
+        "teachers": {
+          "title": "Gestión de Profesores",
+          "description": "Añade profesores de tu centro"
+        },
+        "requests": {
+          "title": "Solicitar Talleres",
+          "description": "Solicita los talleres que desees con las plazas necesarias."
+        },
+        "assignments": {
+          "title": "Asignaciones",
+          "description": "Asigna alumnos a los talleres solicitados."
+        },
+        "sessions": {
+          "title": "Gestión de Sesiones",
+          "description": "Añade a tus profesores a los talleres asignados"
+        },
+        "closed_module": "Módulo cerrado",
+        "general": "General",
+        "phase1": "Fase 1",
+        "phase2": "Fase 2",
+        "phase3": "Fase 3"
+      }
+    },
+    "student": {
+      "title": "Bienvenido/a",
+      "subtitle": "Consulta tus talleres y descarga tus certificados.",
+      "certificates_title": "Mis Certificados",
+      "no_certificates": "No se han encontrado certificados.",
+      "no_certificates_desc": "Aún no has obtenido ningún certificado. Completa un taller para ganar uno.",
+      "download_pdf": "Descargar PDF",
+      "loading": "Cargando panel...",
+      "duration": "Duración",
+      "issued": "Emitido",
+      "pdf_not_implemented": "La generación de PDF no está implementada en esta demo."
+    }
+  },
+  "Forms": {
+    "search": "Buscar...",
+    "search_by_title": "Buscar por título",
+    "filter_by_sector": "Filtrar por sector",
+    "filter_by_modality": "Filtrar por modalidad",
+    "all_sectors": "Todos los sectores",
+    "all_modalities": "Todas las modalidades",
+    "name": "Nombre",
+    "title": "Título",
+    "description": "Descripción",
+    "sector": "Sector",
+    "modality": "Modalidad",
+    "places": "Plazas",
+    "duration": "Duración",
+    "location": "Ubicación",
+    "icon": "Icono",
+    "select_sector": "Selecciona un sector...",
+    "required_fields": "Los campos marcados con * son obligatorios.",
+    "workshop_config_subtitle": "Configuración del Taller y Horario Semanal",
+    "general_info": "Información General",
+    "technical_details": "Detalles Técnicos",
+    "title_placeholder": "Introduce el nombre del taller...",
+    "description_placeholder": "Breve explicación del contenido...",
+    "modality_a": "Modalidad A (3 Trimestres)",
+    "modality_b": "Modalidad B (2 Trimestres)",
+    "modality_c": "Modalidad C (1 Trimestre)",
+    "review_data": "Revisa los datos antes de guardar.",
+    "schedule": "Horario Semanal",
+    "add_slot": "Añadir Franja",
+    "add_day": "Añadir Día",
+    "configured_days": "Días Configurados",
+    "no_days": "Ningún día configurado aún",
+    "save_workshop": "Guardar Taller",
+    "saving": "Guardando...",
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes"
+  },
+  "WorkshopsPage": {
+    "title": "Gestión de Talleres",
+    "subtitle": "Creación, edición y supervisión del catálogo oficial Iter.",
+    "new": "Nuevo Taller",
+    "loading": "Cargando catálogo...",
+    "empty": "No se han encontrado talleres",
+    "empty_desc": "Prueba con otros términos de búsqueda.",
+    "table_info": "Información del Taller",
+    "table_classification": "Clasificación",
+    "table_details": "Detalles y Capacidad"
+  },
+  "CentersPage": {
+    "title": "Gestión de Centros",
+    "subtitle": "Administración de los centros educativos que participan en Iter.",
+    "new": "Nuevo Centro",
+    "search_label": "Buscar por nombre o código",
+    "search_placeholder": "Ej: Institut Pedralbes, 08012345...",
+    "loading": "Cargando centros...",
+    "empty": "No se han encontrado centros",
+    "empty_desc": "Prueba con otros términos de búsqueda.",
+    "table_center": "Centro",
+    "table_address": "Dirección",
+    "table_email": "Email",
+    "table_phone": "Teléfono",
+    "center_code": "CÓDIGO",
+    "no_address": "Sin dirección"
+  },
+  "RequestsPage": {
+    "title": "Gestión de Peticiones",
+    "subtitle": "Monitoriza y gestiona las peticiones de los centros educativos para el curso actual.",
+    "search_workshop": "Buscar Taller",
+    "educational_center": "Centro Educativo",
+    "all_centers": "Todos los centros",
+    "all_modalities": "Todas las modalidades",
+    "automatic_assignment": "Asignación Automática",
+    "syncing": "Sincronizando peticiones...",
+    "no_requests": "No se han encontrado peticiones con los filtros aplicados",
+    "table_center_date": "Centro / Fecha",
+    "table_teachers": "Profesores",
+    "table_students": "Alumnos",
+    "table_status": "Estado",
+    "table_actions": "Acciones",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "edit_request": "Editar Petición",
+    "num_students": "Número de Alumnos",
+    "comments": "Comentarios",
+    "save_changes": "Guardar Cambios",
+    "request_approve_title": "Aprobar Petición",
+    "request_approve_msg": "¿Estás seguro de que quieres aprobar esta petición y generar la asignación inmediatamente?",
+    "request_reject_title": "Rechazar Petición",
+    "request_reject_msg": "¿Estás seguro de que quieres rechazar esta petición? Esta acción no se puede deshacer.",
+    "run_tetris_title": "Ejecutar Asignación Automática",
+    "run_tetris_msg": "Esta acción procesará todas las peticiones aprobadas pendientes y generará asignaciones para todos los centros. ¿Continuar?",
+    "request_approved_success": "Petición aprobada y asignación generada correctamente.",
+    "request_rejected_success": "Petición rechazada.",
+    "tetris_success": "Asignación completada: {count} nuevas asignaciones.",
+    "rejected_status": "Rechazada",
+    "assigned_status": "Asignada",
+    "mod_a": "MOD A (Grupo completo)",
+    "mod_b": "MOD B (Medio grupo)",
+    "mod_c": "MOD C (Proyectos individuales)"
+  },
+  "AssignmentsPage": {
+    "title": "Talleres Asignados",
+    "subtitle": "Consulta y gestiona la planificación de tus talleres.",
+    "search_filters": "Búsqueda y Filtros",
+    "search_placeholder": "BUSCAR POR TALLER O CENTRO...",
+    "all_statuses": "Todos los estados",
+    "in_progress": "En curso / Aceptado",
+    "completed": "Completado",
+    "table_workshop": "Taller Asignado",
+    "table_center": "Centro",
+    "table_planning": "Planificación",
+    "table_status": "Estado",
+    "table_actions": "Acciones",
+    "workshop_id": "IDENTIFICADOR DEL TALLER",
+    "not_assigned": "No asignado",
+    "start_date": "Inicio: {date}",
+    "manage_btn": "Gestionar",
+    "no_assignments": "No se han encontrado asignaciones",
+    "adjust_filters": "Prueba a ajustar los filtros de búsqueda.",
+    "incidents_title": "Gestión de Incidencias y Vacantes",
+    "incidents_subtitle": "INFORMA DE PROBLEMAS DE COMPORTAMIENTO O SOLICITA PLAZAS VACANTES.",
+    "incident_placeholder": "Describe el problema...",
+    "report_btn": "Informar Incidencia",
+    "incident_success": "Incidencia informada. El CEB la revisará pronto."
+  },
+  "StudentsPage": {
+    "title": "Gestión de Alumnado",
+    "subtitle": "Gestiona los alumnos de tu centro educativo y sus datos nominales.",
+    "new_student": "Nuevo Alumno",
+    "search_label": "Buscar por nombre o IDALU",
+    "search_placeholder": "Ej: Joan García, 1234567...",
+    "all_courses": "Todos los cursos",
+    "filter_course": "Filtrar por curso",
+    "no_students": "No se han encontrado alumnos",
+    "adjust_search": "Prueba con otros términos de búsqueda.",
+    "table_info": "Información del Alumno",
+    "table_idalu": "Identificación (IDALU)",
+    "table_course": "Curso / Nivel",
+    "edit_student_title": "Editar Alumno",
+    "create_student_title": "Nuevo Alumno",
+    "modify_data": "Modifica los datos del alumno",
+    "enter_data": "Introduce los datos para el nuevo alumno",
+    "change_photo": "Cambiar Foto",
+    "photo_success": "Foto actualizada correctamente.",
+    "upload_error": "Error al subir la foto.",
+    "name_label": "Nombre del alumno",
+    "surnames_label": "Apellidos",
+    "idalu_label": "Código IDALU",
+    "course_label": "Curso / Nivel (Ej: 4º ESO)",
+    "save_btn": "Guardar Alumno",
+    "delete_title": "Eliminar Alumno",
+    "delete_msg": "¿Estás seguro de que quieres eliminar este alumno? Esta acción no se puede deshacer.",
+    "delete_success": "Alumno eliminado."
+  },
+  "TeachersPage": {
+    "title": "Gestión de Profesorado",
+    "subtitle": "Gestiona los profesores referentes de tu centro educativo.",
+    "new_teacher": "Nuevo Profesor",
+    "search_label": "Buscar por nombre o contacto",
+    "search_placeholder": "Ej: Manuel Pérez, manuel@escolaurgell.cat...",
+    "no_teachers": "No se han encontrado profesores",
+    "table_teacher": "Profesor",
+    "table_contact": "Contacto",
+    "edit_teacher_title": "Editar Profesor",
+    "create_teacher_title": "Nuevo Profesor",
+    "modify_data": "Modifica los datos del profesor",
+    "enter_data": "Introduce los datos para el nuevo profesor",
+    "change_photo": "Cambiar Foto",
+    "photo_success": "Foto actualizada correctamente.",
+    "upload_error": "Error al subir la foto.",
+    "name_label": "Nombre completo",
+    "contact_label": "Información de contacto (Email principal)",
+    "password_label": "Contraseña (Acceso App)",
+    "show_pwd": "Ver",
+    "hide_pwd": "Ocultar",
+    "pwd_placeholder": "Contraseña para la App móvil",
+    "pwd_hint": "Esta será la contraseña que el profesor utilizará para entrar en la App.",
+    "save_btn": "Guardar Profesor",
+    "delete_title": "Eliminar Profesor",
+    "delete_msg": "¿Estás seguro de que quieres eliminar a este profesor? También se le quitará el acceso a la App móvil.",
+    "delete_success": "Profesor eliminado."
+  },
+  "CenterRequestsPage": {
+    "title": "Solicitar Talleres",
+    "subtitle": "Gestiona las solicitudes de talleres para tu centro educativo.",
+    "search_placeholder": "Buscar taller o sector...",
+    "num_workshops": "{count} Talleres disponibles",
+    "table_mod": "Mod",
+    "table_workshop": "Taller / Sector",
+    "table_referents": "Referentes",
+    "table_status": "Estado / Acción",
+    "new_request": "Nueva Solicitud",
+    "edit_request": "Editar Solicitud",
+    "cancel_btn": "Cancelar",
+    "error_title": "Error en la solicitud",
+    "select_workshop": "Selecciona un taller de la lista para empezar",
+    "referents_label": "Profesores Referentes",
+    "referent1_placeholder": "Selecciona el Referente Principal *",
+    "referent2_placeholder": "Selecciona el Segundo Referente *",
+    "num_students_label": "Nº Alumnado Previsto",
+    "num_students_placeholder": "Ej: 4",
+    "modality_c_hint": "* Máximo 4 alumnos por proyecto en Modalidad C.",
+    "reason_label": "Motivo de la Solicitud (Opcional)",
+    "reason_placeholder": "Breve explicación del perfil del alumnado...",
+    "send_btn": "Enviar Solicitud",
+    "update_btn": "Actualizar Solicitud",
+    "processing": "Procesando...",
+    "max_students_alert": "En la Modalidad C, el número máximo de alumnos es 4.",
+    "referents_required": "Debes seleccionar dos profesores referentes.",
+    "referents_different": "Los dos profesores referentes deben ser diferentes.",
+    "send_error": "Error al enviar la solicitud.",
+    "select_btn": "Seleccionar",
+    "selected_label": "Seleccionado",
+    "edit_btn": "Editar"
+  },
+  "AssignmentWorkshopsPage": {
+    "title_prefix": "GESTIÓN DEL TALLER: ",
+    "modality_prefix": "MODALIDAD ",
+    "referent_label": "Equipo Docente Referente",
+    "center_label": "Centro Educativo",
+    "students_title": "Alumnado Participante",
+    "students_subtitle": "{occupied} de {total} plazas ocupadas.",
+    "nominal_register_btn": "Registro Nominal",
+    "no_students": "Aún no hay alumnos asignados",
+    "no_students_hint": "Haz clic aquí para comenzar el registro nominal",
+    "remove_student_success": "Alumno eliminado correctamente.",
+    "remove_student_tooltip": "Eliminar alumno",
+    "loading_msg": "Cargando detalles del taller...",
+    "status": {
+      "PROVISIONAL": "PROVISIONAL",
+      "PUBLISHED": "PUBLICADO",
+      "DATA_ENTRY": "PENDIENTE GESTIÓN",
+      "DATA_SUBMITTED": "DATOS ENVIADOS",
+      "VALIDATED": "CONFIRMADO",
+      "READY_TO_START": "LISTO PARA EMPEZAR",
+      "VACANT": "VACANTE",
+      "IN_PROGRESS": "EN EJECUCIÓN",
+      "COMPLETED": "FINALIZADO",
+      "CANCELLED": "CANCELADO",
+      "provisional": "Provisional",
+      "published": "Publicado",
+      "data_entry": "Pendiente gestión",
+      "data_submitted": "Datos enviados",
+      "validated": "Confirmado",
+      "ready_to_start": "Listo para empezar",
+      "vacant": "Vacante",
+      "in_progress": "En ejecución",
+      "completed": "Finalizado",
+      "cancelled": "Cancelado"
+    },
+    "docs": {
+      "pedagogical_agreement": "Acuerdo Pedagógico",
+      "mobility_authorization": "Aut. Movilidad",
+      "image_rights": "Derechos Imagen"
+    },
+    "finalize_section": {
+      "ready_title": "✓ Todo a punto para empezar",
+      "not_ready_title": "Confirmar Documentación",
+      "ready_desc": "Toda la documentación ha sido validada. Ya puedes confirmar el registro final para activar el taller.",
+      "not_ready_desc": "Una vez toda la documentación esté validada, podrás confirmar el registro final.",
+      "confirm_btn": "Confirmar y Generar Sesiones",
+      "confirm_dialog": "¿Confirmar registro?",
+      "success": "¡Registro confirmado!"
+    },
+    "close_section": {
+      "title": "Cerrar Taller",
+      "desc": "Una vez finalizadas todas las sesiones y las evaluaciones competenciales, puedes cerrar el taller. Esta acción generará automáticamente los certificados de asistencia.",
+      "confirm_btn": "Cerrar Taller",
+      "confirm_dialog": "¿Estás seguro de que quieres cerrar este taller? Esta acción es irreversible y generará los certificados de finalización.",
+      "pending_evals_error": "No se puede cerrar la asignación. Hay {count} evaluaciones pendientes.",
+      "success": "¡Taller cerrado y certificados generados correctamente!",
+      "error": "Error al cerrar el taller."
+    },
+    "Monitoring": {
+      "no_assignments": "No hay talleres activos en ejecución por ahora."
+    }
+  },
+  "Sync": {
+    "title": "Sincronizar",
+    "modal_title": "Lleva tu calendario a todas partes",
+    "modal_subtitle": "Sincroniza tus sesiones e hitos de Iter con tu aplicación de calendario favorita.",
+    "google_btn": "Añadir a Google Calendar",
+    "apple_btn": "Añadir a Apple / Outlook",
+    "copy_btn": "Copiar enlace iCal",
+    "copy_success": "Enlace copiado al portapapeles",
+    "instructions_title": "¿Cómo funciona?",
+    "instructions_step1": "Haz clic en uno de los botones superiores para abrir tu aplicación de calendario.",
+    "instructions_step2": "Si prefieres hacerlo manualmente, copia el enlace iCal y pégalo como 'Suscripción por URL' en tu aplicación.",
+    "instructions_privacy": "Este enlace es privado y contiene tu agenda personal. No lo compartas.",
+    "regenerate_btn": "Generar nuevo enlace",
+    "regenerate_confirm": "¿Si generas un nuevo enlace, el anterior dejará de funcionar en todas tus aplicaciones. ¿Quieres continuar?",
+    "close": "Cerrar"
+  },
+  "Services": {
+    "Risk": {
+      "alert_title": "Alerta: Riesgo de Abandono",
+      "alert_message": "Identificado un nivel de riesgo del {score}%. Factores principales: {factors}. Se recomienda intervención pedagógica inmediata.",
+      "factors": {
+        "absences": "Alto volumen de ausencias recientes",
+        "occasional": "Ausencias ocasionales registradas",
+        "lates": "Problemas persistentes de puntualidad",
+        "low_competency": "{count} evaluaciones de competencia bajas"
+      }
+    },
+    "Vision": {
+      "error_format": "Formato de archivo no soportado. Por favor, sube PDF o imágenes.",
+      "error_empty": "El documento parece estar vacío (menos de 1KB).",
+      "error_signature": "Firma manuscrita no detectada en la región esperada.",
+      "error_unavailable": "El motor de visión de IA local no está disponible actualmente."
+    },
+    "AutoAssignment": {
+      "no_requests": "No se encontraron solicitudes para procesar.",
+      "success": "Asignados {count} estudiantes al Centro {center} para el Taller {workshop}"
     }
   }
 }

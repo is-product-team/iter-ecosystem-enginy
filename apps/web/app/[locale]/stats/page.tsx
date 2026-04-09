@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import statsService, { StatusStat, PopularStat } from '@/services/statsService';
@@ -28,6 +28,8 @@ export default function AdminStatsPage() {
   const tc = useTranslations('Common');
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   const fetchData = async () => {
     try {
@@ -47,13 +49,14 @@ export default function AdminStatsPage() {
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
       return;
     }
 
     if (user) {
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
 
   if (authLoading || !user || loading) {

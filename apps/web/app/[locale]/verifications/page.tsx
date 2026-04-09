@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService, { Assignment } from '@/services/assignmentService';
@@ -36,16 +36,19 @@ export default function DocumentVerificationPage() {
   const itemsPerPage = 6;
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
       return;
     }
 
     if (user) {
       loadData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
 
   const loadData = async () => {
@@ -142,7 +145,7 @@ export default function DocumentVerificationPage() {
                 </tr>
               ) : assignments.length > 0 ? (
                 paginatedAssignments.map((assig) => (
-                  <tr key={assig.assignmentId} className="hover:bg-gray-50 transition-colors">
+                  <tr key={assig.assignmentId} className="hover:bg-background-subtle transition-colors">
                     <td className="px-6 py-5">
                       <div className="font-medium text-text-primary text-[15px] leading-tight mb-1">{assig.center?.name}</div>
                       <div className="text-[12px] font-medium text-consorci-darkBlue">{assig.workshop?.title}</div>
@@ -263,7 +266,7 @@ export default function DocumentVerificationPage() {
           <div className="bg-background-surface w-full max-w-xl border border-border-subtle relative">
             <div className="p-8 border-b border-border-subtle bg-background-subtle flex justify-between items-center">
               <h3 className="text-[14px] font-medium text-text-primary flex items-center gap-3">
-                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                 </svg>
                 {t('report_modal_title')}
@@ -338,7 +341,7 @@ export default function DocumentVerificationPage() {
                 >
                   {sendingNotif ? (
                     <>
-                      <div className="animate-spin h-3.5 w-3.5 border-2 border-white/20 border-t-white"></div>
+                      <Loading size="mini" white />
                       <span>{t('sending')}</span>
                     </>
                   ) : (

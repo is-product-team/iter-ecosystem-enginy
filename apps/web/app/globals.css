@@ -63,7 +63,7 @@ h6 {
 /* Institutional Redesign - Minimalist Sharp */
 * {
   border-radius: 0 !important;
-  box-shadow: none !important; /* Remove all shadows per user request */
+  box-shadow: none !important;
 }
 
 .btn-primary {
@@ -110,6 +110,21 @@ h6 {
   .container-responsive {
     @apply px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24;
   }
+}
+
+/* Base Animations for Loading Component */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-in {
+  animation-duration: 400ms;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
 }
 
 /* Calendar Event Redesign (Apple Calendar Style) */

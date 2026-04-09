@@ -1,22 +1,33 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+// Cargar el .env desde la raíz (dos niveles arriba de src/config)
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.string().default('3000').transform(Number),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  PORT: z.coerce.number().default(3000),
   DATABASE_URL: z.string().url(),
-  JWT_SECRET: z.string().min(10, "JWT_SECRET must be at least 10 characters long"),
-  CORS_ORIGIN: z.string().optional().transform(val => val ? val.split(',').map(o => o.trim()) : []),
+  JWT_SECRET: z.string().min(10),
+  CORS_ORIGIN: z.string().default('*').transform((s) => s.split(',').map(o => o.trim())),
   API_PREFIX: z.string().default(''),
+  // Variables auxiliares para reconstrucción si DATABASE_URL no está
+  POSTGRES_USER: z.string().optional(),
+  POSTGRES_PASSWORD: z.string().optional(),
+  POSTGRES_DB: z.string().optional(),
 });
 
-const _env = envSchema.safeParse(process.env);
+function validateEnv() {
+  const parsed = envSchema.safeParse(process.env);
 
-if (!_env.success) {
-  console.error('❌ Invalid environment variables:', JSON.stringify(_env.error.format(), null, 2));
-  process.exit(1);
+  if (!parsed.success) {
+    console.error('❌ Error de validación en las variables de entorno:');
+    console.error(JSON.stringify(parsed.error.flatten().fieldErrors, null, 2));
+    process.exit(1);
+  }
+
+  return parsed.data;
 }
 
-export const env = _env.data;
+export const env = validateEnv();
