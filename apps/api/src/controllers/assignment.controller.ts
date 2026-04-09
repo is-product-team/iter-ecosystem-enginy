@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES } from '@iter/shared';
+import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES, CHECKLIST_STEPS } from '@iter/shared';
 import { createNotificationInternal } from './notification.controller.js';
 import { VisionService } from '../services/vision.service.js';
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';

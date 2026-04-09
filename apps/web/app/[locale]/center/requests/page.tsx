@@ -41,18 +41,7 @@ export default function RequestsPage() {
   const params = useParams();
   const locale = params?.locale || 'ca';
 
-  useEffect(() => {
-    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
-      router.push(`/${locale}/login`);
-      return;
-    }
-
-    if (user) {
-      loadInitialData();
-    }
-  }, [user, authLoading, router]);
-
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     try {
       const [fetchedWorkshops, fetchedTeachers, fetchedRequests] = await Promise.all([
         workshopService.getAll(),
@@ -68,7 +57,18 @@ export default function RequestsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tCommon]);
+
+  useEffect(() => {
+    if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
+      router.push(`/${locale}/login`);
+      return;
+    }
+
+    if (user) {
+      loadInitialData();
+    }
+  }, [user, authLoading, router, locale, loadInitialData]);
 
   const filteredWorkshops = useMemo(() => {
     let result = workshops;
