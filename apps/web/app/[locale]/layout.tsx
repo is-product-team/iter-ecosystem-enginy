@@ -14,7 +14,7 @@ const inter = Inter({
 });
 
 export function generateStaticParams() {
-  return [{ locale: 'ca' }, { locale: 'es' }];
+  return [{ locale: 'ca' }, { locale: 'es' }, { locale: 'en' }];
 }
 
 export default async function LocaleLayout({
@@ -27,7 +27,7 @@ export default async function LocaleLayout({
   const { locale } = await params;
   
   // Validate that the incoming `locale` parameter is valid
-  if (!['ca', 'es'].includes(locale)) {
+  if (!['ca', 'es', 'en'].includes(locale)) {
     notFound();
   }
 

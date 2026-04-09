@@ -46,6 +46,7 @@ export default function DocumentVerificationPage() {
     if (user) {
       loadData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
 
   const loadData = async () => {

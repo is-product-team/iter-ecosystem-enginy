@@ -93,7 +93,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
     }
 
     try {
-        const nlpResult = nlpService.processText(text);
+        const nlpResult = await nlpService.processText(text);
 
         const enrollmentRecord = await prisma.enrollment.findFirst({
             where: {

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import logoImg from '@/public/logo.png';
-import logoInversImg from '@/public/logo-invers.png';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
@@ -83,14 +82,7 @@ export default function LoginPage() {
               alt="Iter Logo"
               width={128}
               height={128}
-              className="w-full h-full object-contain block dark:hidden"
-            />
-            <Image
-              src={logoInversImg}
-              alt="Iter Logo"
-              width={128}
-              height={128}
-              className="w-full h-full object-contain hidden dark:block"
+              className="w-full h-full object-contain dark:invert"
             />
           </div>
           <h2 className="text-2xl font-medium tracking-tight text-text-primary leading-none">Iter</h2>

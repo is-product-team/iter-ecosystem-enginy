@@ -9,9 +9,6 @@ import notificationService from '@/services/notificationService';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import logoImg from '@/public/logo.png';
-import logoInversImg from '@/public/logo-invers.png';
-
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
@@ -60,14 +57,14 @@ const Navbar: React.FC = () => {
           <div className="flex items-center">
             <Link href={getHomePath()} className="flex items-center">
               <Image 
-                src={logoImg} 
+                src="/logo.png" 
                 alt="Iter Logo" 
                 width={40}
                 height={40}
                 className="w-10 h-10 object-contain block dark:hidden" 
               />
               <Image 
-                src={logoInversImg} 
+                src="/logo-invers.png" 
                 alt="Iter Logo" 
                 width={40}
                 height={40}
