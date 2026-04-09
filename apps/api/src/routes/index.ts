@@ -13,7 +13,6 @@ import calendarRoutes from './calendar.routes.js';
 import phaseRoutes from './phase.routes.js';
 import statsRoutes from './stats.routes.js';
 import sectorRoutes from './sector.routes.js';
-import attendanceRoutes from './attendance.routes.js';
 import notificationRoutes from './notification.routes.js';
 import evaluationRoutes from './evaluation.routes.js'; 
 import questionnaireRoutes from './questionnaire.routes.js';
@@ -44,8 +43,6 @@ router.use('/evaluation', evaluationRoutes);
 // Student and Teacher Routes
 router.use('/students', studentRoutes);
 router.use('/teachers', teacherRoutes);
-router.use('/attendance', attendanceRoutes);
-
 // Calendar Routes
 router.use('/calendar', calendarRoutes);
 router.use('/phases', phaseRoutes);

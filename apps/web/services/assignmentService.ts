@@ -19,6 +19,8 @@ export interface Enrollment {
   imageRightsUrl?: string | null;
   isImageRightsValidated: boolean;
   hasTeacherEvaluation?: boolean;
+  evaluations?: any[];
+  attendance?: any[];
 }
 
 export interface Assignment {
@@ -35,6 +37,7 @@ export interface Assignment {
   teacher1?: { userId: number; name: string };
   teacher2?: { userId: number; name: string };
   enrollments?: Enrollment[];
+  sessions?: any[];
   checklist?: unknown[];
 }
 
@@ -60,7 +63,8 @@ interface BackendEnrollment {
     imageRights?: string;
     isImageRightsValidated?: boolean;
   };
-  evaluations?: unknown[];
+  evaluations?: any[];
+  attendance?: any[];
 }
 
 interface BackendAssignment {
@@ -77,6 +81,7 @@ interface BackendAssignment {
   teacher1?: { userId: number; name: string };
   teacher2?: { userId: number; name: string };
   enrollments?: BackendEnrollment[];
+  sessions?: any[];
   checklist?: unknown[];
 }
 
@@ -124,7 +129,10 @@ const assignmentService = {
           imageRightsUrl: i.docsStatus?.imageRights,
           isImageRightsValidated: i.docsStatus?.isImageRightsValidated ?? false,
           hasTeacherEvaluation: (i.evaluations?.length ?? 0) > 0,
+          evaluations: i.evaluations,
+          attendance: i.attendance
         })),
+        sessions: a.sessions,
         checklist: a.checklist,
       }));
     } catch (error) {
@@ -235,7 +243,10 @@ const assignmentService = {
           imageRightsUrl: i.docsStatus?.imageRights,
           isImageRightsValidated: i.docsStatus?.isImageRightsValidated ?? false,
           hasTeacherEvaluation: (i.evaluations?.length ?? 0) > 0,
+          evaluations: i.evaluations,
+          attendance: i.attendance
         })),
+        sessions: a.sessions,
         checklist: a.checklist,
       }));
     } catch (error) {
@@ -288,7 +299,10 @@ const assignmentService = {
           imageRightsUrl: i.docsStatus?.imageRights,
           isImageRightsValidated: i.docsStatus?.isImageRightsValidated ?? false,
           hasTeacherEvaluation: (i.evaluations?.length ?? 0) > 0,
+          evaluations: i.evaluations,
+          attendance: i.attendance
         })),
+        sessions: a.sessions,
         checklist: a.checklist,
       };
     } catch (error) {

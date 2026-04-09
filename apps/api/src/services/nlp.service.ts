@@ -1,11 +1,13 @@
 
+export interface CompetenceUpdate {
+    competenceName: string;
+    score: number;
+    reason: string;
+}
+
 export interface NLPAnalysisResult {
     attendanceStatus?: 'PRESENT' | 'LATE' | 'ABSENT' | 'JUSTIFIED_ABSENCE';
-    competenceUpdate?: {
-        competenceName: string; // 'Transversal' usually
-        score: number;
-        reason: string;
-    };
+    competenceUpdates: CompetenceUpdate[];
     cleanedObservation: string;
 }
 
@@ -17,10 +19,11 @@ export class NLPService {
     public processText(text: string): NLPAnalysisResult {
         const lowerText = text.toLowerCase();
         const result: NLPAnalysisResult = {
+            competenceUpdates: [],
             cleanedObservation: text
         };
 
-        // 1. Detect Punctuality
+        // 1. Detect Punctuality (Attendance)
         if (lowerText.includes('tarde') || lowerText.includes('retraso') || lowerText.includes('retard')) {
             result.attendanceStatus = 'LATE';
         } else if (lowerText.includes('falta') || lowerText.includes('no ha venido') || lowerText.includes('absent')) {
@@ -31,17 +34,42 @@ export class NLPService {
             result.attendanceStatus = 'PRESENT';
         }
 
-        // 2. Detect Competence (Teamwork / Initiative)
-        // Keywords for positive transversal competence
-        const positiveKeywords = ['ayuda', 'lidera', 'iniciativa', 'proactiv', 'colabora', 'equip', 'ajuda'];
-        const matches = positiveKeywords.filter(k => lowerText.includes(k));
+        // 2. Define Competence Categories
+        const categories = [
+            {
+                name: 'Transversal',
+                keywords: ['ayuda', 'equipo', 'lidera', 'iniciativa', 'proactiv', 'colabora', 'ajuda', 'equip']
+            },
+            {
+                name: 'Técnica',
+                keywords: ['técnico', 'tecnic', 'habilidad', 'destreza', 'aprendizaje', 'herramienta', 'eina', 'habilitat']
+            },
+            {
+                name: 'Participación',
+                keywords: ['participa', 'interés', 'interes', 'motivación', 'atención', 'pregunta']
+            }
+        ];
 
-        if (matches.length > 0) {
-            result.competenceUpdate = {
-                competenceName: 'Transversal', // General assumption for this prototype
-                score: 5, // High score for positive mention
-                reason: `Detected positive behaviors: ${matches.join(', ')}`
-            };
+        // 3. Detect Scores (Simple intensity mapping)
+        let baseScore = 4; // Default decent score
+        if (lowerText.includes('excelente') || lowerText.includes('muy bien') || lowerText.includes('molt bé') || lowerText.includes('5')) {
+            baseScore = 5;
+        } else if (lowerText.includes('flojo') || lowerText.includes('mejorar') || lowerText.includes('regular') || lowerText.includes('3')) {
+            baseScore = 3;
+        } else if (lowerText.includes('insuficiente') || lowerText.includes('mal') || lowerText.includes('2')) {
+            baseScore = 2;
+        }
+
+        // 4. Detect multiple competencies
+        for (const cat of categories) {
+            const matchedKeywords = cat.keywords.filter(k => lowerText.includes(k));
+            if (matchedKeywords.length > 0) {
+                result.competenceUpdates.push({
+                    competenceName: cat.name,
+                    score: baseScore,
+                    reason: `Matched: ${matchedKeywords.join(', ')}`
+                });
+            }
         }
 
         return result;

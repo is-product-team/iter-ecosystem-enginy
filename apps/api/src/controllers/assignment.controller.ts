@@ -10,6 +10,7 @@ import path from 'path';
 import { z } from 'zod';
 import { SessionService } from '../services/session.service.js';
 import { PDFService } from '../services/pdf.service.js';
+import { EvaluationService } from '../services/evaluation.service.js';
 
 const MIN_ATTENDANCE_PERCENTAGE = 80;
 
@@ -89,7 +90,9 @@ export const getAssignmentById = async (req: Request, res: Response) => {
         },
         enrollments: {
           include: {
-            student: true
+            student: true,
+            evaluations: true,
+            attendance: true
           }
         }
       }
@@ -918,6 +921,40 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Obtains all attendance records for a complete assignment.
+ */
+export const getAttendanceByAssignment = async (req: Request, res: Response) => {
+  const { idAssignment } = req.params;
+  const assignmentId = parseInt(idAssignment as string);
+
+  try {
+    const attendances = await prisma.attendance.findMany({
+      where: {
+        enrollment: {
+          assignmentId
+        }
+      },
+      include: {
+        enrollment: {
+          include: {
+            student: true
+          }
+        }
+      },
+      orderBy: [
+        { sessionNumber: 'asc' },
+        { enrollment: { student: { lastName: 'asc' } } }
+      ]
+    });
+
+    res.json(attendances);
+  } catch (error) {
+    console.error("Error in getAttendanceByAssignment:", error);
+    res.status(500).json({ error: 'Error loading full attendance report.' });
+  }
+};
+
 export const registerAttendance = async (req: Request, res: Response) => {
   const { idAssignment, sessionNum } = req.params;
   const assignmentId = parseInt(idAssignment as string);
@@ -936,22 +973,46 @@ export const registerAttendance = async (req: Request, res: Response) => {
   const validatedData = validation.data;
 
   try {
-    // Use transaction for consistency
-    await prisma.$transaction(
-      validatedData.map(item =>
-        prisma.attendance.updateMany({
-          where: {
-            enrollmentId: item.enrollmentId,
-            sessionNumber: num,
-            enrollment: { assignmentId }
-          },
-          data: {
-            status: item.status,
-            observations: item.observations
-          }
-        })
-      )
-    );
+    // 1. Get the session to have the correct date if possible
+    const session = await prisma.session.findFirst({
+      where: {
+        assignmentId,
+      },
+      orderBy: { sessionDate: 'asc' },
+      skip: num - 1,
+      take: 1
+    });
+
+    const sessionDate = session ? session.sessionDate : new Date();
+
+    // 2. Perform updates in a transaction
+    await prisma.$transaction(async (tx) => {
+      for (const item of validatedData) {
+        const existing = await tx.attendance.findFirst({
+          where: { enrollmentId: item.enrollmentId, sessionNumber: num }
+        });
+
+        if (existing) {
+          await tx.attendance.update({
+            where: { attendanceId: existing.attendanceId },
+            data: {
+              status: item.status,
+              observations: item.observations
+            }
+          });
+        } else {
+          await tx.attendance.create({
+            data: {
+              enrollmentId: item.enrollmentId,
+              sessionNumber: num,
+              sessionDate: sessionDate,
+              status: item.status,
+              observations: item.observations
+            }
+          });
+        }
+      }
+    });
 
     res.json({ success: true, message: 'Attendance registered correctly' });
   } catch (error) {
@@ -1085,16 +1146,12 @@ export const closeAssignment = async (req: Request, res: Response) => {
     }
 
     // 2. Generate certificates for students with >= 80% attendance
-    // (Logic adapted from certificate.controller)
-    const totalSessions = await prisma.session.count({ where: { assignmentId } });
+    const evaluationService = new EvaluationService();
     let certificatesIssued = 0;
 
     for (const enrollment of assignment.enrollments) {
-      const attendedCount = enrollment.attendance.filter((a: any) =>
-        a.status === 'PRESENT' || a.status === 'LATE'
-      ).length;
-
-      const percentage = totalSessions > 0 ? (attendedCount / totalSessions) * 100 : 0;
+      const stats = await evaluationService.calculateAttendanceStats(enrollment.enrollmentId);
+      const percentage = stats.percentage;
 
       if (percentage >= MIN_ATTENDANCE_PERCENTAGE) {
         const studentName = `${enrollment.student.fullName} ${enrollment.student.lastName}`;
