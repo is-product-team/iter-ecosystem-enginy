@@ -43,7 +43,7 @@ describe('VisionService', () => {
     const result = await service.validateDocument(mockFile);
     
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain('Unsupported file format. Please upload PDF or images.');
+    expect(result.errors).toContain('Formato de archivo no soportado. Por favor, sube PDF o imágenes.');
   });
 
   it('should detect missing signature if AI content does not mention it', async () => {
@@ -66,6 +66,6 @@ describe('VisionService', () => {
     
     expect(result.valid).toBe(false);
     expect(result.metadata.hasSignature).toBe(false);
-    expect(result.errors).toContain("Handwritten signature not detected in the expected region.");
+    expect(result.errors).toContain("Firma manuscrita no detectada en la región esperada.");
   });
 });

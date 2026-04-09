@@ -25,7 +25,7 @@ describe('AutoAssignmentService', () => {
     
     const result = await service.generateAssignments();
     
-    expect(result).toEqual({ message: 'No requests found to process.' });
+    expect(result).toEqual({ message: 'No se encontraron solicitudes para procesar.' });
     expect(prismaMock.request.findMany).toHaveBeenCalled();
   });
 
