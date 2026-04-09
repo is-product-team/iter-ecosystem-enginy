@@ -62,7 +62,7 @@
     },
     "Phases": {
       "title": "Fases del Curs",
-      "description": "Configura les dates i l'estat de las fases del curs.",
+      "description": "Configura les dates i l'estat de les fases del curs.",
       "control_panel": "Panell de Control Temporal"
     },
     "Stats": {
@@ -143,7 +143,7 @@
       "greetings": {
         "morning": "Hola, bon dia",
         "afternoon": "Hola, bona tarda",
-        "evening": "Hola, bona nit"
+        "evening": "Hola, bon vespre"
       },
       "docs": {
         "select": "Selecciona document...",
@@ -185,9 +185,9 @@
       "change_photo": "Canviar foto de perfil",
       "photo_success": "Foto actualitzada.",
       "photo_error": "Error en pujar la foto.",
-      "no_user_photo_error": "No se pot pujar una foto a un professor sense usuari vinculat.",
+      "no_user_photo_error": "No es pot pujar una foto a un professor sense usuari vinculat.",
       "delete_title": "Eliminar Professor",
-      "delete_confirm": "Estàs segur que vols eliminar aquest professor? També se li retirarà l'accés a l'App mòbil.",
+      "delete_confirm": "Estàs segur que vols eliminar aquest professor? També se li traurà l'accés a l'App mòbil.",
       "form_name": "Nom complet",
       "form_email": "Correu de contacte",
       "password_placeholder": "Contrasenya per a l'App mòbil",
@@ -236,7 +236,7 @@
       "session_n": "Sessió {number}",
       "no_teacher_assigned": "Cap professor assignat",
       "specific_day": "Dia Específic",
-      "whole_workshop": "Taller Complet",
+      "whole_workshop": "Taller Sencer",
       "select_workshop": "Selecciona Taller",
       "select_day": "Selecciona Dia",
       "select_teacher": "Selecciona Professor",
@@ -289,6 +289,34 @@
         "delete_ok": "Avís eliminat.",
         "delete_error": "Error en eliminar l'avís."
       }
+    },
+    "Monitoring": {
+      "title": "Monitorització Operativa (Fase 3)",
+      "subtitle": "Estat de l'execució de tallers i assistència en el teu centre.",
+      "KPI": {
+        "sessions_today": "Sessions Avui",
+        "pending_attendance": "Fulls Pendents",
+        "active_assignments": "Tallers en Marxa",
+        "incidents": "Incidències Actives"
+      },
+      "Assignments": {
+        "title": "Estat dels Tallers",
+        "progress": "Progrés",
+        "health": "Salut de l'Asistència",
+        "view_details": "Gestionar Sessions",
+        "no_staff": "⚠️ Sense professor assignat",
+        "attendance_ok": "Asistència al dia",
+        "attendance_warning": "Falten fulls per omplir"
+      },
+      "Today": {
+        "title": "Agenda d'Avui",
+        "no_sessions": "No hi ha sessions programades per avui."
+      },
+      "Incidents": {
+        "title": "Últimes Incidències",
+        "report_new": "Informar Incidència",
+        "no_incidents": "No hi ha incidències reportades."
+      }
     }
   },
   "Common": {
@@ -327,7 +355,7 @@
     "only_pdf_allowed": "Només es permeten fitxers PDF.",
     "ai_mismatch": "L'IA detecta un tipus diferent: {type}.",
     "ai_no_signatures": "L'IA no ha detectat les signatures requerides.",
-    "ai_error": "Error en processar l'IA. Pots forçar la pujada.",
+    "ai_error": "Error al processar l'IA. Pots forçar la pujada.",
     "showing": "Mostrant",
     "of": "de",
     "previous": "Anterior",
@@ -346,9 +374,9 @@
     "actions": "Accions",
     "edit": "Editar",
     "delete": "Eliminar",
-    "cancel": "Cancel·lar",
     "save": "Desar",
     "confirm": "Confirmar",
+    "cancel": "Cancel·lar",
     "modality_label": "Modalitat {modality}",
     "places_label": "{count} Places",
     "duration_label": "{hours}h",
@@ -356,18 +384,27 @@
     "status_label": "Estat: {status}",
     "save_success": "Operació realitzada correctament.",
     "error_loading": "Error en carregar les dades.",
-    "fill_all_fields": "Si us plau, completa tots els camps.",
+    "fill_all_fields": "Si us plau, emplena tots els camps.",
     "ok": "D'acord",
     "show": "Mostrar",
-    "hide": "Ocultar",
+    "hide": "Amagar",
     "table_info": "Informació",
     "table_idalu": "IDALU",
-    "table_course": "Curs"
+    "table_course": "Curs",
+    "clear": "Netejar",
+    "details": "Detalls",
+    "status": "Estat",
+    "loading_error": "No s'ha pogut carregar la informació",
+    "delete_success": "Element eliminat correctament.",
+    "delete_error": "S'ha produït un error en eliminar l'element.",
+    "delete_confirm_title": "Confirmar eliminació",
+    "delete_confirm_msg": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
+    "new": "Nou"
   },
   "Calendar": {
     "loading_auth": "Sincronitzant el teu calendari...",
     "title": "Calendari Iter",
-    "subtitle": "Visualitza tots els fites, tallers i terminis en un calendari complet.",
+    "subtitle": "Visualitza totes les fites, tallers i terminis en un calendari complet.",
     "active_fase": "Fase Actual: {nom}",
     "sync_phases": "Sincronitzant fases...",
     "view_legend": "Veure Llegenda",
@@ -413,9 +450,9 @@
       "options_label": "OPCIONS (SEPARADES PER COMA)",
       "add_question": "Afegir pregunta",
       "publish": "Publicar model de qüestionari",
-      "placeholder_title": "Ex: Enquesta de Satisfaccío Tallers 2026",
+      "placeholder_title": "Ex: Enquesta de Satisfacció Tallers 2026",
       "placeholder_question": "Què vols preguntar?",
-      "placeholder_options": "Opció 1, Opció 2, Opción 3...",
+      "placeholder_options": "Opció 1, Opció 2, Opció 3...",
       "save_success": "Model de qüestionari creat correctament.",
       "save_error": "Error en crear el qüestionari.",
       "types": {
@@ -430,7 +467,7 @@
     "title": "Informes i Resultats",
     "subtitle": "Anàlisi de l'impacte del programa Iter.",
     "student_exp": "Experiència de l'Alumne",
-    "teacher_sat": "Satisfacció del Docent",
+    "teacher_sat": "Satisfaccó del Docent",
     "workshops_completed": "Tallers Completats",
     "vs_last_year": "+5% vs 2023",
     "student_part": "Participació d'Alumnes",
@@ -461,7 +498,7 @@
       },
       "sections": {
         "attitude": {
-          "title": "Actitud i Comportamiento",
+          "title": "Actitud i Comportament",
           "questions": {
             "punctuality": "Has estat puntual en l'entrega de tasques?",
             "respect": "Has respectat el material i les instal·lacions?",
@@ -481,8 +518,8 @@
           "question": "T'ha ajudat a decidir-te pel teu futur professional?",
           "options": {
             "si": "Sí, m'ha aclarit les idees.",
-            "no": "No, ja ho tenia clar o no és per a mi.",
-            "considerant": "M'ho estic considerant ara mateix."
+            "no": "No, ja ho tenia clar o no és per mi.",
+            "considerant": "Ho estic considerant ara mateix."
           }
         },
         "feedback": {
@@ -496,7 +533,7 @@
       "options": {
         "frequency": {
           "mai": "Mai",
-          "rarament": "Rarament",
+          "rarament": "Raramente",
           "sovint": "Sovint",
           "sempre": "Sempre"
         },
@@ -508,13 +545,13 @@
         }
       },
       "submit_btn": "Enviar Autoconsulta",
-      "sending": "Enviant...",
+      "sending": "Enviando...",
       "error_submit": "Error en enviar l'autoconsulta."
     }
   },
   "Metadata": {
     "title": "Iter Web",
-    "description": "Aplicació web de Iter per a la gestió d'aprenentatge."
+    "description": "Aplicación web de Iter per a la gestió d'aprenentatge."
   },
   "Profile": {
     "title": "El meu Perfil",
@@ -534,26 +571,360 @@
       "system": "Sistema"
     }
   },
-  "Services": {
-    "Risk": {
-      "alert_title": "Alerta: Risc d'Abandonament",
-      "alert_message": "Identificat un nivell de risc del {score}%. Factors principals: {factors}. Es recomana intervenció pedagògica immediata.",
-      "factors": {
-        "absences": "Alt volum d'absències recents",
-        "occasional": "Absències ocasionals registrades",
-        "lates": "Problemas persistents de puntualitat",
-        "low_competency": "{count} avaluacions de competència baixes"
+  "Navigation": {
+    "home": "Inici",
+    "notifications": "Avisos",
+    "calendar": "Calendari",
+    "logout": "Sortir",
+    "workshops": "Tallers",
+    "centers": "Centres",
+    "requests": "Peticions",
+    "phases": "Fases",
+    "stats": "Estadístiques",
+    "verifications": "Verificacions",
+    "students": "Alumnes",
+    "teachers": "Professors",
+    "assignments": "Assignacions",
+    "sessions": "Sessions",
+    "profile": "Perfil",
+    "monitoring": "Monitorització"
+  },
+  "Dashboards": {
+    "admin": {
+      "title": "Panell d'Administració",
+      "subtitle": "Gestió global de centres, tallers i avaluacions del programa.",
+      "sections": {
+        "workshops": {
+          "title": "Gestió de Tallers",
+          "description": "Crea, modifica o elimina tallers per als centres."
+        },
+        "centers": {
+          "title": "Gestió de Centres",
+          "description": "Crea, modifica o elimina centres educatius."
+        },
+        "phases": {
+          "title": "Fases del Curs",
+          "description": "Configura les dates y estats de les fases del curs."
+        },
+        "stats": {
+          "title": "Estadístiques",
+          "description": "Anàlisi avançat de l'ús del sistema i activitat."
+        },
+        "requests": {
+          "title": "Peticions dels Centres",
+          "description": "Consulta les peticions i assigna tallers."
+        },
+        "verifications": {
+          "title": "Verificació de Documents",
+          "description": "Valida la documentació presentada pels centres."
+        }
       }
     },
-    "Vision": {
-      "error_format": "Format de fitxer no suportat. Si us plau, puja PDF o imatges.",
-      "error_empty": "El document sembla estar buit (menys d'1KB).",
-      "error_signature": "Signatura manuscrita no detectada en la regió esperada.",
-      "error_unavailable": "El motor de visió d'IA local no està disponible actualment."
+    "center": {
+      "title": "Panell del Centre",
+      "subtitle": "Gestió del procés de tallers Iter.",
+      "timeline_title": "Estat del Programa Iter 25-26",
+      "loading_calendar": "Carregant calendari...",
+      "sections": {
+        "students": {
+          "title": "Gestió d'Alumnes",
+          "description": "Afegeix alumnes del teu centre"
+        },
+        "teachers": {
+          "title": "Gestió de Professors",
+          "description": "Afegeix professors del teu centre"
+        },
+        "requests": {
+          "title": "Sol·licitar Tallers",
+          "description": "Demana els tallers que vulguis amb les places necessàries."
+        },
+        "assignments": {
+          "title": "Assignacions",
+          "description": "Assigna alumnes als tallers sol·licitats."
+        },
+        "sessions": {
+          "title": "Gestió de Sessions",
+          "description": "Afegeix els teus professors als tallers assignats"
+        },
+        "closed_module": "Mòdul tancat",
+        "general": "General",
+        "phase1": "Fase 1",
+        "phase2": "Fase 2",
+        "phase3": "Fase 3"
+      }
     },
-    "AutoAssignment": {
-      "no_requests": "No s'han trobat sol·licituds per processar.",
-      "success": "Assignats {count} estudiants al Centre {center} per al Taller {workshop}"
+    "student": {
+      "title": "Benvingut/da",
+      "subtitle": "Consulta els teus tallers i descarrega els teus certificats.",
+      "certificates_title": "Els meus Certificats",
+      "no_certificates": "No s'han trobat certificats.",
+      "no_certificates_desc": "Encara no has obtingut cap certificat. Completa un taller per guanyar-ne un.",
+      "download_pdf": "Descarregar PDF",
+      "loading": "Carregant panell...",
+      "duration": "Durada",
+      "issued": "Emès",
+      "pdf_not_implemented": "La generació de PDF no està implementada en aquesta demo."
+    }
+  },
+  "Forms": {
+    "search": "Cercar...",
+    "search_by_title": "Cercar per títol",
+    "filter_by_sector": "Filtrar per sector",
+    "filter_by_modality": "Filtrar per modalitat",
+    "all_sectors": "Tots els sectors",
+    "all_modalities": "Totes les modalitats",
+    "name": "Nom",
+    "title": "Títol",
+    "description": "Descripció",
+    "sector": "Sector",
+    "modality": "Modalitat",
+    "places": "Places",
+    "duration": "Durada",
+    "location": "Ubicació",
+    "icon": "Icona",
+    "select_sector": "Selecciona un sector...",
+    "required_fields": "Els camps marcats amb * són obligatoris.",
+    "workshop_config_subtitle": "Configuració del Taller i Horari Setmanal",
+    "general_info": "Informació General",
+    "technical_details": "Detalls Tècnics",
+    "title_placeholder": "Introdueix el nom del taller...",
+    "description_placeholder": "Breu explicació del contingut...",
+    "modality_a": "Modalitat A (3 Trimestres)",
+    "modality_b": "Modalitat B (2 Trimestres)",
+    "modality_c": "Modalitat C (1 Trimestre)",
+    "review_data": "Revisa les dades abans de guardar.",
+    "schedule": "Horari Setmanal",
+    "add_slot": "Afegir Franja",
+    "add_day": "Afegir Dia",
+    "configured_days": "Dies Configurats",
+    "no_days": "Cap dia configurat encara",
+    "save_workshop": "Guardar Taller",
+    "saving": "Guardant...",
+    "monday": "Dilluns",
+    "tuesday": "Dimarts",
+    "wednesday": "Dimecres",
+    "thursday": "Dijous",
+    "friday": "Divendres"
+  },
+  "WorkshopsPage": {
+    "title": "Gestió de Tallers",
+    "subtitle": "Creació, edició i supervisió del catàleg oficial Iter.",
+    "new": "Nou Taller",
+    "loading": "Carregant catàleg...",
+    "empty": "No s'han trobat tallers",
+    "empty_desc": "Prova amb altres termes de cerca.",
+    "table_info": "Informació del Taller",
+    "table_classification": "Classificació",
+    "table_details": "Detalls i Capacitat"
+  },
+  "CentersPage": {
+    "title": "Gestió de Centres",
+    "subtitle": "Administració dels centres educatius que participen a Iter.",
+    "new": "Nou Centre",
+    "search_label": "Cercar per nom o codi",
+    "search_placeholder": "Ex: Institut Pedralbes, 08012345...",
+    "loading": "Carregant centres...",
+    "empty": "No s'han trobat centres",
+    "empty_desc": "Prova amb altres termes de cerca.",
+    "table_center": "Centre",
+    "table_address": "Adreça",
+    "table_email": "Email",
+    "table_phone": "Telèfon",
+    "center_code": "CODI",
+    "no_address": "Sense adreça"
+  },
+  "RequestsPage": {
+    "title": "Gestió de Peticions",
+    "subtitle": "Monitoritza i gestiona les peticions dels centres educatius per al curs actual.",
+    "search_workshop": "Cercar Taller",
+    "educational_center": "Centre Educatiu",
+    "all_centers": "Tots els centres",
+    "all_modalities": "Totes les modalitats",
+    "automatic_assignment": "Assignació Automàtica",
+    "syncing": "Sincronitzant peticions...",
+    "no_requests": "No s'han trobat peticions amb els filtres aplicats",
+    "table_center_date": "Centre / Data",
+    "table_teachers": "Professors",
+    "table_students": "Alumnes",
+    "table_status": "Estat",
+    "table_actions": "Accions",
+    "approve": "Aprovar",
+    "reject": "Rebutjar",
+    "edit_request": "Editar Petició",
+    "num_students": "Nombre d'Alumnes",
+    "comments": "Comentaris",
+    "save_changes": "Guardar Canvis",
+    "request_approve_title": "Aprovar Petició",
+    "request_approve_msg": "Estàs segur que vols aprovar aquesta petició i generar l'assignació immediatament?",
+    "request_reject_title": "Rebutjar Petició",
+    "request_reject_msg": "Estàs segur que vols rebutjar aquesta petició? Aquesta acció no es pot desfer.",
+    "run_tetris_title": "Executar Assignació Automàtica",
+    "run_tetris_msg": "Aquesta acció processarà totes les peticions aprovades pendents i generarà assignacions per a tots els centres. Continuar?",
+    "request_approved_success": "Petició aprovada i assignació generada correctament.",
+    "request_rejected_success": "Petició rebutjada.",
+    "tetris_success": "Assignació completada: {count} noves assignacions.",
+    "rejected_status": "Rebutjada",
+    "assigned_status": "Assignada",
+    "mod_a": "MOD A (Grup complet)",
+    "mod_b": "MOD B (Mig grup)",
+    "mod_c": "MOD C (Projectes individuals)"
+  },
+  "AssignmentsPage": {
+    "title": "Tallers Assignats",
+    "subtitle": "Consulta i gestiona la planificació dels teus tallers.",
+    "search_filters": "Cerca i Filtres",
+    "search_placeholder": "CERCAR PER TALLER O CENTRE...",
+    "all_statuses": "Tots els estats",
+    "in_progress": "En curs / Acceptat",
+    "completed": "Completat",
+    "table_workshop": "Taller Assignat",
+    "table_center": "Centre",
+    "table_planning": "Planificació",
+    "table_status": "Estat",
+    "table_actions": "Accions",
+    "workshop_id": "IDENTIFICADOR DEL TALLER",
+    "not_assigned": "No assignat",
+    "start_date": "Inici: {date}",
+    "manage_btn": "Gestionar",
+    "no_assignments": "No s'han trobat assignacions",
+    "adjust_filters": "Prova d'ajustar els filtres de cerca.",
+    "incidents_title": "Gestió d'Incidències i Vacants",
+    "incidents_subtitle": "INFORMA DE PROBLEMES DE COMPORTAMENT O SOL·LICITA PLACES VACANTS.",
+    "incident_placeholder": "Descriu el problema...",
+    "report_btn": "Informar Incidència",
+    "incident_success": "Incidència informada. El CEB la revisarà aviat."
+  },
+  "StudentsPage": {
+    "title": "Gestió d'Alumnat",
+    "subtitle": "Gestiona els alumnes del teu centre educatiu i les seves dades nominals.",
+    "new_student": "Nou Alumne",
+    "search_label": "Cercar per nom o IDALU",
+    "search_placeholder": "Ex: Joan García, 1234567...",
+    "all_courses": "Tots els cursos",
+    "filter_course": "Filtrar per curs",
+    "no_students": "No s'han trobat alumnes",
+    "adjust_search": "Prova amb altres termes de cerca.",
+    "table_info": "Informació de l'Alumne",
+    "table_idalu": "Identificació (IDALU)",
+    "table_course": "Curs / Nivell",
+    "edit_student_title": "Editar Alumne",
+    "create_student_title": "Nou Alumne",
+    "modify_data": "Modifica les dades de l'alumne",
+    "enter_data": "Introdueix les dades per al nou alumne",
+    "change_photo": "Canviar Foto",
+    "photo_success": "Foto actualitzada correctament.",
+    "upload_error": "Error en pujar la foto.",
+    "name_label": "Nom de l'alumne",
+    "surnames_label": "Cognoms",
+    "idalu_label": "Codi IDALU",
+    "course_label": "Curs / Nivell (Ex: 4rt ESO)",
+    "save_btn": "Guardar Alumne",
+    "delete_title": "Eliminar Alumne",
+    "delete_msg": "Estàs segur que vols eliminar aquest alumne? Aquesta acció no es pot desfer.",
+    "delete_success": "Alumne eliminat."
+  },
+  "TeachersPage": {
+    "title": "Gestió de Professorat",
+    "subtitle": "Gestiona els professors referents del teu centre educatiu.",
+    "new_teacher": "Nou Professor",
+    "search_label": "Cercar per nom o contacte",
+    "search_placeholder": "Ex: Manuel Pérez, manuel@escolaurgell.cat...",
+    "no_teachers": "No s'han trobat professors",
+    "table_teacher": "Professor",
+    "table_contact": "Contacte",
+    "edit_teacher_title": "Editar Professor",
+    "create_teacher_title": "Nou Professor",
+    "modify_data": "Modifica les dades del professor",
+    "enter_data": "Introdueix les dades per al nou professor",
+    "change_photo": "Canviar Foto",
+    "photo_success": "Foto actualitzada correctament.",
+    "upload_error": "Error en pujar la foto.",
+    "name_label": "Nom complet",
+    "contact_label": "Informació de contacte (Email principal)",
+    "password_label": "Contrasenya (Accés App)",
+    "show_pwd": "Veure",
+    "hide_pwd": "Amagar",
+    "pwd_placeholder": "Contrasenya per a l'App mòbil",
+    "pwd_hint": "Aquesta serà la contrasenya que el professor utilitzarà per entrar a l'App.",
+    "save_btn": "Guardar Professor",
+    "delete_title": "Eliminar Professor",
+    "delete_msg": "Estàs segur que vols eliminar aquest professor? També se li traurà l'accés a l'App mòbil.",
+    "delete_success": "Professor eliminat."
+  },
+  "CenterRequestsPage": {
+    "title": "Sol·licitar Tallers",
+    "subtitle": "Gestiona les sol·licituds de tallers per al teu centre educatiu.",
+    "search_placeholder": "Cercar taller o sector...",
+    "num_workshops": "{count} Tallers disponibles",
+    "table_mod": "Mod",
+    "table_workshop": "Taller / Sector",
+    "table_referents": "Referents",
+    "table_status": "Estat / Acció",
+    "new_request": "Nova Sol·licitud",
+    "edit_request": "Editar Sol·licitud",
+    "cancel_btn": "Cancel·lar",
+    "error_title": "Error en la sol·licitud",
+    "select_workshop": "Selecciona un taller de la llista per començar",
+    "referents_label": "Professors Referents",
+    "referent1_placeholder": "Selecciona el Referent Principal *",
+    "referent2_placeholder": "Selecciona el Segon Referent *",
+    "num_students_label": "Nº Alumnat Previst",
+    "num_students_placeholder": "Ex: 4",
+    "modality_c_hint": "* Màxim 4 alumnes per projecte en Modalitat C.",
+    "reason_label": "Motiu de la Sol·licitud (Opcional)",
+    "reason_placeholder": "Breu explicació del perfil de l'alumnat...",
+    "send_btn": "Enviar Sol·licitud",
+    "update_btn": "Actualitzar Sol·licitud",
+    "processing": "Processant...",
+    "max_students_alert": "En la Modalitat C, el nombre màxim d'alumnes és 4.",
+    "referents_required": "Has de seleccionar dos professors referents.",
+    "referents_different": "Els dos professors referents han de ser diferents.",
+    "send_error": "Error en enviar la sol·licitud.",
+    "select_btn": "Seleccionar",
+    "selected_label": "Seleccionat",
+    "edit_btn": "Editar"
+  },
+  "AssignmentDetailPage": {
+    "title_prefix": "GESTIÓ DEL TALLER: ",
+    "modality_prefix": "MODALITAT ",
+    "referent_label": "Equip Docent Referent",
+    "center_label": "Centre Educatiu",
+    "students_title": "Alumnat Participant",
+    "students_subtitle": "{occupied} de {total} places ocupades.",
+    "nominal_register_btn": "Registre Nominal",
+    "no_students": "Encara no hi ha alumnes assignats",
+    "no_students_hint": "Fes clic aquí per començar el registre nominal",
+    "remove_student_success": "Alumne eliminat correctament.",
+    "loading_msg": "Carregant detalls del taller...",
+    "status": {
+      "DATA_ENTRY": "PENDENT GESTIÓ",
+      "PROVISIONAL": "PROVISIONAL",
+      "VALIDATED": "CONFIRMAT",
+      "IN_PROGRESS": "EN EXECUCIÓ",
+      "COMPLETED": "FINALITZAT"
+    },
+    "docs": {
+      "pedagogical_agreement": "Acord Pedagògic",
+      "mobility_authorization": "Aut. Mobilitat",
+      "image_rights": "Drets Imatge"
+    },
+    "finalize_section": {
+      "ready_title": "✓ Tot a punt per començar",
+      "not_ready_title": "Confirmar Documentació",
+      "ready_desc": "Tota la documentació ha estat validada. Ja pots confirmar el registre final per activar el taller.",
+      "not_ready_desc": "Un cop tota la documentació estigui validada, podràs confirmar el registre final.",
+      "confirm_btn": "Confirmar i Generar Sessions",
+      "confirm_dialog": "Confirmar registre?",
+      "success": "Registre confirmat!"
+    },
+    "close_section": {
+      "title": "Tancar Taller",
+      "desc": "Un cop finalitzades totes les sessions i les avaluacions competencials, pots tancar el taller. Aquesta acció generarà automàticament els certificats d'assistència.",
+      "confirm_btn": "Tancar Taller",
+      "confirm_dialog": "Estàs segur que vols tancar aquest taller? Aquesta acció és irreversible i generarà els certificats de finalització.",
+      "pending_evals_error": "No es pot tancar l'assignació. Hi ha {count} avaluacions pendents.",
+      "success": "Taller tancat i certificats generats correctament!",
+      "error": "Error en tancar el taller."
     }
   }
 }

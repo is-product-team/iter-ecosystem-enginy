@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -17,13 +18,17 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isOpen,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   onCancel,
   isDestructive = false,
 }) => {
+  const t = useTranslations('Common');
   if (!isOpen) return null;
+
+  const finalConfirmLabel = confirmLabel || t('confirm');
+  const finalCancelLabel = cancelLabel || t('cancel');
 
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 transition-all duration-300">
@@ -54,7 +59,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             onClick={onCancel}
             className="flex-1 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors"
           >
-            {cancelLabel}
+            {finalCancelLabel}
           </button>
           <button
             onClick={onConfirm}
@@ -64,7 +69,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 : 'bg-consorci-darkBlue hover:bg-consorci-actionBlue'
             }`}
           >
-            {confirmLabel}
+            {finalConfirmLabel}
           </button>
         </div>
       </div>

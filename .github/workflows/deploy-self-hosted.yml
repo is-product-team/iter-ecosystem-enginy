@@ -44,16 +44,13 @@ jobs:
           docker pull mirror.gcr.io/library/node:22-alpine
           docker tag mirror.gcr.io/library/node:22-alpine node:22-alpine
 
-      - name: 🔑 Create Environment Files from Secrets
+      - name: 🔑 Create Unified Environment File from Secrets
         run: |
-          # Crear el .env de la API
-          echo "${{ secrets.PROD_API_ENV }}" > apps/api/.env.production
-
-          # Crear el .env de la Web
-          echo "${{ secrets.PROD_WEB_ENV }}" > apps/web/.env.production
-
-          # Opcional: Crear el .env del Mobile (si lo necesitas en el servidor)
-          echo "${{ secrets.PROD_MOBILE_ENV }}" > apps/mobile/.env.production
+          # Combinar todos los secretos en un único .env en la raíz
+          echo "# Production Environment" > .env
+          echo "${{ secrets.PROD_API_ENV }}" >> .env
+          echo "${{ secrets.PROD_WEB_ENV }}" >> .env
+          echo "${{ secrets.PROD_MOBILE_ENV }}" >> .env
 
       - name: 🐳 Deploy with Docker Compose
         run: |
@@ -61,8 +58,8 @@ jobs:
           docker compose -f docker-compose.prod.yml build
 
           echo "--- 🗄️ Ejecutando Migraciones (Contenedor Aislado) ---"
-          # Extraemos la URL para pasarla al contenedor independiente
-          export DB_URL=$(grep DATABASE_URL apps/api/.env.production | cut -d '=' -f2-)
+          # Extraemos la URL para pasarla al contenedor independiente (ahora desde la raíz)
+          export DB_URL=$(grep DATABASE_URL .env | cut -d '=' -f2-)
 
           # Ejecutamos la migración en un contenedor temporal que usa la red del proxy
           # Esto evita pelear por RAM con la API principal

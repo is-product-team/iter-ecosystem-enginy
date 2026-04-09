@@ -1,0 +1,9 @@
+- [ ] Correct Catalan spelling in `apps/web/messages/ca.json`
+- [ ] Add `Navigation` namespace to `ca.json` and `es.json`
+- [ ] Add `Dashboard` translations to `ca.json` and `es.json`
+- [ ] Refactor `Navbar.tsx` for internationalization
+- [ ] Refactor `Breadcrumbs.tsx` for internationalization
+- [ ] Internationalize Admin Dashboard
+- [ ] Internationalize Center Dashboard
+- [ ] Internationalize Student Dashboard
+- [ ] Final verification of all localized routes

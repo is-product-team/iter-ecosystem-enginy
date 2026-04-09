@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { THEME, ROLES } from "@iter/shared";
 import WorkshopIcon from "../../../components/WorkshopIcon";
@@ -11,14 +12,15 @@ import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
 import workshopService, { Workshop } from "@/services/workshopService";
-import { useTranslations } from 'next-intl';
 
 export default function WorkshopAdminPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const t = useTranslations('Admin.Workshops');
   const tc = useTranslations('Common');
-  
+  const tForm = useTranslations('Forms');
+
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+
   const [editingWorkshop, setEditingWorkshop] = useState<Workshop | null>(null);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export default function WorkshopAdminPage() {
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -56,7 +58,7 @@ export default function WorkshopAdminPage() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const fetchWorkshops = useCallback(async () => {
@@ -175,13 +177,13 @@ export default function WorkshopAdminPage() {
       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
       </svg>
-      {t("new_workshop")}  
+      {t("new_workshop")}
     </button>
   );
 
   return (
-    <DashboardLayout 
-      title={t("management_title")} 
+    <DashboardLayout
+      title={t("management_title")}
       subtitle={t("management_subtitle")}
       actions={headerActions}
     >
@@ -191,7 +193,7 @@ export default function WorkshopAdminPage() {
         <div className="flex-1">
           <label className="block text-[13px] font-medium text-text-primary mb-3">{tc("search_by_title")}</label>
           <div className="relative">
-            <input 
+            <input
               type="text"
               placeholder={tc("search_placeholder")}
               value={searchQuery}
@@ -207,7 +209,7 @@ export default function WorkshopAdminPage() {
         {/* Sector Filter */}
         <div className="lg:w-64">
           <label className="block text-[13px] font-medium text-text-primary mb-3">{tc("filter_by_sector")}</label>
-          <select 
+          <select
             value={selectedSector}
             onChange={(e) => handleSectorChange(e.target.value)}
             className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
@@ -221,7 +223,7 @@ export default function WorkshopAdminPage() {
         {/* Modality Filter */}
         <div className="lg:w-64">
           <label className="block text-[11px] font-medium text-text-primary mb-3">{tc("filter_by_modality")}</label>
-          <select 
+          <select
             value={selectedModality}
             onChange={(e) => handleModalityChange(e.target.value)}
             className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
@@ -234,7 +236,7 @@ export default function WorkshopAdminPage() {
 
         {/* Action: Clear */}
         <div className="flex items-end">
-          <button 
+          <button
             onClick={() => {
               setSearchQuery("");
               setSelectedSector(tc("all_sectors"));
@@ -294,13 +296,13 @@ export default function WorkshopAdminPage() {
                     </td>
                     <td className="px-6 py-6">
                       <div className="flex justify-end items-center gap-4">
-                        <button 
+                        <button
                           onClick={() => handleEdit(workshop)}
                           className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
                         >
                           {tc("edit")}
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(workshop._id)}
                           className="p-2 text-text-muted hover:text-red-600 transition-all"
                         >
@@ -347,7 +349,7 @@ export default function WorkshopAdminPage() {
         onWorkshopCreated={handleWorkshopSaved}
         initialData={editingWorkshop}
       />
-      <ConfirmDialog 
+      <ConfirmDialog
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}

@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -12,9 +13,12 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
 import getApi from '@/services/api';
 import Pagination from "@/components/Pagination";
-import { useTranslations } from 'next-intl';
 
 export default function TeachersCRUD() {
+  const t = useTranslations('Center.Teachers');
+  const tc = useTranslations('Common');
+  const ta = useTranslations('Auth.login');
+
   const { user, loading: authLoading } = useAuth();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,9 +29,6 @@ export default function TeachersCRUD() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const t = useTranslations('Center.Teachers');
-  const tc = useTranslations('Common');
-  const ta = useTranslations('Auth.login');
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -44,10 +45,12 @@ export default function TeachersCRUD() {
   });
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
       return;
     }
     if (user) loadTeachers();

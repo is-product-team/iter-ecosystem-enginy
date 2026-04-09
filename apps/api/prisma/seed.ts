@@ -220,8 +220,8 @@ async function seedPhases() {
         name: phase.name,
         order: phase.order,
         isActive: phase.isActive,
-        startDate: new Date(`${currentYear}-09-01`),
-        endDate: new Date(`${currentYear + 1}-06-30`),
+        startDate: new Date(new Date().setMonth(now.getMonth() - 3)),
+        endDate: new Date(new Date().setMonth(now.getMonth() + 9)),
       },
     });
   }

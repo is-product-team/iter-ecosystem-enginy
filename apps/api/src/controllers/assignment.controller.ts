@@ -7,6 +7,19 @@ import { VisionService } from '../services/vision.service.js';
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
+import { SessionService } from '../services/session.service.js';
+import { PDFService } from '../services/pdf.service.js';
+import { EvaluationService } from '../services/evaluation.service.js';
+
+const MIN_ATTENDANCE_PERCENTAGE = 80;
+
+// Schema for bulk attendance update
+const AttendanceUpdateSchema = z.array(z.object({
+  enrollmentId: z.number(),
+  status: z.enum(['PRESENT', 'ABSENT', 'LATE', 'JUSTIFIED_ABSENCE']),
+  observations: z.string().optional().nullable()
+}));
 
 // GET: All assignments (Admin only)
 export const getAssignments = async (req: Request, res: Response) => {
@@ -77,7 +90,9 @@ export const getAssignmentById = async (req: Request, res: Response) => {
         },
         enrollments: {
           include: {
-            student: true
+            student: true,
+            evaluations: true,
+            attendance: true
           }
         }
       }
@@ -88,7 +103,7 @@ export const getAssignmentById = async (req: Request, res: Response) => {
     }
 
     // Security Scoping
-    if (role !== ROLES.ADMIN && assignment.centerId !== centerId) {
+    if (role !== ROLES.ADMIN && Number(assignment.centerId) !== Number(centerId)) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -104,8 +119,13 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
   const { centerId, role } = req.user!;
 
   // Security Scoping
-  if (role !== ROLES.ADMIN && parseInt(targetCenterId as string) !== centerId) {
-    return res.status(403).json({ error: 'Access denied: You cannot view assignments from another center' });
+  if (role !== ROLES.ADMIN) {
+    if (!centerId) {
+      return res.status(403).json({ error: 'Access denied: Your account has no center assigned' });
+    }
+    if (Number(targetCenterId) !== Number(centerId)) {
+      return res.status(403).json({ error: 'Access denied: You cannot view assignments from another center' });
+    }
   }
 
   try {
@@ -211,8 +231,13 @@ export const getIssuesByCenter = async (req: Request, res: Response) => {
   const { centerId, role } = req.user!;
 
   // Security Scoping
-  if (role !== ROLES.ADMIN && parseInt(targetCenterId as string) !== centerId) {
-    return res.status(403).json({ error: 'Access denied: You cannot view issues from another center' });
+  if (role !== ROLES.ADMIN) {
+    if (!centerId) {
+      return res.status(403).json({ error: 'Access denied: Your account has no center assigned' });
+    }
+    if (Number(targetCenterId) !== Number(centerId)) {
+      return res.status(403).json({ error: 'Access denied: You cannot view issues from another center' });
+    }
   }
 
   try {
@@ -228,13 +253,15 @@ export const getIssuesByCenter = async (req: Request, res: Response) => {
 
 // POST: Create issue
 export const createIssue = async (req: Request, res: Response) => {
-  const { centerId, description } = req.body;
+  const { centerId, description, assignmentId, sessionId } = req.body;
   try {
     const newIssue = await prisma.issue.create({
       data: {
         centerId: parseInt(centerId),
-        description: description
-      }
+        description: description,
+        assignmentId: assignmentId ? parseInt(assignmentId) : undefined,
+        sessionId: sessionId ? parseInt(sessionId) : undefined
+      } as any
     });
     res.status(201).json(newIssue);
   } catch (error) {
@@ -370,7 +397,7 @@ export const createEnrollments = async (req: Request, res: Response) => {
   const { studentIds } = req.body;
 
   try {
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx) => {
       // 1. Verify existence of the assignment
       const assignment = await tx.assignment.findUnique({
         where: { assignmentId: assignmentId },
@@ -388,11 +415,11 @@ export const createEnrollments = async (req: Request, res: Response) => {
       }
 
       // 3. Synchronize enrollments
-      const currentIds = assignment.enrollments.map((i: any) => i.studentId);
-      const newIds = studentIds.map((id: any) => parseInt(id));
+      const currentIds = assignment.enrollments.map(i => i.studentId);
+      const newIds = (studentIds as (string | number)[]).map(id => parseInt(id as string));
 
-      const toAdd = newIds.filter((id: number) => !currentIds.includes(id));
-      const toRemove = currentIds.filter((id: number) => !newIds.includes(id));
+      const toAdd = newIds.filter((id) => !currentIds.includes(id));
+      const toRemove = currentIds.filter((id) => !newIds.includes(id));
 
       if (toRemove.length > 0) {
         await tx.enrollment.deleteMany({
@@ -416,7 +443,7 @@ export const createEnrollments = async (req: Request, res: Response) => {
       await tx.assignmentChecklist.updateMany({
         where: {
           assignmentId: assignmentId,
-          stepName: { contains: 'Nominal Registration' }
+          stepName: { contains: 'Nominal Register' } // Sincronizado con el servicio
         },
         data: {
           isCompleted: true,
@@ -573,78 +600,40 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
 export const confirmLegalRegistration = async (req: Request, res: Response) => {
   const { assignmentId } = req.params;
   try {
-    // 1. Mark enrollments as confirmed
-    const enrollments = await prisma.enrollment.findMany({ where: { assignmentId: parseInt(assignmentId as string) } });
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Mark enrollments as confirmed
+      const enrollments = await tx.enrollment.findMany({ where: { assignmentId: parseInt(assignmentId as string) } });
 
-    for (const enrollment of enrollments) {
-      const docsStatus = (enrollment.docsStatus as any) || {};
-      await prisma.enrollment.update({
-        where: { enrollmentId: enrollment.enrollmentId },
-        data: {
-          docsStatus: {
-            ...docsStatus,
-            cebRegistrationConfirmed: true
-          }
-        }
-      });
-    }
-
-    // 2. Get workshop data to generate sessions
-    const assignment = await prisma.assignment.findUnique({
-      where: { assignmentId: parseInt(assignmentId as string) },
-      include: { workshop: true }
-    });
-
-    if (!assignment || !assignment.workshop) {
-      return res.status(404).json({ error: 'Assignment not found' });
-    }
-
-    // 3. Generate sessions if they don't exist
-    const existingSessions = await prisma.session.count({
-      where: { assignmentId: parseInt(assignmentId as string) }
-    });
-
-    if (existingSessions === 0) {
-      const schedule = assignment.workshop.executionDays as any[];
-
-      // 3.1 Get dates of Phase 3
-      const { phase: phase3 } = await isPhaseActive(PHASES.EXECUTION);
-
-      if (phase3 && Array.isArray(schedule) && schedule.length > 0) {
-        const startDate = new Date(Math.max(new Date().getTime(), phase3.startDate.getTime()));
-        const endDate = phase3.endDate;
-
-        // Iterate by weeks from startDate to endDate
-        const currentPointer = new Date(startDate);
-        let _i = 0; // Initialize session number counter
-        while (currentPointer <= endDate) {
-          for (const slot of schedule) {
-            const sessionDate = new Date(currentPointer);
-
-            // Calculate desired day of week for this session
-            const currentDay = sessionDate.getDay();
-            const daysUntil = (slot.dayOfWeek + 7 - currentDay) % 7;
-            sessionDate.setDate(sessionDate.getDate() + daysUntil);
-
-            // Verify we are still within the phase range
-            if (sessionDate >= startDate && sessionDate <= endDate) {
-              // Create the session
-              await prisma.session.create({
-                data: {
-                  assignmentId: assignment.assignmentId,
-                  sessionDate: sessionDate,
-                  startTime: slot.startTime,
-                  endTime: slot.endTime
-                }
-              });
-              _i++; // Increment session number
+      for (const enrollment of enrollments) {
+        const docsStatus = (enrollment.docsStatus as Record<string, any>) || {};
+        await tx.enrollment.update({
+          where: { enrollmentId: enrollment.enrollmentId },
+          data: {
+            docsStatus: {
+              ...docsStatus,
+              cebRegistrationConfirmed: true
             }
           }
-          // Advance to next week
-          currentPointer.setDate(currentPointer.getDate() + 7);
-        }
+        });
       }
-    }
+
+      // 2. Get workshop data to generate sessions
+      const assignment = await tx.assignment.findUnique({
+        where: { assignmentId: parseInt(assignmentId as string) },
+        include: { workshop: true }
+      });
+
+      if (!assignment || !assignment.workshop) {
+        throw new Error('Assignment or workshop not found');
+      }
+
+      // 3. Generate sessions using SessionService
+      await SessionService.syncSessionsForAssignment(assignment.assignmentId);
+
+      return assignment;
+    });
+
+    const assignment = result;
 
     const oldAssignment = await prisma.assignment.findUnique({ where: { assignmentId: parseInt(assignmentId as string) } });
 
@@ -863,11 +852,173 @@ export const getSessions = async (req: Request, res: Response) => {
 };
 
 export const getSessionAttendance = async (req: Request, res: Response) => {
-  res.status(501).json({ error: 'Not implemented: getSessionAttendance' });
+  const { idAssignment, sessionNum } = req.params;
+  const assignmentId = parseInt(idAssignment as string);
+  const num = parseInt(sessionNum as string);
+
+  if (isNaN(assignmentId) || isNaN(num)) {
+    return res.status(400).json({ error: 'Invalid parameters' });
+  }
+
+  try {
+    // 0. Sync sessions if they don't exist yet
+    let sessions = await prisma.session.findMany({
+      where: { assignmentId },
+      orderBy: { sessionDate: 'asc' }
+    });
+
+    if (sessions.length === 0) {
+      await SessionService.syncSessionsForAssignment(assignmentId);
+      sessions = await prisma.session.findMany({
+        where: { assignmentId },
+        orderBy: { sessionDate: 'asc' }
+      });
+    }
+
+    const targetSession = sessions[num - 1];
+    if (!targetSession) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    // 2. Ensure attendance records are initialized
+    await SessionService.ensureAttendanceRecords(assignmentId, num, targetSession.sessionDate);
+
+    // 3. Get combined attendance list
+    const rawAttendance = await prisma.attendance.findMany({
+      where: {
+        enrollment: { assignmentId },
+        sessionNumber: num
+      },
+      include: {
+        enrollment: {
+          include: {
+            student: true
+          }
+        }
+      }
+    });
+
+    const attendance = rawAttendance.map((r) => ({
+      attendanceId: r.attendanceId,
+      enrollmentId: r.enrollmentId,
+      sessionNumber: r.sessionNumber,
+      sessionDate: r.sessionDate.toISOString(),
+      status: r.status,
+      observations: r.observations,
+      enrollment: {
+        student: {
+          fullName: r.enrollment.student.fullName,
+          lastName: r.enrollment.student.lastName,
+          idalu: r.enrollment.student.idalu
+        }
+      }
+    }));
+
+    res.json(attendance);
+  } catch (error) {
+    console.error("Error in getSessionAttendance:", error);
+    res.status(500).json({ error: 'Error obtaining attendance records' });
+  }
+};
+
+/**
+ * Obtains all attendance records for a complete assignment.
+ */
+export const getAttendanceByAssignment = async (req: Request, res: Response) => {
+  const { idAssignment } = req.params;
+  const assignmentId = parseInt(idAssignment as string);
+
+  try {
+    const attendances = await prisma.attendance.findMany({
+      where: {
+        enrollment: {
+          assignmentId
+        }
+      },
+      include: {
+        enrollment: {
+          include: {
+            student: true
+          }
+        }
+      },
+      orderBy: [
+        { sessionNumber: 'asc' },
+        { enrollment: { student: { lastName: 'asc' } } }
+      ]
+    });
+
+    res.json(attendances);
+  } catch (error) {
+    console.error("Error in getAttendanceByAssignment:", error);
+    res.status(500).json({ error: 'Error loading full attendance report.' });
+  }
 };
 
 export const registerAttendance = async (req: Request, res: Response) => {
-  res.status(501).json({ error: 'Not implemented: registerAttendance' });
+  const { idAssignment, sessionNum } = req.params;
+  const assignmentId = parseInt(idAssignment as string);
+  const num = parseInt(sessionNum as string);
+
+  if (isNaN(assignmentId) || isNaN(num)) {
+    return res.status(400).json({ error: 'Invalid parameters' });
+  }
+
+  // Validate body
+  const validation = AttendanceUpdateSchema.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(400).json({ error: 'Invalid attendance data', details: validation.error.format() });
+  }
+
+  const validatedData = validation.data;
+
+  try {
+    // 1. Get the session to have the correct date if possible
+    const session = await prisma.session.findFirst({
+      where: {
+        assignmentId,
+      },
+      orderBy: { sessionDate: 'asc' },
+      skip: num - 1,
+      take: 1
+    });
+
+    const sessionDate = session ? session.sessionDate : new Date();
+
+    // 2. Perform updates in a transaction
+    await prisma.$transaction(async (tx) => {
+      for (const item of validatedData) {
+        const existing = await tx.attendance.findFirst({
+          where: { enrollmentId: item.enrollmentId, sessionNumber: num }
+        });
+
+        if (existing) {
+          await tx.attendance.update({
+            where: { attendanceId: existing.attendanceId },
+            data: {
+              status: item.status,
+              observations: item.observations
+            }
+          });
+        } else {
+          await tx.attendance.create({
+            data: {
+              enrollmentId: item.enrollmentId,
+              sessionNumber: num,
+              sessionDate: sessionDate,
+              status: item.status,
+              observations: item.observations
+            }
+          });
+        }
+      }
+    });
+
+    res.json({ success: true, message: 'Attendance registered correctly' });
+  } catch (error) {
+    console.error("Error in registerAttendance:", error);
+    res.status(500).json({ error: 'Error saving attendance' });
+  }
 };
 
 // Phase 2: Teaching Staff Management
@@ -963,5 +1114,91 @@ export const removeSessionTeacher = async (req: Request, res: Response) => {
 
 // Phase 4: Closing
 export const closeAssignment = async (req: Request, res: Response) => {
-  res.status(501).json({ error: 'Not implemented: closeAssignment' });
+  const { idAssignment } = req.params;
+  const assignmentId = parseInt(idAssignment as string);
+
+  try {
+    const assignment = await prisma.assignment.findUnique({
+      where: { assignmentId },
+      include: {
+        enrollments: {
+          include: {
+            evaluations: true,
+            student: true,
+            attendance: true
+          }
+        },
+        workshop: true
+      }
+    });
+
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+
+    // 1. Validate that all enrollments have an evaluation
+    const missingEvaluations = assignment.enrollments.filter(e => e.evaluations.length === 0);
+    if (missingEvaluations.length > 0) {
+      return res.status(400).json({ 
+        error: 'Cannot close assignment: Some students haven\'t been evaluated.',
+        missingCount: missingEvaluations.length
+      });
+    }
+
+    // 2. Generate certificates for students with >= 80% attendance
+    const evaluationService = new EvaluationService();
+    let certificatesIssued = 0;
+
+    for (const enrollment of assignment.enrollments) {
+      const stats = await evaluationService.calculateAttendanceStats(enrollment.enrollmentId);
+      const percentage = stats.percentage;
+
+      if (percentage >= MIN_ATTENDANCE_PERCENTAGE) {
+        const studentName = `${enrollment.student.fullName} ${enrollment.student.lastName}`;
+        const fileName = `Certificado_${enrollment.studentId}_${assignmentId}.pdf`;
+        
+        await PDFService.generateCertificate(
+          studentName,
+          assignment.workshop.title,
+          new Date(),
+          fileName
+        );
+
+        await prisma.certificate.upsert({
+          where: {
+            studentId_assignmentId: {
+              studentId: enrollment.studentId,
+              assignmentId
+            }
+          },
+          update: {},
+          create: {
+            studentId: enrollment.studentId,
+            assignmentId: assignmentId,
+            issuedAt: new Date()
+          }
+        });
+        certificatesIssued++;
+      }
+    }
+
+    // 3. Update assignment status to COMPLETED
+    const updated = await prisma.assignment.update({
+      where: { assignmentId },
+      data: { status: 'COMPLETED' }
+    });
+
+    // 4. Log the change
+    await logStatusChange(assignmentId, assignment.status, 'COMPLETED');
+
+    res.json({
+      success: true,
+      message: `${certificatesIssued} certificates generated and assignment closed.`,
+      status: updated.status
+    });
+
+  } catch (error) {
+    console.error("Error in closeAssignment:", error);
+    res.status(500).json({ error: 'Error closing the assignment' });
+  }
 };

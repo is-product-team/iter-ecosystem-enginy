@@ -1,23 +1,24 @@
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
-import DashboardLayout from '@/components/DashboardLayout';
 import { useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
+import DashboardLayout from '@/components/DashboardLayout';
 import Loading from '@/components/Loading';
-import { useTranslations } from 'next-intl';
 
 export default function AdminDashboardPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const t = useTranslations('Admin');
   const tc = useTranslations('Common');
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const locale = useLocale();
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   if (authLoading || !user) {
     return (

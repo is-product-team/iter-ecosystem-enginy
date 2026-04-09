@@ -59,12 +59,13 @@ export class SessionService {
 
     /**
      * Ensures attendance records exist for a given assignment and session number.
-     * If not, creates them for all currently enrolled students.
+     * If not, creates them for all currently enrolled students with a 'PRESENT' status.
      */
     static async ensureAttendanceRecords(assignmentId: number, sessionNum: number, date: Date) {
         // 1. Get all enrollments for this assignment
         const enrollments = await prisma.enrollment.findMany({
-            where: { assignmentId: assignmentId }
+            where: { assignmentId },
+            select: { enrollmentId: true }
         });
 
         if (enrollments.length === 0) return;
@@ -72,25 +73,28 @@ export class SessionService {
         // 2. Check which students already have attendance for this session
         const existingAttendance = await prisma.attendance.findMany({
             where: {
-                enrollment: { assignmentId: assignmentId },
+                enrollment: { assignmentId },
                 sessionNumber: sessionNum
             },
             select: { enrollmentId: true }
         });
 
-        const existingIds = new Set(existingAttendance.map((a: any) => a.enrollmentId));
+        const existingIds = new Set(existingAttendance.map((a) => a.enrollmentId));
 
-        // 3. Create missing records
-        const missingEnrollments = enrollments.filter((e: any) => !existingIds.has(e.enrollmentId));
+        // 3. Identify and create missing records
+        const toCreate = enrollments
+            .filter((e) => !existingIds.has(e.enrollmentId))
+            .map((e) => ({
+                enrollmentId: e.enrollmentId,
+                sessionNumber: sessionNum,
+                sessionDate: date,
+                status: 'PRESENT' as any // Prisma enum needs cast or correct string
+            }));
 
-        if (missingEnrollments.length > 0) {
-            await (prisma.attendance as any).createMany({
-                data: missingEnrollments.map((e: any) => ({
-                    enrollmentId: e.enrollmentId,
-                    sessionNumber: sessionNum,
-                    sessionDate: date,
-                    status: 'PRESENT'
-                }))
+        if (toCreate.length > 0) {
+            await prisma.attendance.createMany({
+                data: toCreate,
+                skipDuplicates: true
             });
         }
     }
@@ -101,7 +105,7 @@ export class SessionService {
     static async getSessionStatus(assignmentId: number, sessionNum: number): Promise<string> {
         const count = await prisma.attendance.count({
             where: {
-                enrollment: { assignmentId: assignmentId },
+                enrollment: { assignmentId },
                 sessionNumber: sessionNum
             }
         });
@@ -110,35 +114,145 @@ export class SessionService {
 
     /**
      * Synchronizes sessions for an assignment based on its workshop schedule.
+     * Uses a smart diffing algorithm to preserve existing sessions (and their staff/issues) if dates match.
      */
     static async syncSessionsForAssignment(assignmentId: number) {
         const assignment = await prisma.assignment.findUnique({
-            where: { assignmentId: assignmentId },
+            where: { assignmentId },
             include: { workshop: true }
         });
 
         if (!assignment || !assignment.startDate) return;
 
-        const schedule = assignment.workshop.executionDays;
-        const sessionDates = this.generateDatesFromSchedule(assignment.startDate, schedule as any);
+        const scheduleData = assignment.workshop?.executionDays;
+        
+        // 1. Generate desired session dates and times
+        let desiredSessions: Array<{ date: Date; startTime?: string; endTime?: string }> = [];
+        
+        if (Array.isArray(scheduleData)) {
+            if (scheduleData.length > 0 && typeof scheduleData[0] === 'string') {
+                // Legacy format: string[]
+                const dates = this.generateDatesFromSchedule(assignment.startDate, scheduleData as string[]);
+                desiredSessions = dates.map(d => ({ date: d }));
+            } else {
+                // Object format: { dayOfWeek: number, startTime: string, endTime: string }[]
+                const { phase } = await prisma.phase.findFirst({
+                    where: { name: 'EXECUTION' }, // Assuming standard name
+                    select: { startDate: true, endDate: true }
+                }).then(p => ({ phase: p })) as any; // Fallback or use shared utility
 
-        const hasAttendance = await prisma.attendance.count({
-            where: { enrollment: { assignmentId: assignmentId } }
+                const startDate = assignment.startDate;
+                const endDate = assignment.endDate || phase?.endDate || addWeeks(startDate, 10);
+
+                let current = startOfDay(startDate);
+                while (current <= endDate) {
+                    const dayOfWeek = getDay(current);
+                    const slots = (scheduleData as any[]).filter(s => s.dayOfWeek === dayOfWeek);
+                    
+                    for (const slot of slots) {
+                        desiredSessions.push({
+                            date: new Date(current),
+                            startTime: slot.startTime,
+                            endTime: slot.endTime
+                        });
+                    }
+                    current = addDays(current, 1);
+                    if (desiredSessions.length > 50) break; // Safety limit
+                }
+            }
+        }
+
+        if (desiredSessions.length === 0) return;
+
+        // 2. Fetch existing sessions
+        const existingSessions = await prisma.session.findMany({
+            where: { assignmentId },
+            include: { staff: true }
         });
 
-        if (hasAttendance > 0) return;
+        // 3. Diffing
+        const toDelete: number[] = [];
+        const toKeep = new Set<number>();
+        const toCreate: typeof desiredSessions = [];
 
-        // Delete existing sessions
-        await prisma.session.deleteMany({
-            where: { assignmentId: assignmentId }
+        for (const desired of desiredSessions) {
+            const match = existingSessions.find(s => 
+                s.sessionDate.getTime() === desired.date.getTime() &&
+                s.startTime === (desired.startTime || null) &&
+                s.endTime === (desired.endTime || null)
+            );
+
+            if (match) {
+                toKeep.add(match.sessionId);
+            } else {
+                toCreate.push(desired);
+            }
+        }
+
+        // Identify sessions to delete (those not in toKeep and that don't have attendance)
+        for (const existing of existingSessions) {
+            if (!toKeep.has(existing.sessionId)) {
+                // Check if it has attendance BEFORE deleting
+                const attendanceCount = await prisma.attendance.count({
+                    where: { enrollment: { assignmentId }, sessionDate: existing.sessionDate }
+                });
+                if (attendanceCount === 0) {
+                    toDelete.push(existing.sessionId);
+                }
+            }
+        }
+
+        // 4. Execute Changes
+        if (toDelete.length > 0) {
+            await prisma.session.deleteMany({
+                where: { sessionId: { in: toDelete } }
+            });
+        }
+
+        if (toCreate.length > 0) {
+            await prisma.session.createMany({
+                data: toCreate.map(s => ({
+                    assignmentId,
+                    sessionDate: s.date,
+                    startTime: s.startTime,
+                    endTime: s.endTime
+                }))
+            });
+        }
+    }
+
+    /**
+     * Calculates the "health" of an assignment's attendance.
+     * Returns the percentage of elapsed sessions that have recorded attendance.
+     */
+    static async getAttendanceHealth(assignmentId: number): Promise<{ percentage: number; pendingCount: number; totalSessions: number }> {
+        const totalSessions = await prisma.session.count({ where: { assignmentId } });
+        if (totalSessions === 0) return { percentage: 100, pendingCount: 0, totalSessions: 0 };
+
+        const now = new Date();
+        const elapsedSessions = await prisma.session.findMany({
+            where: {
+                assignmentId,
+                sessionDate: { lte: now }
+            },
+            select: { sessionId: true, sessionDate: true }
         });
 
-        // Create new ones
-        await (prisma.session as any).createMany({
-            data: sessionDates.map(date => ({
-                assignmentId: assignmentId,
-                sessionDate: date
-            }))
+        if (elapsedSessions.length === 0) return { percentage: 100, pendingCount: 0, totalSessions };
+
+        const attendanceRecs = await prisma.attendance.groupBy({
+            by: ['sessionDate'],
+            where: {
+                enrollment: { assignmentId },
+                sessionDate: { in: elapsedSessions.map(s => s.sessionDate) }
+            },
+            _count: { attendanceId: true }
         });
+
+        const recordedCount = attendanceRecs.length;
+        const pendingCount = elapsedSessions.length - recordedCount;
+        const percentage = Math.round((recordedCount / elapsedSessions.length) * 100);
+
+        return { percentage, pendingCount, totalSessions };
     }
 }

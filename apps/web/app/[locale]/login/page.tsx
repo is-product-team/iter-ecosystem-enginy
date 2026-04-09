@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import logoImg from '@/public/logo.png';
+import logoInversImg from '@/public/logo-invers.png';
 import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
@@ -21,17 +22,19 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showProfessorLink, setShowProfessorLink] = useState(false);
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
   const { user, login, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (!authLoading && user) {
       if (user.role.name === ROLES.ADMIN) {
-        router.push('/admin');
+        router.push(`/${locale}/admin`);
       } else if (user.role.name === ROLES.COORDINATOR) {
-        router.push('/center');
+        router.push(`/${locale}/center`);
       }
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, locale]);
 
   if (authLoading) {
     return <Loading fullScreen message={t('loading')} />;
@@ -52,9 +55,9 @@ export default function LoginPage() {
       } else {
         login(user);
         if (user.role.name === ROLES.ADMIN) {
-          router.push('/admin');
+          router.push(`/${locale}/admin`);
         } else if (user.role.name === ROLES.COORDINATOR) {
-          router.push('/center');
+          router.push(`/${locale}/center`);
         }
       }
     } catch (err) {
@@ -82,7 +85,16 @@ export default function LoginPage() {
               alt="Iter Logo"
               width={128}
               height={128}
-              className="w-full h-full object-contain dark:invert"
+              priority
+              className="w-full h-full object-contain block dark:hidden"
+            />
+            <Image
+              src={logoInversImg}
+              alt="Iter Logo"
+              width={128}
+              height={128}
+              priority
+              className="w-full h-full object-contain hidden dark:block"
             />
           </div>
           <h2 className="text-2xl font-medium tracking-tight text-text-primary leading-none">Iter</h2>

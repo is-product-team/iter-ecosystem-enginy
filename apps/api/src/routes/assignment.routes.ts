@@ -42,6 +42,7 @@ router.delete('/:idAssignment/staff/:idUser', authenticateToken, assignmentContr
 router.get('/:idAssignment/sessions', authenticateToken, assignmentController.getSessions);
 router.get('/:idAssignment/sessions/:sessionNum', authenticateToken, assignmentController.getSessionAttendance);
 router.post('/:idAssignment/sessions/:sessionNum', authenticateToken, assignmentController.registerAttendance);
+router.get('/:idAssignment/attendance', authenticateToken, assignmentController.getAttendanceByAssignment);
 
 // Phase 3: Dynamic Session Teaching Staff
 router.post('/sessions/:idSession/staff', authenticateToken, assignmentController.addSessionTeacher);

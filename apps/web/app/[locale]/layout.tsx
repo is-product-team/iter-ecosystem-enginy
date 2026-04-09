@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import '@/config/env';
 import '../globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { Toaster } from 'sonner';
@@ -12,6 +14,14 @@ const inter = Inter({
   display: 'swap',
   variable: '--font-inter',
 });
+
+export const metadata: Metadata = {
+  title: 'Iter Web',
+  description: 'Iter Web Application',
+  icons: {
+    icon: '/logo.png',
+  },
+};
 
 export function generateStaticParams() {
   return [{ locale: 'ca' }, { locale: 'es' }, { locale: 'en' }];

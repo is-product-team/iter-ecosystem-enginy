@@ -44,7 +44,7 @@ const Breadcrumbs: React.FC = () => {
 
           return (
             <React.Fragment key={path}>
-...
+              ...
               {index > 0 && (
                 <span className="text-text-muted mx-2">
                   <svg className="w-3 h-3 text-text-muted/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,7 +57,7 @@ const Breadcrumbs: React.FC = () => {
                   {label}
                 </span>
               ) : (
-                <Link 
+                <Link
                   href={path}
                   className="text-consorci-darkBlue hover:text-consorci-actionBlue transition-colors"
                 >

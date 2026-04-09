@@ -2,18 +2,22 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
 import notificationService from '@/services/notificationService';
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
 
 const Navbar: React.FC = () => {
+  const t = useTranslations('Navigation');
+  const commonT = useTranslations('Common');
   const { user, logout } = useAuth();
   const pathname = usePathname();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
   const [unreadCount, setUnreadCount] = useState(0);
-  const t = useTranslations('Common');
+  const isCoordinator = user?.role?.name === ROLES.COORDINATOR;
 
   useEffect(() => {
     if (user) {
@@ -35,19 +39,19 @@ const Navbar: React.FC = () => {
   if (!user) return null;
 
   const isAdmin = user.role.name === ROLES.ADMIN;
-  const isCoordinator = user.role.name === ROLES.COORDINATOR;
 
   const getHomePath = () => {
-    if (isAdmin) return `/admin`;
-    if (isCoordinator) return `/center`;
-    return `/`;
+    if (isAdmin) return `/${locale}/admin`;
+    if (isCoordinator) return `/${locale}/center`;
+    return `/${locale}`;
   };
 
   const navLinks = [
     { label: t('home'), path: getHomePath(), show: true },
-    { label: t('notifications'), path: `/center/notifications`, show: true, isNotifications: true },
-    { label: t('calendar'), path: `/calendar`, show: true },
-    { label: t('profile'), path: `/profile`, show: true },
+    { label: t('monitoring'), path: `/${locale}/center/monitoring`, show: isCoordinator },
+    { label: t('notifications'), path: `/${locale}/center/notifications`, show: true, isNotifications: true },
+    { label: t('calendar'), path: `/${locale}/calendar`, show: true },
+    { label: t('profile'), path: `/${locale}/profile`, show: true },
   ];
 
   return (
@@ -61,14 +65,16 @@ const Navbar: React.FC = () => {
                 alt="Iter Logo" 
                 width={40}
                 height={40}
-                className="w-10 h-10 object-contain block dark:hidden" 
+                priority
+                className="w-10 h-10 object-contain block dark:hidden"
               />
               <Image 
                 src="/logo-invers.png" 
                 alt="Iter Logo" 
                 width={40}
                 height={40}
-                className="w-10 h-10 object-contain hidden dark:block" 
+                priority
+                className="w-10 h-10 object-contain hidden dark:block"
               />
             </Link>
           </div>
@@ -79,11 +85,10 @@ const Navbar: React.FC = () => {
                 <Link
                   key={link.path}
                   href={link.path}
-                  className={`h-full flex items-center px-4 text-[13px] font-medium transition-all border-b-2 ${
-                    pathname === link.path 
-                      ? 'border-consorci-darkBlue text-text-primary' 
+                  className={`h-full flex items-center px-4 text-[13px] font-medium transition-all border-b-2 ${pathname === link.path
+                      ? 'border-consorci-darkBlue text-text-primary'
                       : 'border-transparent text-text-muted hover:text-text-primary'
-                  }`}
+                    }`}
                 >
                   <span className="relative">
                     {link.label}
@@ -105,7 +110,7 @@ const Navbar: React.FC = () => {
                   {user?.fullName || ''}
                 </span>
                 <span className="text-text-secondary text-[11px] font-normal">
-                  {user?.center?.name || t('educational_center')}
+                  {user?.center?.name || commonT('educational_center')}
                 </span>
                 <span className="text-[11px] font-normal text-text-muted mt-0.5 truncate max-w-[180px]">
                   {user?.role?.name} {user?.center?.centerCode ? `• ${user.center.centerCode}` : ''}
@@ -115,7 +120,7 @@ const Navbar: React.FC = () => {
                 onClick={logout}
                 className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[12px] font-medium px-5 py-2 transition-all active:scale-[0.98]"
               >
-                {t('logout')}
+                {commonT('logout')}
               </button>
             </div>
           </div>

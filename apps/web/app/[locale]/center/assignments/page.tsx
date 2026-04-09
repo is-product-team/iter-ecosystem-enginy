@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { getUser, User } from '@/lib/auth';
 import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -14,13 +15,16 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from "@/components/Pagination";
 
 export default function AssignmentsPage() {
+  const t = useTranslations('AssignmentsPage');
+  const tCommon = useTranslations('Common');
+
   const [user, setUser] = useState<User | null>(null);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All statuses");
-  
+  const [statusFilter, setStatusFilter] = useState("All");
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -32,10 +36,12 @@ export default function AssignmentsPage() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     let isMounted = true;
@@ -44,10 +50,10 @@ export default function AssignmentsPage() {
       if (!isMounted) return;
 
       if (!currentUser || currentUser.role.name !== ROLES.COORDINATOR) {
-        router.push('/login');
+        router.push(`/${locale}/login`);
         return;
       }
-      
+
       setUser(currentUser);
 
       // Fetch assignments
@@ -81,12 +87,12 @@ export default function AssignmentsPage() {
   };
 
   const filteredAssignments = assignments.filter(a => {
-    const matchesSearch = !searchQuery || 
+    const matchesSearch = !searchQuery ||
       a.workshop?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.center?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === "All statuses" || a.status === statusFilter;
-    
+
+    const matchesStatus = statusFilter === "All" || a.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -99,16 +105,16 @@ export default function AssignmentsPage() {
 
   const totalPages = Math.ceil(filteredAssignments.length / itemsPerPage);
   const paginatedAssignments = filteredAssignments.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   if (!user) return null;
 
   return (
     <DashboardLayout
-      title="Assigned Workshops"
-      subtitle="View and manage the planning of your workshops."
+      title={t('title')}
+      subtitle={t('subtitle')}
     >
       <div className="w-full">
         {/* Filters Panel */}
@@ -120,7 +126,7 @@ export default function AssignmentsPage() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative group">
-                  <input 
+                  <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -136,13 +142,13 @@ export default function AssignmentsPage() {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all outline-none appearance-none"
                 >
-                  <option value="All statuses">All statuses</option>
-                  <option value="IN_PROGRESS">In progress / Accepted</option>
-                  <option value="COMPLETED">Completed</option>
+                  <option value="All">{t('all_statuses')}</option>
+                  <option value="IN_PROGRESS">{t('in_progress')}</option>
+                  <option value="COMPLETED">{t('completed')}</option>
                 </select>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => { setSearchQuery(""); setStatusFilter("All statuses"); }}
               className="px-8 py-3.5 text-[13px] font-medium text-text-muted hover:text-text-primary transition-all"
             >
@@ -183,11 +189,10 @@ export default function AssignmentsPage() {
                       </div>
                     </td>
                     <td className="px-10 py-8">
-                      <span className={`text-[11px] font-medium px-3 py-1 border ${
-                        a.status === 'VALIDATED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
-                        a.status === 'DATA_ENTRY' ? 'border-orange-500/20 bg-orange-500/5 text-orange-600' :
-                        'border-border-subtle bg-background-subtle text-text-muted'
-                      }`}>
+                      <span className={`text-[11px] font-medium px-3 py-1 border ${a.status === 'VALIDATED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
+                          a.status === 'DATA_ENTRY' ? 'border-orange-500/20 bg-orange-500/5 text-orange-600' :
+                            'border-border-subtle bg-background-subtle text-text-muted'
+                        }`}>
                         {a.status}
                       </span>
                     </td>
@@ -196,21 +201,21 @@ export default function AssignmentsPage() {
                         onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
                         className="bg-consorci-darkBlue text-white py-2 px-6 text-[12px] font-medium transition-all hover:bg-black active:scale-[0.98]"
                       >
-                        Manage
+                        {t('manage_btn')}
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            
+
             {filteredAssignments.length === 0 && (
               <div className="p-20 text-center">
                 <p className="text-text-primary font-medium text-sm">No assignments found</p>
                 <p className="text-text-muted text-[12px] font-medium mt-2">Try adjusting the search filters.</p>
               </div>
             )}
-            
+
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -247,17 +252,17 @@ export default function AssignmentsPage() {
                     description: input.value
                   });
                   input.value = '';
-                  toast.success('Incident reported. The CEB will review it soon.');
+                  toast.success(t('incident_success'));
                 }}
                 className="px-8 py-4 bg-[#F26178] text-white font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98]"
               >
-                Report Incident
+                {t('report_btn')}
               </button>
             </div>
           </section>
         )}
       </div>
-      <ConfirmDialog 
+      <ConfirmDialog
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}

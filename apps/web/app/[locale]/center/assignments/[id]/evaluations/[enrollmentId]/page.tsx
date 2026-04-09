@@ -221,26 +221,32 @@ export default function StudentEvaluationFormPage({ params }: { params: Promise<
                 <form onSubmit={handleSubmit} className="space-y-12">
                     {/* Monitoring Section */}
                     <section className="bg-white p-8 border shadow-sm">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-8">Monitoring and Attendance</h3>
+                        <div className="flex justify-between items-start mb-8">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Monitoring and Attendance</h3>
+                            <span className="text-[9px] font-black uppercase px-2 py-1 bg-blue-50 text-blue-700 border border-blue-100">
+                                Automatically calculated from Phase 3
+                            </span>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                            <div className="space-y-4">
+                            <div className="space-y-4 opacity-70">
                                 <label className="block text-xs font-black uppercase tracking-widest text-gray-400">Attendance Percentage (%)</label>
                                 <div className="flex items-center gap-6">
                                     <input
                                         type="range" min="0" max="100"
                                         value={form.attendancePercentage}
-                                        onChange={(e) => setForm({ ...form, attendancePercentage: parseInt(e.target.value) })}
-                                        className="flex-1 accent-blue-900"
+                                        disabled
+                                        className="flex-1 accent-blue-900 cursor-not-allowed"
                                     />
                                     <span className="text-2xl font-black text-blue-900 w-16">{form.attendancePercentage}%</span>
                                 </div>
+                                <p className="text-[10px] text-gray-400 italic">Minimum 80% required for certification</p>
                             </div>
-                            <div className="space-y-4">
-                                <label className="block text-xs font-black uppercase tracking-widest text-gray-400">Number of Delays</label>
+                            <div className="space-y-4 opacity-70">
+                                <label className="block text-xs font-black uppercase tracking-widest text-gray-400">Number of Delays (Retards)</label>
                                 <div className="flex items-center gap-6">
-                                    <button type="button" onClick={() => setForm({ ...form, delayCount: Math.max(0, form.delayCount - 1) })} className="w-10 h-10 border-2 font-black text-xl hover:bg-gray-100">-</button>
+                                    <div className="w-10 h-10 border-2 border-gray-100 flex items-center justify-center font-black text-xl text-gray-300">-</div>
                                     <span className="text-2xl font-black text-gray-900">{form.delayCount}</span>
-                                    <button type="button" onClick={() => setForm({ ...form, delayCount: form.delayCount + 1 })} className="w-10 h-10 border-2 font-black text-xl hover:bg-gray-100">+</button>
+                                    <div className="w-10 h-10 border-2 border-gray-100 flex items-center justify-center font-black text-xl text-gray-300">+</div>
                                 </div>
                             </div>
                         </div>

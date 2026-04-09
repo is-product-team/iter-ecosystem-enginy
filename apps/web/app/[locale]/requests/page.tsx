@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { REQUEST_STATUSES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
@@ -13,10 +14,13 @@ import api from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import Pagination from "@/components/Pagination";
-import { useTranslations } from 'next-intl';
+import Pagination from '@/components/Pagination';
 
 export default function AdminRequestsPage() {
+  const t = useTranslations('Admin.Requests');
+  const tc = useTranslations('Common');
+  const tForm = useTranslations('Forms');
+
   const { user, loading: authLoading } = useAuth();
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [requests, setRequests] = useState<Request[]>([]);
@@ -24,14 +28,12 @@ export default function AdminRequestsPage() {
   const [_phases, _setPhases] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const t = useTranslations('Admin.Requests');
-  const tc = useTranslations('Common');
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCenterId, setSelectedCenterId] = useState<string>('');
   const [selectedModality, setSelectedModality] = useState<string>('');
-  
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -136,14 +138,14 @@ export default function AdminRequestsPage() {
           toast.success(t('success_tetris', { count: result.assignmentsCreated }));
           await fetchData();
         } catch (err: unknown) {
-          const errorMessage = (err as { response?: { data?: { error?: string } }, message?: string })?.response?.data?.error 
-            || (err as Error).message 
+          const errorMessage = (err as { response?: { data?: { error?: string } }, message?: string })?.response?.data?.error
+            || (err as Error).message
             || 'Unknown error';
           toast.error(t('error_tetris') + errorMessage);
         } finally {
           setLoading(false);
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
         }
-        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
     });
   };
@@ -221,8 +223,8 @@ export default function AdminRequestsPage() {
 
   const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
   const paginatedWorkshops = filteredWorkshops.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   if (authLoading || !user) {
@@ -366,7 +368,7 @@ export default function AdminRequestsPage() {
                             {r.status === REQUEST_STATUSES.REJECTED ? (
                               <span className="text-[11px] font-medium text-text-muted italic">{t('rejected')}</span>
                             ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
-                                <span className="text-[11px] font-medium text-text-muted italic">{t('assigned')}</span>
+                              <span className="text-[11px] font-medium text-text-muted italic">{t('assigned')}</span>
                             ) : (
                               <div className="flex justify-end gap-3">
                                 <button
@@ -400,7 +402,7 @@ export default function AdminRequestsPage() {
               </section>
             );
           })}
-          
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
