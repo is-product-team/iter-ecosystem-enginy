@@ -125,32 +125,31 @@ export class EvaluationService {
     }
 
     /**
-     * MOCK AI: Simulates Speech-to-Text and sentiment/score analysis.
-     * In a real version, this would call OpenAI or a similar service.
+     * Uses the local NLP Service (Ollama) to analyze teacher observations.
+     * Extracts state, sentiment and score suggestion.
      */
     async analyzeObservationsAI(text: string) {
-        // Simulation delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Mock logic: looks for keywords to suggest scores
-        const keywordsPositive = ['good', 'excellent', 'well', 'disciplined', 'responsible', 'proactive', 'bueno', 'excelente', 'bien', 'responsable'];
-        const keywordsNegative = ['bad', 'missing', 'attention', 'distracted', 'passive', 'mal', 'falta', 'atención', 'distraído', 'pasivo'];
-
-        let scoreSuggestion = 3; // Sufficient by default
-
-        const words = text.toLowerCase().split(/\s+/);
-        const positiveCount = words.filter(w => keywordsPositive.includes(w)).length;
-        const negativeCount = words.filter(w => keywordsNegative.includes(w)).length;
-
-        if (positiveCount > negativeCount) scoreSuggestion = 4 + (positiveCount > 3 ? 1 : 0);
-        if (negativeCount > positiveCount) scoreSuggestion = 2 - (negativeCount > 3 ? 1 : 0);
-
-        return {
-            transcription: text,
-            sentiment: positiveCount >= negativeCount ? 'Positive' : 'Negative',
-            suggestedScore: Math.max(1, Math.min(5, scoreSuggestion)),
-            summary: `Automated analysis: The student shows a ${positiveCount >= negativeCount ? 'favorable' : 'to-be-improved'} attitude.`
-        };
+        const { NLPService } = await import('./nlp.service.js');
+        const nlp = new NLPService();
+        
+        try {
+            const result = await nlp.processText(text);
+            
+            return {
+                transcription: text,
+                sentiment: result.attendanceStatus === 'ABSENT' || (result.competenceUpdate && result.competenceUpdate.score < 3) ? 'Negative' : 'Positive',
+                suggestedScore: result.competenceUpdate?.score || 3,
+                summary: `AI Audit: ${result.attendanceStatus || 'Present'}. ${result.competenceUpdate?.reason || 'No specific competence mentioned.'}`
+            };
+        } catch (error) {
+            console.error("AI Analysis Failed:", error);
+            return {
+                transcription: text,
+                sentiment: 'Neutral',
+                suggestedScore: 3,
+                summary: 'AI Analysis currently unavailable. Defaulting to neutral values.'
+            };
+        }
     }
 
     /**

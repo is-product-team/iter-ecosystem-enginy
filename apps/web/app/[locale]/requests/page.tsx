@@ -85,6 +85,7 @@ export default function AdminRequestsPage() {
     if (user) {
       fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
 
   const handleApprove = (requestId: number) => {

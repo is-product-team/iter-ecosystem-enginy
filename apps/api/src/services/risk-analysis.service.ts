@@ -1,6 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { createNotificationInternal } from '../controllers/notification.controller.js';
 
+
 export interface RiskResult {
     studentId: number;
     riskScore: number; // 0-100
@@ -12,71 +13,82 @@ export class RiskAnalysisService {
 
     /**
      * Analyzes risk for a specific student based on their recent activity.
+     * Calibrated weights for educational diagnostic accuracy.
      */
     async analyzeStudentRisk(studentId: number): Promise<RiskResult> {
         const factors: string[] = [];
         let riskScore = 0;
 
-        // 1. Fetch Attendance (Last 3 sessions)
+
+
+
+        // 1. Fetch Attendance (Last 5 sessions for better trend)
         const recentAttendance = await prisma.attendance.findMany({
             where: {
-                enrollment: { studentId: studentId }
+                enrollment: {
+                    studentId: studentId 
+                }
             },
-            orderBy: { sessionDate: 'desc' },
-            take: 3
+            orderBy: {
+                sessionDate: 'desc'
+            },
+            take: 5
         });
 
-        // 2. Calculate Attendance Risk
+        // 2. Calculate Attendance Risk (Weighted)
         if (recentAttendance.length > 0) {
             let absences = 0;
-            let late = 0;
+            let lates = 0;
 
-            recentAttendance.forEach((a: any) => {
-                if (a.status === 'ABSENT' || a.status === 'JUSTIFIED_ABSENCE') {
-                    absences++;
-                    factors.push(`Absent on ${a.sessionDate.toLocaleDateString()}`);
-                }
-                if (a.status === 'LATE') late++;
+            recentAttendance.forEach((a) => {
+                if (a.status === 'ABSENT' || a.status === 'JUSTIFIED_ABSENCE') absences++;
+                if (a.status === 'LATE') lates++;
             });
 
-            if (absences >= 2) {
-                riskScore += 40;
-                factors.push('Multiple unjustified absences in recent sessions');
-            } else if (absences === 1) {
-                riskScore += 15;
+            // Heavy penalty for frequent absences (>60%)
+            if (absences >= 3) {
+                riskScore += 50;
+                factors.push('Detectado un alto volumen de ausencias recientes');
+            } else if (absences >= 1) {
+                riskScore += 20;
+                factors.push('Se han registrado ausencias ocasionales');
             }
 
-            if (late >= 2) {
-                riskScore += 10;
-                factors.push('Persistent tardiness');
+            if (lates >= 3) {
+                riskScore += 15;
+                factors.push('Problemas persistentes de puntualidad');
             }
         }
 
-        // 3. Fetch Competence Evaluations (Low engagement?)
-        const lowEvaluations = await prisma.competenceEvaluation.count({
+        // 3. Fetch Competence Evaluations (Performance)
+        const lowEvals = await prisma.competenceEvaluation.findMany({
             where: {
                 evaluation: {
-                    enrollment: { studentId: studentId }
+                    enrollment: {
+                        studentId: studentId
+                    }
                 },
                 score: { lt: 3 }
             }
         });
 
-        if (lowEvaluations > 0) {
-            riskScore += (lowEvaluations * 10);
-            factors.push(`Found ${lowEvaluations} low competency evaluations`);
+        if (lowEvals.length > 0) {
+            // Normalized weight: max 30 points from performance
+            const deduction = Math.min(lowEvals.length * 8, 30);
+            riskScore += deduction;
+            factors.push(`${lowEvals.length} evaluaciones de competencia bajas`);
         }
 
         // Cap score
-        if (riskScore > 100) riskScore = 100;
+        riskScore = Math.min(riskScore, 100);
 
         // Determine Level
         let riskLevel: RiskResult['riskLevel'] = 'LOW';
-        if (riskScore >= 80) riskLevel = 'CRITICAL';
-        else if (riskScore >= 50) riskLevel = 'HIGH';
-        else if (riskScore >= 30) riskLevel = 'MEDIUM';
+        if (riskScore >= 85) riskLevel = 'CRITICAL';
+        else if (riskScore >= 60) riskLevel = 'HIGH';
+        else if (riskScore >= 35) riskLevel = 'MEDIUM';
 
-        // 4. Trigger Alert if Critical
+        // 4. Trigger Alert if Critical/High
         if (riskLevel === 'CRITICAL' || riskLevel === 'HIGH') {
             await this.triggerAlert(studentId, riskScore, factors);
         }
@@ -85,18 +97,17 @@ export class RiskAnalysisService {
     }
 
     private async triggerAlert(studentId: number, score: number, factors: string[]) {
-        // Find Student Info
         const student = await prisma.student.findUnique({
-            where: { studentId: studentId },
-            include: { centerOrigin: true }
-        });
+            where: { id_student: studentId } as any,
+            include: { center_origin: true } as any
+        }) as any;
 
-        if (!student || !student.centerOrigin) return;
+        if (!student || !student.id_center_origin) return;
 
         await createNotificationInternal({
-            centerId: student.centerOrigin.centerId,
-            title: `⚠️ Risk Alert: ${student.fullName} ${student.lastName}`,
-            message: `The student shows a dropout risk of ${score}%. Factors: ${factors.join(', ')}. Intervention is recommended.`,
+            centerId: student.id_center_origin,
+            title: `⚠️ Alerta: Riesgo de Abandono - ${student.nom} ${student.cognoms}`,
+            message: `Identificado un nivel de riesgo del ${score}%. Factores principales: ${factors.join(', ')}. Se recomienda intervención pedagógica inmediata.`,
             type: 'SYSTEM',
             importance: 'URGENT'
         });

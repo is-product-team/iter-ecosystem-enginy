@@ -21,6 +21,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 200M
 
   # Adminer (Visualizador DB)
   adminer:
@@ -49,6 +53,10 @@ services:
       - db
     networks:
       - iter-network
+    deploy:
+      resources:
+        limits:
+          memory: 500M
 
   # Backend API (Dev)
   api:
@@ -77,6 +85,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 800M
 
   # Frontend Web (Dev)
   web:
@@ -106,6 +118,24 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # IA Local (Especializada en documentos)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: iter_ollama
+    restart: always
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - iter-network
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
 
 networks:
   iter-network:
@@ -114,3 +144,4 @@ networks:
 volumes:
   postgres_data:
   node_modules_cache:
+  ollama_data:

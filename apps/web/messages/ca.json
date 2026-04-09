@@ -62,7 +62,7 @@
     },
     "Phases": {
       "title": "Fases del Curs",
-      "description": "Configura les dates i l'estat de les fases del curs.",
+      "description": "Configura les dates i l'estat de las fases del curs.",
       "control_panel": "Panell de Control Temporal"
     },
     "Stats": {
@@ -143,7 +143,7 @@
       "greetings": {
         "morning": "Hola, bon dia",
         "afternoon": "Hola, bona tarda",
-        "evening": "Hola, bon vespre"
+        "evening": "Hola, bona nit"
       },
       "docs": {
         "select": "Selecciona document...",
@@ -185,9 +185,9 @@
       "change_photo": "Canviar foto de perfil",
       "photo_success": "Foto actualitzada.",
       "photo_error": "Error en pujar la foto.",
-      "no_user_photo_error": "No es pot pujar una foto a un professor sense usuari vinculat.",
+      "no_user_photo_error": "No se pot pujar una foto a un professor sense usuari vinculat.",
       "delete_title": "Eliminar Professor",
-      "delete_confirm": "Estàs segur que vols eliminar aquest professor? També se li traurà l'accés a l'App mòbil.",
+      "delete_confirm": "Estàs segur que vols eliminar aquest professor? També se li retirarà l'accés a l'App mòbil.",
       "form_name": "Nom complet",
       "form_email": "Correu de contacte",
       "password_placeholder": "Contrasenya per a l'App mòbil",
@@ -236,7 +236,7 @@
       "session_n": "Sessió {number}",
       "no_teacher_assigned": "Cap professor assignat",
       "specific_day": "Dia Específic",
-      "whole_workshop": "Taller Sencer",
+      "whole_workshop": "Taller Complet",
       "select_workshop": "Selecciona Taller",
       "select_day": "Selecciona Dia",
       "select_teacher": "Selecciona Professor",
@@ -355,7 +355,7 @@
     "only_pdf_allowed": "Només es permeten fitxers PDF.",
     "ai_mismatch": "L'IA detecta un tipus diferent: {type}.",
     "ai_no_signatures": "L'IA no ha detectat les signatures requerides.",
-    "ai_error": "Error al processar l'IA. Pots forçar la pujada.",
+    "ai_error": "Error en processar l'IA. Pots forçar la pujada.",
     "showing": "Mostrant",
     "of": "de",
     "previous": "Anterior",
@@ -384,10 +384,10 @@
     "status_label": "Estat: {status}",
     "save_success": "Operació realitzada correctament.",
     "error_loading": "Error en carregar les dades.",
-    "fill_all_fields": "Si us plau, emplena tots els camps.",
+    "fill_all_fields": "Si us plau, completa tots els camps.",
     "ok": "D'acord",
     "show": "Mostrar",
-    "hide": "Amagar",
+    "hide": "Ocultar",
     "table_info": "Informació",
     "table_idalu": "IDALU",
     "table_course": "Curs",
@@ -404,7 +404,7 @@
   "Calendar": {
     "loading_auth": "Sincronitzant el teu calendari...",
     "title": "Calendari Iter",
-    "subtitle": "Visualitza totes les fites, tallers i terminis en un calendari complet.",
+    "subtitle": "Visualitza tots els fites, tallers i terminis en un calendari complet.",
     "active_fase": "Fase Actual: {nom}",
     "sync_phases": "Sincronitzant fases...",
     "view_legend": "Veure Llegenda",
@@ -450,9 +450,9 @@
       "options_label": "OPCIONS (SEPARADES PER COMA)",
       "add_question": "Afegir pregunta",
       "publish": "Publicar model de qüestionari",
-      "placeholder_title": "Ex: Enquesta de Satisfacció Tallers 2026",
+      "placeholder_title": "Ex: Enquesta de Satisfaccío Tallers 2026",
       "placeholder_question": "Què vols preguntar?",
-      "placeholder_options": "Opció 1, Opció 2, Opció 3...",
+      "placeholder_options": "Opció 1, Opció 2, Opción 3...",
       "save_success": "Model de qüestionari creat correctament.",
       "save_error": "Error en crear el qüestionari.",
       "types": {
@@ -467,7 +467,7 @@
     "title": "Informes i Resultats",
     "subtitle": "Anàlisi de l'impacte del programa Iter.",
     "student_exp": "Experiència de l'Alumne",
-    "teacher_sat": "Satisfaccó del Docent",
+    "teacher_sat": "Satisfacció del Docent",
     "workshops_completed": "Tallers Completats",
     "vs_last_year": "+5% vs 2023",
     "student_part": "Participació d'Alumnes",
@@ -498,7 +498,7 @@
       },
       "sections": {
         "attitude": {
-          "title": "Actitud i Comportament",
+          "title": "Actitud i Comportamiento",
           "questions": {
             "punctuality": "Has estat puntual en l'entrega de tasques?",
             "respect": "Has respectat el material i les instal·lacions?",
@@ -518,8 +518,8 @@
           "question": "T'ha ajudat a decidir-te pel teu futur professional?",
           "options": {
             "si": "Sí, m'ha aclarit les idees.",
-            "no": "No, ja ho tenia clar o no és per mi.",
-            "considerant": "Ho estic considerant ara mateix."
+            "no": "No, ja ho tenia clar o no és per a mi.",
+            "considerant": "M'ho estic considerant ara mateix."
           }
         },
         "feedback": {
@@ -961,5 +961,27 @@
     "regenerate_btn": "Generar nou enllaç",
     "regenerate_confirm": "Si generes un nou enllaç, l'anterior deixarà de funcionar a totes les teves aplicacions. Vols continuar?",
     "close": "Tancar"
+  },
+  "Services": {
+    "Risk": {
+      "alert_title": "Alerta: Risc d'Abandonament",
+      "alert_message": "Identificat un nivell de risc del {score}%. Factors principals: {factors}. Es recomana intervenció pedagògica immediata.",
+      "factors": {
+        "absences": "Alt volum d'absències recents",
+        "occasional": "Absències ocasionals registrades",
+        "lates": "Problemas persistents de puntualitat",
+        "low_competency": "{count} avaluacions de competència baixes"
+      }
+    },
+    "Vision": {
+      "error_format": "Format de fitxer no suportat. Si us plau, puja PDF o imatges.",
+      "error_empty": "El document sembla estar buit (menys d'1KB).",
+      "error_signature": "Signatura manuscrita no detectada en la regió esperada.",
+      "error_unavailable": "El motor de visió d'IA local no està disponible actualment."
+    },
+    "AutoAssignment": {
+      "no_requests": "No s'han trobat sol·licituds per processar.",
+      "success": "Assignats {count} estudiants al Centre {center} per al Taller {workshop}"
+    }
   }
 }

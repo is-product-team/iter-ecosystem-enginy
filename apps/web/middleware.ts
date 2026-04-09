@@ -2,12 +2,11 @@ import createMiddleware from 'next-intl/middleware';
 
 export default createMiddleware({
   // A list of all locales that are supported
-  locales: ['ca', 'es'],
- 
-  // Used when no locale matches
-  defaultLocale: 'ca'
-});
+  locales: ['ca', 'es', 'en'],
 
+  // Used when no locale matches
+  defaultLocale: 'es'
+  });
 export const config = {
   matcher: [
     // Match all request paths except for the ones starting with:

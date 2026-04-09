@@ -59,7 +59,26 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between h-16">
           {/* Left Side: Main Navigation */}
           <div className="flex items-center">
-            <nav className="flex items-center h-full space-x-2">
+            <Link href={getHomePath()} className="flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="Iter Logo" 
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain block dark:hidden" 
+              />
+              <Image 
+                src="/logo-invers.png" 
+                alt="Iter Logo" 
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain hidden dark:block" 
+              />
+            </Link>
+          </div>
+
+          <div className="flex items-center">
+            <nav className="hidden md:flex items-center h-full mr-8">
               {navLinks.filter(link => link.show).map((link) => (
                 <Link
                   key={link.path}

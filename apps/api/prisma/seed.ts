@@ -8,14 +8,14 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 /**
- * Professional Seeding Strategy:
- * 1. Idempotency: Use upsert where possible.
- * 2. Modularity: Separate infrastructure from sample data.
- * 3. Validation: Use shared constants.
+ * Estrategia de Seeding Profesional:
+ * 1. Idempotencia: Usar upsert siempre que sea posible.
+ * 2. Modularidad: Separar infraestructura de datos de ejemplo.
+ * 3. Validación: Usar constantes compartidas.
  */
 
 async function seedInfrastructure() {
-  console.log('🏗️  Configuring base infrastructure (Roles and Sectors)...');
+  console.log('🏗️  Configurando infraestructura base (Roles y Sectores)...');
 
   const roles = await Promise.all(
     Object.values(ROLES).map((roleName) =>
@@ -33,7 +33,7 @@ async function seedInfrastructure() {
     TEACHER: roles.find((r) => r.roleName === ROLES.TEACHER)!,
   };
 
-  const sectors = ['Digital Transformation', 'Artistic Creation', 'Industrial and Logistics'];
+  const sectors = ['Transformación Digital', 'Creación Artística', 'Industrial y Logística'];
   const createdSectors = await Promise.all(
     sectors.map((name) =>
       prisma.sector.upsert({
@@ -47,29 +47,29 @@ async function seedInfrastructure() {
   return {
     roles: rolesMap,
     sectors: {
-      tech: createdSectors.find((s) => s.name === 'Digital Transformation')!,
-      creative: createdSectors.find((s) => s.name === 'Artistic Creation')!,
-      industrial: createdSectors.find((s) => s.name === 'Industrial and Logistics')!,
+      tech: createdSectors.find((s) => s.name === 'Transformación Digital')!,
+      creative: createdSectors.find((s) => s.name === 'Creación Artística')!,
+      industrial: createdSectors.find((s) => s.name === 'Industrial y Logística')!,
     },
   };
 }
 
 async function seedUsers(roles: any, passDefault: string) {
-  console.log('👥  Generating users and sample centers...');
+  console.log('👥  Generando usuarios y centros de prueba...');
 
-  // 1. Global Admin
+  // 1. Administrador Global
   await prisma.user.upsert({
     where: { email: 'admin@admin.com' },
     update: {},
     create: {
-      fullName: 'Global Administrator',
+      fullName: 'Administrador Global',
       email: 'admin@admin.com',
       passwordHash: passDefault,
       roleId: roles.ADMIN.roleId,
     },
   });
 
-  // 2. Centers
+  // 2. Centros
   const centersData = [
     {
       code: '08014231',
@@ -119,7 +119,7 @@ async function seedUsers(roles: any, passDefault: string) {
     });
   }
 
-  // 3. Teachers
+  // 3. Profesores
   const brossaProfs = ['Laura Martínez', 'Jordi Soler'];
   const clarisProfs = ['Anna Ferrer', 'Marc Dalmau'];
 
@@ -177,12 +177,12 @@ async function seedUsers(roles: any, passDefault: string) {
 }
 
 async function seedWorkshops(sectors: any) {
-  console.log('📚  Generating workshop catalog...');
+  console.log('📚  Generando catálogo de talleres...');
   const workshops = [
-    { title: 'Robotics and IoT', sectorId: sectors.tech.sectorId, modality: Modality.A, icon: 'ROBOT' },
-    { title: 'Digital Cinema', sectorId: sectors.creative.sectorId, modality: Modality.B, icon: 'FILM' },
-    { title: '3D Printing', sectorId: sectors.industrial.sectorId, modality: Modality.A, icon: 'TOOLS' },
-    { title: 'Web Development', sectorId: sectors.tech.sectorId, modality: Modality.C, icon: 'CODE' },
+    { title: 'Robótica e IoT', sectorId: sectors.tech.sectorId, modality: Modality.A, icon: 'ROBOT' },
+    { title: 'Cine Digital', sectorId: sectors.creative.sectorId, modality: Modality.B, icon: 'FILM' },
+    { title: 'Impresión 3D', sectorId: sectors.industrial.sectorId, modality: Modality.A, icon: 'TOOLS' },
+    { title: 'Desarrollo Web', sectorId: sectors.tech.sectorId, modality: Modality.C, icon: 'CODE' },
   ];
 
   for (const w of workshops) {
@@ -194,14 +194,14 @@ async function seedWorkshops(sectors: any) {
         durationHours: 3,
         maxPlaces: 20,
         icon: w.icon,
-        description: `Practical exploration of ${w.title}.`,
+        description: `Exploración práctica de ${w.title}.`,
       },
     });
   }
 }
 
 async function seedPhases() {
-  console.log('🗓️   Configuring program phases...');
+  console.log('🗓️   Configurando fases del programa...');
   const now = new Date();
   const currentYear = now.getFullYear();
 
@@ -259,7 +259,7 @@ async function seedPhases() {
 }
 
 async function main() {
-  console.log('🌱  Starting seeding process...');
+  console.log('🌱  Iniciando proceso de seeding...');
 
   const infra = await seedInfrastructure();
 
@@ -270,12 +270,12 @@ async function main() {
   await seedWorkshops(infra.sectors);
   await seedPhases();
 
-  console.log('✅  Seeding completed successfully.');
+  console.log('✅  Seeding completado con éxito.');
 }
 
 main()
   .catch((e) => {
-    console.error('❌  Seeding error:', e);
+    console.error('❌  Error en el seeding:', e);
     process.exit(1);
   })
   .finally(async () => {
