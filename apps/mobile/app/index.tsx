@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { Redirect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { View, ActivityIndicator, Platform } from 'react-native';
 import { ROLES } from '@iter/shared';
 
 export default function Index() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasToken, setHasToken] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [hasToken, setHasToken] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     async function checkAuth() {
       try {
         let token = null;

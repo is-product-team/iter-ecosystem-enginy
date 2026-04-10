@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
 

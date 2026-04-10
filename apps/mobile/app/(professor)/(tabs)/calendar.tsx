@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import * as React from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { THEME } from '@iter/shared';
 import { getCalendar } from '../../../services/api';
@@ -11,11 +11,11 @@ export default function CalendarTabScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isRangeFetching, setIsRangeFetching] = useState(false);
+  const [calendarEvents, setCalendarEvents] = React.useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [isRangeFetching, setIsRangeFetching] = React.useState(false);
 
-  const fetchRangeData = useCallback(async (date: Date) => {
+  const fetchRangeData = React.useCallback(async (date: Date) => {
     // Calculate start and end of month
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -41,7 +41,7 @@ export default function CalendarTabScreen() {
   }, []);
 
   // Initial fetch
-  useEffect(() => {
+  React.useEffect(() => {
     fetchRangeData(new Date());
   }, [fetchRangeData]);
 

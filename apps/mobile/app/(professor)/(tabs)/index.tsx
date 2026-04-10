@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -17,14 +17,14 @@ export default function DashboardScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [phases, setPhases] = useState<any[]>([]);
-  const [assignments, setAssignments] = useState<any[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedWorkshop, setSelectedWorkshop] = useState<CalendarEvent | null>(null);
-  const [userName, setUserName] = useState('Professor');
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [phases, setPhases] = React.useState<any[]>([]);
+  const [assignments, setAssignments] = React.useState<any[]>([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [selectedWorkshop, setSelectedWorkshop] = React.useState<CalendarEvent | null>(null);
+  const [userName, setUserName] = React.useState('Professor');
+  const [unreadCount, setUnreadCount] = React.useState(0);
   
   // 1. Helpers
   const isPhaseActive = (phaseName: string) => {

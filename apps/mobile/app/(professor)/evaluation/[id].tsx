@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
@@ -11,13 +11,13 @@ export default function EvaluationScreen() {
   const { id, assignmentId } = useLocalSearchParams(); // id is enrollmentId (from SessionScreen router.push)
   const router = useRouter();
   
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [competencies, setCompetencies] = useState<any[]>([]);
-  const [ratings, setRatings] = useState<{[key: number]: number}>({});
-  const [observations, setObservations] = useState('');
+  const [loading, setLoading] = React.useState(true);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [competencies, setCompetencies] = React.useState<any[]>([]);
+  const [ratings, setRatings] = React.useState<{[key: number]: number}>({});
+  const [observations, setObservations] = React.useState('');
   
-  useEffect(() => {
+  React.useEffect(() => {
     loadData();
   }, [id]);
 

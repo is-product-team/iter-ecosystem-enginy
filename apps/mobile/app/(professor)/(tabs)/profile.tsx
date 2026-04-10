@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME, ROLES } from '@iter/shared';
@@ -14,10 +14,10 @@ export default function PerfilScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colorScheme, setColorScheme } = useColorScheme();
-  const [notifications, setNotifications] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [notifications, setNotifications] = React.useState(true);
+  const [user, setUser] = React.useState<any>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     async function loadUser() {
       try {
         let userData = null;

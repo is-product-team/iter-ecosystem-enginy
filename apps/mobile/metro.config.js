@@ -18,11 +18,15 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, 'node_modules'),
 ];
 
+config.resolver.extraNodeModules = {
+  'scheduler': path.resolve(workspaceRoot, 'node_modules/scheduler'),
+};
+
 // 3. Make sure typescript files in the monorepo are discoverable
 config.resolver.sourceExts.push('mjs', 'ts', 'tsx');
 
 // Enable package exports support (required for semver v7 subpath imports)
-config.resolver.unstable_enablePackageExports = true;
+config.resolver.unstable_enablePackageExports = false;
 
 // Allow Metro to look up nested node_modules (required for hoisted dependencies with nested children)
 config.resolver.disableHierarchicalLookup = false;

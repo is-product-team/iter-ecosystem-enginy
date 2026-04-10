@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import * as React from 'react';
 import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,14 +14,14 @@ export default function SessionScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [enrollments, setEnrollments] = useState<any[]>([]);
-  const [attendance, setAttendance] = useState<{[key: string]: string}>({}); 
-  const [observations, setObservations] = useState('');
-  const [sessionMode, setSessionMode] = useState<'ATTENDANCE' | 'WORK'>('ATTENDANCE');
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [enrollments, setEnrollments] = React.useState<any[]>([]);
+  const [attendance, setAttendance] = React.useState<{[key: string]: string}>({}); 
+  const [observations, setObservations] = React.useState('');
+  const [sessionMode, setSessionMode] = React.useState<'ATTENDANCE' | 'WORK'>('ATTENDANCE');
+  const [showSuccess, setShowSuccess] = React.useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -68,7 +68,7 @@ export default function SessionScreen() {
   };
 
   useFocusEffect(
-    useCallback(() => {
+    React.useCallback(() => {
       fetchData();
     }, [id])
   );

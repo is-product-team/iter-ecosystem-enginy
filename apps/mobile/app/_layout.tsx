@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import * as React from 'react';
 import { Stack } from 'expo-router';
 import '../i18n'; // Initialize i18n
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -35,7 +35,7 @@ function RootLayout() {
     'Inter-Black': Inter_900Black,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();
     }

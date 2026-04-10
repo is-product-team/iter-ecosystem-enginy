@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -11,10 +11,10 @@ export default function CoordinationScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [assignments, setAssignments] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [assignments, setAssignments] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     getMyAssignments()
       .then(res => setAssignments(res.data))
       .catch(err => console.error("Error fetching assignments for coordination:", err))
