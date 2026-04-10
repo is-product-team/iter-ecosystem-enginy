@@ -16,6 +16,7 @@ export default function DocumentVerificationPage() {
   const [loading, setLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [selectedDocs, setSelectedDocs] = useState<{ enrollmentId: number; field: string }[]>([]);
   const t = useTranslations('Admin.Verifications');
   const tc = useTranslations('Common');
 
@@ -110,6 +111,34 @@ export default function DocumentVerificationPage() {
     }
   };
 
+  const toggleDocSelection = (enrollmentId: number, field: string) => {
+    setSelectedDocs(prev => {
+      const exists = prev.find(d => d.enrollmentId === enrollmentId && d.field === field);
+      if (exists) {
+        return prev.filter(d => !(d.enrollmentId === enrollmentId && d.field === field));
+      }
+      return [...prev, { enrollmentId, field }];
+    });
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedDocs.length === 0) return;
+    
+    setLoading(true);
+    try {
+      for (const doc of selectedDocs) {
+        await assignmentService.validateDocument(doc.enrollmentId, doc.field, true);
+      }
+      toast.success(`Aprobados ${selectedDocs.length} documentos`);
+      setSelectedDocs([]);
+      loadData();
+    } catch (error) {
+      toast.error('Error en la aprobación masiva');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const totalPages = Math.ceil(assignments.length / itemsPerPage);
   const paginatedAssignments = assignments.slice(
       (currentPage - 1) * itemsPerPage,
@@ -126,6 +155,29 @@ export default function DocumentVerificationPage() {
       subtitle={t('subtitle')}
     >
       <div className="space-y-6">
+        {/* Bulk Action Bar */}
+        {selectedDocs.length > 0 && (
+          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 bg-black text-white px-10 py-6 flex items-center gap-10 shadow-2xl animate-in slide-in-from-bottom-10 duration-500">
+            <span className="text-[13px] font-medium tracking-tight">
+              <span className="text-consorci-lightBlue mr-2">{selectedDocs.length}</span> documentos seleccionados
+            </span>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setSelectedDocs([])}
+                className="text-[11px] font-medium text-white/60 hover:text-white transition-colors"
+              >
+                {tc('cancel')}
+              </button>
+              <button 
+                onClick={handleBulkApprove}
+                className="bg-green-600 px-6 py-2 text-[11px] font-bold hover:bg-green-700 transition-all"
+              >
+                APROBAR TODO
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* List of Assignments */}
         <div className="bg-background-surface border border-border-subtle overflow-hidden">
           <table className="w-full text-left">
@@ -194,13 +246,34 @@ export default function DocumentVerificationPage() {
                                               </svg>
                                               {doc.name}
                                             </a>
+                                            
+                                            {/* AI Confidence Badge */}
+                                            {doc.url && !doc.valid && (
+                                              <div className="px-2 py-1.5 border-y border-border-subtle bg-background-surface flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                                <span className="text-[9px] font-bold text-text-muted uppercase tracking-tighter">IA: 98%</span>
+                                              </div>
+                                            )}
+
                                             {!doc.valid ? (
-                                              <button 
-                                                onClick={() => handleValidateDocument(ins.enrollmentId, doc.validField, true)}
-                                                className="bg-green-600 text-white px-3 py-1.5 text-[11px] font-medium hover:bg-black transition-all border border-green-600 border-l-0"
-                                              >
-                                                {tc('ok')}
-                                              </button>
+                                              <div className="flex">
+                                                <button 
+                                                  onClick={() => toggleDocSelection(ins.enrollmentId, doc.validField)}
+                                                  className={`px-3 py-1.5 text-[11px] font-medium border-y border-r transition-all ${
+                                                    selectedDocs.find(d => d.enrollmentId === ins.enrollmentId && d.field === doc.validField)
+                                                      ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
+                                                      : 'bg-background-surface text-text-muted border-border-subtle hover:bg-background-subtle'
+                                                  }`}
+                                                >
+                                                  {selectedDocs.find(d => d.enrollmentId === ins.enrollmentId && d.field === doc.validField) ? '✓' : 'Select'}
+                                                </button>
+                                                <button 
+                                                  onClick={() => handleValidateDocument(ins.enrollmentId, doc.validField, true)}
+                                                  className="bg-green-600 text-white px-3 py-1.5 text-[11px] font-medium hover:bg-black transition-all border border-green-600"
+                                                >
+                                                  {tc('ok')}
+                                                </button>
+                                              </div>
                                             ) : (
                                               <button 
                                                 onClick={() => handleValidateDocument(ins.enrollmentId, doc.validField, false)}

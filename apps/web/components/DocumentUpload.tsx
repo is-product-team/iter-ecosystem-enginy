@@ -13,6 +13,7 @@ interface DocumentUploadProps {
   isValidated?: boolean;
   label: string;
   onUploadSuccess: (newUrl: string) => void;
+  variant?: 'default' | 'table';
 }
 
 export default function DocumentUpload({
@@ -22,7 +23,8 @@ export default function DocumentUpload({
   initialUrl,
   isValidated,
   label,
-  onUploadSuccess
+  onUploadSuccess,
+  variant = 'default'
 }: DocumentUploadProps) {
   const t = useTranslations('Common');
   // --- Upload and Validation States ---
@@ -134,6 +136,46 @@ export default function DocumentUpload({
       setValidatingAI(false);
     }
   };
+
+  if (variant === 'table') {
+    return (
+      <div className="flex items-center gap-3">
+        <label className={`shrink-0 cursor-pointer w-8 h-8 flex items-center justify-center transition-all border ${
+          uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted' : 
+          currentUrl ? 'border-green-200 bg-green-50 text-green-600 hover:bg-green-100' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
+        }`} title={currentUrl ? t('change') : t('attach')}>
+          {uploading || validatingAI ? (
+            <div className="w-3 h-3 border-2 border-t-transparent border-current animate-spin rounded-full" />
+          ) : currentUrl ? (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          )}
+          <input
+            type="file"
+            className="hidden"
+            accept=".pdf"
+            onChange={handleFileChange}
+            disabled={uploading || validatingAI}
+          />
+        </label>
+        {currentUrl && (
+          <a
+            href={`${process.env.NEXT_PUBLIC_API_URL}${currentUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`p-2 transition-all ${isValidated ? 'text-green-600' : 'text-consorci-darkBlue hover:bg-background-subtle'}`}
+            title={isValidated ? t('document_validated') : t('view_document')}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </a>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-2">

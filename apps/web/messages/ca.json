@@ -151,7 +151,9 @@
         "mobility": "Autorització de Mobilitat",
         "image": "Drets d'Imatge",
         "all": "Tota la documentació"
-      }
+      },
+      "bulk_selection": "{count} documents seleccionats",
+      "bulk_approve_btn": "APROVAR TOT"
     }
   },
   "Center": {
@@ -216,7 +218,12 @@
       "form_surnames": "Cognoms",
       "form_idalu": "Codi IDALU",
       "form_course": "Curs / Nivell (Ex: 4t ESO)",
-      "save_btn": "Desar alumne"
+      "save_btn": "Desar alumne",
+      "selection_drawer": {
+        "title": "Registre Nominal",
+        "selected": "Seleccionats: {count} / {total}",
+        "search_placeholder": "Cercar per nom o IDALU..."
+      }
     },
     "Sessions": {
       "title": "Planificació de Sessions",
@@ -893,9 +900,7 @@
     "students_subtitle": "{occupied} de {total} places ocupades.",
     "nominal_register_btn": "Registre Nominal",
     "no_students": "Encara no hi ha alumnes assignats",
-    "no_students_hint": "Fes clic aquí per començar el registre nominal",
     "remove_student_success": "Alumne eliminat correctament.",
-    "remove_student_tooltip": "Eliminar alumne",
     "loading_msg": "Carregant detalls del taller...",
     "status": {
       "PROVISIONAL": "PROVISIONAL",
@@ -944,6 +949,15 @@
     },
     "Monitoring": {
       "no_assignments": "No hi ha tallers actius en execució hores d'ara."
+    },
+    "ia_matcher_btn": "IA Matcher",
+    "ia_matcher_close_btn": "Tancar IA Matcher",
+    "bulk_upload": {
+      "title": "Pujada Massiva Intel·ligent",
+      "subtitle": "Arrossega els teus PDFs aquí i l'IA els assignarà automàticament",
+      "processing": "Processant documents amb l'IA...",
+      "success": "Processats: {count} documents correctament.",
+      "error": "{count} documents no s'han pogut processar."
     }
   },
   "Sync": {

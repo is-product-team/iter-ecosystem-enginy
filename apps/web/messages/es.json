@@ -151,7 +151,9 @@
         "mobility": "Autorización de Movilidad",
         "image": "Derechos de Imagen",
         "all": "Toda la documentación"
-      }
+      },
+      "bulk_selection": "{count} documentos seleccionados",
+      "bulk_approve_btn": "APROBAR TODO"
     }
   },
   "Center": {
@@ -216,7 +218,12 @@
       "form_surnames": "Apellidos",
       "form_idalu": "Código IDALU",
       "form_course": "Curso / Nivel (Ej: 4º ESO)",
-      "save_btn": "Guardar alumno"
+      "save_btn": "Guardar alumno",
+      "selection_drawer": {
+        "title": "Registro Nominal",
+        "selected": "Seleccionados: {count} / {total}",
+        "search_placeholder": "Buscar por nombre o IDALU..."
+      }
     },
     "Sessions": {
       "title": "Planificación de Sesiones",
@@ -893,9 +900,7 @@
     "students_subtitle": "{occupied} de {total} plazas ocupadas.",
     "nominal_register_btn": "Registro Nominal",
     "no_students": "Aún no hay alumnos asignados",
-    "no_students_hint": "Haz clic aquí para comenzar el registro nominal",
     "remove_student_success": "Alumno eliminado correctamente.",
-    "remove_student_tooltip": "Eliminar alumno",
     "loading_msg": "Cargando detalles del taller...",
     "status": {
       "PROVISIONAL": "PROVISIONAL",
@@ -944,6 +949,15 @@
     },
     "Monitoring": {
       "no_assignments": "No hay talleres activos en ejecución por ahora."
+    },
+    "ia_matcher_btn": "IA Matcher",
+    "ia_matcher_close_btn": "Cerrar IA Matcher",
+    "bulk_upload": {
+      "title": "Subida Masiva Inteligente",
+      "subtitle": "Arrastra tus PDFs aquí y la IA los asignará automáticamente",
+      "processing": "Procesando documentos con IA...",
+      "success": "Procesados: {count} documentos correctamente.",
+      "error": "{count} documentos no han podido procesarse."
     }
   },
   "Sync": {
