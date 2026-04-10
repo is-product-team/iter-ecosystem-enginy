@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { getUser, User } from '@/lib/auth';
@@ -14,24 +14,22 @@ import dynamic from 'next/dynamic';
 import Avatar from '@/components/Avatar';
 import getApi from '@/services/api';
 
-const DocumentUpload = dynamic(() => import('@/components/DocumentUpload'), { ssr: false });
 const StudentSelectionDrawer = dynamic(() => import('@/components/StudentSelectionDrawer'), { ssr: false });
 const Phase2Table = dynamic(() => import('@/components/Phase2Table'), { ssr: false });
 const BulkDocumentUpload = dynamic(() => import('@/components/BulkDocumentUpload'), { ssr: false });
 
-type ViewMode = 'workshop' | 'selection';
-
-export default function AssignmentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+export default function AssignmentDetailsPage() {
   const t = useTranslations('AssignmentWorkshopsPage');
   const tCommon = useTranslations('Common');
-  const { id } = use(params);
-  const [_user, setUser] = useState<User | null>(null);
+  const params = useParams();
+  const id = params?.id as string;
+  const locale = params?.locale || 'ca';
+
+  const [user, setUser] = useState<User | null>(null);
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
-  const paramsNav = useParams();
-  const locale = paramsNav?.locale || 'ca';
 
   const router = useRouter();
 
@@ -44,6 +42,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     setUser(currentUser);
 
     const fetchData = async () => {
+      if (!id) return;
       try {
         const resAssig = await assignmentService.getById(parseInt(id));
         setAssignment(resAssig);
@@ -60,9 +59,9 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
   const handleRemoveStudent = async (studentId: number) => {
     try {
-      if (!assignment) return;
+      if (!assignment || !id) return;
       const currentIds = assignment.enrollments?.map((i: Enrollment) => i.studentId) || [];
-      const updated = await assignmentService.updateEnrollments(parseInt(id), currentIds.filter((id: number) => id !== studentId));
+      const updated = await assignmentService.updateEnrollments(parseInt(id), currentIds.filter((sid: number) => sid !== studentId));
       setAssignment(updated);
       toast.success(t('remove_student_success'));
     } catch (error) {
@@ -72,6 +71,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
   const handleUpdateEnrollments = async (studentIds: number[]) => {
     try {
+      if (!id) return;
       const updated = await assignmentService.updateEnrollments(parseInt(id), studentIds);
       setAssignment(updated);
       toast.success(tCommon('success'));
@@ -82,6 +82,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
 
   const refreshData = async () => {
     try {
+      if (!id) return;
       const resAssig = await assignmentService.getById(parseInt(id));
       setAssignment(resAssig);
     } catch (error) {
@@ -89,7 +90,6 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
     }
   };
 
-  // Hardcoded mapping to ensure something is always displayed even if i18n fails
   const STATUS_MAP: Record<string, string> = {
     'PROVISIONAL': locale === 'ca' ? 'PROVISIONAL' : 'PROVISIONAL',
     'PUBLISHED': locale === 'ca' ? 'PUBLICAT' : 'PUBLICADO',
@@ -106,37 +106,33 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
   const getStatusLabel = (status: string) => {
     if (!status) return '—';
     const cleanStatus = status.trim().toUpperCase();
-
     try {
-      // 1. Try dynamic translation from renamed namespace
       if (typeof (t as any).has === 'function' && (t as any).has(`status.${cleanStatus}`)) {
         return t(`status.${cleanStatus}`);
       }
-
-      // 2. Fallback to hardcoded map
-      if (STATUS_MAP[cleanStatus]) {
-        return STATUS_MAP[cleanStatus];
-      }
-
-      // 3. Last resort: formatted raw string
-      return cleanStatus.replace(/_/g, ' ');
+      return STATUS_MAP[cleanStatus] || cleanStatus.replace(/_/g, ' ');
     } catch (e) {
-      console.warn(`[i18n-critical] Fallback triggered for ${status}`, e);
       return STATUS_MAP[cleanStatus] || cleanStatus.replace(/_/g, ' ') || '—';
     }
   };
 
+  const allDocumentsValidated = useMemo(() => {
+    if (!assignment?.enrollments) return false;
+    return assignment.enrollments.length > 0 && assignment.enrollments.every(ins => 
+      ins.isPedagogicalAgreementValidated &&
+      ins.isMobilityAuthorizationValidated &&
+      ins.isImageRightsValidated
+    );
+  }, [assignment]);
+
   if (loading || !assignment) return <Loading fullScreen message={t('loading_msg')} />;
 
-  const allDocumentsValidated = assignment.enrollments && assignment.enrollments.length > 0 && assignment.enrollments.every((ins: Enrollment) =>
-    ins.isPedagogicalAgreementValidated &&
-    ins.isMobilityAuthorizationValidated &&
-    ins.isImageRightsValidated
-  );
+  const workshopTitle = assignment.workshop?.title || '';
+  const workshopModality = assignment.workshop?.modality || '';
 
   return (
     <DashboardLayout
-      title={t('title_prefix') + assignment.workshop?.title}
+      title={`${t('title_prefix')}${workshopTitle}`}
       subtitle={
         <div className="flex flex-col gap-6 mt-8">
           <div className="flex items-center gap-4">
@@ -144,29 +140,13 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
               {getStatusLabel(assignment.status)}
             </div>
             <div className="px-4 py-1 text-[11px] font-medium bg-consorci-darkBlue text-white">
-              {t('modality_prefix') + assignment.workshop?.modality}
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-10 p-8 bg-background-subtle border border-border-subtle mb-10">
-            <div className="flex flex-col">
-              <span className="text-[11px] font-medium text-text-muted uppercase tracking-widest mb-2">{t('referent_label')}</span>
-              <div className="flex items-center gap-3">
-                <span className="text-[13px] font-medium text-text-primary">{assignment.teacher1?.name}</span>
-                <span className="text-text-muted opacity-30">•</span>
-                <span className="text-[13px] font-medium text-text-primary">{assignment.teacher2?.name}</span>
-              </div>
-            </div>
-            <div className="h-10 w-[1px] bg-border-subtle hidden sm:block"></div>
-            <div className="flex flex-col">
-              <span className="text-[11px] font-medium text-text-muted uppercase tracking-widest mb-2">{t('center_label')}</span>
-              <span className="text-[13px] font-medium text-text-primary">{assignment.center?.name}</span>
+              {`${t('modality_prefix')}${workshopModality}`}
             </div>
           </div>
         </div>
       }
     >
       <div className="pb-20">
-        {/* SECTION: PHASE 2 CONSOLE */}
         <section className="flex flex-col gap-10">
           <div className="flex flex-col md:flex-row justify-between items-end gap-8 bg-background-surface p-10 border border-border-subtle">
             <div>
@@ -193,7 +173,7 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                 className="bg-consorci-darkBlue text-white px-8 py-4 text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
-                {t('nominal_register_btn')}
+                {t('select_students_btn')}
               </button>
             </div>
           </div>
@@ -225,62 +205,51 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
         onSave={handleUpdateEnrollments}
       />
 
-        {/* ACTION: FINALIZE REGISTRATION */}
-        {assignment.status !== 'IN_PROGRESS' && assignment.status !== 'COMPLETED' && (
-          <div className={`p-10 flex flex-col md:flex-row items-center justify-between gap-8 border ${allDocumentsValidated ? 'bg-green-500/5 border-green-500/20' : 'bg-background-subtle border-border-subtle'
-            }`}>
-            <div>
-              <h4 className={`text-lg font-medium ${allDocumentsValidated ? 'text-green-600' : 'text-text-primary'}`}>
-                {allDocumentsValidated ? t('finalize_section.ready_title') : t('finalize_section.not_ready_title')}
-              </h4>
-              <p className="text-[13px] text-text-muted mt-2 max-w-xl">
-                {allDocumentsValidated
-                  ? t('finalize_section.ready_desc')
-                  : t('finalize_section.not_ready_desc')
-                }
-              </p>
-            </div>
-            {allDocumentsValidated && (
-              <button
-                onClick={async () => {
-                  if (!confirm(t('finalize_section.confirm_dialog'))) return;
-                  try {
-                    await assignmentService.confirmRegistration(parseInt(id));
-                    toast.success(t('finalize_section.success'));
-                    window.location.reload();
-                  } catch (_e) {
-                    toast.error(tCommon('save_error'));
-                  }
-                }}
-                className="px-8 py-4 bg-green-600 text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
-              >
-                {t('finalize_section.confirm_btn')}
-              </button>
-            )}
+      {assignment.status !== 'IN_PROGRESS' && assignment.status !== 'COMPLETED' && (
+        <div className={`p-10 flex flex-col md:flex-row items-center justify-between gap-8 border ${allDocumentsValidated ? 'bg-green-500/5 border-green-500/20' : 'bg-background-subtle border-border-subtle'}`}>
+          <div>
+            <h4 className={`text-lg font-medium ${allDocumentsValidated ? 'text-green-600' : 'text-text-primary'}`}>
+              {allDocumentsValidated ? t('finalize_section.ready_title') : t('finalize_section.not_ready_title')}
+            </h4>
+            <p className="text-[13px] text-text-muted mt-2 max-w-xl">
+              {allDocumentsValidated ? t('finalize_section.ready_desc') : t('finalize_section.not_ready_desc')}
+            </p>
           </div>
-        )}
+          {allDocumentsValidated && (
+            <button
+              onClick={async () => {
+                if (!confirm(t('finalize_section.confirm_dialog'))) return;
+                try {
+                  await assignmentService.confirmRegistration(parseInt(id));
+                  toast.success(t('finalize_section.success'));
+                  window.location.reload();
+                } catch (_e) {
+                  toast.error(tCommon('save_error'));
+                }
+              }}
+              className="px-8 py-4 bg-green-600 text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
+            >
+              {t('finalize_section.confirm_btn')}
+            </button>
+          )}
+        </div>
+      )}
 
-        {/* ACTION: CLOSE WORKSHOP */}
-        {assignment.status === 'IN_PROGRESS' && (
+      {assignment.status === 'IN_PROGRESS' && (
+        <>
           <div className="p-8 flex flex-col gap-8 shadow-sm border bg-indigo-50 border-indigo-100 mt-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <h4 className="text-lg font-black uppercase text-indigo-700">
-                  {t('close_section.title')}
-                </h4>
-                <p className="text-xs text-gray-600 mt-1 max-w-xl">
-                  {t('close_section.desc')}
-                </p>
+                <h4 className="text-lg font-black uppercase text-indigo-700">{t('close_section.title')}</h4>
+                <p className="text-xs text-gray-600 mt-1 max-w-xl">{t('close_section.desc')}</p>
               </div>
               <button
                 onClick={async () => {
                   const pendingEvaluations = assignment.enrollments?.filter(e => !e.evaluations || e.evaluations.length === 0).length || 0;
-
                   if (pendingEvaluations > 0) {
                     toast.error(t('close_section.pending_evals_error', { count: pendingEvaluations }));
                     return;
                   }
-
                   if (!confirm(t('close_section.confirm_dialog'))) return;
                   try {
                     const api = getApi();
@@ -298,7 +267,6 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
               </button>
             </div>
 
-            {/* Summary List */}
             <div className="border-t border-indigo-100 pt-6">
               <h5 className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-4">Certification Summary</h5>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -308,7 +276,6 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
                   const pct = total > 0 ? Math.round((attended / total) * 100) : 0;
                   const hasEvaluation = ins.evaluations && ins.evaluations.length > 0;
                   const willGetCert = pct >= 80 && hasEvaluation;
-
                   return (
                     <div key={ins.enrollmentId} className="bg-white/50 p-4 border border-indigo-100 flex items-center justify-between">
                       <div>
@@ -330,8 +297,8 @@ export default function AssignmentDetailsPage({ params }: { params: Promise<{ id
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
     </DashboardLayout>
   );
 }

@@ -33,6 +33,7 @@ Detailed technical references for the system's design and structure.
 
 - **[System Overview](./architecture/system-overview.md)**: Tech stack, service map, and directory structure.
 - **[Data Model](./architecture/data-model.md)**: Database schema and entity relationships.
+- **[AI Pipeline](./architecture/AI_PIPELINE.md)**: Privacy-first document validation using local Ollama and Vision models.
 
 ## 🧩 Capability Specifications
 

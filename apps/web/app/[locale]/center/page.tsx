@@ -112,123 +112,6 @@ export default function CenterDashboard() {
           </div>
         </section>
 
-        {/* Direct Access - edubcn Style Cards */}
-        <div className="flex justify-center w-full pb-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
-            {[
-              {
-                title: t('Students.title'),
-                text: t('Students.description'),
-                icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-                path: '/center/students',
-                active:
-                  isPhaseActive(PHASES.PLANNING) ||
-                  isPhaseActive(PHASES.APPLICATION),
-                phase: tc('general'),
-              },
-              {
-                title: t('Teachers.title'),
-                text: t('Teachers.description'),
-                icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
-                path: '/center/teachers',
-                active: true,
-                phase: tc('general'),
-              },
-              {
-                title: t('Requests.title'),
-                text: t('Requests.description'),
-                icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-                path: '/center/requests',
-                active: isPhaseActive(PHASES.APPLICATION),
-                phase: `${tc('phase')} 1`,
-              },
-              {
-                title: t('Assignments.title'),
-                text: t('Assignments.description'),
-                icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
-                path: '/center/assignments',
-                active: isPhaseActive(PHASES.PLANNING),
-                phase: `${tc('phase')} 2`,
-              },
-              {
-                title: t('Sessions.title'),
-                text: t('Sessions.description'),
-                icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-                path: '/center/sessions',
-                active: isPhaseActive(PHASES.EXECUTION),
-                phase: `${tc('phase')} 3`,
-              },
-            ].map((item, idx) => (
-              <div
-                key={idx}
-                onClick={() => item.active && router.push(item.path)}
-                className={`group bg-background-surface p-8 md:p-10 border transition-all duration-300 relative overflow-hidden ${item.active
-                    ? 'border-border-subtle cursor-pointer hover:border-consorci-darkBlue'
-                    : 'border-border-subtle opacity-60 cursor-not-allowed'
-                  }`}
-              >
-                <div className={`w-16 h-16 flex items-center justify-center mb-8 border border-border-subtle transition-all duration-300 ${item.active
-                  ? 'bg-background-subtle text-consorci-darkBlue dark:text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white'
-                  : 'bg-background-subtle text-text-muted'
-                  }`}>
-                  <div className={item.active ? 'group-hover:text-white' : ''}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-7 w-7"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d={item.icon}
-                      />
-                    </svg>
-                  </div>
-                </div>
-
-                <h3
-                  className={`text-xl font-medium mb-3 tracking-tight ${item.active ? 'text-text-primary' : 'text-text-muted'
-                    }`}
-                >
-                  {item.title}
-                </h3>
-
-                <p className="text-xs text-text-muted font-normal leading-relaxed">
-                  {item.text}
-                </p>
-
-                <div className="mt-8 flex items-center">
-                  <div
-                    className={`flex items-center font-medium text-[11px] transition-transform ${item.active
-                        ? 'text-consorci-darkBlue group-hover:translate-x-2'
-                        : 'text-text-muted'
-                      }`}
-                  >
-                    {item.active ? item.phase : tc('module_closed')}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 w-3 ml-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={3}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              ))}
-              </div>
-              </div>
-
               {/* Direct Access - edubcn Style Cards */}      <div className="flex justify-center w-full pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
           {[
@@ -260,7 +143,7 @@ export default function CenterDashboard() {
               title: t('Assignments.title'),
               text: t('Assignments.description'),
               icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01",
-              path: "/center/assignments",
+              path: `/${locale}/center/assignments`,
               active: isPhaseActive(PHASES.PLANNING),
               phase: `${tc('phase')} 2`
             },

@@ -30,7 +30,7 @@ export default function DocumentUpload({
   // --- Upload and Validation States ---
   const [uploading, setUploading] = useState(false); // Indicates if the HTTP upload to backend is in progress
   const [currentUrl, setCurrentUrl] = useState(initialUrl); // Current URL of the uploaded document
-  const [validatingAI, setValidatingAI] = useState(false); // Indicates if the AI pipeline (TensorFlow/PDF.js) is working
+  const [validatingAI, setValidatingAI] = useState(false); // Indicates if the server AI is working
   const [overrideMode, setOverrideMode] = useState(false); // Activated if AI rejects the doc, allowing manual upload
   const [pendingFile, setPendingFile] = useState<File | null>(null); // Stores the file that failed validation for "Forced" upload
 
@@ -92,40 +92,7 @@ export default function DocumentUpload({
       setValidatingAI(true);
       setOverrideMode(false);
       
-      // Dynamic loading of utilities to avoid penalizing the initial bundle
-      const { extractTextFromPdf, classifyDocumentType } = await import('@/lib/pdfUtils');
-      const text = await extractTextFromPdf(file);
-      const detectedType = classifyDocumentType(text);
-
-      // Mapping between the type expected by props and the one detected by AI (text heuristics)
-      const expectedInIAPipeline = documentType === 'pedagogical_agreement' ? 'pedagogical_agreement' : 
-                                   documentType === 'mobility_authorization' ? 'mobility_authorization' : 
-                                   documentType === 'image_rights' ? 'image_rights' : 'unknown';
-
-      // Validation 1: Text content must match the upload slot type
-      if (detectedType !== 'unknown' && detectedType !== expectedInIAPipeline) {
-        toast.error(t('ai_mismatch', { type: detectedType }));
-        setOverrideMode(true);
-        setPendingFile(file);
-        return;
-      }
-
-      // Validation 2: If it's a Pedagogical Agreement, use Computer Vision (TF.js) to look for signatures
-      if (documentType === 'pedagogical_agreement') {
-        const { signatureDetector } = await import('@/lib/visionUtils');
-        await signatureDetector.loadModel(); // Load YOLOv8 model if not in memory
-        const croppedCanvas = await signatureDetector.getBottomThirdOfLastPage(file);
-        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // We look for 3 signatures
-
-        if (!hasSignatures) {
-          toast.error(t('ai_no_signatures'));
-          setOverrideMode(true);
-          setPendingFile(file);
-          return;
-        }
-      }
-
-      // If it passes all filters, proceed to real upload
+      // We directly perform the upload. The server's VisionService (Ollama) will validate it.
       await handleValidUpload(file);
     } catch (err) {
       console.error("AI Validation Error:", err);

@@ -115,7 +115,7 @@ export default function Phase2Table({
               ))
             )}
           </tbody>
-鼓        </table>
+        </table>
       </div>
     </div>
   );

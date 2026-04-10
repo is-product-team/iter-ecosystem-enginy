@@ -4,13 +4,30 @@
       "title": "Inici de Sessió",
       "subtitle": "Benvingut de nou. Si us plau, introdueix les teves credencials per accedir a la plataforma.",
       "email": "Correu electrònic",
-      "email_placeholder": "el_teu_correu@exemple.com",
+      "email_placeholder": "example@example.com",
       "password": "Contrasenya",
       "password_placeholder": "••••••••",
+      "tagline": "ecosistema d'enginyeria i gestió educativa",
       "submit": "Iniciar Sessió",
       "loading": "Verificant credencials...",
       "error": "Correu o contrasenya incorrectes. Intenta-ho de nou.",
-      "no_account": "No tens compte? Contacta amb el teu centre.",
+      "no_account_link": "No tens compte? Informa-te'n aquí",
+      "register_info": {
+        "title": "Com obtenir accés?",
+        "coordinator": {
+          "title": "Coordinació",
+          "desc": "Contacta amb coordinacio@iter.cat per donar d'alta el teu centre a la plataforma."
+        },
+        "admin": {
+          "title": "Administració",
+          "desc": "Posa't en contacte amb l'equip del projecte per a la gestió global."
+        },
+        "teacher": {
+          "title": "Professorat",
+          "desc": "Gestiona les teves sessions i incidències directament des de l'App de professors."
+        },
+        "back": "Tornar a l'inici de sessió"
+      },
       "forgot_password": "Has oblidat la contrasenya?",
       "access_mobile": "Accés via App Mòbil",
       "teacher_mobile_hint": "Com a professor, has d'utilitzar l'aplicació mòbil Iter per gestionar les teves sessions.",
@@ -357,7 +374,9 @@
     "view_document": "Veure document",
     "pending": "Pendent",
     "authenticating": "Autenticant...",
+    "success": "Operació realitzada amb èxit",
     "upload_success": "{label} pujat correctament.",
+    "save_error": "Error en guardar els canvis.",
     "error_upload": "Error en pujar el document.",
     "only_pdf_allowed": "Només es permeten fitxers PDF.",
     "ai_mismatch": "L'IA detecta un tipus diferent: {type}.",
@@ -898,7 +917,8 @@
     "center_label": "Centre Educatiu",
     "students_title": "Alumnat Participant",
     "students_subtitle": "{occupied} de {total} places ocupades.",
-    "nominal_register_btn": "Registre Nominal",
+    "select_students_btn": "Seleccionar Alumnes",
+    "table_info": "Alumne / Informació",
     "no_students": "Encara no hi ha alumnes assignats",
     "remove_student_success": "Alumne eliminat correctament.",
     "loading_msg": "Carregant detalls del taller...",

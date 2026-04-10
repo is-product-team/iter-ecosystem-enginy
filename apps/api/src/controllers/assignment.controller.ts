@@ -801,7 +801,7 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
     const workshopTitle = sanitizeFileName(workshop.title);
 
     const fileName = `${studentName}_${studentCourse}_${workshopTitle}_${documentType}_${Date.now()}${fileExt}`;
-    const docDir = path.join('uploads', 'documents');
+    const docDir = path.resolve(process.cwd(), 'uploads', 'documents');
     const filePath = path.join(docDir, fileName);
 
     // Ensure documents dir exists
