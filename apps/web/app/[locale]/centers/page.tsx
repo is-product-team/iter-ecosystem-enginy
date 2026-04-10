@@ -65,7 +65,7 @@ export default function CentersScreen() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [tCommon]);
 
   useEffect(() => {
     if (user && user.role.name === ROLES.ADMIN) {

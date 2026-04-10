@@ -341,7 +341,7 @@ export default function DocumentVerificationPage() {
                 >
                   {sendingNotif ? (
                     <>
-                      <div className="animate-spin h-3.5 w-3.5 border-2 border-white/20 border-t-white"></div>
+                      <Loading size="mini" white />
                       <span>{t('sending')}</span>
                     </>
                   ) : (

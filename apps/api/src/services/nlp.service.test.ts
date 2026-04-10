@@ -23,7 +23,16 @@ describe('NLPService', () => {
 
     (global.fetch as any).mockResolvedValue({
       ok: true,
-      json: async () => mockResponse
+      json: async () => ({
+        ok: true,
+        json: async () => mockResponse
+      })
+    });
+    
+    // Simplified mock for the internal fetch call in nlp.service.ts
+    global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => mockResponse
     });
 
     const result = await service.processText('Student arrived 15 minutes late');
@@ -39,7 +48,7 @@ describe('NLPService', () => {
       })
     };
 
-    (global.fetch as any).mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => mockResponse
     });
@@ -61,7 +70,7 @@ describe('NLPService', () => {
       })
     };
 
-    (global.fetch as any).mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => mockResponse
     });
@@ -71,5 +80,23 @@ describe('NLPService', () => {
     expect(result.competenceUpdate).toBeDefined();
     expect(result.competenceUpdate?.competenceName).toBe('Punctuality');
     expect(result.competenceUpdate?.score).toBe(5);
+  });
+
+  it('should return the original text as cleanedObservation', async () => {
+    const mockResponse = {
+      response: JSON.stringify({
+        attendanceStatus: 'PRESENT',
+        cleanedObservation: 'Clase normal sin incidencias.'
+      })
+    };
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse
+    });
+
+    const text = 'Clase normal sin incidencias.';
+    const result = await service.processText(text);
+    expect(result.cleanedObservation).toBe(text);
   });
 });

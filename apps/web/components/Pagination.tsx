@@ -22,9 +22,9 @@ const Pagination: React.FC<PaginationProps> = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="bg-[#F8FAFC] border-t border-gray-100 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-        Showing <span className="text-[#00426B]">{currentItemsCount}</span> of <span className="text-[#00426B]">{totalItems}</span> {itemName}
+    <div className="bg-background-subtle/50 border-t border-border-subtle p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="text-[10px] font-black uppercase text-text-muted tracking-widest">
+        Showing <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{currentItemsCount}</span> of <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{totalItems}</span> {itemName}
       </div>
       <div className="flex items-center gap-2">
         <button
@@ -36,7 +36,7 @@ const Pagination: React.FC<PaginationProps> = ({
         >
           {t('previous')}
         </button>
-        <div className="px-4 py-2 bg-white border border-gray-200 text-[10px] font-bold text-[#00426B] tracking-[0.2em]">
+        <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-bold text-consorci-darkBlue dark:text-consorci-lightBlue tracking-[0.2em]">
           Page {currentPage} of {totalPages}
         </div>
         <button

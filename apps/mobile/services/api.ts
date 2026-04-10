@@ -272,8 +272,10 @@ export const postIncident = (data: { assignmentId: number; title: string; descri
 export const getPhases = () => 
   api.get<Phase[]>('phases');
 
-export const getCalendar = () => 
-  api.get('calendar');
+export const getCalendar = (start?: string, end?: string) => {
+  const params = start && end ? `?start=${start}&end=${end}` : '';
+  return api.get(`calendar${params}`);
+};
 
 export const getNotifications = () => 
   api.get<Notification[]>('notifications');

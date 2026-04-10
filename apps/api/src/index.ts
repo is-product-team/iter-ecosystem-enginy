@@ -21,6 +21,7 @@ app.use(cors({
     } else {
       logger.error(`[CORS] Rejected origin: ${origin}. Allowed: ${allowedOrigins.join(', ')}`);
       callback(new Error('CORS Policy: Origin not allowed'));
+      callback(new Error('Política CORS: Origen no permitido'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

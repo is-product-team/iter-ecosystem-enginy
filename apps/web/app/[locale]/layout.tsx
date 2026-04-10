@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, IBM_Plex_Sans_Arabic } from 'next/font/google';
 import '@/config/env';
 import '../globals.css';
 import { AuthProvider } from '@/context/AuthContext';
@@ -8,11 +8,19 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { routing } from '@/i18n/routing';
 
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
+});
+
+const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+  weight: ['400', '500', '700'],
+  subsets: ['arabic'],
+  display: 'swap',
+  variable: '--font-ibm-arabic',
 });
 
 export const metadata: Metadata = {
@@ -24,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export function generateStaticParams() {
-  return [{ locale: 'ca' }, { locale: 'es' }, { locale: 'en' }];
+  return routing.locales.map((locale) => ({ locale }));
 }
 
 export default async function LocaleLayout({
@@ -37,7 +45,7 @@ export default async function LocaleLayout({
   const { locale } = await params;
   
   // Validate that the incoming `locale` parameter is valid
-  if (!['ca', 'es', 'en'].includes(locale)) {
+  if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
@@ -45,9 +53,16 @@ export default async function LocaleLayout({
   // side is the easiest way to get started
   const messages = await getMessages();
 
+  const isRtl = locale === 'ar';
+
   return (
-    <html lang={locale} suppressHydrationWarning className={inter.variable}>
-      <body className="antialiased font-sans">
+    <html 
+      lang={locale} 
+      dir={isRtl ? 'rtl' : 'ltr'} 
+      suppressHydrationWarning 
+      className={`${inter.variable} ${ibmPlexArabic.variable}`}
+    >
+      <body className={`antialiased ${isRtl ? 'font-arabic' : 'font-sans'}`}>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <AuthProvider>

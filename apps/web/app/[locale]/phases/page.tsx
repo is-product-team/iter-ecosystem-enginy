@@ -178,7 +178,7 @@ export default function PhaseManagementPage() {
                       {updating === phase.phaseId
                         ? (
                           <div className="flex items-center justify-center gap-3">
-                            <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white animate-spin"></div>
+                            <Loading size="mini" white />
                             Processing...
                           </div>
                         )

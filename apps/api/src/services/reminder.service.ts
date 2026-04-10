@@ -35,10 +35,37 @@ export class ReminderService {
    * Scans for events happening in the next 24 hours
    */
   private static async checkReminders() {
-    const now = new Date();
-    const next24h = addHours(now, 24);
-
     try {
+      // Basic lock: Don't run if another check happened recently (e.g. within 30 min)
+      // This helps if multiple API instances are running
+      const recentCheck = await prisma.notification.findFirst({
+        where: {
+          type: 'SYSTEM',
+          title: 'CALENDAR_CHECK_HEARTBEAT',
+          createdAt: {
+            gt: new Date(Date.now() - 30 * 60 * 1000)
+          }
+        }
+      });
+
+      if (recentCheck) {
+        return;
+      }
+
+      // Record this check heartbeat
+      await prisma.notification.create({
+        data: {
+          title: 'CALENDAR_CHECK_HEARTBEAT',
+          message: 'Background calendar check executed',
+          type: 'SYSTEM',
+          importance: 'INFO',
+          isRead: true
+        }
+      });
+
+      const now = new Date();
+      const next24h = addHours(now, 24);
+
       // 1. Check for upcoming Sessions
       const upcomingSessions = await prisma.session.findMany({
         where: {
@@ -68,32 +95,35 @@ export class ReminderService {
       });
 
       for (const session of upcomingSessions) {
-        // Notify all staff assigned to this session
-        const staffUsers = session.staff.map(s => s.user);
-        const teachers = session.assignment.teachers.map(t => t.user);
+        try {
+          const staffUsers = session.staff.map(s => s.user);
+          const teachers = session.assignment.teachers.map(t => t.user);
+          const usersToNotify = Array.from(new Set([...staffUsers, ...teachers]));
 
-        // Unique users to notify
-        const usersToNotify = Array.from(new Set([...staffUsers, ...teachers]));
-
-        for (const user of usersToNotify) {
-          // Check if notification already exists to avoid spamming
-          const existing = await prisma.notification.findFirst({
-            where: {
-              userId: user.userId,
-              title: { startsWith: 'Reminder: ' },
-              message: { contains: session.assignment.workshop.title }
-            }
-          });
-
-          if (!existing) {
-            await createNotificationInternal({
-              userId: user.userId,
-              title: `Reminder: Workshop Session`,
-              message: `You have a session for the workshop "${session.assignment.workshop.title}" scheduled for today at ${session.startTime || 'its usual time'}.`,
-              type: 'SYSTEM',
-              importance: 'INFO'
+          for (const user of usersToNotify) {
+            const existing = await prisma.notification.findFirst({
+              where: {
+                userId: user.userId,
+                title: `Reminder: Workshop Session`,
+                message: { contains: session.assignment.workshop.title },
+                createdAt: {
+                  gt: new Date(Date.now() - 12 * 60 * 60 * 1000) // Don't repeat if sent in last 12h
+                }
+              }
             });
+
+            if (!existing) {
+              await createNotificationInternal({
+                userId: user.userId,
+                title: `Reminder: Workshop Session`,
+                message: `You have a session for the workshop "${session.assignment.workshop.title}" scheduled for today at ${session.startTime || 'its usual time'}.`,
+                type: 'SYSTEM',
+                importance: 'INFO'
+              });
+            }
           }
+        } catch (sessionError) {
+          console.error(`❌ Error processing reminders for session ${session.sessionId}:`, sessionError);
         }
       }
 
@@ -108,16 +138,18 @@ export class ReminderService {
       });
 
       for (const milestone of upcomingMilestones) {
-        // Global milestones notify all relevant users? 
-        // For now, let's just create a global notification (userId and centerId null)
-        const existing = await prisma.notification.findFirst({
+        try {
+          const existing = await prisma.notification.findFirst({
             where: {
               userId: null,
               centerId: null,
-              title: milestone.title
+              title: `Upcoming Milestone: ${milestone.title}`,
+              createdAt: {
+                gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+              }
             }
           });
-  
+
           if (!existing) {
             await createNotificationInternal({
               title: `Upcoming Milestone: ${milestone.title}`,
@@ -126,10 +158,15 @@ export class ReminderService {
               importance: 'WARNING'
             });
           }
+        } catch (milestoneError) {
+          console.error(`❌ Error processing reminders for milestone ${milestone.eventId}:`, milestoneError);
         }
+      }
 
+      // Cleanup old heartbeats (Optional, every Sunday or similar)
+      // For now, we just let them exist as logs
     } catch (error) {
-      console.error('❌ ReminderService Error:', error);
+      console.error('❌ ReminderService Critical Error:', error);
     }
   }
 }

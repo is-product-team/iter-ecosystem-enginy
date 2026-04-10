@@ -79,7 +79,7 @@ export default function AssignmentsPage() {
 
     init();
     return () => { isMounted = false; };
-  }, [router]);
+  }, [router, locale]);
 
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find(f => f.name === phaseName);

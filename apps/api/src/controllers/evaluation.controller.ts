@@ -136,7 +136,7 @@ export const processVoiceEvaluation = async (req: Request, res: Response) => {
 
         const competenceEvals = [];
 
-        if (nlpResult.competenceUpdates.length > 0 && enrollmentRecord) {
+        if (nlpResult.competenceUpdates && nlpResult.competenceUpdates.length > 0 && enrollmentRecord) {
             let teacherEval = await prisma.evaluation.findUnique({
                 where: { enrollmentId: enrollmentRecord.enrollmentId }
             });

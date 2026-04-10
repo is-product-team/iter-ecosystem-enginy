@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { getUser, User } from '@/lib/auth';
 import DashboardLayout from '@/components/DashboardLayout';
 import { ROLES } from '@iter/shared';
@@ -24,6 +25,7 @@ interface AssignmentDetail {
 
 export default function SessionManagementPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const locale = useLocale();
   const [user, setUser] = useState<User | null>(null);
   const [assignment, setAssignment] = useState<AssignmentDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -122,7 +124,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
               <div className="flex flex-col">
                 <span className="text-[10px] font-black text-[#4197CB] uppercase tracking-widest">Session {idx + 1}</span>
                 <span className="text-sm font-black text-[#00426B] uppercase">
-                  {new Date(session.sessionDate).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  {new Date(session.sessionDate).toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
               </div>
               <div className="text-[10px] font-bold text-gray-300">

@@ -13,7 +13,7 @@ WORKDIR /app
 FROM base AS pruner
 RUN npm install -g turbo
 COPY . .
-RUN turbo prune web --docker
+RUN turbo prune @iter/web --docker
 RUN turbo prune api --docker
 
 # --- BUILDER WEB ---
@@ -24,7 +24,7 @@ COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 RUN npm install --ignore-scripts
 COPY --from=pruner /app/out/full/ .
-RUN npx turbo run build --filter=web
+RUN npx turbo run build --filter=@iter/web
 
 # --- RUNNER WEB (PRODUCCIÓN) ---
 FROM base AS runner-web

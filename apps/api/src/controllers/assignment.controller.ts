@@ -1,7 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES } from '@iter/shared';
-import { isPhaseActive, PHASES } from '../lib/phaseUtils.js';
+import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES, CHECKLIST_STEPS } from '@iter/shared';
 import { createNotificationInternal } from './notification.controller.js';
 import { VisionService } from '../services/vision.service.js';
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';
@@ -104,7 +103,7 @@ export const getAssignmentById = async (req: Request, res: Response) => {
 
     // Security Scoping
     if (role !== ROLES.ADMIN && Number(assignment.centerId) !== Number(centerId)) {
-      return res.status(403).json({ error: 'Access denied' });
+      return res.status(403).json({ error: 'Access denied: You cannot view assignments from another center' });
     }
 
     res.json(assignment);
@@ -115,22 +114,29 @@ export const getAssignmentById = async (req: Request, res: Response) => {
 
 // GET: List assignments of a center
 export const getAssignmentsByCenter = async (req: Request, res: Response) => {
-  const { centerId: targetCenterId } = req.params;
+  const { idCenter: targetCenterId } = req.params;
   const { centerId, role } = req.user!;
+
+  let queryCenterId = parseInt(targetCenterId as string);
 
   // Security Scoping
   if (role !== ROLES.ADMIN) {
     if (!centerId) {
       return res.status(403).json({ error: 'Access denied: Your account has no center assigned' });
     }
-    if (Number(targetCenterId) !== Number(centerId)) {
+
+    // Explicitly check if the requested centerId matches the user's centerId
+    if (queryCenterId !== centerId) {
       return res.status(403).json({ error: 'Access denied: You cannot view assignments from another center' });
     }
+
+    // For Coordinators/Teachers, we use the centerId from their token (already verified match)
+    queryCenterId = centerId;
   }
 
   try {
     const assignments = await prisma.assignment.findMany({
-      where: { centerId: parseInt(targetCenterId as string) },
+      where: { centerId: queryCenterId },
       include: {
         workshop: true,
         center: true,
@@ -164,7 +170,7 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
 
 // GET: Get students enrolled in an assignment
 export const getStudents = async (req: Request, res: Response) => {
-  const { assignmentId } = req.params;
+  const { idAssignment: assignmentId } = req.params;
 
   try {
     const enrollments = await prisma.enrollment.findMany({
@@ -188,7 +194,7 @@ export const getStudents = async (req: Request, res: Response) => {
 
 // GET: Checklist of an assignment
 export const getChecklist = async (req: Request, res: Response) => {
-  const { assignmentId } = req.params;
+  const { idAssignment: assignmentId } = req.params;
   try {
     const checklist = await prisma.assignmentChecklist.findMany({
       where: { assignmentId: parseInt(assignmentId as string) }
@@ -201,7 +207,7 @@ export const getChecklist = async (req: Request, res: Response) => {
 
 // PATCH: Update checklist item
 export const updateChecklistItem = async (req: Request, res: Response) => {
-  const { itemId } = req.params;
+  const { idItem: itemId } = req.params;
   const result = AssignmentChecklistSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -227,22 +233,23 @@ export const updateChecklistItem = async (req: Request, res: Response) => {
 
 // GET: Issues of a center
 export const getIssuesByCenter = async (req: Request, res: Response) => {
-  const { centerId: targetCenterId } = req.params;
+  const { idCenter: targetCenterId } = req.params;
   const { centerId, role } = req.user!;
+
+  let queryCenterId = parseInt(targetCenterId as string);
 
   // Security Scoping
   if (role !== ROLES.ADMIN) {
     if (!centerId) {
       return res.status(403).json({ error: 'Access denied: Your account has no center assigned' });
     }
-    if (Number(targetCenterId) !== Number(centerId)) {
-      return res.status(403).json({ error: 'Access denied: You cannot view issues from another center' });
-    }
+    // For non-admins, force their own centerId
+    queryCenterId = centerId;
   }
 
   try {
     const issues = await prisma.issue.findMany({
-      where: { centerId: parseInt(targetCenterId as string) },
+      where: { centerId: queryCenterId },
       orderBy: { createdAt: 'desc' }
     });
     res.json(issues);
@@ -348,10 +355,10 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
         // Initialize default checklist for Phase 2
         checklist: {
           create: [
-            { stepName: 'DESIGNATE_TEACHERS', isCompleted: true },
-            { stepName: 'INPUT_STUDENTS', isCompleted: false },
-            { stepName: 'CONFIRM_REGISTRATION', isCompleted: false },
-            { stepName: 'Pedagogical Agreement (Modality C)', isCompleted: request.modality !== 'C' }
+            { stepName: CHECKLIST_STEPS.DESIGNATE_TEACHERS, isCompleted: true },
+            { stepName: CHECKLIST_STEPS.INPUT_STUDENTS, isCompleted: false },
+            { stepName: CHECKLIST_STEPS.CONFIRM_REGISTRATION, isCompleted: false },
+            { stepName: CHECKLIST_STEPS.PEDAGOGICAL_AGREEMENT, isCompleted: request.modality !== 'C' }
           ]
         }
       }
@@ -393,7 +400,7 @@ export const publishAssignments = async (req: Request, res: Response) => {
 
 // POST: Perform Nominal Registration (Enroll students in an assignment)
 export const createEnrollments = async (req: Request, res: Response) => {
-  const assignmentId = parseInt(req.params.assignmentId as string);
+  const assignmentId = parseInt(req.params.idAssignment as string);
   const { studentIds } = req.body;
 
   try {
@@ -443,7 +450,7 @@ export const createEnrollments = async (req: Request, res: Response) => {
       await tx.assignmentChecklist.updateMany({
         where: {
           assignmentId: assignmentId,
-          stepName: { contains: 'Nominal Register' } // Sincronizado con el servicio
+          stepName: CHECKLIST_STEPS.INPUT_STUDENTS
         },
         data: {
           isCompleted: true,
@@ -463,7 +470,7 @@ export const createEnrollments = async (req: Request, res: Response) => {
 
 // PATCH: Designate teachers for an assignment
 export const designateTeachers = async (req: Request, res: Response) => {
-  const { assignmentId } = req.params;
+  const { idAssignment: assignmentId } = req.params;
   const { teacher1Id, teacher2Id } = req.body;
 
   try {
@@ -497,7 +504,7 @@ export const designateTeachers = async (req: Request, res: Response) => {
     await prisma.assignmentChecklist.updateMany({
       where: {
         assignmentId: parseInt(assignmentId as string),
-        stepName: { contains: 'Referent Teachers' }
+        stepName: CHECKLIST_STEPS.DESIGNATE_TEACHERS
       },
       data: {
         isCompleted: !!(teacher1Id && teacher2Id),
@@ -519,7 +526,7 @@ export const designateTeachers = async (req: Request, res: Response) => {
 
 // POST: Validate Center Data (Admin)
 export const validateCenterData = async (req: Request, res: Response) => {
-  const { assignmentId } = req.params;
+  const { idAssignment: assignmentId } = req.params;
   const { approved, feedback: _feedback } = req.body;
   const { role } = req.user!;
 
@@ -839,7 +846,7 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
 };
 
 export const getSessions = async (req: Request, res: Response) => {
-  const { assignmentId } = req.params;
+  const { idAssignment: assignmentId } = req.params;
   try {
     const sessions = await prisma.session.findMany({
       where: { assignmentId: parseInt(assignmentId as string) },
@@ -1023,7 +1030,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
 
 // Phase 2: Teaching Staff Management
 export const addTeachingStaff = async (req: Request, res: Response) => {
-  const { assignmentId } = req.params;
+  const { idAssignment: assignmentId } = req.params;
   const { userId, isPrincipal } = req.body;
 
   try {
@@ -1050,7 +1057,7 @@ export const addTeachingStaff = async (req: Request, res: Response) => {
 };
 
 export const removeTeachingStaff = async (req: Request, res: Response) => {
-  const { assignmentId, userId } = req.params;
+  const { idAssignment: assignmentId, userId } = req.params;
 
   try {
     await prisma.assignmentTeacher.delete({
@@ -1069,7 +1076,7 @@ export const removeTeachingStaff = async (req: Request, res: Response) => {
 
 // Phase 3: Dynamic Session Teaching Staff
 export const addSessionTeacher = async (req: Request, res: Response) => {
-  const { sessionId } = req.params;
+  const { idSession: sessionId } = req.params;
   const { userId } = req.body;
 
   try {
@@ -1094,7 +1101,7 @@ export const addSessionTeacher = async (req: Request, res: Response) => {
 };
 
 export const removeSessionTeacher = async (req: Request, res: Response) => {
-  const { sessionId, userId } = req.params;
+  const { idSession: sessionId, userId } = req.params;
 
   try {
     await prisma.sessionTeacher.delete({
@@ -1139,7 +1146,7 @@ export const closeAssignment = async (req: Request, res: Response) => {
     // 1. Validate that all enrollments have an evaluation
     const missingEvaluations = assignment.enrollments.filter(e => e.evaluations.length === 0);
     if (missingEvaluations.length > 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Cannot close assignment: Some students haven\'t been evaluated.',
         missingCount: missingEvaluations.length
       });
@@ -1156,7 +1163,7 @@ export const closeAssignment = async (req: Request, res: Response) => {
       if (percentage >= MIN_ATTENDANCE_PERCENTAGE) {
         const studentName = `${enrollment.student.fullName} ${enrollment.student.lastName}`;
         const fileName = `Certificado_${enrollment.studentId}_${assignmentId}.pdf`;
-        
+
         await PDFService.generateCertificate(
           studentName,
           assignment.workshop.title,

@@ -93,7 +93,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
   const toggleStudent = (idStudent: number) => {
     setSelectedIds(prev => {
       const isSelected = prev.includes(idStudent);
-      const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxPlaces || 20;
+      const maxSeats = assignment?.request?.studentsAprox || assignment?.workshop?.maxPlaces || 20;
 
       if (!isSelected && prev.length >= maxSeats) {
         toast.warning(`Limit of ${maxSeats} seats reached.`);
@@ -108,7 +108,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxPlaces || 20;
+      const maxSeats = assignment?.request?.studentsAprox || assignment?.workshop?.maxPlaces || 20;
       const available = maxSeats - selectedIds.length;
       
       if (available <= 0) {
@@ -173,7 +173,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
 
   if (loading && !assignment) return <Loading fullScreen message="Loading assignment data..." />;
 
-  const maxSeats = assignment?.request?.approxStudents || assignment?.workshop?.maxPlaces || 20;
+  const maxSeats = assignment?.request?.studentsAprox || assignment?.workshop?.maxPlaces || 20;
   const isFull = selectedIds.length === maxSeats;
 
   const headerActions = (
@@ -258,7 +258,7 @@ export default function NominalRegisterPage({ params }: { params: Promise<{ id: 
                 <tr className="bg-[#F8FAFC] border-b border-gray-200">
                   <th className="px-8 py-4 w-16">
                     <div 
-                      onClick={(e) => { e.stopPropagation(); handleSelectAll(selectedIds.length < (assignment?.request?.approxStudents || 0)); }}
+                      onClick={(e) => { e.stopPropagation(); handleSelectAll(selectedIds.length < (assignment?.request?.studentsAprox || 0)); }}
                       className={`w-5 h-5 border-2 flex items-center justify-center cursor-pointer transition-all ${
                         selectedIds.length > 0 ? 'bg-[#00426B] border-[#00426B] text-white' : 'bg-white border-gray-200'
                       }`}

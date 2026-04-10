@@ -1,0 +1,802 @@
+{
+  "Auth": {
+    "login": {
+      "title": "تسجيل الدخول",
+      "subtitle": "مرحباً بك مجدداً. يرجى إدخال بيانات الاعتماد الخاصة بك للوصول إلى المنصة.",
+      "email": "البريد الإلكتروني",
+      "email_placeholder": "بريدك@مثال.كم",
+      "password": "كلمة المرور",
+      "password_placeholder": "••••••••",
+      "submit": "تسجيل الدخول",
+      "loading": "جاري التحقق من البيانات...",
+      "error": "البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.",
+      "no_account": "ليس لديك حساب؟ اتصل بمركزك.",
+      "forgot_password": "هل نسيت كلمة المرور؟",
+      "access_mobile": "الوصول عبر تطبيق الجوال",
+      "teacher_mobile_hint": "بصفتك مدرساً، يجب عليك استخدام تطبيق Iter لإدارة جلساتك.",
+      "download_app": "تحميل تطبيق Iter",
+      "back_to_login": "العودة إلى تسجيل الدخول"
+    },
+    "logout": {
+      "title": "تسجيل الخروج",
+      "message": "هل أنت متأكد أنك تريد الخروج؟",
+      "confirm": "خروج",
+      "cancel": "إلغاء"
+    }
+  },
+  "Admin": {
+    "dashboard": {
+      "title": "لوحة الإدارة",
+      "subtitle": "الإدارة العامة للمراكز والورش وتقييمات البرنامج.",
+      "welcome": "مرحباً بك في مركز التحكم. قم بإدارة الورش والمراكز والطلبات من هنا."
+    },
+    "Centers": {
+      "title": "المراكز التعليمية",
+      "add_btn": "مركز جديد",
+      "search_placeholder": "البحث عن مركز...",
+      "description": "إنشاء أو تعديل أو حذف المراكز.",
+      "table_center": "المركز",
+      "table_address": "العنوان",
+      "table_email": "البريد",
+      "table_phone": "الهاتف"
+    },
+    "Workshops": {
+      "title": "الورش والطلبات",
+      "management_title": "إدارة الورش",
+      "management_subtitle": "إنشاء وتحرير والإشراف على كتالوج Iter الرسمي.",
+      "create": "نشر ورشة",
+      "new_workshop": "ورشة جديدة",
+      "list_title": "قائمة الورش النشطة",
+      "description": "إنشاء أو تعديل أو حذف الورش للمراكز.",
+      "table_info": "معلومات الورشة",
+      "table_classification": "التصنيف",
+      "table_details": "التفاصيل والسعة",
+      "table_actions": "الإجراءات",
+      "delete_title": "حذف الورشة",
+      "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه الورشة؟ سيؤدي هذا الإجراء إلى حذف الورشة نهائياً من الكتالوج.",
+      "save_success": "تم حفظ الورشة بنجاح.",
+      "delete_success": "تم حذف الورشة بنجاح.",
+      "delete_error": "خطأ في حذف الورشة.",
+      "load_error": "تعذر تحميل الورش.",
+      "loading_catalog": "جاري تحميل الكتالوج..."
+    },
+    "Phases": {
+      "title": "مراحل الدورة",
+      "description": "ضبط التواريخ وحالة مراحل الدورة.",
+      "control_panel": "لوحة التحكم الزمنية"
+    },
+    "Stats": {
+      "title": "الإحصائيات",
+      "description": "تحليل متقدم لاستخدام النظام، وأكثر الورش طلباً، ونشاط النظام.",
+      "management_stats": "إحصائيات الإدارة",
+      "total_requests": "إجمالي الطلبات",
+      "request_status": "حالة الطلبات",
+      "global_demand": "الطلب العالمي على الورش",
+      "secure_hub": "مركز البيانات الآمن نشط"
+    },
+    "Requests": {
+      "title": "طلبات المراكز",
+      "subtitle": "مراقب وإدارة طلبات المراكز للدورة الحالية.",
+      "description": "عرض طلبات المراكز وتعيين الورش.",
+      "table_center_date": "المركز / التاريخ",
+      "table_teachers": "المدرسون",
+      "table_students": "الطلاب",
+      "table_status": "الحالة",
+      "edit_title": "تعديل الطلب",
+      "num_students": "عدد الطلاب",
+      "comments": "تعليقات",
+      "rejected": "مرفوض",
+      "assigned": "مُعين",
+      "run_tetris_btn": "تشغيل التعيين التلقائي",
+      "approve_btn": "موافقة",
+      "reject_btn": "رفض",
+      "no_requests": "لم يتم العثور على طلبات مع الفلاتر المطبقة",
+      "approve_title": "الموافقة على الطلب",
+      "approve_confirm": "هل أنت متأكد أنك تريد الموافقة على هذا الطلب وتوليد التعيين فوراً؟",
+      "reject_title": "رفض الطلب",
+      "reject_confirm": "هل أنت متأكد أنك تريد رفض هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+      "tetris_title": "تشغيل التعيين التلقائي",
+      "tetris_confirm": "سيقوم هذا الإجراء بمعالجة جميع الطلبات المعتمدة المعلقة وتوليد التعيينات لجميع المراكز. هل تريد المتابعة؟",
+      "success_approve": "تمت الموافقة على الطلب وتوليد التعيين بنجاح.",
+      "error_approve": "خطأ في عملية الموافقة.",
+      "success_reject": "تم رفض الطلب.",
+      "error_reject": "خطأ في رفض الطلب.",
+      "success_tetris": "اكتمل التعيين: {count} تعيينات جديدة.",
+      "error_tetris": "خطأ في تشغيل التعيين التلقائي: ",
+      "success_update": "تم تحديث الطلب بنجاح.",
+      "error_update": "خطأ في تحديث الطلب."
+    },
+    "Verifications": {
+      "title": "التحقق من المستندات",
+      "subtitle": "تحقق من وثائق المراكز وأبلغ عن الحالة.",
+      "description": "التحقق من صحة الوثائق المقدمة من المراكز (اتفاقية بيداغوجية، تنقل، إلخ).",
+      "table_center_workshop": "المركز / الورشة",
+      "table_dates": "التواريخ",
+      "table_docs": "وثائق الطلاب",
+      "start": "بداية",
+      "end": "نهاية",
+      "dates_not_defined": "التواريخ غير محددة",
+      "no_students": "لا يوجد طلاب مسجلون",
+      "preview": "معاينة الرسالة",
+      "greeting": "تحية",
+      "doc_with_error": "وثيقة بها خطأ",
+      "reason_error": "سبب الخطأ",
+      "send_notification": "إرسال إشعار",
+      "sending": "جاري إرسال الإشعار...",
+      "report_problem_hint": "أبلغ عن مشكلة في وثائق هذا الطالب",
+      "report_problem_btn": "إبلاغ عن مشكلة",
+      "no_assignments": "لا توجد تعيينات للتحقق منها",
+      "report_modal_title": "الإبلاغ عن مشكلة وثائقية",
+      "reason_placeholder": "صف سبب الخطأ هنا...",
+      "error_no_comment": "يجب عليك كتابة تعليق",
+      "success_notif": "تم إرسال الإشعار بنجاح",
+      "error_notif": "خطأ في إرسال الإشعار",
+      "success_validate": "تم التحقق من الوثيقة",
+      "success_unvalidate": "تم إزالة التحقق",
+      "error_validate": "خطأ في التحقق من الوثيقة",
+      "error_load": "تعذر تحميل التعيينات",
+      "doc_names": {
+        "agreement": "اتفاقية",
+        "mobility": "تنقل",
+        "rights": "حقوق"
+      },
+      "greetings": {
+        "morning": "مرحباً، صباح الخير",
+        "afternoon": "مرحباً، مساء الخير",
+        "evening": "مرحباً، طاب مساؤك"
+      },
+      "docs": {
+        "select": "اختر وثيقة...",
+        "pedagogical": "اتفاقية بيداغوجية",
+        "mobility": "تصريح تنقل",
+        "image": "حقوق الصورة",
+        "all": "جميع الوثائق"
+      }
+    }
+  },
+  "Center": {
+    "dashboard": {
+      "title": "لوحة المركز: {name}",
+      "subtitle": "عملية إدارة ورش Iter.",
+      "status_title": "حالة برنامج Iter 25-26"
+    },
+    "Assignments": {
+      "title": "التعيينات والورش",
+      "subtitle": "إدارة الأنشطة المعينة لمركزك.",
+      "create": "تعيين جديد",
+      "description": "تعيين الطلاب مع الوثائق اللازمة للورش المطلوبة مسبقاً.",
+      "status": {
+        "pending": "معلق",
+        "active": "نشط",
+        "completed": "مكتمل"
+      }
+    },
+    "Teachers": {
+      "title": "إدارة المدرسين",
+      "add": "إضافة مدرس",
+      "import": "استيراد قائمة",
+      "description": "إضافة مدرسين من مركزك.",
+      "search_placeholder": "البحث عن طريق الاسم أو البريد...",
+      "table_name": "الاسم الكامل",
+      "table_email": "بريد الاتصال",
+      "edit_title": "تعديل مدرس",
+      "edit_subtitle": "تعديل بيانات المدرس",
+      "add_subtitle": "أدخل بيانات المدرس الجديد",
+      "change_photo": "تغيير صورة الملف الشخصي",
+      "photo_success": "تم تحديث الصورة.",
+      "photo_error": "خطأ في رفع الصورة.",
+      "no_user_photo_error": "لا يمكن رفع صورة لمدرس بدون مستخدم مرتبط.",
+      "delete_title": "حذف مدرس",
+      "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا المدرس؟ سيتم أيضاً سحب الوصول إلى تطبيق الجوال.",
+      "form_name": "الاسم الكامل",
+      "form_email": "بريد الاتصال",
+      "password_placeholder": "كلمة المرور لتطبيق الجوال",
+      "save_btn": "حفظ المدرس"
+    },
+    "Students": {
+      "title": "إدارة الطلاب",
+      "add": "تسجيل طالب",
+      "import": "تحميل جماعي",
+      "description": "إضافة طلاب من مركزك.",
+      "search_placeholder": "البحث بالاسم أو IDALU...",
+      "filter_course": "تصفية حسب الدورة",
+      "all_courses": "جميع الدورات",
+      "table_info": "معلومات الطالب",
+      "table_idalu": "الهوية (IDALU)",
+      "table_course": "الدورة / المستوى",
+      "edit_title": "تعديل طالب",
+      "edit_subtitle": "تعديل بيانات الطالب",
+      "add_subtitle": "أدخل بيانات الطالب الجديد",
+      "change_photo": "تغيير صورة الملف الشخصي",
+      "photo_success": "تم تحديث الصورة.",
+      "photo_error": "خطأ في رفع الصورة.",
+      "delete_title": "حذف طالب",
+      "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا الطالب؟ لا يمكن التراجع عن هذا الإجراء.",
+      "form_name": "اسم الطالب",
+      "form_surnames": "الألقاب",
+      "form_idalu": "رمز IDALU",
+      "form_course": "الدورة / المستوى (مثال: 4 ESO)",
+      "save_btn": "حفظ الطالب"
+    },
+    "Sessions": {
+      "title": "تخطيط الجلسات",
+      "new": "برمجة جلسة",
+      "description": "أضف مدرسيك إلى الورش المعينة.",
+      "search_workshop": "البحث عن ورشة",
+      "pending_confirmation": "في انتظار التأكيد",
+      "assign_teacher": "تعيين مدرس",
+      "assign_teacher_desc": "اختر الوضع والمدرس للجلسة.",
+      "choose_workshop": "-- اختر ورشة --",
+      "choose_session": "-- اختر جلسة --",
+      "choose_teacher": "-- اختر مدرساً --",
+      "referent_team": "الفريق المرجعي العام",
+      "specific_team": "الفريق التعليمي الخاص",
+      "use_referent_team": "استخدام الفريق المرجعي",
+      "modify_teacher": "+ تعديل المدرس لهذا اليوم",
+      "session_n": "الجلسة {number}",
+      "no_teacher_assigned": "لم يتم تعيين مدرس",
+      "specific_day": "يوم محدد",
+      "whole_workshop": "ورشة كاملة",
+      "select_workshop": "اختر الورشة",
+      "select_day": "اختر اليوم",
+      "select_teacher": "اختر المدرس",
+      "error_no_selection": "اختر الورشة والمدرس",
+      "error_no_session": "اختر جلسة",
+      "success_whole": "تم تعيين المدرس للورشة كاملة",
+      "success_day": "تم تعيين المدرس لليوم المحدد",
+      "error_assignment": "خطأ في تنفيذ التعيين",
+      "success_remove": "تم حذف المدرس بنجاح",
+      "error_remove": "خطأ في حذف المدرس"
+    },
+    "Requests": {
+      "title": "طلب ورش",
+      "description": "اطلب الورش التي تريدها مع الأماكن المطلوبة.",
+      "table_mod": "الوضع",
+      "table_workshop": "الورشة / القطاع",
+      "table_actions": "الحالة / الإجراء",
+      "selected": "مختار",
+      "select": "اختيار",
+      "referent_teachers": "المدرسون المرجعيون",
+      "select_main": "اختر المرجع الرئيسي *",
+      "select_second": "اختر المرجع الثاني *",
+      "approx_students": "عدد الطلاب التقريبي",
+      "reason": "سبب الطلب",
+      "processing": "جاري معالجة الطلب...",
+      "update_btn": "تحديث الطلب",
+      "send_btn": "إرسال الطلب"
+    },
+    "Evaluations": {
+      "title": "المتابعة والتقييم",
+      "subtitle": "مراجعة الأثر ونتائج الورش."
+    },
+    "Notifications": {
+      "title_user": "التنبيهات والإشعارات",
+      "subtitle_user": "ابق على اطلاع بتغييرات المراحل، وقرارات الطلبات والبلاغات الرسمية.",
+      "loading": "جاري تحميل التنبيهات الرسمية...",
+      "empty": {
+        "title": "ليس لديك تنبيهات معلقة",
+        "subtitle": "عند وجود تغييرات في طلباتك أو تواريخ هامة، ستظهر هنا."
+      },
+      "btn": {
+        "read": "تحديد كمقروء",
+        "delete": "حذف"
+      },
+      "delete_dialog": {
+        "title": "حذف التنبيه",
+        "message": "هل أنت متأكد أنك تريد حذف هذا التنبيه؟ لا يمكن التراجع عن هذا الإجراء."
+      },
+      "messages": {
+        "delete_ok": "تم حذف التنبيه.",
+        "delete_error": "خطأ في حذف التنبيه."
+      }
+    },
+    "Monitoring": {
+      "title": "المراقبة التشغيلية (المرحلة 3)",
+      "subtitle": "حالة تنفيذ الورش والحضور في مركزك.",
+      "KPI": {
+        "sessions_today": "جلسات اليوم",
+        "pending_attendance": "قوائم معلقة",
+        "active_assignments": "ورش جارية",
+        "incidents": "حوادث نشطة"
+      },
+      "Assignments": {
+        "title": "حالة الورش",
+        "progress": "التقدم",
+        "health": "حالة الحضور",
+        "view_details": "إدارة الجلسات",
+        "no_staff": "⚠️ بدون مدرس معين",
+        "attendance_ok": "الحضور محدث",
+        "attendance_warning": "قوائم ناقصة"
+      },
+      "Today": {
+        "title": "أجندة اليوم",
+        "no_sessions": "لا توجد جلسات مبرمجة لليوم."
+      },
+      "Incidents": {
+        "title": "آخر الحوادث",
+        "report_new": "الإبلاغ عن حادث",
+        "no_incidents": "لا توجد حوادث مبلغ عنها."
+      }
+    }
+  },
+  "Common": {
+    "general": "عام",
+    "configuration": "إعدادات",
+    "global": "عالمي",
+    "phase": "مرحلة",
+    "loading": "جاري التحميل...",
+    "module_closed": "الوحدة مغلقة",
+    "loading_calendar": "جاري تحميل التقويم...",
+    "home": "الرئيسية",
+    "notifications": "تنبيهات",
+    "calendar": "التقويم",
+    "profile": "الملف الشخصي",
+    "logout": "خروج",
+    "educational_center": "المركز التعليمي",
+    "workshops": "ورش ورش",
+    "centers": "مراكز",
+    "requests": "طلبات",
+    "phases": "مراحل",
+    "students": "طلاب",
+    "teachers": "مدرسون",
+    "assignments": "تعيينات",
+    "sessions": "جلسات",
+    "uploading": "جاري الرفع...",
+    "validating_ai": "التحقق (الذكاء الاصطناعي)...",
+    "force_manual_upload": "إجبار الرفع اليدوي",
+    "change": "تغيير",
+    "attach": "إرفاق",
+    "document_validated": "تم التحقق من الوثيقة",
+    "view_document": "عرض الوثيقة",
+    "pending": "معلق",
+    "authenticating": "جاري المصادقة...",
+    "upload_success": "تم رفع {label} بنجاح.",
+    "error_upload": "خطأ في رفع الوثيقة.",
+    "only_pdf_allowed": "يسمح فقط بملفات PDF.",
+    "ai_mismatch": "اكتشف الذكاء الاصطناعي نوعاً مختلفاً: {type}.",
+    "ai_no_signatures": "لم يكتشف الذكاء الاصطناعي التوقيعات المطلوبة.",
+    "ai_error": "خطأ في معالجة الذكاء الاصطناعي. يمكنك إجبار الرفع.",
+    "showing": "عرض",
+    "of": "من",
+    "previous": "السابق",
+    "page": "صفحة",
+    "next": "التالي",
+    "all_sectors": "جميع القطاعات",
+    "all_modalities": "جميع الأنماط",
+    "all_centers": "جميع المراكز",
+    "search_placeholder": "مثال: نجارة، روبوتات...",
+    "clear_filters": "مسح الفلاتر",
+    "no_results": "لم يتم العثور على نتائج",
+    "try_other_terms": "حاول باستخدام مصطلحات بحث أخرى.",
+    "search_by_title": "البحث بالعنوان",
+    "filter_by_sector": "تصفية حسب القطاع",
+    "filter_by_modality": "تصفية حسب النمط",
+    "actions": "إجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ",
+    "confirm": "تأكيد",
+    "cancel": "إلغاء",
+    "modality_label": "نمط {modality}",
+    "places_label": "{count} أماكن",
+    "duration_label": "{hours}س",
+    "id_label": "ID: {id}",
+    "status_label": "الحالة: {status}",
+    "save_success": "تمت العملية بنجاح.",
+    "error_loading": "خطأ في تحميل البيانات.",
+    "fill_all_fields": "يرجى إكمال جميع الحقول.",
+    "ok": "حسناً",
+    "show": "إظهار",
+    "hide": "إخفاء",
+    "table_info": "معلومات",
+    "table_idalu": "IDALU",
+    "table_course": "الدورة",
+    "clear": "مسح",
+    "details": "تفاصيل",
+    "status": "الحالة",
+    "loading_error": "تعذر تحميل المعلومات",
+    "delete_success": "تم حذف العنصر بنجاح.",
+    "delete_error": "حدث خطأ أثناء حذف العنصر.",
+    "delete_confirm_title": "تأكيد الحذف",
+    "delete_confirm_msg": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذه الخطوة.",
+    "new": "جديد"
+  },
+  "Calendar": {
+    "loading_auth": "جاري مزامنة تقويمك...",
+    "title": "تقويم Iter",
+    "subtitle": "عرض جميع الأحداث والورش والمواعيد النهائية في تقويم كامل.",
+    "active_fase": "المرحلة الحالية: {nom}",
+    "sync_phases": "جاري مزامنة المراحل...",
+    "view_legend": "عرض المفتاح",
+    "legend_title": "مفتاح الألوان",
+    "assignment_label": "تعيين",
+    "assignment_desc": "الفترة الإجمالية للورشة في المركز.",
+    "session_label": "جلسة ورشة",
+    "session_desc": "يوم ووقت محدد للنشاط.",
+    "phases_label": "مراحل البرنامج",
+    "phase_solicitud": "الطلب والتسجيل",
+    "phase_planificacion": "التخطيط والتعيين",
+    "phase_ejecucion": "التنفيذ والمتابعة",
+    "phase_evaluacion": "الإغلاق والتقييم",
+    "legend_ok": "فهمت",
+    "event_details": "تفاصيل الحدث",
+    "close": "إغلاق",
+    "view_details": "عرض التفاصيل"
+  },
+  "Questionnaires": {
+    "title": "الاستبيانات",
+    "subtitle": "إدارة نماذج التقييم والرضا.",
+    "available_models": "النماذج المتاحة",
+    "no_models": "لم يتم إنشاء نماذج استبيان بعد.",
+    "create_first": "إنشاء الأول",
+    "questions_count": "{count} أسئلة",
+    "view_results": "عرض النتائج",
+    "how_works_title": "كيف تعمل الاستبيانات؟",
+    "how_works_desc": "يمكن إرسال الاستبيانات الديناميكية للمشاركين بمجرد انتهاء مرحلة التنفيذ. البيانات التي يتم الحصول عليها تغذي تلقائياً لوحة التقييم للمسؤولين.",
+    "new_questionnaire": "استبيان جديد",
+    "builder": {
+      "title": "منشئ الاستبيانات",
+      "general_config": "الإعدادات العامة",
+      "form_title": "عنوان الاستبيان",
+      "target_audience": "الجمهور المستهدف",
+      "audience": {
+        "student": "الطلاب",
+        "teacher": "المدرسون",
+        "center": "المركز المرجعي"
+      },
+      "questions_title": "الأسئلة ({count})",
+      "question_text": "نص السؤال {number}",
+      "response_type": "نوع الإجابة",
+      "options_label": "الخيارات (مفصولة بفاصلة)",
+      "add_question": "إضافة سؤال",
+      "publish": "نشر نموذج الاستبيان",
+      "placeholder_title": "مثال: استطلاع رضا عن الورش 2026",
+      "placeholder_question": "ماذا تريد أن تسأل؟",
+      "placeholder_options": "الخيار 1، الخيار 2، الخيار 3...",
+      "save_success": "تم إنشاء نموذج الاستبيان بنجاح.",
+      "save_error": "خطأ في إنشاء الاستبيان.",
+      "types": {
+        "likert_5": "مقياس 1-5 (ليكيرت)",
+        "likert_10": "مقياس 1-10",
+        "multiple": "خيار متعدد",
+        "open": "نص حر"
+      }
+    }
+  },
+  "Reports": {
+    "title": "التقارير والنتائج",
+    "subtitle": "تحليل أثر برنامج Iter.",
+    "student_exp": "تجربة الطالب",
+    "teacher_sat": "رضا المدرس",
+    "workshops_completed": "ورش مكتملة",
+    "vs_last_year": "+5% مقابل 2023",
+    "student_part": "مشاركة الطلاب",
+    "total_enrollments": "إجمالي التسجيلات",
+    "vocational_dist": "توزيع الأثر المهني",
+    "impact_labels": {
+      "si": "اختار فرعاً مهنياً",
+      "no": "لم يغير رأيه",
+      "considerant": "يفكر في الأمر الآن"
+    },
+    "top_rated": "الورش الأعلى تقييماً",
+    "download_pdf": "تحميل ملخص PDF",
+    "low_rating_alerts": "تنبيهات التقييم المنخفض",
+    "low_rating_msg": "2 ورش تظهر رضا أقل من 3.5. يوصى بالمراجعة مع المركز المرجعي.",
+    "view_details": "عرض التفاصيل"
+  },
+  "Student": {
+    "autoconsulta": {
+      "submitted": {
+        "title": "شكراً لمشاركتك!",
+        "subtitle": "رأيك يساعدنا في تحسين برنامج Enginy. تم تسجيل إجاباتك بنجاح.",
+        "close_btn": "إغلاق النافذة"
+      },
+      "header": {
+        "tagline": "برنامج Enginy",
+        "title": "التقييم الذاتي للطالب",
+        "subtitle": "نريد معرفة تجربتك خلال الورشة. الصدق والتفصيل سيساعداننا كثيراً!"
+      },
+      "sections": {
+        "attitude": {
+          "title": "الموقف والسلوك",
+          "questions": {
+            "punctuality": "هل كنت منضبطاً في تسليم المهام؟",
+            "respect": "هل احترمت المواد والمرافق؟",
+            "interest": "ما مدى الاهتمام الذي أظهرته للتعلم؟",
+            "autonomy": "هل شعرت بالاستقلالية في حل المشكلات؟"
+          }
+        },
+        "satisfaction": {
+          "title": "التقييم والرضا",
+          "experience": "التجربة العامة (1-10)",
+          "teacher": "جودة المدرس (1-10)",
+          "pobre": "ضعيف",
+          "excellent": "ممتاز"
+        },
+        "impact": {
+          "title": "الأثر المهني",
+          "question": "هل ساعدك ذلك في اتخاذ قرار بشأن مستقبلك المهني؟",
+          "options": {
+            "si": "نعم، أوضح لي الأفكار.",
+            "no": "لا، كان الأمر واضحاً بالفعل أو ليس من أجلي.",
+            "considerant": "أفكر في الأمر الآن."
+          }
+        },
+        "feedback": {
+          "title": "ملاحظات مفتوحة",
+          "improvements_label": "ماذا ستغير أو تحسن في الورشة؟",
+          "improvements_placeholder": "رأيك...",
+          "learnings_label": "ما هي الدروس الـ 3 الرئيسية التي تعلمتها؟",
+          "learnings_placeholder": "1. ... 2. ... 3. ..."
+        }
+      },
+      "options": {
+        "frequency": {
+          "mai": "أبداً",
+          "rarament": "نادراً",
+          "sovint": "غالباً",
+          "sempre": "دائماً"
+        },
+        "interest": {
+          "gens": "لا شيء تقريباً",
+          "poc": "قليل",
+          "molt": "كثير",
+          "moltissim": "كثيراً جداً"
+        }
+      },
+      "submit_btn": "إرسال التقييم الذاتي",
+      "sending": "جاري الإرسال...",
+      "error_submit": "خطأ في إرسال التقييم الذاتي."
+    }
+  },
+  "Metadata": {
+    "title": "Iter Web",
+    "description": "تطبيق Iter ويب لإدارة التعلم."
+  },
+  "Profile": {
+    "title": "ملفي الشخصي",
+    "subtitle": "إدارة معلوماتك الشخصية وتفضيلات الأكاديمية.",
+    "edit_profile": "تعديل الملف الشخصي",
+    "contact_info_label": "بيانات الاتصال",
+    "email_label": "البريد الإلكتروني",
+    "center_referent_label": "المركز المرجعي",
+    "no_center_assigned": "لا يوجد مركز معين",
+    "center_usage_hint": "يستخدم لإدارة الورش والطلبات.",
+    "security_label": "الأمان",
+    "change_password": "تغيير كلمة المرور",
+    "appearance_label": "مظهر الواجهة",
+    "themes": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام"
+    }
+  },
+  "Navigation": {
+    "home": "الرئيسية",
+    "notifications": "تنبيهات",
+    "calendar": "التقويم",
+    "logout": "خروج",
+    "workshops": "ورش",
+    "centers": "مراكز",
+    "requests": "طلبات",
+    "phases": "مراحل",
+    "stats": "إحصائيات",
+    "verifications": "تحققات",
+    "students": "طلاب",
+    "teachers": "مدرسون",
+    "assignments": "تعيينات",
+    "sessions": "جلسات",
+    "profile": "الملف الشخصي",
+    "monitoring": "المراقبة"
+  },
+  "Dashboards": {
+    "admin": {
+      "title": "لوحة الإدارة",
+      "subtitle": "الإدارة العامة للمراكز والورش وتقييمات البرنامج.",
+      "sections": {
+        "workshops": {
+          "title": "إدارة الورش",
+          "description": "إنشاء أو تعديل أو حذف الورش للمراكز."
+        },
+        "centers": {
+          "title": "إدارة المراكز",
+          "description": "إنشاء أو تعديل أو حذف المراكز التعليمية."
+        },
+        "phases": {
+          "title": "مراحل الدورة",
+          "description": "ضبط التواريخ وحالات مراحل الدورة."
+        },
+        "stats": {
+          "title": "الإحصائيات",
+          "description": "تحليل متقدم لاستخدام النظام والنشاط."
+        },
+        "requests": {
+          "title": "طلبات المراكز",
+          "description": "استشارة الطلبات وتعيين الورش."
+        },
+        "verifications": {
+          "title": "التحقق من المستندات",
+          "description": "التحقق من صحة الوثائق المقدمة من المراكز."
+        }
+      }
+    },
+    "center": {
+      "title": "لوحة المركز",
+      "subtitle": "إدارة عملية ورش Iter.",
+      "timeline_title": "حالة برنامج Iter 25-26",
+      "loading_calendar": "جاري تحميل التقويم...",
+      "sections": {
+        "students": {
+          "title": "إدارة الطلاب",
+          "description": "أضف طلاباً من مركزك"
+        },
+        "teachers": {
+          "title": "إدارة المدرسين",
+          "description": "أضف مدرسين من مركزك"
+        },
+        "requests": {
+          "title": "طلب ورش",
+          "description": "اطلب الورش التي تريدها مع الأماكن المطلوبة."
+        },
+        "assignments": {
+          "title": "التعيينات",
+          "description": "تعيين الطلاب في الورش المطلوبة."
+        },
+        "sessions": {
+          "title": "إدارة الجلسات",
+          "description": "أضف مدرسيك إلى الورش المعينة"
+        },
+        "closed_module": "الوحدة مغلقة",
+        "general": "عام",
+        "phase1": "مرحلة 1",
+        "phase2": "مرحلة 2",
+        "phase3": "مرحلة 3"
+      }
+    },
+    "student": {
+      "title": "أهلاً بك",
+      "subtitle": "استعرض ورشك وحمل شهاداتك.",
+      "certificates_title": "شهاداتي",
+      "no_certificates": "لم يتم العثور على شهادات.",
+      "no_certificates_desc": "لم تحصل على أي شهادة بعد. أكمل ورشة للحصول على واحدة.",
+      "download_pdf": "تحميل PDF",
+      "loading": "جاري تحميل اللوحة...",
+      "duration": "المدة",
+      "issued": "صادر في",
+      "pdf_not_implemented": "توليد PDF غير مفعل في هذا العرض التجريبي."
+    }
+  },
+  "Forms": {
+    "search": "بحث...",
+    "search_by_title": "البحث بالعنوان",
+    "filter_by_sector": "تصفية حسب القطاع",
+    "filter_by_modality": "تصفية حسب النمط",
+    "all_sectors": "جميع القطاعات",
+    "all_modalities": "جميع الأنماط",
+    "name": "الاسم",
+    "title": "العنوان",
+    "description": "الوصف",
+    "sector": "القطاع",
+    "modality": "النمط",
+    "places": "أماكن",
+    "duration": "المدة",
+    "location": "الموقع",
+    "icon": "أيقونة",
+    "select_sector": "اختر قطاعاً...",
+    "required_fields": "الحقول المميزة بـ * إجبارية.",
+    "workshop_config_subtitle": "ضبط الورشة والجدول الأسبوعي",
+    "general_info": "معلومات عامة",
+    "technical_details": "تفاصيل تقنية",
+    "title_placeholder": "أدخل اسم الورشة...",
+    "description_placeholder": "شرح موجز للمحتوى...",
+    "modality_a": "نمط A (3 فصول)",
+    "modality_b": "نمط B (فصلين)",
+    "modality_c": "نمط C (فصل واحد)",
+    "review_data": "راجع البيانات قبل الحفظ.",
+    "schedule": "الجدول الأسبوعي",
+    "add_slot": "إضافة فترة",
+    "add_day": "إضافة يوم",
+    "configured_days": "الأيام المحددة",
+    "no_days": "لم يتم تحديد أي يوم بعد",
+    "save_workshop": "حفظ الورشة",
+    "saving": "جاري الحفظ...",
+    "monday": "الاثنين",
+    "tuesday": "الثلاثاء",
+    "wednesday": "الأربعاء",
+    "thursday": "الخميس",
+    "friday": "الجمعة"
+  },
+  "WorkshopsPage": {
+    "title": "إدارة الورش",
+    "subtitle": "إنشاء وتحرير والإشراف على كتالوج Iter الرسمي.",
+    "new": "ورشة جديدة",
+    "loading": "جاري تحميل الكتالوج...",
+    "empty": "لم يتم العثور على ورش",
+    "empty_desc": "حاول باستخدام مصطلحات بحث أخرى.",
+    "table_info": "معلومات الورشة",
+    "table_classification": "التصنيف",
+    "table_details": "التفاصيل والسعة"
+  },
+  "CentersPage": {
+    "title": "إدارة المراكز",
+    "subtitle": "إدارة المراكز التعليمية المشاركة في Iter.",
+    "new": "مركز جديد",
+    "search_label": "البحث بالاسم أو الرمز",
+    "search_placeholder": "مثال: مدرسة، 08012345...",
+    "loading": "جاري تحميل المراكز...",
+    "empty": "لم يتم العثور على مراكز",
+    "empty_desc": "حاول باستخدام مصطلحات بحث أخرى.",
+    "table_center": "المركز",
+    "table_address": "العنوان",
+    "table_email": "البريد الإلكتروني",
+    "table_phone": "الهاتف",
+    "center_code": "الرمز",
+    "no_address": "بدون عنوان"
+  },
+  "RequestsPage": {
+    "title": "إدارة الطلبات",
+    "subtitle": "مراقب وإدارة طلبات المراكز التعليمية للدورة الحالية.",
+    "search_workshop": "البحث عن ورشة",
+    "educational_center": "المركز التعليمي",
+    "all_centers": "جميع المراكز",
+    "all_modalities": "جميع الأنماط",
+    "automatic_assignment": "تعيين تلقائي",
+    "syncing": "جاري مزامنة الطلبات...",
+    "no_requests": "لم يتم العثور على طلبات مع الفلاتر المطبقة",
+    "table_center_date": "المركز / التاريخ",
+    "table_teachers": "المدرسون",
+    "table_students": "الطلاب",
+    "table_status": "الحالة",
+    "table_actions": "الإجراءات",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "edit_request": "تعديل الطلب",
+    "num_students": "عدد الطلاب",
+    "comments": "تعليقات",
+    "save_changes": "حفظ التغييرات",
+    "request_approve_title": "الموافقة على الطلب",
+    "request_approve_msg": "هل أنت متأكد أنك تريد الموافقة على هذا الطلب وتوليد التعيين فوراً؟",
+    "request_reject_title": "رفض الطلب",
+    "request_reject_msg": "هل أنت متأكد أنك تريد رفض هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+    "run_tetris_title": "تشغيل التعيين التلقائي",
+    "run_tetris_msg": "سيقوم هذا الإجراء بمعالجة جميع الطلبات المعتمدة المعلقة وتوليد التعيينات لجميع المراكز. هل تريد المتابعة؟",
+    "request_approved_success": "تمت الموافقة على الطلب وتوليد التعيين بنجاح.",
+    "request_rejected_success": "تم رفض الطلب.",
+    "tetris_success": "اكتمل التعيين: {count} تعيينات جديدة.",
+    "rejected_status": "مرفوض",
+    "assigned_status": "مُعين",
+    "mod_a": "نمط A (مجموعة كاملة)",
+    "mod_b": "نمط B (نصف مجموعة)",
+    "mod_c": "نمط C (مشاريع فردية)"
+  },
+  "AssignmentsPage": {
+    "title": "ورش معينة",
+    "subtitle": "استشر ودر خطتك لورشك.",
+    "search_filters": "البحث والفلاتر",
+    "search_placeholder": "البحث حسب الورشة أو المركز...",
+    "all_statuses": "جميع الحالات",
+    "in_progress": "جاري التنفيذ / مقبول",
+    "completed": "مكتمل",
+    "table_workshop": "ورشة معينة",
+    "table_center": "المركز",
+    "table_planning": "التخطيط",
+    "table_status": "الحالة",
+    "table_actions": "الإجراءات",
+    "workshop_id": "معرف الورشة",
+    "not_assigned": "غير معين",
+    "start_date": "البداية: {date}",
+    "manage_btn": "إدارة",
+    "no_assignments": "لم يتم العثور على تعيينات",
+    "adjust_filters": "حاول ضبط فلاتر البحث.",
+    "incidents_title": "إدارة الحوادث والشواغر",
+    "incidents_subtitle": "أبلغ عن مشاكل السلوك أو اطلب أماكن شاغرة.",
+    "incident_placeholder": "صف المشكلة...",
+    "report_btn": "إبلاغ عن حادث",
+    "incident_success": "تم الإبلاغ عن الحادث. سنقوم بمراجعته قريباً."
+  },
+  "StudentsPage": {
+    "title": "إدارة الطلاب",
+    "subtitle": "إدارة طلاب مركزك التعليمي وبياناتهم الاسمية.",
+    "new_student": "طالب جديد"
+  }
+}

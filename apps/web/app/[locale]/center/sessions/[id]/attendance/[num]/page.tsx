@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
@@ -40,7 +40,7 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
     }
   }, [user, authLoading, router]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const api = getApi();
       const res = await api.get(`/assignments/${id}/sessions/${num}`);
@@ -54,13 +54,13 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, num]);
 
   useEffect(() => {
     if (user) {
       fetchData();
     }
-  }, [user, id, num]);
+  }, [user, fetchData]);
 
   const handleStatusChange = (enrollmentId: number, newStatus: AttendanceRecord['status']) => {
     setAttendance(prev => prev.map(record => 

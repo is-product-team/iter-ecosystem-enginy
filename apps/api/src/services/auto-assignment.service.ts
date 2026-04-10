@@ -1,4 +1,4 @@
-import { RequestStatus, Modality, AssignmentStatus } from '@prisma/client';
+import { RequestStatus, AssignmentStatus } from '@prisma/client';
 import prisma from '../lib/prisma.js';
 import { isPhaseActive } from '../lib/phaseUtils.js';
 import { PHASES, REQUEST_STATUSES } from '@iter/shared';
@@ -43,6 +43,7 @@ export class AutoAssignmentService {
         }
 
         console.log(`🚀 AutoAssignmentService: Processing ${requests.length} requests...`);
+        console.log(`🚀 AutoAssignmentService: Procesando ${requests.length} solicitudes de Modalidad C...`);
 
         // 2. Group Requests by Workshop
         const workshopMap = new Map<number, typeof requests>();

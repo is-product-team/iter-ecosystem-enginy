@@ -68,7 +68,6 @@ export default function SessionsListPage() {
 
   const router = useRouter();
   const params = useParams();
-  const locale = params?.locale || 'ca';
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {

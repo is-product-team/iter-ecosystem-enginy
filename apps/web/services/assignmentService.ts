@@ -33,7 +33,7 @@ export interface Assignment {
   status: string;
   workshop?: { title: string; modality: string; maxPlaces: number };
   center?: { name: string };
-  request?: { approxStudents: number };
+  request?: { studentsAprox: number };
   teacher1?: { userId: number; name: string };
   teacher2?: { userId: number; name: string };
   enrollments?: Enrollment[];
@@ -77,7 +77,7 @@ interface BackendAssignment {
   status: string;
   workshop?: { title: string; modality: string; maxPlaces: number };
   center?: { name: string };
-  request?: { approxStudents: number };
+  request?: { studentsAprox: number };
   teacher1?: { userId: number; name: string };
   teacher2?: { userId: number; name: string };
   enrollments?: BackendEnrollment[];
@@ -107,7 +107,7 @@ const assignmentService = {
           maxPlaces: a.workshop.maxPlaces
         } : undefined,
         center: a.center ? { name: a.center.name } : undefined,
-        request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
+        request: a.request ? { studentsAprox: a.request.studentsAprox } : undefined,
         teacher1: a.teacher1 ? { userId: a.teacher1.userId, name: a.teacher1.name } : undefined,
         teacher2: a.teacher2 ? { userId: a.teacher2.userId, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
@@ -135,9 +135,14 @@ const assignmentService = {
         sessions: a.sessions,
         checklist: a.checklist,
       }));
-    } catch (error) {
-      console.error(error);
-      const errorMessage = (error as { response?: { data?: { error?: string } } }).response?.data?.error || "Error loading assignment";
+    } catch (error: any) {
+      console.error("[assignmentService] Error in getByCenter:", {
+        centerId,
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      const errorMessage = error.response?.data?.error || "Error loading assignment";
       throw new Error(errorMessage);
     }
   },
@@ -221,7 +226,7 @@ const assignmentService = {
           maxPlaces: a.workshop.maxPlaces
         } : undefined,
         center: a.center ? { name: a.center.name } : undefined,
-        request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
+        request: a.request ? { studentsAprox: a.request.studentsAprox } : undefined,
         teacher1: a.teacher1 ? { userId: a.teacher1.userId, name: a.teacher1.name } : undefined,
         teacher2: a.teacher2 ? { userId: a.teacher2.userId, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
@@ -277,7 +282,7 @@ const assignmentService = {
           maxPlaces: a.workshop.maxPlaces
         } : undefined,
         center: a.center ? { name: a.center.name } : undefined,
-        request: a.request ? { approxStudents: a.request.approxStudents } : undefined,
+        request: a.request ? { studentsAprox: a.request.studentsAprox } : undefined,
         teacher1: a.teacher1 ? { userId: a.teacher1.userId, name: a.teacher1.name } : undefined,
         teacher2: a.teacher2 ? { userId: a.teacher2.userId, name: a.teacher2.name } : undefined,
         enrollments: a.enrollments?.map((i: BackendEnrollment) => ({
