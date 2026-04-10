@@ -41,6 +41,12 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Logger global de peticiones para depuración
+app.use((req, res, next) => {
+  console.log(`[API] ${req.method} ${req.url}`);
+  next();
+});
+
 const API_PREFIX = env.API_PREFIX;
 app.use(`${API_PREFIX}/uploads`, express.static('uploads'));
 

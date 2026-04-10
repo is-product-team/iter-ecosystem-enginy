@@ -34,7 +34,8 @@ export default function BulkDocumentUpload({
       const api = getApi();
 
       for (const file of Array.from(files)) {
-        if (file.type !== 'application/pdf') {
+        const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {
           failCount++;
           continue;
         }
@@ -122,7 +123,7 @@ export default function BulkDocumentUpload({
       <input 
         type="file" 
         multiple 
-        accept=".pdf" 
+        accept="application/pdf,image/*" 
         className="hidden" 
         ref={fileInputRef}
         onChange={(e) => e.target.files && handleFiles(e.target.files)}

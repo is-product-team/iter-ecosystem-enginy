@@ -52,24 +52,36 @@ export default function DocumentUpload({
         },
       });
 
-      // Extract the URL from the 'docs_status' JSON field of the response (Enrollment model)
-      const docsStatus = res.data.docs_status || {};
+      // Extract the URL from the 'docsStatus' JSON field of the response (Enrollment model)
+      console.log('--- DEBUG UPLOAD RESPONSE ---', res.data);
+      const docsStatus = res.data.docsStatus || res.data.docs_status || {};
       const fieldKey = documentType === 'pedagogical_agreement' ? 'pedagogicalAgreementUrl' :
                        documentType === 'mobility_authorization' ? 'mobilityAuthorizationUrl' :
                        'imageRightsUrl';
       
       const newUrl = docsStatus[fieldKey];
+      const isValidatedAI = docsStatus[`${documentType}Validated`];
 
-      setCurrentUrl(newUrl);
-      if (newUrl) onUploadSuccess(newUrl);
-      toast.success(t('upload_success', { label }));
+      if (newUrl) {
+        setCurrentUrl(newUrl);
+        onUploadSuccess(newUrl);
+        
+        if (isValidatedAI === false) {
+           toast.error(t('ai_no_signatures'));
+           setOverrideMode(true);
+           setPendingFile(file);
+        } else {
+           toast.success(t('upload_success', { label }));
+        }
+      }
       
       // Clear error/blocking states after success
       setOverrideMode(false);
       setPendingFile(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading document:', error);
-      toast.error(t('error_upload'));
+      const message = error.response?.data?.error || t('error_upload');
+      toast.error(message);
     } finally {
       setUploading(false);
     }
@@ -80,14 +92,17 @@ export default function DocumentUpload({
    */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('[DEBUG] Archivo seleccionado:', file?.name, 'Tipo:', file?.type);
     if (!file) return;
 
     // Basic format validation
-    if (file.type !== 'application/pdf') {
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
       toast.error(t('only_pdf_allowed'));
       return;
     }
 
+    console.log('[DEBUG] Formato validado. Iniciando validación de IA/Subida...');
     try {
       setValidatingAI(true);
       setOverrideMode(false);
@@ -121,7 +136,7 @@ export default function DocumentUpload({
           <input
             type="file"
             className="hidden"
-            accept=".pdf"
+            accept="application/pdf,image/*"
             onChange={handleFileChange}
             disabled={uploading || validatingAI}
           />
@@ -185,7 +200,7 @@ export default function DocumentUpload({
             <input
               type="file"
               className="hidden"
-              accept=".pdf"
+              accept="application/pdf,image/*"
               onChange={handleFileChange}
               disabled={uploading || validatingAI}
             />

@@ -767,7 +767,8 @@ const sanitizeFileName = (str: string) => {
 };
 
 export const uploadStudentDocument = async (req: Request, res: Response) => {
-  const { enrollmentId, documentType } = req.body;
+  const { idEnrollment, documentType } = req.body;
+  const enrollmentId = idEnrollment; // Rename for internal logic
 
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded.' });
@@ -809,9 +810,28 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
       fs.mkdirSync(docDir, { recursive: true });
     }
 
+    console.log(`[Upload] Saving file to: ${filePath}`);
     fs.writeFileSync(filePath, req.file.buffer);
 
     const url = `/uploads/documents/${fileName}`;
+
+    // --- AI VALIDATION (OLLAMA) ---
+    console.log(`[Upload] Starting AI validation with Ollama for ${documentType}...`);
+    const visionService = new VisionService();
+    let aiResult;
+    try {
+      // 30s timeout safety for AI
+      aiResult = await Promise.race([
+        visionService.validateDocument(req.file),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('AI_TIMEOUT')), 30000))
+      ]) as any;
+      console.log(`[Upload] AI Result:`, aiResult);
+    } catch (aiError) {
+      console.error(`[Upload] AI validation failed or timed out:`, aiError);
+      // Fallback: Mark as not validated but allow the upload to continue
+      aiResult = { valid: false, errors: ["IA no disponible en este momento"], metadata: { hasSignature: false, confidence: 0, error: 'AI_FALLBACK' } };
+    }
+    // ------------------------------
 
     const fieldMap: Record<string, string> = {
       'pedagogical_agreement': 'pedagogicalAgreementUrl',
@@ -827,21 +847,28 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
 
     const docsStatus = (enrollment?.docsStatus as any) || {};
 
+    console.log(`[Upload] Updating database for enrollment ${enrollmentId}...`);
     const updated = await prisma.enrollment.update({
       where: { enrollmentId: parseInt(enrollmentId as string) },
       data: {
         docsStatus: {
           ...docsStatus,
           [updateField]: url,
-          [`${documentType}Present`]: true
+          [`${documentType}Present`]: true,
+          [`${documentType}Validated`]: aiResult.valid,
+          [`${documentType}AIResult`]: aiResult.metadata
         }
       }
     });
 
+    console.log(`[Upload] Success! URL: ${url}`);
     res.json(updated);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error uploading document:", error);
-    res.status(500).json({ error: 'Error processing document upload.' });
+    res.status(500).json({ 
+      error: `Server Error: ${error.message || 'Unknown error'}`,
+      details: error.stack
+    });
   }
 };
 
