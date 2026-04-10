@@ -18,7 +18,7 @@ const THEME = {
 module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
-  // darkMode: "class",
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -38,14 +38,23 @@ module.exports = {
           subtle: "var(--border-subtle)",
         },
         // Institutional / Brand
+        consorci: {
+          darkBlue: "var(--consorci-dark-blue)",
+          lightBlue: "var(--consorci-light-blue)",
+          lightGray: "var(--consorci-light-gray)",
+          pinkRed: "var(--consorci-pink-red)",
+          beige: "var(--consorci-beige)",
+          yellow: "var(--consorci-yellow)",
+        },
         primary: {
           DEFAULT: "var(--consorci-dark-blue)", 
         },
-        'light-blue': "var(--consorci-light-blue)",
-        'light-gray': "var(--consorci-light-gray)",
-        'pink-red': "var(--consorci-pink-red)",
-        beige: "var(--consorci-beige)",
-        yellow: "var(--consorci-yellow)",
+        secondary: {
+          DEFAULT: "var(--consorci-light-blue)",
+        },
+        accent: {
+          DEFAULT: "var(--consorci-pink-red)",
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'], 

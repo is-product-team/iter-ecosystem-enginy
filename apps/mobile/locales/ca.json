@@ -32,6 +32,7 @@
     "login": {
       "title": "Inici de\nSessió",
       "email": "Correu Electrònic",
+      "name": "Nom",
       "password": "Contrasenya",
       "fill_all_fields": "Per favor, omple tots els camps.",
       "exclusive_use_error": "Aquesta aplicació és d'ús exclusiu per a professors. Els administradors i coordinadors han d'utilitzar la plataforma web.",
@@ -48,6 +49,7 @@
     "title": "El Meu Perfil",
     "role_professor": "Professorat",
     "role_admin": "Administrador",
+    "information": "Informació del compte",
     "preferences": "Preferències",
     "notifications": "Notificacions Push",
     "appearance": "Apariència",
@@ -62,7 +64,8 @@
       "ca": "Català",
       "es": "Español"
     },
-    "help": "Suport i Ajuda"
+    "help": "Suport i Ajuda",
+    "camera_permission_denied": "Es necessiten permisos per accedir a la galeria."
   },
   "Routes": {
     "session": "Sessió",

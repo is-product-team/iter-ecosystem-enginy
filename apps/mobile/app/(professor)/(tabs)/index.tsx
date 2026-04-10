@@ -1,17 +1,72 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { THEME, PHASES } from '@iter/shared';
+import { THEME, ROLES } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import { getMyAssignments, getPhases, getNotifications } from '../../../services/api';
 
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
-import StatusCard from '../../../components/dashboard/StatusCard';
-import FeatureListModule from '../../../components/dashboard/FeatureListModule';
+
+// Reusable WhatsApp-style Section Header
+const SectionHeader = ({ title }: { title: string }) => (
+  <View className="px-6 pt-6 pb-2">
+    <Text className="text-text-muted text-[12px] font-bold uppercase tracking-wider">
+      {title}
+    </Text>
+  </View>
+);
+
+// Reusable Dashboard Item (WhatsApp Style)
+const DashboardItem = ({ 
+  icon, 
+  iconColor, 
+  title, 
+  subtitle, 
+  onPress, 
+  badge,
+  isLast = false 
+}: { 
+  icon: keyof typeof Ionicons.glyphMap;
+  iconColor: string;
+  title: string;
+  subtitle?: string;
+  onPress?: () => void;
+  badge?: number;
+  isLast?: boolean;
+}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.7}
+    className="flex-row items-center py-4 px-6 bg-background-surface"
+  >
+    <View className="w-10 h-10 rounded-full items-center justify-center mr-4 bg-background-subtle border border-border-subtle">
+      <Ionicons name={icon} size={20} color={iconColor} />
+    </View>
+    <View className="flex-1 justify-center">
+      <Text className="text-text-primary text-[16px] font-bold" style={{ fontFamily: THEME.fonts.primary }}>
+        {title}
+      </Text>
+      {subtitle && (
+        <Text className="text-text-muted text-[13px] mt-0.5" numberOfLines={1} style={{ fontFamily: THEME.fonts.primary }}>
+          {subtitle}
+        </Text>
+      )}
+    </View>
+    {badge !== undefined && badge > 0 && (
+      <View className="bg-primary px-2 py-0.5 rounded-full mr-2">
+        <Text className="text-white text-[10px] font-black">{badge}</Text>
+      </View>
+    )}
+    <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
+    {!isLast && (
+      <View className="absolute bottom-0 left-20 right-0 h-[0.5px] bg-border-subtle" />
+    )}
+  </TouchableOpacity>
+);
 
 export default function DashboardScreen() {
   const { t, i18n } = useTranslation();
@@ -24,67 +79,63 @@ export default function DashboardScreen() {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [selectedWorkshop, setSelectedWorkshop] = React.useState<CalendarEvent | null>(null);
   const [userName, setUserName] = React.useState('Professor');
+  const [userInitials, setUserInitials] = React.useState('??');
   const [unreadCount, setUnreadCount] = React.useState(0);
+  const [avatar, setAvatar] = React.useState<string | null>(null);
   
-  // 1. Helpers
-  const isPhaseActive = (phaseName: string) => {
-    const phase = phases.find(p => p.name === phaseName);
-    return phase ? phase.isActive : false;
-  };
-
   const checkRoleAndFetchData = async (isRefresh = false) => {
       try {
         if (isRefresh) setRefreshing(true);
         let userData = null;
+        let userImage = null;
         try {
-          userData = Platform.OS === 'web' 
-            ? localStorage.getItem('user') 
-            : await SecureStore.getItemAsync('user');
+          if (Platform.OS === 'web') {
+            userData = localStorage.getItem('user');
+            userImage = localStorage.getItem('user-avatar');
+          } else {
+            userData = await SecureStore.getItemAsync('user');
+            userImage = await SecureStore.getItemAsync('user-avatar');
+          }
         } catch (storageError) {
-          console.warn("⚠️ [Dashboard] Error accessing storage:", storageError);
           router.replace('/login');
           return;
         }
         
         if (userData) {
           const user = JSON.parse(userData);
-          console.log("🔍 [DEBUG DASHBOARD] User found:", user.email, "Role:", user.role?.roleName);
-
           if (user.firstName) setUserName(user.firstName);
           else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
           
+          if (user.fullName) {
+            const initials = user.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
+            setUserInitials(initials);
+          }
+          
+          if (userImage) setAvatar(userImage);
+
           const roleName = user.role?.roleName;
           if (roleName !== 'PROFESSOR' && roleName !== 'TEACHER') {
-            console.warn("⚠️ [Dashboard] Unauthorized role:", roleName);
             router.replace('/login');
             return;
           }
         } else {
-          console.log("🔍 [DEBUG DASHBOARD] No user data, redirecting...");
           router.replace('/login');
           return;
         }
 
-        const [phasesRes, assignmentsRes] = await Promise.all([
+        const [phasesRes, assignmentsRes, notifsRes] = await Promise.all([
           getPhases(),
-          getMyAssignments()
+          getMyAssignments(),
+          getNotifications()
         ]);
         
-        // The /phases API returns { data: [...], meta: [...] }
         const phasesData = phasesRes.data as any;
         const phasesArray = Array.isArray(phasesData) ? phasesData : phasesData.data;
         setPhases(Array.isArray(phasesArray) ? phasesArray : []);
-        
-        // Assignments API returns the array directly
         setAssignments(Array.isArray(assignmentsRes.data) ? assignmentsRes.data : []);
-
-        // 4. Fetch Notifications
-        const notifsRes = await getNotifications();
-        const unread = notifsRes.data.filter((n: any) => !n.isRead).length;
-        setUnreadCount(unread);
+        setUnreadCount(notifsRes.data.filter((n: any) => !n.isRead).length);
       } catch (error: any) {
         console.error("Error fetching dashboard data:", error);
-        // Ensure state remains valid even on error
         setPhases([]);
         setAssignments([]);
       } finally {
@@ -134,7 +185,6 @@ export default function DashboardScreen() {
       );
   };
 
-  // 2. Effects
   useFocusEffect(
     React.useCallback(() => {
       checkRoleAndFetchData();
@@ -145,7 +195,6 @@ export default function DashboardScreen() {
     checkRoleAndFetchData(true);
   }, []);
 
-  // 3. Derived State
   const nextWorkshop = getNextSession();
   const activePhase = phases.find(p => p.isActive);
   const activePhaseName = activePhase ? activePhase.name : '';
@@ -153,7 +202,6 @@ export default function DashboardScreen() {
 
   const handleWorkshopClick = (assignment: any) => {
     const evaluated = isEvaluated(assignment);
-
     const formattedEvent: CalendarEvent = {
         id: assignment.assignmentId,
         title: assignment.workshop.title,
@@ -161,7 +209,7 @@ export default function DashboardScreen() {
         type: 'assignment',
         description: assignment.workshop.description || t('Common.no_description'),
         metadata: {
-            time: new Date(assignment.startDate).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(assignment.startDate).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }), 
+            time: (assignment.startTime || "09:00") + ' - ' + (assignment.endTime || "13:00"), 
             center: assignment.center.name,
             address: assignment.center.address,
             assignmentId: assignment.assignmentId,
@@ -175,13 +223,12 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-[#F9FAFB]">
+      <View className="flex-1 justify-center items-center bg-background-page">
         <ActivityIndicator size="large" color={THEME.colors.primary} />
       </View>
     );
   }
 
-  // Filter assignments for pending tasks
   const pendingAssignments = assignments.filter(a => !isEvaluated(a));
 
   return (
@@ -190,117 +237,103 @@ export default function DashboardScreen() {
         className="flex-1" 
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={onRefresh} 
-            tintColor={THEME.colors.primary} 
-            colors={[THEME.colors.primary]} 
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.colors.primary} />
         }
       >
         
-        {/* Professional Header */}
-        <View className="px-6 pb-6 pt-4 mb-6">
-          <View className="flex-row items-baseline mb-2">
-            <Text className="text-text-muted text-xs font-bold uppercase tracking-widest mr-2" style={{ fontFamily: THEME.fonts.primary }}>
-              {new Date().toLocaleDateString(i18n.language, { weekday: 'long' })}
-            </Text>
-            <Text className="text-text-secondary text-xs font-bold uppercase tracking-widest" style={{ fontFamily: THEME.fonts.primary }}>
-              {new Date().toLocaleDateString(i18n.language, { day: 'numeric', month: 'long' })}
-            </Text>
-          </View>
-          <Text className="text-3xl font-extrabold text-text-primary leading-tight" style={{ fontFamily: THEME.fonts.primary }}>
-            {t('Dashboard.welcome', { name: userName })}
-          </Text>
+        {/* Refined Left-Aligned Header */}
+        <View className="px-6 pt-8 pb-6 bg-background-surface border-b border-border-subtle flex-row justify-between items-end">
+           <View className="flex-1">
+              <Text className="text-[11px] font-black text-text-muted uppercase tracking-[2px] mb-1">
+                {t('Common.practical_workshop')}
+              </Text>
+              <Text className="text-2xl font-black text-text-primary tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
+                {t('Dashboard.welcome', { name: userName })}
+              </Text>
+           </View>
+           <TouchableOpacity 
+             onPress={() => router.push('/profile')}
+             activeOpacity={0.8}
+             className="w-12 h-12 rounded-full bg-primary items-center justify-center shadow-sm overflow-hidden mb-1"
+           >
+              {avatar ? (
+                <Image source={{ uri: avatar }} className="w-full h-full" />
+              ) : (
+                <Text className="text-sm font-black text-white">{userInitials}</Text>
+              )}
+           </TouchableOpacity>
         </View>
 
-        <View className="px-6">
-          <StatusCard
-            title={t('Dashboard.overview')}
-            percentage={assignments.length > 0 ? Math.round(((assignments.length - pendingAssignments.length) / assignments.length) * 100) : 0}
-            primaryLabel={t('Dashboard.current_phase_label')}
-            primaryMetric={activePhaseName || t('Dashboard.loading_data')}
-            secondaryLabel={t('Dashboard.total_workshops')}
-            secondaryMetric={`${assignments.length}`}
-            footerMetrics={[
-              {
-                icon: "school",
-                iconColor: "#4197CB",
-                label: t('Common.status'),
-                value: t('Dashboard.active')
-              },
-              {
-                icon: "time",
-                iconColor: "#F26178",
-                label: t('Dashboard.next_session_label'),
-                value: nextWorkshop?.startTime || "N/A"
-              }
-            ]}
-          />
-
-          {/* Pending Tasks Module */}
-          {isEvalPhase && pendingAssignments.length > 0 && (
-            <FeatureListModule
-              title={t('Dashboard.pending_tasks')}
-              items={pendingAssignments.map(assign => ({
-                id: assign.assignmentId,
-                title: assign.workshop.title,
-                subtitle: t('Dashboard.evaluate_finished_workshop'),
-                icon: 'star',
-                iconColor: '#F59E0B',
-                iconBgColor: '#78350F',
-                onPress: () => router.push(`/(professor)/questionnaire/${assign.assignmentId}`)
-              }))}
-            />
-          )}
-
-          {/* Next Session Module */}
-          {nextWorkshop ? (
-            <FeatureListModule
-              title={t('Dashboard.next_session')}
-              items={[{
-                id: nextWorkshop.assignmentId,
-                title: nextWorkshop.workshop.title,
-                subtitle: nextWorkshop.center.name,
-                icon: 'calendar',
-                iconColor: '#38BDF8',
-                iconBgColor: '#0C4A6E',
-                onPress: () => handleWorkshopClick(nextWorkshop)
-              }]}
-            />
-          ) : (
-            <View className="w-full items-center justify-center py-10 rounded-3xl border border-border-subtle border-dashed mb-8">
-               <Text className="text-text-muted font-medium text-sm" style={{ fontFamily: THEME.fonts.primary }}>{t('Dashboard.no_upcoming_workshops')}</Text>
-            </View>
-          )}
-
-          {/* Communications Section */}
-          <FeatureListModule
-            title={t('Coordination.collaboration')}
-            items={[
-              {
-                id: 'notifications',
-                title: t('Notifications.title'),
-                subtitle: unreadCount > 0 ? `${unreadCount} ${t('Notifications.empty').replace(t('Notifications.empty'), 'avisos pendents')}` : t('Notifications.empty'),
-                icon: 'notifications',
-                iconColor: '#F87171',
-                iconBgColor: '#450a0a',
-                onPress: () => router.push('/(professor)/notifications')
-              },
-              {
-                id: 'coordination',
-                title: t('Coordination.collaboration'),
-                subtitle: t('Coordination.teacher_space'),
-                icon: 'people',
-                iconColor: '#34D399',
-                iconBgColor: '#064e3b',
-                onPress: () => router.push('/(professor)/coordination')
-              }
-            ]}
-          />
-
-          <View className="h-6" /> 
+        {/* Current Status Section */}
+        <SectionHeader title={t('Dashboard.overview')} />
+        <View className="bg-background-surface border-t border-b border-border-subtle p-6">
+           <View className="bg-background-subtle rounded-[24px] p-5 flex-row items-center border border-border-subtle">
+              <View className="w-10 h-10 rounded-xl bg-primary items-center justify-center">
+                 <Ionicons name="rocket" size={20} color="white" />
+              </View>
+              <View className="ml-4 flex-1">
+                 <Text className="text-text-muted text-[10px] font-black uppercase tracking-widest mb-0.5">{t('Dashboard.current_phase_label')}</Text>
+                 <Text className="text-text-primary text-base font-black">{activePhaseName || "N/A"}</Text>
+              </View>
+              <View className="bg-white/80 px-2.5 py-1 rounded-full border border-border-subtle">
+                 <Text className="text-primary text-[9px] font-black uppercase">{t('Dashboard.active')}</Text>
+              </View>
+           </View>
         </View>
+
+        {/* Sessions & Tasks */}
+        <SectionHeader title={t('Dashboard.next_session')} />
+        <View className="border-t border-b border-border-subtle">
+           {nextWorkshop ? (
+             <DashboardItem 
+                icon="calendar"
+                iconColor="#007AFF"
+                title={nextWorkshop.workshop.title}
+                subtitle={`${nextWorkshop.center.name} • ${nextWorkshop.startTime || "09:00"}`}
+                onPress={() => handleWorkshopClick(nextWorkshop)}
+                isLast={pendingAssignments.length === 0}
+             />
+           ) : (
+             <View className="p-8 items-center bg-background-surface">
+                <Text className="text-text-muted text-sm italic">{t('Dashboard.no_upcoming_workshops')}</Text>
+             </View>
+           )}
+
+           {isEvalPhase && pendingAssignments.map((assign, idx) => (
+             <DashboardItem 
+                key={assign.assignmentId}
+                icon="star"
+                iconColor="#FF9500"
+                title={assign.workshop.title}
+                subtitle={t('Dashboard.evaluate_finished_workshop')}
+                onPress={() => router.push(`/(professor)/questionnaire/${assign.assignmentId}`)}
+                isLast={idx === pendingAssignments.length - 1}
+             />
+           ))}
+        </View>
+
+        {/* Communications */}
+        <SectionHeader title={t('Coordination.collaboration')} />
+        <View className="border-t border-b border-border-subtle">
+           <DashboardItem 
+              icon="notifications"
+              iconColor="#FF3B30"
+              title={t('Notifications.title')}
+              subtitle={unreadCount > 0 ? `${unreadCount} ${t('Notifications.empty').replace(t('Notifications.empty'), 'avisos pendents')}` : t('Notifications.empty')}
+              badge={unreadCount}
+              onPress={() => router.push('/(professor)/notifications')}
+           />
+           <DashboardItem 
+              icon="people"
+              iconColor="#34C759"
+              title={t('Coordination.collaboration')}
+              subtitle={t('Coordination.teacher_space')}
+              onPress={() => router.push('/(professor)/coordination')}
+              isLast
+           />
+        </View>
+
+        <View className="h-12" />
       </ScrollView>
 
       <WorkshopDetailModal 

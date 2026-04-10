@@ -70,27 +70,15 @@ export default function NotificationsTabScreen() {
 
   return (
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
-      {/* Custom Header matching Dashboard style */}
-      <View className="px-6 pb-6 pt-4 mb-2 flex-row justify-between items-end">
-        <View>
-          <View className="flex-row items-baseline mb-2">
-            <Text className="text-text-muted text-xs font-bold uppercase tracking-widest mr-2" style={{ fontFamily: THEME.fonts.primary }}>
-              {new Date().toLocaleDateString(i18n.language, { weekday: 'long' })}
-            </Text>
-            <Text className="text-text-secondary text-xs font-bold uppercase tracking-widest" style={{ fontFamily: THEME.fonts.primary }}>
-              {new Date().toLocaleDateString(i18n.language, { day: 'numeric', month: 'long' })}
-            </Text>
-          </View>
-          <Text className="text-3xl font-extrabold text-text-primary leading-tight" style={{ fontFamily: THEME.fonts.primary }}>
-            {t('Notifications.title')}
-          </Text>
-        </View>
-        <TouchableOpacity 
-          onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-background-surface items-center justify-center border border-border-subtle shadow-sm mb-1"
-        >
-          <Ionicons name="close" size={20} color={THEME.colors.primary} />
-        </TouchableOpacity>
+      
+      {/* Refined Left-Aligned Header */}
+      <View className="px-6 pt-8 pb-6 bg-background-surface border-b border-border-subtle">
+         <Text className="text-[11px] font-black text-text-muted uppercase tracking-[2px] mb-1">
+           {t('Notifications.tagline')}
+         </Text>
+         <Text className="text-2xl font-black text-text-primary tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
+           {t('Notifications.title')}
+         </Text>
       </View>
 
       <ScrollView 
@@ -100,80 +88,67 @@ export default function NotificationsTabScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.colors.primary} />
         }
       >
-        <View className="px-6 pb-12">
+        <View className="border-t border-b border-border-subtle">
           {notifications.length > 0 ? (
             notifications.map((notif, index) => {
               const isRead = notif.isRead;
+              const isLast = index === notifications.length - 1;
 
               return (
-                <View 
+                <TouchableOpacity 
                   key={notif.notificationId}
-                  className={`bg-white rounded-[32px] p-6 mb-5 shadow-sm border border-neutral-100 ${isRead ? 'opacity-60' : ''}`}
+                  activeOpacity={0.7}
+                  className={`bg-background-surface p-6 flex-row ${isRead ? 'opacity-60' : ''}`}
                 >
-                  {/* Top Section: Icon + Content + Dot */}
-                  <View className="flex-row">
-                    {/* Icon Box */}
-                    <View 
-                        className="w-14 h-14 rounded-[20px] items-center justify-center mr-4"
-                        style={{ backgroundColor: isRead ? '#334155' : '#450a0a' }}
-                    >
-                       <Ionicons name="notifications" size={24} color={isRead ? '#94a3b8' : '#F87171'} />
-                    </View>
-                    
-                    {/* Text Content */}
-                    <View className="flex-1 relative pr-4">
-                      <Text className="text-[#0f172a] text-[17px] font-bold mb-1" style={{ fontFamily: THEME.fonts.primary }}>
+                  {!isRead && (
+                    <View className="absolute left-2 top-1/2 -mt-1 w-2 h-2 rounded-full bg-primary" />
+                  )}
+                  
+                  <View className="w-12 h-12 rounded-full bg-background-subtle items-center justify-center mr-4 border border-border-subtle">
+                    <Ionicons name="notifications" size={22} color={isRead ? "#94a3b8" : THEME.colors.primary} />
+                  </View>
+                  
+                  <View className="flex-1">
+                    <View className="flex-row justify-between items-start mb-1">
+                      <Text className="text-text-primary text-[16px] font-black flex-1 pr-2" numberOfLines={1}>
                         {notif.title}
                       </Text>
-                      
-                      <Text className="text-[#475569] text-[14px] leading-tight mb-2" style={{ fontFamily: THEME.fonts.primary }}>
-                        {notif.message}
-                      </Text>
-
-                      <Text className="text-[#94a3b8] text-[11px] font-bold uppercase">
+                      <Text className="text-text-muted text-[11px] font-bold uppercase">
                         {new Date(notif.createdAt).toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' })}
                       </Text>
+                    </View>
+                    
+                    <Text className="text-text-secondary text-sm leading-tight mb-3" numberOfLines={2}>
+                      {notif.message}
+                    </Text>
 
-                      {/* Blue Indicator Dot */}
+                    <View className="flex-row space-x-4">
                       {!isRead && (
-                        <View className="w-2.5 h-2.5 rounded-full bg-[#0369a1] absolute top-1.5 -right-1" />
+                        <TouchableOpacity onPress={() => markRead(notif.notificationId)} className="bg-background-subtle px-3 py-1.5 rounded-lg border border-border-subtle">
+                          <Text className="text-text-primary text-[10px] font-black uppercase tracking-widest">{t('Notifications.mark_read')}</Text>
+                        </TouchableOpacity>
                       )}
+                      <TouchableOpacity onPress={() => deleteNotif(notif.notificationId)} className="bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">
+                        <Text className="text-red-600 text-[10px] font-black uppercase tracking-widest">{t('Notifications.delete')}</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
 
-                  {/* Actions Section: Row of distinct buttons */}
-                  <View className="flex-row space-x-8 mt-6">
-                    {!isRead && (
-                      <TouchableOpacity 
-                        onPress={() => markRead(notif.notificationId)}
-                        className="flex-1 bg-neutral-100 rounded-2xl py-4 items-center justify-center"
-                        activeOpacity={0.7}
-                      >
-                        <Text className="text-[#334155] font-bold text-[11px] uppercase tracking-wider">
-                          {t('Notifications.mark_read')}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                    <TouchableOpacity 
-                      onPress={() => deleteNotif(notif.notificationId)}
-                      className="flex-1 bg-neutral-100 rounded-2xl py-4 items-center justify-center"
-                      activeOpacity={0.7}
-                    >
-                      <Text className="text-[#334155] font-bold text-[11px] uppercase tracking-wider">
-                        {t('Notifications.delete')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                  {!isLast && (
+                    <View className="absolute bottom-0 left-24 right-0 h-[0.5px] bg-border-subtle" />
+                  )}
+                </TouchableOpacity>
               );
             })
           ) : (
-            <View className="items-center justify-center py-20 rounded-3xl border border-border-subtle border-dashed">
+            <View className="items-center justify-center py-20 bg-background-surface">
                <Ionicons name="notifications-off-outline" size={40} color={THEME.colors.primary} className="opacity-20 mb-4" />
                <Text className="text-text-muted font-medium text-sm" style={{ fontFamily: THEME.fonts.primary }}>{t('Notifications.empty')}</Text>
             </View>
           )}
         </View>
+        
+        <View className="h-12" />
       </ScrollView>
     </View>
   );

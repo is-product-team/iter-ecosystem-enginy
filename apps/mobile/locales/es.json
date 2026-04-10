@@ -32,6 +32,7 @@
     "login": {
       "title": "Inicio de\nSesión",
       "email": "Correo Electrónico",
+      "name": "Nombre",
       "password": "Contraseña",
       "fill_all_fields": "Por favor, rellena todos los campos.",
       "exclusive_use_error": "Esta aplicación es de uso exclusivo para profesores. Los administradores y coordinadores deben usar la plataforma web.",
@@ -48,6 +49,7 @@
     "title": "Mi Perfil",
     "role_professor": "Profesorado",
     "role_admin": "Administrador",
+    "information": "Información de la cuenta",
     "preferences": "Preferencias",
     "notifications": "Notificaciones Push",
     "appearance": "Apariencia",
@@ -62,7 +64,9 @@
       "ca": "Catalán",
       "es": "Español"
     },
-    "help": "Soporte y Ayuda"
+    "security_support": "Seguridad y Soporte",
+    "help": "Soporte y Ayuda",
+    "camera_permission_denied": "Se necesitan permisos para acceder a la galería."
   },
   "Routes": {
     "session": "Sesión",
