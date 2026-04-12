@@ -34,13 +34,15 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 WORKDIR /app
+# En modo standalone, Next.js pone todo lo necesario en la carpeta standalone
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder-web /app/apps/web/public ./public
-COPY --from=builder-web /app/apps/web/public ./apps/web/public
+# Nota: En standalone, el server.js suele estar en la raíz o en apps/web/server.js
+# Dependiendo de la estructura del monorepo. Probamos con la raíz.
 USER node
 EXPOSE 3000
-CMD ["node", "apps/web/server.js"]
+CMD ["node", "server.js"]
 
 # --- BUILDER API ---
 FROM base AS builder-api
@@ -60,12 +62,12 @@ FROM base AS runner-api
 ENV NODE_ENV=production
 WORKDIR /app
 
-# Copiamos solo lo necesario del builder
-# Como RootDir es ../../, el dist contiene la estructura completa (apps/api y shared)
-COPY --from=builder-api /app/apps/api/dist ./apps/api/dist
+# Copiamos la estructura completa necesaria para que los symlinks de node_modules funcionen
 COPY --from=builder-api /app/node_modules ./node_modules
+COPY --from=builder-api /app/shared ./shared
 COPY --from=builder-api /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder-api /app/apps/api/prisma ./apps/api/prisma
+COPY --from=builder-api /app/apps/api/dist ./apps/api/dist
 COPY --from=builder-api /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder-api /app/node_modules/@prisma ./node_modules/@prisma
 
@@ -74,6 +76,5 @@ RUN mkdir -p /app/uploads/perfil /app/uploads/documents
 
 USER node
 EXPOSE 3000
-# El comando debe apuntar al archivo compilado en dist
-# Con rootDir: ../../, la estructura en dist es apps/api/src/index.js
+# Apuntamos a la ruta exacta donde tsc genera el index con rootDir: ../../
 CMD ["node", "apps/api/dist/apps/api/src/index.js"]
