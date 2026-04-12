@@ -19,8 +19,8 @@ node_modules/
 # --- Prisma (Backend) ---
 apps/api/prisma/dev.db
 apps/api/prisma/dev.db-journal
-apps/api/prisma/migrations/
 # Nota: Las migraciones de Prisma se suelen subir, pero si es un proyecto experimental, puedes ignorarlas.
+# apps/api/prisma/migrations/ (REMOVED: Now allowed to be tracked)
 
 # --- Mobile (Expo & Native) ---
 .expo/
