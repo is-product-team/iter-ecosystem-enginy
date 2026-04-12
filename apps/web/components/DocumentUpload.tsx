@@ -13,6 +13,7 @@ interface DocumentUploadProps {
   isValidated?: boolean;
   label: string;
   onUploadSuccess: (newUrl: string) => void;
+  variant?: 'default' | 'table';
 }
 
 export default function DocumentUpload({
@@ -22,13 +23,14 @@ export default function DocumentUpload({
   initialUrl,
   isValidated,
   label,
-  onUploadSuccess
+  onUploadSuccess,
+  variant = 'default'
 }: DocumentUploadProps) {
   const t = useTranslations('Common');
   // --- Upload and Validation States ---
   const [uploading, setUploading] = useState(false); // Indicates if the HTTP upload to backend is in progress
   const [currentUrl, setCurrentUrl] = useState(initialUrl); // Current URL of the uploaded document
-  const [validatingAI, setValidatingAI] = useState(false); // Indicates if the AI pipeline (TensorFlow/PDF.js) is working
+  const [validatingAI, setValidatingAI] = useState(false); // Indicates if the server AI is working
   const [overrideMode, setOverrideMode] = useState(false); // Activated if AI rejects the doc, allowing manual upload
   const [pendingFile, setPendingFile] = useState<File | null>(null); // Stores the file that failed validation for "Forced" upload
 
@@ -50,24 +52,36 @@ export default function DocumentUpload({
         },
       });
 
-      // Extract the URL from the 'docs_status' JSON field of the response (Enrollment model)
-      const docsStatus = res.data.docs_status || {};
+      // Extract the URL from the 'docsStatus' JSON field of the response (Enrollment model)
+      console.log('--- DEBUG UPLOAD RESPONSE ---', res.data);
+      const docsStatus = res.data.docsStatus || res.data.docs_status || {};
       const fieldKey = documentType === 'pedagogical_agreement' ? 'pedagogicalAgreementUrl' :
                        documentType === 'mobility_authorization' ? 'mobilityAuthorizationUrl' :
                        'imageRightsUrl';
       
       const newUrl = docsStatus[fieldKey];
+      const isValidatedAI = docsStatus[`${documentType}Validated`];
 
-      setCurrentUrl(newUrl);
-      if (newUrl) onUploadSuccess(newUrl);
-      toast.success(t('upload_success', { label }));
+      if (newUrl) {
+        setCurrentUrl(newUrl);
+        onUploadSuccess(newUrl);
+        
+        if (isValidatedAI === false) {
+           toast.error(t('ai_no_signatures'));
+           setOverrideMode(true);
+           setPendingFile(file);
+        } else {
+           toast.success(t('upload_success', { label }));
+        }
+      }
       
       // Clear error/blocking states after success
       setOverrideMode(false);
       setPendingFile(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading document:', error);
-      toast.error(t('error_upload'));
+      const message = error.response?.data?.error || t('error_upload');
+      toast.error(message);
     } finally {
       setUploading(false);
     }
@@ -78,52 +92,22 @@ export default function DocumentUpload({
    */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('[DEBUG] Archivo seleccionado:', file?.name, 'Tipo:', file?.type);
     if (!file) return;
 
     // Basic format validation
-    if (file.type !== 'application/pdf') {
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
       toast.error(t('only_pdf_allowed'));
       return;
     }
 
+    console.log('[DEBUG] Formato validado. Iniciando validación de IA/Subida...');
     try {
       setValidatingAI(true);
       setOverrideMode(false);
       
-      // Dynamic loading of utilities to avoid penalizing the initial bundle
-      const { extractTextFromPdf, classifyDocumentType } = await import('@/lib/pdfUtils');
-      const text = await extractTextFromPdf(file);
-      const detectedType = classifyDocumentType(text);
-
-      // Mapping between the type expected by props and the one detected by AI (text heuristics)
-      const expectedInIAPipeline = documentType === 'pedagogical_agreement' ? 'pedagogical_agreement' : 
-                                   documentType === 'mobility_authorization' ? 'mobility_authorization' : 
-                                   documentType === 'image_rights' ? 'image_rights' : 'unknown';
-
-      // Validation 1: Text content must match the upload slot type
-      if (detectedType !== 'unknown' && detectedType !== expectedInIAPipeline) {
-        toast.error(t('ai_mismatch', { type: detectedType }));
-        setOverrideMode(true);
-        setPendingFile(file);
-        return;
-      }
-
-      // Validation 2: If it's a Pedagogical Agreement, use Computer Vision (TF.js) to look for signatures
-      if (documentType === 'pedagogical_agreement') {
-        const { signatureDetector } = await import('@/lib/visionUtils');
-        await signatureDetector.loadModel(); // Load YOLOv8 model if not in memory
-        const croppedCanvas = await signatureDetector.getBottomThirdOfLastPage(file);
-        const hasSignatures = await signatureDetector.validateSignatures(croppedCanvas, 3); // We look for 3 signatures
-
-        if (!hasSignatures) {
-          toast.error(t('ai_no_signatures'));
-          setOverrideMode(true);
-          setPendingFile(file);
-          return;
-        }
-      }
-
-      // If it passes all filters, proceed to real upload
+      // We directly perform the upload. The server's VisionService (Ollama) will validate it.
       await handleValidUpload(file);
     } catch (err) {
       console.error("AI Validation Error:", err);
@@ -134,6 +118,49 @@ export default function DocumentUpload({
       setValidatingAI(false);
     }
   };
+
+  if (variant === 'table') {
+    return (
+      <div className="flex items-center gap-3">
+        <label className={`shrink-0 cursor-pointer w-8 h-8 flex items-center justify-center transition-all border ${
+          uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted' : 
+          currentUrl ? 'border-green-200 bg-green-50 text-green-600 hover:bg-green-100' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
+        }`} title={currentUrl ? t('change') : t('attach')}>
+          {uploading || validatingAI ? (
+            <div className="relative w-4 h-4 flex items-center justify-center keep-rounded overflow-hidden">
+               <div className="absolute inset-0 border-2 border-consorci-darkBlue/20 keep-rounded"></div>
+               <div className="absolute inset-0 border-2 border-t-consorci-darkBlue animate-spin keep-rounded"></div>
+            </div>
+          ) : currentUrl ? (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          )}
+          <input
+            type="file"
+            className="hidden"
+            accept="application/pdf,image/*"
+            onChange={handleFileChange}
+            disabled={uploading || validatingAI}
+          />
+        </label>
+        {currentUrl && (
+          <a
+            href={`${process.env.NEXT_PUBLIC_API_URL}${currentUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`p-2 transition-all ${isValidated ? 'text-green-600' : 'text-consorci-darkBlue hover:bg-background-subtle'}`}
+            title={isValidated ? t('document_validated') : t('view_document')}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </a>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -169,14 +196,17 @@ export default function DocumentUpload({
             </button>
           )}
           
-          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[11px] font-medium transition-all border ${
-            uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
+          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[11px] font-medium transition-all border flex items-center gap-2 ${
+            uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted opacity-80' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
           }`}>
+            {(uploading || validatingAI) && (
+              <div className="w-3 h-3 border border-t-transparent border-current animate-spin keep-rounded" />
+            )}
             {uploading ? t('uploading') : validatingAI ? t('validating_ai') : currentUrl ? t('change') : t('attach')}
             <input
               type="file"
               className="hidden"
-              accept=".pdf"
+              accept="application/pdf,image/*"
               onChange={handleFileChange}
               disabled={uploading || validatingAI}
             />

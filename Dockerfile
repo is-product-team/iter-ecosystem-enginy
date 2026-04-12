@@ -1,6 +1,6 @@
 # Stage 1: Base (Node 22 + Librerías sistema)
 FROM node:22-alpine AS base
-RUN apk add --no-cache libc6-compat openssl
+RUN apk add --no-cache libc6-compat openssl curl
 RUN corepack enable
 ENV COREPACK_ENABLE=1
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -14,11 +14,9 @@ FROM base AS pruner-web
 RUN npm install -g turbo
 COPY . .
 RUN turbo prune @iter/web --docker
-
-FROM base AS pruner-api
-RUN npm install -g turbo
-COPY . .
-RUN turbo prune api --docker
+RUN turbo prune @iter/api --docker
+# El fix definitivo: re-inyectar manualmente las migraciones que turbo prune borra
+RUN mkdir -p out/full/apps/api/prisma && cp -r apps/api/prisma/* out/full/apps/api/prisma/
 
 # --- BUILDER WEB ---
 FROM base AS builder-web
@@ -36,42 +34,51 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 WORKDIR /app
+# En modo standalone monorepo, Next.js pone todo lo necesario en la carpeta standalone
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder-web /app/apps/web/public ./public
 COPY --from=builder-web /app/apps/web/public ./apps/web/public
+COPY --from=builder-web /app/apps/web/public ./public
+
 USER node
 EXPOSE 3000
+# IMPORTANTE: En monorepo standalone, server.js está en apps/web/server.js
 CMD ["node", "apps/web/server.js"]
 
 # --- BUILDER API ---
 FROM base AS builder-api
-COPY --from=pruner-api /app/out/json/ .
-COPY --from=pruner-api /app/out/package-lock.json ./package-lock.json
-RUN npm ci --ignore-scripts
-COPY --from=pruner-api /app/out/full/ .
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/package-lock.json ./package-lock.json
+RUN npm install --ignore-scripts
+COPY --from=pruner /app/out/full/ .
+# Forzar inclusión de prisma y migraciones
+COPY --from=pruner /app/apps/api/prisma ./apps/api/prisma
 WORKDIR /app/apps/api
 RUN npx prisma generate
 WORKDIR /app
-RUN npx turbo run build --filter=api
+RUN npx turbo run build --filter=@iter/api
 
 # --- RUNNER API (PRODUCCIÓN) ---
 FROM base AS runner-api
 ENV NODE_ENV=production
 WORKDIR /app
 
-# Copiamos solo lo necesario del builder
-# Como RootDir es ../../, el dist contiene la estructura completa (apps/api y shared)
-COPY --from=builder-api /app/apps/api/dist ./
-COPY --from=builder-api /app/node_modules ./node_modules
-COPY --from=builder-api /app/apps/api/package.json ./apps/api/package.json
-COPY --from=builder-api /app/apps/api/prisma ./apps/api/prisma
-COPY --from=builder-api /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder-api /app/node_modules/@prisma ./node_modules/@prisma
+# Asegurar que el usuario node tenga permisos sobre el WORKDIR
+RUN chown -R node:node /app
 
-# Crear la carpeta d'uploads per garantir que existeixi
-RUN mkdir -p /app/uploads/perfil /app/uploads/documents
+# Copiamos la estructura completa necesaria para que los symlinks de node_modules funcionen
+COPY --from=builder-api --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder-api --chown=node:node /app/shared ./shared
+COPY --from=builder-api --chown=node:node /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder-api --chown=node:node /app/apps/api/prisma ./apps/api/prisma
+COPY --from=builder-api --chown=node:node /app/apps/api/dist ./apps/api/dist
+COPY --from=builder-api --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder-api --chown=node:node /app/node_modules/@prisma ./node_modules/@prisma
+
+# Crear la carpeta d'uploads y asegurar permisos
+RUN mkdir -p /app/uploads/perfil /app/uploads/documents && chown -R node:node /app/uploads
 
 USER node
 EXPOSE 3000
-CMD ["node", "apps/api/src/index.js"]
+# Apuntamos a la ruta exacta donde tsc genera el index con rootDir: ../../
+CMD ["node", "apps/api/dist/apps/api/src/index.js"]

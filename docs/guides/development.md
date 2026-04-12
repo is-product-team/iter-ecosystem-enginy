@@ -20,7 +20,7 @@ We use **Turborepo** to manage our multi-package architecture. Instead of runnin
 ### Running a Specific App
 To run only the API or the Web UI:
 ```bash
-npx turbo dev --filter=api
+npx turbo dev --filter=@iter/api
 npx turbo dev --filter=@iter/web
 ```
 

@@ -61,9 +61,13 @@ h6 {
 
 /* Institutional Design System */
 /* Institutional Redesign - Minimalist Sharp */
-* {
+*:not(.keep-rounded) {
   border-radius: 0 !important;
   box-shadow: none !important;
+}
+
+.keep-rounded {
+  border-radius: 100% !important;
 }
 
 .btn-primary {
@@ -116,6 +120,23 @@ h6 {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes tick-fade {
+  from { opacity: 1; }
+  to { opacity: 0.15; }
+}
+
+@keyframes progress-loading {
+  0% { width: 0%; }
+  20% { width: 30%; }
+  50% { width: 70%; }
+  80% { width: 90%; }
+  100% { width: 100%; }
+}
+
+.animate-progress {
+  animation: progress-loading 3s ease-out forwards;
 }
 
 .animate-in {

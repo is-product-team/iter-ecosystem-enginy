@@ -1,0 +1,55 @@
+# Pipeline de IA Local (Fase 2)
+
+Este documento detalla la arquitectura de Inteligencia Artificial utilizada para la validación automática de documentación en la Fase 2 de Iter Ecosystem.
+
+## 🛡️ Filosofía de Privacidad (Zero-Leak)
+
+Dada la sensibilidad de los datos educativos tratados (DNI, IDALU, firmas de menores), el sistema utiliza una arquitectura de **IA Privada y Local**. 
+- Los documentos **nunca** abandonan la red interna de Docker del centro.
+- No se utilizan APIs externas (OpenAI, Google) para evitar el entrenamiento de modelos de terceros con datos reales.
+
+## 🧠 Componentes Tecnológicos
+
+### 1. Motor de Inferencia: Ollama
+Utilizamos [Ollama](https://ollama.com/) ejecutándose en un contenedor dedicado dentro del stack de Docker Compose.
+- **Host**: `http://ollama:11434`
+- **Recursos**: Limitado a 2GB de RAM para asegurar la estabilidad del servidor host.
+
+### 2. Modelo de Visión: Moondream2 (`moondream`)
+Moondream es un modelo de lenguaje visual (VLM) pequeño pero potente (1.6 Billones de parámetros).
+- **Especialidad**: Detección de elementos manuscritos y clasificación visual de formularios.
+- **Funcionamiento**: La API extrae la última página del PDF, la convierte a imagen y se la pasa a Moondream con un prompt estructurado.
+
+## 📋 Flujo de Validación
+
+```mermaid
+graph TD
+    User[Coordinador] -->|Bulk Upload| Web[Next.js App]
+    Web -->|POST /student-document| API[Node.js backend]
+    API -->|Storage| Disk[Volume: /uploads]
+    API -->|Inference Request| Ollama[Ollama Container]
+    Ollama -->|JSON Response| API
+    API -->|Success/Fail| Web
+```
+
+### Prompt Estructurado (JSON Mode)
+Para garantizar una integración robusta, forzamos a la IA a responder en formato JSON:
+
+```json
+{
+  "hasSignature": true,
+  "confidence": 0.98,
+  "reason": "Se detectan firmas en los recuadros del coordinador y el tutor."
+}
+```
+
+## 🛠️ Mantenimiento
+
+### Actualizar o Cambiar el Modelo
+Si se desea utilizar un modelo más potente (ej. `llama3-vision`), se debe:
+1. Actualizar la variable `AI_MODEL_VISION` en `docker-compose.yml`.
+2. Ejecutar:  
+   `docker exec -it iter_ollama ollama pull <nuevo-modelo>`
+
+### Requisitos de OCR
+Para el emparejamiento por IDALU, el sistema utiliza `pdf.js-dist` en el backend para extraer texto plano antes de la validación visual, optimizando el tiempo de respuesta.

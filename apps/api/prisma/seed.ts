@@ -186,8 +186,15 @@ async function seedWorkshops(sectors: any) {
   ];
 
   for (const w of workshops) {
-    await prisma.workshop.create({ 
-      data: {
+    await prisma.workshop.upsert({ 
+      where: {
+        title_modality: {
+          title: w.title,
+          modality: w.modality
+        }
+      },
+      update: {},
+      create: {
         title: w.title,
         modality: w.modality,
         sectorId: w.sectorId,
@@ -220,22 +227,23 @@ async function seedPhases() {
     // Sequential dates logic
     switch (phase.name) {
       case PHASES.APPLICATION:
-        startDate = new Date(now.getFullYear(), now.getMonth() - 4, 1);
-        endDate = new Date(now.getFullYear(), now.getMonth() - 2, 0); // End of Month -2
+        // Set Application active starting 1 week ago until 3 months from now
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0);
+        isActive = true; // Set APPLICATION as the active phase for testing
         break;
       case PHASES.PLANNING:
-        startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        endDate = new Date(now.getFullYear(), now.getMonth(), 0); // End of Month -1
+        startDate = new Date(now.getFullYear(), now.getMonth() + 3, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 4, 0);
         break;
       case PHASES.EXECUTION:
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0); // End of Month +2
-        isActive = true; // Set current phase as active
+        startDate = new Date(now.getFullYear(), now.getMonth() + 4, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 7, 0);
         break;
       case PHASES.CLOSURE:
       default:
-        startDate = new Date(now.getFullYear(), now.getMonth() + 3, 1);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 5, 0); // End of Month +4
+        startDate = new Date(now.getFullYear(), now.getMonth() + 7, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 8, 0);
         break;
     }
 

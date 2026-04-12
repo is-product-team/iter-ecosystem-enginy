@@ -11,6 +11,20 @@ import { SessionService } from '../services/session.service.js';
 import { PDFService } from '../services/pdf.service.js';
 import { EvaluationService } from '../services/evaluation.service.js';
 
+// Helper to flatten enrollment docsStatus for frontend compatibility
+const flattenEnrollmentDocs = (enrollment: any) => {
+  const docsStatus = enrollment.docsStatus || {};
+  return {
+    ...enrollment,
+    pedagogicalAgreementUrl: docsStatus.pedagogicalAgreementUrl || null,
+    mobilityAuthorizationUrl: docsStatus.mobilityAuthorizationUrl || null,
+    imageRightsUrl: docsStatus.imageRightsUrl || null,
+    isPedagogicalAgreementValidated: docsStatus.isPedagogicalAgreementValidated || false,
+    isMobilityAuthorizationValidated: docsStatus.isMobilityAuthorizationValidated || false,
+    isImageRightsValidated: docsStatus.isImageRightsValidated || false
+  };
+};
+
 const MIN_ATTENDANCE_PERCENTAGE = 80;
 
 // Schema for bulk attendance update
@@ -34,6 +48,10 @@ export const getAssignments = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
+        request: true, // Include request for fallback dates
+        sessions: {
+          orderBy: { sessionDate: 'asc' }
+        },
         teachers: {
           include: {
             user: {
@@ -55,7 +73,16 @@ export const getAssignments = async (req: Request, res: Response) => {
         assignmentId: 'desc'
       }
     });
-    res.json(assignments);
+
+    // Transform assignments to flatten enrollment docs and handle dates
+    const transformed = assignments.map(assig => ({
+      ...assig,
+      startDate: assig.startDate || assig.sessions[0]?.sessionDate || null,
+      endDate: assig.endDate || assig.sessions[assig.sessions.length - 1]?.sessionDate || null,
+      enrollments: assig.enrollments.map(flattenEnrollmentDocs)
+    }));
+
+    res.json(transformed);
   } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignments' });
   }
@@ -73,7 +100,9 @@ export const getAssignmentById = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
+        request: true,
         sessions: {
+          orderBy: { sessionDate: 'asc' },
           include: {
             staff: {
               include: {
@@ -101,12 +130,20 @@ export const getAssignmentById = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
+    // Transform
+    const transformed = {
+      ...assignment,
+      startDate: assignment.startDate || assignment.sessions[0]?.sessionDate || null,
+      endDate: assignment.endDate || assignment.sessions[assignment.sessions.length - 1]?.sessionDate || null,
+      enrollments: assignment.enrollments.map(flattenEnrollmentDocs)
+    };
+
     // Security Scoping
     if (role !== ROLES.ADMIN && Number(assignment.centerId) !== Number(centerId)) {
       return res.status(403).json({ error: 'Access denied: You cannot view assignments from another center' });
     }
 
-    res.json(assignment);
+    res.json(transformed);
   } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignment details' });
   }
@@ -141,6 +178,7 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
+        request: true,
         teachers: {
           include: { user: { select: { fullName: true, userId: true } } }
         },
@@ -162,7 +200,15 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
         }
       }
     });
-    res.json(assignments);
+
+    const transformed = assignments.map(assig => ({
+      ...assig,
+      startDate: assig.startDate || assig.sessions[0]?.sessionDate || null,
+      endDate: assig.endDate || assig.sessions[assig.sessions.length - 1]?.sessionDate || null,
+      enrollments: assig.enrollments.map(flattenEnrollmentDocs)
+    }));
+
+    res.json(transformed);
   } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignments' });
   }
@@ -767,7 +813,8 @@ const sanitizeFileName = (str: string) => {
 };
 
 export const uploadStudentDocument = async (req: Request, res: Response) => {
-  const { enrollmentId, documentType } = req.body;
+  const { idEnrollment, documentType } = req.body;
+  const enrollmentId = idEnrollment; // Rename for internal logic
 
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded.' });
@@ -801,7 +848,7 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
     const workshopTitle = sanitizeFileName(workshop.title);
 
     const fileName = `${studentName}_${studentCourse}_${workshopTitle}_${documentType}_${Date.now()}${fileExt}`;
-    const docDir = path.join('uploads', 'documents');
+    const docDir = path.resolve(process.cwd(), 'uploads', 'documents');
     const filePath = path.join(docDir, fileName);
 
     // Ensure documents dir exists
@@ -809,9 +856,28 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
       fs.mkdirSync(docDir, { recursive: true });
     }
 
+    console.log(`[Upload] Saving file to: ${filePath}`);
     fs.writeFileSync(filePath, req.file.buffer);
 
     const url = `/uploads/documents/${fileName}`;
+
+    // --- AI VALIDATION (OLLAMA) ---
+    console.log(`[Upload] Starting AI validation with Ollama for ${documentType}...`);
+    const visionService = new VisionService();
+    let aiResult;
+    try {
+      // 30s timeout safety for AI
+      aiResult = await Promise.race([
+        visionService.validateDocument(req.file),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('AI_TIMEOUT')), 30000))
+      ]) as any;
+      console.log(`[Upload] AI Result:`, aiResult);
+    } catch (aiError) {
+      console.error(`[Upload] AI validation failed or timed out:`, aiError);
+      // Fallback: Mark as not validated but allow the upload to continue
+      aiResult = { valid: false, errors: ["IA no disponible en este momento"], metadata: { hasSignature: false, confidence: 0, error: 'AI_FALLBACK' } };
+    }
+    // ------------------------------
 
     const fieldMap: Record<string, string> = {
       'pedagogical_agreement': 'pedagogicalAgreementUrl',
@@ -827,21 +893,28 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
 
     const docsStatus = (enrollment?.docsStatus as any) || {};
 
+    console.log(`[Upload] Updating database for enrollment ${enrollmentId}...`);
     const updated = await prisma.enrollment.update({
       where: { enrollmentId: parseInt(enrollmentId as string) },
       data: {
         docsStatus: {
           ...docsStatus,
           [updateField]: url,
-          [`${documentType}Present`]: true
+          [`${documentType}Present`]: true,
+          [`${documentType}Validated`]: aiResult.valid,
+          [`${documentType}AIResult`]: aiResult.metadata
         }
       }
     });
 
+    console.log(`[Upload] Success! URL: ${url}`);
     res.json(updated);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error uploading document:", error);
-    res.status(500).json({ error: 'Error processing document upload.' });
+    res.status(500).json({ 
+      error: `Server Error: ${error.message || 'Unknown error'}`,
+      details: error.stack
+    });
   }
 };
 
