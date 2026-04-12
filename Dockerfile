@@ -46,6 +46,8 @@ COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 RUN npm install --ignore-scripts
 COPY --from=pruner /app/out/full/ .
+# Forzar inclusión de prisma y migraciones
+COPY --from=pruner /app/apps/api/prisma ./apps/api/prisma
 WORKDIR /app/apps/api
 RUN npx prisma generate
 WORKDIR /app
