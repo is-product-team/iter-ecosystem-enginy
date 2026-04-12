@@ -15,6 +15,8 @@ RUN npm install -g turbo
 COPY . .
 RUN turbo prune @iter/web --docker
 RUN turbo prune @iter/api --docker
+# El fix definitivo: re-inyectar manualmente las migraciones que turbo prune borra
+RUN mkdir -p out/full/apps/api/prisma && cp -r apps/api/prisma/* out/full/apps/api/prisma/
 
 # --- BUILDER WEB ---
 FROM base AS builder-web

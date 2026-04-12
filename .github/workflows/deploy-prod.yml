@@ -112,7 +112,7 @@ jobs:
             --network red_proxy \
             --env-file .env \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_API }}:latest \
-            sh -c "cd apps/api && npx prisma migrate resolve --applied 20260412085247_init && npx prisma migrate deploy"
+            sh -c "echo '🔍 Verificando archivos...' && ls -R apps/api/prisma && npx prisma migrate resolve --applied 20260412085247_init --schema apps/api/prisma/schema.prisma && npx prisma migrate deploy --schema apps/api/prisma/schema.prisma"
 
       - name: 🚀 Restart Services
         run: docker compose -f docker-compose.prod.yml up -d
