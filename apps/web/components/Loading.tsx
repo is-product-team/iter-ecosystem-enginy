@@ -36,7 +36,7 @@ const Loading: React.FC<LoadingProps> = ({
       aria-live="polite"
       aria-label={message || "Loading"}
     >
-      <div className={`relative ${sizeClasses[size]} flex items-center justify-center`}>
+      <div className={`relative ${sizeClasses[size]} flex items-center justify-center keep-rounded`}>
         {/* Apple Style Tick Spinner */}
         <svg 
           className="w-full h-full" 

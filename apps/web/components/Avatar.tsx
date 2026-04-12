@@ -29,7 +29,7 @@ export default function Avatar({ url, name, id, type, size = 'md', className = '
   const showPhoto = fullUrl && !isAdmin;
 
   return (
-    <div className={`relative shrink-0 overflow-hidden bg-background-subtle text-text-primary flex items-center justify-center font-medium ${currentSize} ${className}`}>
+    <div className={`relative shrink-0 overflow-hidden bg-background-subtle text-text-primary flex items-center justify-center font-medium keep-rounded ${currentSize} ${className}`}>
       {showPhoto ? (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img 

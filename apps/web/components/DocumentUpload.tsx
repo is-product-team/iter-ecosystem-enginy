@@ -127,7 +127,10 @@ export default function DocumentUpload({
           currentUrl ? 'border-green-200 bg-green-50 text-green-600 hover:bg-green-100' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
         }`} title={currentUrl ? t('change') : t('attach')}>
           {uploading || validatingAI ? (
-            <div className="w-3 h-3 border-2 border-t-transparent border-current animate-spin rounded-full" />
+            <div className="relative w-4 h-4 flex items-center justify-center keep-rounded overflow-hidden">
+               <div className="absolute inset-0 border-2 border-consorci-darkBlue/20 keep-rounded"></div>
+               <div className="absolute inset-0 border-2 border-t-consorci-darkBlue animate-spin keep-rounded"></div>
+            </div>
           ) : currentUrl ? (
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           ) : (
@@ -193,9 +196,12 @@ export default function DocumentUpload({
             </button>
           )}
           
-          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[11px] font-medium transition-all border ${
-            uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
+          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[11px] font-medium transition-all border flex items-center gap-2 ${
+            uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted opacity-80' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
           }`}>
+            {(uploading || validatingAI) && (
+              <div className="w-3 h-3 border border-t-transparent border-current animate-spin keep-rounded" />
+            )}
             {uploading ? t('uploading') : validatingAI ? t('validating_ai') : currentUrl ? t('change') : t('attach')}
             <input
               type="file"

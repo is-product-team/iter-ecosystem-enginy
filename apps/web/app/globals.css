@@ -61,9 +61,13 @@ h6 {
 
 /* Institutional Design System */
 /* Institutional Redesign - Minimalist Sharp */
-* {
+*:not(.keep-rounded) {
   border-radius: 0 !important;
   box-shadow: none !important;
+}
+
+.keep-rounded {
+  border-radius: 100% !important;
 }
 
 .btn-primary {

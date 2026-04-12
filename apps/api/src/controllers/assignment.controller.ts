@@ -11,6 +11,20 @@ import { SessionService } from '../services/session.service.js';
 import { PDFService } from '../services/pdf.service.js';
 import { EvaluationService } from '../services/evaluation.service.js';
 
+// Helper to flatten enrollment docsStatus for frontend compatibility
+const flattenEnrollmentDocs = (enrollment: any) => {
+  const docsStatus = enrollment.docsStatus || {};
+  return {
+    ...enrollment,
+    pedagogicalAgreementUrl: docsStatus.pedagogicalAgreementUrl || null,
+    mobilityAuthorizationUrl: docsStatus.mobilityAuthorizationUrl || null,
+    imageRightsUrl: docsStatus.imageRightsUrl || null,
+    isPedagogicalAgreementValidated: docsStatus.isPedagogicalAgreementValidated || false,
+    isMobilityAuthorizationValidated: docsStatus.isMobilityAuthorizationValidated || false,
+    isImageRightsValidated: docsStatus.isImageRightsValidated || false
+  };
+};
+
 const MIN_ATTENDANCE_PERCENTAGE = 80;
 
 // Schema for bulk attendance update
@@ -34,6 +48,10 @@ export const getAssignments = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
+        request: true, // Include request for fallback dates
+        sessions: {
+          orderBy: { sessionDate: 'asc' }
+        },
         teachers: {
           include: {
             user: {
@@ -55,7 +73,16 @@ export const getAssignments = async (req: Request, res: Response) => {
         assignmentId: 'desc'
       }
     });
-    res.json(assignments);
+
+    // Transform assignments to flatten enrollment docs and handle dates
+    const transformed = assignments.map(assig => ({
+      ...assig,
+      startDate: assig.sessions[0]?.sessionDate || assig.request?.preferredStartDate || null,
+      endDate: assig.sessions[assig.sessions.length - 1]?.sessionDate || assig.request?.preferredEndDate || null,
+      enrollments: assig.enrollments.map(flattenEnrollmentDocs)
+    }));
+
+    res.json(transformed);
   } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignments' });
   }
@@ -73,7 +100,9 @@ export const getAssignmentById = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
+        request: true,
         sessions: {
+          orderBy: { sessionDate: 'asc' },
           include: {
             staff: {
               include: {
@@ -101,12 +130,20 @@ export const getAssignmentById = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
+    // Transform
+    const transformed = {
+      ...assignment,
+      startDate: assignment.sessions[0]?.sessionDate || assignment.request?.preferredStartDate || null,
+      endDate: assignment.sessions[assignment.sessions.length - 1]?.sessionDate || assignment.request?.preferredEndDate || null,
+      enrollments: assignment.enrollments.map(flattenEnrollmentDocs)
+    };
+
     // Security Scoping
     if (role !== ROLES.ADMIN && Number(assignment.centerId) !== Number(centerId)) {
       return res.status(403).json({ error: 'Access denied: You cannot view assignments from another center' });
     }
 
-    res.json(assignment);
+    res.json(transformed);
   } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignment details' });
   }
@@ -141,6 +178,7 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
+        request: true,
         teachers: {
           include: { user: { select: { fullName: true, userId: true } } }
         },
@@ -162,7 +200,15 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
         }
       }
     });
-    res.json(assignments);
+
+    const transformed = assignments.map(assig => ({
+      ...assig,
+      startDate: assig.sessions[0]?.sessionDate || assig.request?.preferredStartDate || null,
+      endDate: assig.sessions[assig.sessions.length - 1]?.sessionDate || assig.request?.preferredEndDate || null,
+      enrollments: assig.enrollments.map(flattenEnrollmentDocs)
+    }));
+
+    res.json(transformed);
   } catch (_error) {
     res.status(500).json({ error: 'Error obtaining assignments' });
   }

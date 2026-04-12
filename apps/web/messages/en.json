@@ -128,13 +128,20 @@
       "subtitle": "Verify center documentation and report status.",
       "description": "Validate documentation presented by centers (Pedagogical Agreement, Mobility, etc.).",
       "table_center_workshop": "Center / Workshop",
+      "table_student": "Student",
       "table_dates": "Dates",
-      "table_docs": "Student Documentation",
+      "table_docs": "Documents",
+      "all_statuses": "All Statuses",
+      "pending_validation": "Pending Validation",
+      "fully_validated": "Fully Validated",
+      "btn_validate": "Approve Now",
+      "btn_unvalidate": "Unvalidate",
+      "doc_not_uploaded": "Document not uploaded",
+      "preview": "Notification Preview",
       "start": "Start",
       "end": "End",
       "dates_not_defined": "Dates not defined",
       "no_students": "No enrolled students",
-      "preview": "MESSAGE PREVIEW",
       "greeting": "Greeting",
       "doc_with_error": "Document with error",
       "reason_error": "Reason for the error",
@@ -910,12 +917,14 @@
     "click_to_edit": "Click to edit"
   },
   "AssignmentWorkshopsPage": {
+    "table_info": "Student Information",
     "title_prefix": "WORKSHOP MANAGEMENT: ",
     "modality_prefix": "MODALITY ",
     "referent_label": "Referent Teaching Team",
     "center_label": "Educational Center",
     "students_title": "Participating Students",
     "students_subtitle": "{occupied} of {total} places occupied.",
+    "select_students_btn": "Select Students",
     "nominal_register_btn": "Nominal Register",
     "no_students": "No students assigned yet",
     "no_students_hint": "Click here to start nominal registration",
@@ -969,7 +978,9 @@
     },
     "Monitoring": {
       "no_assignments": "No active workshops in execution for now."
-    }
+    },
+    "ia_matcher_btn": "IA Matcher",
+    "ia_matcher_close_btn": "Close IA Matcher"
   },
   "Sync": {
     "title": "Synchronize",
