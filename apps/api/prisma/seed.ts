@@ -186,8 +186,15 @@ async function seedWorkshops(sectors: any) {
   ];
 
   for (const w of workshops) {
-    await prisma.workshop.create({ 
-      data: {
+    await prisma.workshop.upsert({ 
+      where: {
+        title_modality: {
+          title: w.title,
+          modality: w.modality
+        }
+      },
+      update: {},
+      create: {
         title: w.title,
         modality: w.modality,
         sectorId: w.sectorId,

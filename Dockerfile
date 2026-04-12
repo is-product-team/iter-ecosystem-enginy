@@ -14,7 +14,7 @@ FROM base AS pruner
 RUN npm install -g turbo
 COPY . .
 RUN turbo prune @iter/web --docker
-RUN turbo prune api --docker
+RUN turbo prune @iter/api --docker
 
 # --- BUILDER WEB ---
 FROM base AS builder-web
@@ -49,7 +49,7 @@ COPY --from=pruner /app/out/full/ .
 WORKDIR /app/apps/api
 RUN npx prisma generate
 WORKDIR /app
-RUN npx turbo run build --filter=api
+RUN npx turbo run build --filter=@iter/api
 
 # --- RUNNER API (PRODUCCIÓN) ---
 FROM base AS runner-api
