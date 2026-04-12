@@ -32,26 +32,16 @@ export default function LanguageSelector() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const getLocalizedPath = (newLocale: string) => {
-    const currentPath = window.location.pathname;
-    const pathParts = currentPath.split('/');
-    if (pathParts.length > 1) {
-      pathParts[1] = newLocale;
-      return pathParts.join('/');
-    }
-    return `/${newLocale}`;
-  };
-
   const handleLanguageChange = (locale: string) => {
     setIsOpen(false);
     if (locale === currentLocale) return;
-    window.location.href = getLocalizedPath(locale);
+    router.replace(pathname, { locale });
   };
 
   const handleReset = () => {
     setIsOpen(false);
     document.cookie = 'NEXT_LOCALE=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = '/';
+    router.push('/');
   };
 
   return (
