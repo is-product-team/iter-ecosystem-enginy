@@ -62,7 +62,7 @@ WORKDIR /app
 
 # Copiamos solo lo necesario del builder
 # Como RootDir es ../../, el dist contiene la estructura completa (apps/api y shared)
-COPY --from=builder-api /app/apps/api/dist ./
+COPY --from=builder-api /app/apps/api/dist ./apps/api/dist
 COPY --from=builder-api /app/node_modules ./node_modules
 COPY --from=builder-api /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder-api /app/apps/api/prisma ./apps/api/prisma
@@ -74,4 +74,6 @@ RUN mkdir -p /app/uploads/perfil /app/uploads/documents
 
 USER node
 EXPOSE 3000
-CMD ["node", "apps/api/src/index.js"]
+# El comando debe apuntar al archivo compilado en dist
+# Con rootDir: ../../, la estructura en dist es apps/api/src/index.js
+CMD ["node", "apps/api/dist/apps/api/src/index.js"]
