@@ -8,6 +8,14 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import prisma from './lib/prisma.js';
 import { ReminderService } from './services/reminder.service.js';
 import { env } from './config/env.js';
+import fs from 'fs';
+import path from 'path';
+
+// Asegurar carpeta de uploads al arranque
+const uploadDir = path.resolve(process.cwd(), 'uploads', 'documents');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 const app = express();
 app.set('trust proxy', 1);
@@ -32,6 +40,12 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Logger global de peticiones para depuración
+app.use((req, res, next) => {
+  console.log(`[API] ${req.method} ${req.url}`);
+  next();
+});
 
 const API_PREFIX = env.API_PREFIX;
 app.use(`${API_PREFIX}/uploads`, express.static('uploads'));

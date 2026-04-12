@@ -4,13 +4,30 @@
       "title": "Login",
       "subtitle": "Welcome back. Please enter your credentials to access the platform.",
       "email": "Email",
-      "email_placeholder": "your_email@example.com",
+      "email_placeholder": "example@example.com",
       "password": "Password",
       "password_placeholder": "••••••••",
+      "tagline": "engineering and educational management ecosystem",
       "submit": "Log In",
       "loading": "Verifying credentials...",
       "error": "Incorrect email or password. Please try again.",
-      "no_account": "Don't have an account? Contact your center.",
+      "no_account_link": "Don't have an account? Find out here",
+      "register_info": {
+        "title": "How to get access?",
+        "coordinator": {
+          "title": "Coordination",
+          "desc": "Contact coordinacio@iter.cat to register your center on the platform."
+        },
+        "admin": {
+          "title": "Administration",
+          "desc": "Get in touch with the project team for global management."
+        },
+        "teacher": {
+          "title": "Teaching Staff",
+          "desc": "Manage your sessions and incidents directly from the Teachers App."
+        },
+        "back": "Back to login"
+      },
       "forgot_password": "Forgot your password?",
       "access_mobile": "Mobile App Access",
       "teacher_mobile_hint": "As a teacher, you must use the Iter mobile application to manage your sessions.",

@@ -46,7 +46,7 @@ services:
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
-    command: sh -c "npm install && npx turbo db:generate --filter=api && npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss && npx turbo db:seed --filter=api"
+    command: sh -c "npm install && npx turbo db:generate --filter=@iter/api && npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss && npx turbo db:seed --filter=@iter/api"
     env_file:
       - .env
     depends_on:
@@ -65,19 +65,24 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: npx turbo dev --filter=api
+    command: npx turbo dev --filter=@iter/api
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
+      - ./apps/api/uploads:/app/uploads
     ports:
       - "${API_PORT_EXTERNAL}:${API_PORT_INTERNAL}"
     env_file:
       - .env
     environment:
       - PORT=${API_PORT_INTERNAL}
+      - AI_MODEL_VISION=moondream
+      - OLLAMA_HOST=http://ollama:11434
     depends_on:
       setup:
         condition: service_completed_successfully
+    tty: true
+    stdin_open: true
     networks:
       - iter-network
     healthcheck:
@@ -97,7 +102,7 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: npx turbo dev --filter=@iter/web
+    command: npx turbo run dev --filter=@iter/web --parallel
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
@@ -111,6 +116,8 @@ services:
     depends_on:
       setup:
         condition: service_completed_successfully
+    tty: true
+    stdin_open: true
     networks:
       - iter-network
     healthcheck:
@@ -121,7 +128,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
 
   # IA Local (Especializada en documentos)
   ollama:
@@ -135,7 +142,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1.5G
+          memory: 2G
 
 networks:
   iter-network:

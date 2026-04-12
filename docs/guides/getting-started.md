@@ -47,7 +47,7 @@ Once the containers are running, you can access the services at the following UR
 ### Seeding the Database
 The database is seeded automatically on first run, but you can re-seed manually if needed:
 ```bash
-docker compose exec setup npm run db:seed --filter=api
+docker compose exec setup npm run db:seed --filter=@iter/api
 ```
 
 ### Viewing Logs

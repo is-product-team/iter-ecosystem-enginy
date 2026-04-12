@@ -39,7 +39,7 @@ const Loading: React.FC<LoadingProps> = ({
       <div className={`relative ${sizeClasses[size]} flex items-center justify-center`}>
         {/* Apple Style Tick Spinner */}
         <svg 
-          className="w-full h-full animate-spin [animation-duration:1s]" 
+          className="w-full h-full" 
           viewBox="0 0 24 24" 
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +57,8 @@ const Loading: React.FC<LoadingProps> = ({
               style={{
                 transform: `rotate(${i * 45}deg)`,
                 transformOrigin: '12px 12px',
-                opacity: 1 - (i * 0.12)
+                animation: `tick-fade 0.8s linear infinite`,
+                animationDelay: `${-0.8 + (i * 0.1)}s`,
               }}
             />
           ))}

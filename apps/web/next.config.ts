@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   transpilePackages: ["@iter/shared"],
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:8000', '127.0.0.1:8000', 'http://localhost:8000'],
+    },
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();
