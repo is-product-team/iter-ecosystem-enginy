@@ -11,10 +11,14 @@ import { env } from './config/env.js';
 import fs from 'fs';
 import path from 'path';
 
-// Asegurar carpeta de uploads al arranque
+// Asegurar carpeta de uploads al arranque (de forma no bloqueante)
 const uploadDir = path.resolve(process.cwd(), 'uploads', 'documents');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (error) {
+  logger.warn(`⚠️ No se pudo asegurar la carpeta de uploads: ${uploadDir}. Puede ser normal si usas volúmenes de Docker.`);
 }
 
 const app = express();
@@ -40,6 +44,11 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Health check para Docker (en la raíz, sin prefijo)
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date() });
+});
 
 // Logger global de peticiones para depuración
 app.use((req, res, next) => {
