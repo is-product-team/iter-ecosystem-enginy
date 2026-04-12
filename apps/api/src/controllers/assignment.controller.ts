@@ -77,8 +77,8 @@ export const getAssignments = async (req: Request, res: Response) => {
     // Transform assignments to flatten enrollment docs and handle dates
     const transformed = assignments.map(assig => ({
       ...assig,
-      startDate: assig.sessions[0]?.sessionDate || assig.request?.preferredStartDate || null,
-      endDate: assig.sessions[assig.sessions.length - 1]?.sessionDate || assig.request?.preferredEndDate || null,
+      startDate: assig.startDate || assig.sessions[0]?.sessionDate || null,
+      endDate: assig.endDate || assig.sessions[assig.sessions.length - 1]?.sessionDate || null,
       enrollments: assig.enrollments.map(flattenEnrollmentDocs)
     }));
 
@@ -203,8 +203,8 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
 
     const transformed = assignments.map(assig => ({
       ...assig,
-      startDate: assig.sessions[0]?.sessionDate || assig.request?.preferredStartDate || null,
-      endDate: assig.sessions[assig.sessions.length - 1]?.sessionDate || assig.request?.preferredEndDate || null,
+      startDate: assig.startDate || assig.sessions[0]?.sessionDate || null,
+      endDate: assig.endDate || assig.sessions[assig.sessions.length - 1]?.sessionDate || null,
       enrollments: assig.enrollments.map(flattenEnrollmentDocs)
     }));
 
