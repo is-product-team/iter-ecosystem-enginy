@@ -2,11 +2,22 @@
   "name": "@iter/shared",
   "version": "1.0.0",
   "private": true,
-  "main": "./index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./index.ts"
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
   },
   "dependencies": {
     "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
   }
 }
