@@ -908,7 +908,15 @@
     "send_error": "Error al enviar la solicitud.",
     "select_btn": "Seleccionar",
     "selected_label": "Seleccionado",
-    "edit_btn": "Editar"
+    "edit_btn": "Editar",
+    "duration": "Duración",
+    "max_students": "Plazas Máx.",
+    "description": "Descripción del Taller",
+    "workshop_details": "Información Técnica",
+    "status_pending": "Pendiente",
+    "status_approved": "Aprobado",
+    "status_rejected": "Rechazado",
+    "click_to_edit": "Haz clic para editar"
   },
   "AssignmentWorkshopsPage": {
     "title_prefix": "GESTIÓN DEL TALLER: ",
@@ -1017,5 +1025,10 @@
       "no_requests": "No se encontraron solicitudes para procesar.",
       "success": "Asignados {count} estudiantes al Centro {center} para el Taller {workshop}"
     }
+  },
+  "NotFound": {
+    "title": "Página no encontrada",
+    "description": "Lo sentimos, pero la página que estás buscando no existe o ha sido movida.",
+    "goHome": "Volver al inicio"
   }
 }

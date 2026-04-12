@@ -899,7 +899,15 @@
     "send_error": "Error sending the request.",
     "select_btn": "Select",
     "selected_label": "Selected",
-    "edit_btn": "Edit"
+    "edit_btn": "Edit",
+    "duration": "Duration",
+    "max_students": "Max Places",
+    "description": "Workshop Description",
+    "workshop_details": "Technical Information",
+    "status_pending": "Pending",
+    "status_approved": "Approved",
+    "status_rejected": "Rejected",
+    "click_to_edit": "Click to edit"
   },
   "AssignmentWorkshopsPage": {
     "title_prefix": "WORKSHOP MANAGEMENT: ",

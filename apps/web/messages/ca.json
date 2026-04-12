@@ -908,7 +908,15 @@
     "send_error": "Error en enviar la sol·licitud.",
     "select_btn": "Seleccionar",
     "selected_label": "Seleccionat",
-    "edit_btn": "Editar"
+    "edit_btn": "Editar",
+    "duration": "Durada",
+    "max_students": "Places Màx.",
+    "description": "Descripció del Taller",
+    "workshop_details": "Informació Tècnica",
+    "status_pending": "Pendent",
+    "status_approved": "Aprovat",
+    "status_rejected": "Rebutjat",
+    "click_to_edit": "Fes clic per a editar"
   },
   "AssignmentWorkshopsPage": {
     "title_prefix": "GESTIÓ DEL TALLER: ",
@@ -1016,11 +1024,11 @@
     "AutoAssignment": {
       "no_requests": "No s'han trobat sol·licituds per processar.",
       "success": "Assignats {count} estudiants al Centre {center} per al Taller {workshop}"
-    },
-    "NotFound": {
-      "title": "Pàgina no trobada",
-      "description": "Ho sentim, però la pàgina que estàs buscant no existeix o ha estat moguda.",
-      "goHome": "Tornar a l'inici"
     }
+  },
+  "NotFound": {
+    "title": "Pàgina no trobada",
+    "description": "Ho sentim, però la pàgina que estàs buscant no existeix o ha estat moguda.",
+    "goHome": "Tornar a l'inici"
   }
 }
