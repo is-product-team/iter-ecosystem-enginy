@@ -997,8 +997,12 @@
       "error_unavailable": "Local AI vision engine is currently unavailable."
     },
     "AutoAssignment": {
-      "no_requests": "No requests found for processing.",
-      "success": "Assigned {count} students to Center {center} for Workshop {workshop}"
+      "no_requests": "No requests found for processing."
     }
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "Sorry, the page you are looking for doesn't exist or has been moved.",
+    "goHome": "Go back home"
   }
 }

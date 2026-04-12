@@ -1016,6 +1016,11 @@
     "AutoAssignment": {
       "no_requests": "No s'han trobat sol·licituds per processar.",
       "success": "Assignats {count} estudiants al Centre {center} per al Taller {workshop}"
+    },
+    "NotFound": {
+      "title": "Pàgina no trobada",
+      "description": "Ho sentim, però la pàgina que estàs buscant no existeix o ha estat moguda.",
+      "goHome": "Tornar a l'inici"
     }
   }
 }
