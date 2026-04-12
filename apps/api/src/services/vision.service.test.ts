@@ -20,7 +20,7 @@ describe('VisionService', () => {
     } as any;
 
     const mockResponse = {
-      response: 'YES, I can clearly see a signature.'
+      response: '{"hasSignature": true, "confidence": 0.9, "reason": "Signature found"}'
     };
 
     (global.fetch as any).mockResolvedValue({
@@ -54,7 +54,7 @@ describe('VisionService', () => {
     } as any;
 
     const mockResponse = {
-      response: 'NO, the signature box is completely empty.'
+      response: '{"hasSignature": false, "confidence": 0.2, "reason": "Firma manuscrita no detectada en la región esperada."}'
     };
 
     (global.fetch as any).mockResolvedValue({

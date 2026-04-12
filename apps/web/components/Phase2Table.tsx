@@ -51,6 +51,7 @@ export default function Phase2Table({
                       <Avatar
                         url={ins.student.photoUrl}
                         name={ins.student.fullName}
+                        id={ins.student.studentId}
                         size="sm"
                         type="student"
                       />
