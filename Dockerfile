@@ -34,15 +34,15 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 WORKDIR /app
-# En modo standalone, Next.js pone todo lo necesario en la carpeta standalone
+# En modo standalone monorepo, Next.js pone todo lo necesario en la carpeta standalone
 COPY --from=builder-web /app/apps/web/.next/standalone ./
 COPY --from=builder-web /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder-web /app/apps/web/public ./public
-# Nota: En standalone, el server.js suele estar en la raíz o en apps/web/server.js
-# Dependiendo de la estructura del monorepo. Probamos con la raíz.
+COPY --from=builder-web /app/apps/web/public ./apps/web/public
+
 USER node
 EXPOSE 3000
-CMD ["node", "server.js"]
+# IMPORTANTE: En monorepo standalone, server.js está en apps/web/server.js
+CMD ["node", "apps/web/server.js"]
 
 # --- BUILDER API ---
 FROM base AS builder-api

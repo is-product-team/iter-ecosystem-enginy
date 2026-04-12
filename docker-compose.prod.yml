@@ -14,7 +14,7 @@ services:
     networks:
       - red_proxy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"] # La API no tiene basePath /iter internamente, solo el proxy
       interval: 30s
       timeout: 10s
       retries: 3
@@ -33,7 +33,7 @@ services:
     networks:
       - red_proxy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/iter"] # Next.js tiene basePath: /iter
       interval: 30s
       timeout: 10s
       retries: 3
