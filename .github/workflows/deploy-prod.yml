@@ -133,6 +133,7 @@ jobs:
             sleep 10
           done
           echo "❌ Health check timed out!"
+          docker logs iter_api
           docker compose -f docker-compose.prod.yml ps
           exit 1
 

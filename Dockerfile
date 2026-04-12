@@ -62,17 +62,20 @@ FROM base AS runner-api
 ENV NODE_ENV=production
 WORKDIR /app
 
-# Copiamos la estructura completa necesaria para que los symlinks de node_modules funcionen
-COPY --from=builder-api /app/node_modules ./node_modules
-COPY --from=builder-api /app/shared ./shared
-COPY --from=builder-api /app/apps/api/package.json ./apps/api/package.json
-COPY --from=builder-api /app/apps/api/prisma ./apps/api/prisma
-COPY --from=builder-api /app/apps/api/dist ./apps/api/dist
-COPY --from=builder-api /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder-api /app/node_modules/@prisma ./node_modules/@prisma
+# Asegurar que el usuario node tenga permisos sobre el WORKDIR
+RUN chown -R node:node /app
 
-# Crear la carpeta d'uploads per garantir que existeixi
-RUN mkdir -p /app/uploads/perfil /app/uploads/documents
+# Copiamos la estructura completa necesaria para que los symlinks de node_modules funcionen
+COPY --from=builder-api --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder-api --chown=node:node /app/shared ./shared
+COPY --from=builder-api --chown=node:node /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder-api --chown=node:node /app/apps/api/prisma ./apps/api/prisma
+COPY --from=builder-api --chown=node:node /app/apps/api/dist ./apps/api/dist
+COPY --from=builder-api --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder-api --chown=node:node /app/node_modules/@prisma ./node_modules/@prisma
+
+# Crear la carpeta d'uploads y asegurar permisos
+RUN mkdir -p /app/uploads/perfil /app/uploads/documents && chown -R node:node /app/uploads
 
 USER node
 EXPOSE 3000
