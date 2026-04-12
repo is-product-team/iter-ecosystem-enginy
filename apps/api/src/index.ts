@@ -13,8 +13,14 @@ import path from 'path';
 
 // Asegurar carpeta de uploads al arranque
 const uploadDir = path.resolve(process.cwd(), 'uploads', 'documents');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log(`[API] Carpeta de uploads creada en: ${uploadDir}`);
+  }
+} catch (error) {
+  console.error(`[API] Error al crear carpeta de uploads: ${error.message}`);
+  console.warn(`[API] Asegúrese de que el usuario tenga permisos de escritura en: ${uploadDir}`);
 }
 
 const app = express();
