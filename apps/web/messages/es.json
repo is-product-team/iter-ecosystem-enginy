@@ -179,6 +179,27 @@
       },
       "bulk_selection": "{count} documentos seleccionados",
       "bulk_approve_btn": "APROBAR TODO"
+    },
+    "Closure": {
+      "title": "Cierre y Certificación",
+      "subtitle": "Finalización de talleres, bloqueo de datos y emisión de certificados oficiales.",
+      "search_placeholder": "Buscar por taller o centro...",
+      "assignments_name": "talleres",
+      "evaluations": "EVALUACIONES DOCENTES",
+      "action_close": "Cerrar y Certificar",
+      "closed_status": "Taller Certificado",
+      "closure_success": "Taller cerrado y certificados emitidos correctamente.",
+      "closure_error": "Error al cerrar el taller. Revisa las evaluaciones pendientes.",
+      "modal_title": "Confirmar Cierre de Ciclo",
+      "evaluations_status": "Estado de Evaluaciones",
+      "certificates_to_be_issued": "Certificados a Emitir",
+      "missing_evaluations_warning": "Atención: Faltan {count} evaluaciones docentes. El cierre es posible, pero estos alumnos podrían no recibir el certificado correctamente.",
+      "effects_title": "EFECTOS DEL CIERRE",
+      "effect_lock_data": "Los datos de asistencia y evaluación quedarán bloqueados (solo lectura).",
+      "effect_generate_pdf": "Se generarán los archivos PDF oficiales para los alumnos aptos.",
+      "effect_finish_phase": "El taller pasará al estado FINALIZADO y se dará por cerrado el ciclo.",
+      "closing_process": "Procesando cierre...",
+      "confirm_closure": "CONFIRMAR CIERRE FINAL"
     }
   },
   "Center": {
@@ -567,6 +588,10 @@
         "verifications": {
           "title": "Verificación de Documentos",
           "description": "Valida la documentación presentada por los centros."
+        },
+        "closure": {
+          "title": "Cierre y Certificación",
+          "description": "Finaliza talleres y emite certificados oficiales."
         }
       }
     },
@@ -603,18 +628,6 @@
         "phase3": "Fase 3"
       }
     },
-    "student": {
-      "title": "Bienvenido/a",
-      "subtitle": "Consulta tus talleres y descarga tus certificados.",
-      "certificates_title": "Mis Certificados",
-      "no_certificates": "No se han encontrado certificados.",
-      "no_certificates_desc": "Aún no has obtenido ningún certificado. Completa un taller para ganar uno.",
-      "download_pdf": "Descargar PDF",
-      "loading": "Cargando panel...",
-      "duration": "Duración",
-      "issued": "Emitido",
-      "pdf_not_implemented": "La generación de PDF no está implementada en esta demo."
-    }
   },
   "Forms": {
     "search": "Buscar...",
@@ -990,5 +1003,36 @@
     "actions": "Acciones",
     "ok": "Aceptar",
     "cancel": "Cancelar"
+  },
+  "PublicSurvey": {
+    "title": "Iter Ecosystem",
+    "subtitle": "Autoevaluación del taller",
+    "email_label": "Correo electrónico (xtec)",
+    "email_placeholder": "ejemplo@xtec.cat",
+    "verify_button": "Comenzar encuesta",
+    "verifying": "Verificando...",
+    "success_title": "¡Encuesta finalizada!",
+    "success_message": "Muchas gracias por tu tiempo. Tus respuestas nos ayudan a mejorar el Programa Enginy.",
+    "subtitle_with_name": "¿Cómo ha ido el taller, {name}?",
+    "error_no_survey": "No hemos encontrado ninguna encuesta pendiente para ti.",
+    "submit_success": "¡Encuesta enviada correctamente!",
+    "submit_error": "Error al enviar la encuesta.",
+    "section_quality": "Calidad y Contenido",
+    "section_experience": "Valoración de Experiencia",
+    "section_vocational": "Impacto Vocacional",
+    "label_interest": "¿Te ha parecido interesante el tema tratado?",
+    "label_clarity": "¿La explicación de las actividades ha sido clara y entendible?",
+    "label_material": "¿Los materiales y herramientas eran adecuados y de buena calidad?",
+    "label_support": "¿Te has sentido ayudado/a y acompañado/a por el docente?",
+    "label_overall": "¿Cómo valorarías tu experiencia global hoy?",
+    "label_teacher": "¿Cómo valorarías al/la docente que ha impartido el taller?",
+    "label_future": "¿Te ha ayudado a decidir tu futuro profesional?",
+    "label_comments": "Cuéntanos brevemente lo que más te ha gustado (o mejorarías):",
+    "opt_future_yes": "Sí, me ha aclarado las ideas.",
+    "opt_future_no": "No, ya lo tenía claro o no es para mí.",
+    "opt_future_maybe": "Me lo estoy considerando ahora de nuevo.",
+    "footer_note": "Feedback anónimo para el centro. ¡Sé sincero!",
+    "submit_button": "Enviar encuesta",
+    "submitting": "Enviando..."
   }
 }

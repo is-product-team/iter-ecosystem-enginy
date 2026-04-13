@@ -1,114 +1,92 @@
-import { PrismaClient, QuestionnaireTarget, ResponseType } from '@prisma/client';
-import * as uuid from 'uuid';
-const { v4: uuidv4 } = uuid;
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma.js';
 
 export class QuestionnaireService {
-    async getModels() {
-        return await prisma.questionnaireModel.findMany({
-            include: { _count: { select: { questions: true } } }
-        });
-    }
-
-    async getModelById(modelId: number) {
-        return await prisma.questionnaireModel.findUnique({
-            where: { modelId: modelId },
-            include: { questions: true },
-        });
-    }
-
-    async createModel(data: {
-        name: string;
-        target: QuestionnaireTarget;
-        questions: { text: string; type: ResponseType; options?: any }[];
+    /**
+     * Submit a public survey for a student
+     */
+    async submitPublicSurvey(data: {
+        enrollmentId: number;
+        workshopClarity: number;
+        materialQuality: number;
+        learningInterest: number;
+        supportRating: number;
+        experienceRating: number;
+        teacherRating: number;
+        vocationalImpact: string;
+        keyLearnings?: string;
     }) {
-        return await prisma.questionnaireModel.create({
+        const { enrollmentId, ...surveyData } = data;
+
+        // Verify enrollment exists and has no survey yet
+        const enrollment = await prisma.enrollment.findUnique({
+            where: { enrollmentId },
+            include: { selfConsultation: true }
+        });
+
+        if (!enrollment) throw new Error('Enrollment not found');
+        if (enrollment.selfConsultation) throw new Error('Survey already submitted for this workshop');
+
+        return prisma.studentSelfConsultation.create({
             data: {
-                name: data.name,
-                target: data.target,
-                questions: {
-                    create: data.questions.map(q => ({
-                        text: q.text,
-                        type: q.type,
-                        options: q.options
-                    })),
-                },
-            },
-            include: { questions: true },
+                enrollmentId,
+                ...surveyData
+            }
         });
     }
 
-    async trackSubmission(assignmentId: number, target: QuestionnaireTarget) {
-        return await prisma.questionnaire.create({
-            data: {
-                assignmentId,
-                target,
-                token: uuidv4(),
-                isCompleted: false
+    /**
+     * Get aggregated statistics for a specific assignment
+     */
+    async getAggregatedStats(assignmentId: number) {
+        const aggregations = await prisma.studentSelfConsultation.aggregate({
+            where: {
+                enrollment: {
+                    assignmentId: assignmentId
+                }
             },
-        });
-    }
-
-    async submitResponses(token: string, responses: { questionId: number; value: string }[]) {
-        const questionnaire = await prisma.questionnaire.findUnique({
-            where: { token }
-        });
-
-        if (!questionnaire) throw new Error('Questionnaire not found');
-
-        await prisma.questionnaire.update({
-            where: { questionnaireId: questionnaire.questionnaireId },
-            data: {
-                isCompleted: true,
-                completedAt: new Date(),
-            },
-        });
-
-        return await prisma.questionnaireResponse.createMany({
-            data: responses.map((r) => ({
-                questionnaireId: questionnaire.questionnaireId,
-                questionId: r.questionId,
-                value: r.value,
-            })),
-        });
-    }
-
-    async submitStudentSelfConsultation(data: any) {
-        return await prisma.studentSelfConsultation.create({
-            data: {
-                enrollmentId: data.enrollmentId,
-                taskPunctuality: data.taskPunctuality,
-                respectForMaterial: data.respectForMaterial,
-                learningInterest: data.learningInterest,
-                resolutionAutonomy: data.resolutionAutonomy,
-                experienceRating: data.experienceRating,
-                teacherRating: data.teacherRating,
-                vocationalImpact: data.vocationalImpact,
-                personalImprovements: data.personalImprovements,
-                keyLearnings: data.keyLearnings,
-            },
-        });
-    }
-
-    async getSatisfactionMetrics() {
-        const avgStats = await prisma.studentSelfConsultation.aggregate({
             _avg: {
+                workshopClarity: true,
+                materialQuality: true,
+                learningInterest: true,
+                supportRating: true,
                 experienceRating: true,
                 teacherRating: true,
             },
+            _count: {
+                _all: true
+            }
         });
 
-        const impactStats = await prisma.studentSelfConsultation.groupBy({
+        const impactDistribution = await prisma.studentSelfConsultation.groupBy({
+            where: {
+                enrollment: {
+                    assignmentId: assignmentId
+                }
+            },
             by: ['vocationalImpact'],
             _count: {
-                _all: true,
+                _all: true
+            }
+        });
+
+        // Get key learnings (last 5 for the card)
+        const recentLearnings = await prisma.studentSelfConsultation.findMany({
+            where: {
+                enrollment: { assignmentId }
             },
+            select: { keyLearnings: true },
+            take: 5,
+            orderBy: { createdAt: 'desc' }
         });
 
         return {
-            generalAvg: avgStats._avg,
-            impactDistribution: impactStats,
+            averages: aggregations._avg,
+            totalResponses: aggregations._count._all,
+            impact: impactDistribution.map(id => ({
+                name: id.vocationalImpact,
+                value: id._count._all
+            })),
+            learnings: recentLearnings.map(l => l.keyLearnings).filter(Boolean)
         };
     }
 }

@@ -9,6 +9,8 @@ import { KPIOverview } from '@/components/monitoring/KPIOverview';
 import { AssignmentMonitorCard } from '@/components/monitoring/AssignmentMonitorCard';
 import { IncidentFeed } from '@/components/monitoring/IncidentFeed';
 import Loading from '@/components/Loading';
+import SatisfactionCharts from '@/components/SatisfactionCharts';
+import { toast } from 'sonner';
 
 export default function MonitoringPage() {
   const t = useTranslations('Center.Monitoring');
@@ -17,6 +19,11 @@ export default function MonitoringPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // Phase 4 Analytics State
+  const [selectedAssignmentStats, setSelectedAssignmentStats] = useState<any>(null);
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [activeTab, setActiveTab] = useState<'ACTIVE' | 'COMPLETED'>('ACTIVE');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -39,6 +46,35 @@ export default function MonitoringPage() {
     }
   }, [user, commonT]);
 
+  const handleFetchStats = async (assignmentId: number) => {
+    setLoadingStats(true);
+    try {
+      const response = await getApi().get(`/certificates/stats/${assignmentId}`);
+      setSelectedAssignmentStats({ id: assignmentId, ...response.data });
+    } catch (err) {
+      toast.error("No s'ha pogut carregar l'analítica.");
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  const handleDownloadZip = async (assignmentId: number) => {
+    try {
+      const response = await getApi().get(`/certificates/download-bulk/${assignmentId}`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `certificats_taller_${assignmentId}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      toast.success("Descàrrega iniciada corregidament!");
+    } catch (err) {
+      toast.error("Error en generar el fitxer ZIP.");
+    }
+  };
+
   if (loading) return <Loading />;
 
   if (error || !stats) {
@@ -51,48 +87,106 @@ export default function MonitoringPage() {
     );
   }
 
+  const activeAssignments = stats.assignments.filter((a: any) => a.status !== 'COMPLETED');
+  const completedAssignments = stats.assignments.filter((a: any) => a.status === 'COMPLETED');
+
   return (
     <DashboardLayout title={t('title')} subtitle={t('subtitle')}>
-      {/* 1. KPIs Section */}
       <KPIOverview 
         stats={{
           sessionsToday: stats.summary.sessionsToday,
           pendingAttendance: stats.summary.totalPendingAttendance,
-          activeAssignments: stats.assignments.length,
+          activeAssignments: activeAssignments.length,
           incidents: stats.incidents.length
         }} 
       />
 
+      {/* Tab Switcher */}
+      <div className="flex border-b border-gray-100 mb-10 gap-8">
+        <button 
+          onClick={() => setActiveTab('ACTIVE')}
+          className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'ACTIVE' ? 'text-[#00426B] border-b-2 border-[#00426B]' : 'text-gray-400'}`}
+        >
+          Tallers en Execució
+        </button>
+        <button 
+          onClick={() => setActiveTab('COMPLETED')}
+          className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'COMPLETED' ? 'text-[#00426B] border-b-2 border-[#00426B]' : 'text-gray-400'}`}
+        >
+          Resultats i Certificats (Fase 4)
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* 2. Active Workshops Progress (Main column) */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="flex justify-between items-center mb-6 px-1">
-             <h3 className="text-[12px] font-medium text-text-muted uppercase tracking-widest">{t('Assignments.title')}</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {stats.assignments.map((assignment: any) => (
-              <AssignmentMonitorCard 
-                key={assignment.assignmentId} 
-                assignment={{
-                  id: assignment.assignmentId,
-                  workshopName: assignment.title,
-                  modality: assignment.modality,
-                  centerName: assignment.centerName,
-                  progress: assignment.progress,
-                  attendanceHealth: assignment.health,
-                  hasStaffGap: assignment.hasStaffGap,
-                  sessionsCompleted: assignment.totalSessions - assignment.pendingAttendance,
-                  totalSessions: assignment.totalSessions,
-                  nextSessionDate: assignment.nextSession?.date || null
-                }}
-              />
-            ))}
-            {stats.assignments.length === 0 && (
-              <div className="col-span-full py-12 text-center bg-background-subtle border border-dashed border-border-subtle text-text-muted text-[11px] font-medium uppercase tracking-widest">
-                {t('no_assignments')}
-              </div>
-            )}
-          </div>
+          {activeTab === 'ACTIVE' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {activeAssignments.map((assignment: any) => (
+                <AssignmentMonitorCard 
+                  key={assignment.assignmentId} 
+                  assignment={{
+                    id: assignment.assignmentId,
+                    workshopName: assignment.title,
+                    modality: assignment.modality,
+                    centerName: assignment.centerName,
+                    progress: assignment.progress,
+                    attendanceHealth: assignment.health,
+                    hasStaffGap: assignment.hasStaffGap,
+                    sessionsCompleted: assignment.totalSessions - assignment.pendingAttendance,
+                    totalSessions: assignment.totalSessions,
+                    nextSessionDate: assignment.nextSession?.date || null
+                  }}
+                />
+              ))}
+              {activeAssignments.length === 0 && (
+                <div className="col-span-full py-12 text-center bg-background-subtle border border-dashed border-border-subtle text-text-muted text-[11px] font-medium uppercase tracking-widest">
+                  No hi ha tallers actius en aquest moment.
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {completedAssignments.map((assignment: any) => (
+                <div key={assignment.assignmentId} className="bg-white border-2 border-gray-100 p-6 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm">
+                  <div>
+                    <h4 className="text-sm font-black text-[#00426B] uppercase tracking-tight">{assignment.title}</h4>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Finalitzat el {new Date().toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex gap-4 w-full md:w-auto">
+                    <button 
+                      onClick={() => handleFetchStats(assignment.assignmentId)}
+                      className="flex-1 md:flex-none px-6 py-3 bg-gray-50 border border-gray-100 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all"
+                    >
+                      Veure Analítica
+                    </button>
+                    <button 
+                      onClick={() => handleDownloadZip(assignment.assignmentId)}
+                      className="flex-1 md:flex-none px-6 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all"
+                    >
+                      Certificats (ZIP)
+                    </button>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Analytics Display Area */}
+              {selectedAssignmentStats && (
+                <div className="mt-12 pt-12 border-t-2 border-dashed border-gray-100">
+                  <div className="flex justify-between items-center mb-8">
+                    <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">Informe de Qualitat</h3>
+                    <button onClick={() => setSelectedAssignmentStats(null)} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tancar</button>
+                  </div>
+                  <SatisfactionCharts data={selectedAssignmentStats} />
+                </div>
+              )}
+
+              {completedAssignments.length === 0 && (
+                <div className="py-12 text-center bg-background-subtle border border-dashed border-border-subtle text-text-muted text-[11px] font-medium uppercase tracking-widest">
+                  No hi ha tallers finalitzats recents.
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 3. Incident Sidebar */}

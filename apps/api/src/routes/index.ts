@@ -58,6 +58,10 @@ router.use('/surveys', surveyRoutes);
 // File Upload Routes
 router.use('/upload', uploadRoutes);
 
+// Public Routes (Unauthenticated)
+import publicRoutes from './public.routes.js';
+router.use('/public', publicRoutes);
+
 // Health Check
 router.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });

@@ -10,6 +10,11 @@ import { z } from 'zod';
 import { SessionService } from '../services/session.service.js';
 import { PDFService } from '../services/pdf.service.js';
 import { EvaluationService } from '../services/evaluation.service.js';
+import { ClosureService } from '../services/closure.service.js';
+
+const closureService = new ClosureService();
+const evaluationService = new EvaluationService();
+const visionService = new VisionService();
 
 // Helper to flatten enrollment docsStatus for frontend compatibility
 const flattenEnrollmentDocs = (enrollment: any) => {
@@ -1198,87 +1203,18 @@ export const closeAssignment = async (req: Request, res: Response) => {
   const assignmentId = parseInt(idAssignment as string);
 
   try {
-    const assignment = await prisma.assignment.findUnique({
-      where: { assignmentId },
-      include: {
-        enrollments: {
-          include: {
-            evaluations: true,
-            student: true,
-            attendance: true
-          }
-        },
-        workshop: true
-      }
-    });
-
-    if (!assignment) {
-      return res.status(404).json({ error: 'Assignment not found' });
-    }
-
-    // 1. Validate that all enrollments have an evaluation
-    const missingEvaluations = assignment.enrollments.filter(e => e.evaluations.length === 0);
-    if (missingEvaluations.length > 0) {
-      return res.status(400).json({
-        error: 'Cannot close assignment: Some students haven\'t been evaluated.',
-        missingCount: missingEvaluations.length
-      });
-    }
-
-    // 2. Generate certificates for students with >= 80% attendance
-    const evaluationService = new EvaluationService();
-    let certificatesIssued = 0;
-
-    for (const enrollment of assignment.enrollments) {
-      const stats = await evaluationService.calculateAttendanceStats(enrollment.enrollmentId);
-      const percentage = stats.percentage;
-
-      if (percentage >= MIN_ATTENDANCE_PERCENTAGE) {
-        const studentName = `${enrollment.student.fullName} ${enrollment.student.lastName}`;
-        const fileName = `Certificado_${enrollment.studentId}_${assignmentId}.pdf`;
-
-        await PDFService.generateCertificate(
-          studentName,
-          assignment.workshop.title,
-          new Date(),
-          fileName
-        );
-
-        await prisma.certificate.upsert({
-          where: {
-            studentId_assignmentId: {
-              studentId: enrollment.studentId,
-              assignmentId
-            }
-          },
-          update: {},
-          create: {
-            studentId: enrollment.studentId,
-            assignmentId: assignmentId,
-            issuedAt: new Date()
-          }
-        });
-        certificatesIssued++;
-      }
-    }
-
-    // 3. Update assignment status to COMPLETED
-    const updated = await prisma.assignment.update({
-      where: { assignmentId },
-      data: { status: 'COMPLETED' }
-    });
-
-    // 4. Log the change
-    await logStatusChange(assignmentId, assignment.status, 'COMPLETED');
+    const result = await closureService.closeAssignment(assignmentId);
+    
+    // Log the change
+    await logStatusChange(assignmentId, 'IN_PROGRESS', 'COMPLETED');
 
     res.json({
       success: true,
-      message: `${certificatesIssued} certificates generated and assignment closed.`,
-      status: updated.status
+      ...result
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in closeAssignment:", error);
-    res.status(500).json({ error: 'Error closing the assignment' });
+    res.status(400).json({ error: error.message });
   }
 };

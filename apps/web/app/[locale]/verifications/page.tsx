@@ -366,7 +366,7 @@ export default function DocumentVerificationPage() {
               ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-20 text-center">
-                    <div className="text-text-muted text-[13px] font-medium italic opacity-60 italic">{tc('no_results') || 'No se han encontrado resultados'}</div>
+                    <div className="text-text-muted text-[13px] font-medium italic opacity-60">{tc('no_results') || 'No se han encontrado resultados'}</div>
                   </td>
                 </tr>
               )}

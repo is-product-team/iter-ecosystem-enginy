@@ -179,6 +179,27 @@
       },
       "bulk_selection": "{count} documents seleccionats",
       "bulk_approve_btn": "APROVAR TOT"
+    },
+    "Closure": {
+      "title": "Tancament i Certificació",
+      "subtitle": "Finalització de tallers, bloqueig de dades i emissió de certificats oficials.",
+      "search_placeholder": "Cercar per taller o centre...",
+      "assignments_name": "tallers",
+      "evaluations": "AVALUACIONS DOCENTS",
+      "action_close": "Tancar i Certificar",
+      "closed_status": "Taller Certificat",
+      "closure_success": "Taller tancat i certificats emesos correctament.",
+      "closure_error": "Error en tancar el taller. Revisa les avaluacions pendents.",
+      "modal_title": "Confirmar Tancament de Cicle",
+      "evaluations_status": "Estat d'Avaluacions",
+      "certificates_to_be_issued": "Certificats a Emetre",
+      "missing_evaluations_warning": "Atenció: Falten {count} avaluacions docents. El tancament és possible, però aquests alumnes podrien no rebre el certificat correctament.",
+      "effects_title": "EFECTES DEL TANCAMENT",
+      "effect_lock_data": "Les dades d'asistència i avaluació quedaran bloquejades (només lectura).",
+      "effect_generate_pdf": "Es generaran els fitxers PDF oficials per als alumnes aptes.",
+      "effect_finish_phase": "El taller passarà a l'estat FINALITZAT i es donarà pel tancat el cicle.",
+      "closing_process": "Processant tancament...",
+      "confirm_closure": "CONFIRMAR TANCAMENT FINAL"
     }
   },
   "Center": {
@@ -567,6 +588,10 @@
         "verifications": {
           "title": "Verificació de Documents",
           "description": "Valida la documentació presentada pels centres."
+        },
+        "closure": {
+          "title": "Tancament i Certificació",
+          "description": "Finalitza tallers i emet certificats oficials."
         }
       }
     },
@@ -603,21 +628,39 @@
         "phase3": "Fase 3"
       }
     },
-    "student": {
-      "title": "Benvingut/da",
-      "subtitle": "Consulta els teus tallers i descarrega els teus certificats.",
-      "certificates_title": "Els meus Certificats",
-      "no_certificates": "No s'han trobat certificats.",
-      "no_certificates_desc": "Encara no has obtingut cap certificat. Completa un taller per guanyar-ne un.",
-      "download_pdf": "Descarregar PDF",
-      "loading": "Carregant panell...",
-      "duration": "Durada",
-      "issued": "Emès",
-      "pdf_not_implemented": "La generació de PDF no està implementada en aquesta demo."
-    }
   },
-  "Forms": {
-    "search": "Cercar...",
+  "PublicSurvey": {
+    "title": "Iter Ecosystem",
+    "subtitle": "Autoavaluació del taller",
+    "email_label": "Correu electrònic (xtec)",
+    "email_placeholder": "exemple@xtec.cat",
+    "verify_button": "Començar enquesta",
+    "verifying": "Verificant...",
+    "success_title": "Enquesta finalitzada!",
+    "success_message": "Moltes gràcies pel teu temps. Les teves respostes ens ajuden a millorar el Programa Enginy.",
+    "subtitle_with_name": "Com ha anat el taller, {name}?",
+    "error_no_survey": "No hem trobat cap enquesta pendent per a tu.",
+    "submit_success": "Enquesta enviada correctament!",
+    "submit_error": "Error en enviar l'enquesta.",
+    "section_quality": "Qualitat i Contingut",
+    "section_experience": "Valoració d'Experiència",
+    "section_vocational": "Impacte Vocational",
+    "label_interest": "T'ha semblat interessant el tema tractat?",
+    "label_clarity": "L'explicació de les activitats ha estat clara i entenedora?",
+    "label_material": "Els materials i eines eren adequats i de bona qualitat?",
+    "label_support": "T'has sentit ajudat/ada i acompanyat/ada pel docent?",
+    "label_overall": "Com valoraries la teva experiència global avui?",
+    "label_teacher": "Com valoraries el/la docent que ha impartit el taller?",
+    "label_future": "T'ha ajudat a decidir el teu futur professional?",
+    "label_comments": "Explica'ns breument el que més t'ha agradat (o milloraries):",
+    "opt_future_yes": "Sí, m'ha aclarit les idees.",
+    "opt_future_no": "No, ja ho tenia clar o no és per a mi.",
+    "opt_future_maybe": "M'ho estic considerant ara de nou.",
+    "footer_note": "Feedback anònim per al centre. Sigues sincer!",
+    "submit_button": "Enviar enquesta",
+    "submitting": "Enviant..."
+  },
+  "Common": {
     "search_by_title": "Cercar per títol",
     "filter_by_sector": "Filtrar per sector",
     "filter_by_modality": "Filtrar per modalitat",

@@ -278,6 +278,77 @@ async function main() {
   await seedWorkshops(infra.sectors);
   await seedPhases();
 
+  // Operative data for testing
+  console.log('🧪  Generando datos operativos (Alumnos, Inscripciones, Encuestas)...');
+  
+  const centerBrossa = await prisma.center.findUnique({ where: { centerCode: '08014231' } });
+  const workshop = await prisma.workshop.findFirst({ where: { title: 'Robótica e IoT' } });
+
+  if (centerBrossa && workshop) {
+    // 1. Assignment Completed
+    const assignment = await prisma.assignment.create({
+      data: {
+        centerId: centerBrossa.centerId,
+        workshopId: workshop.workshopId,
+        status: 'COMPLETED',
+        startDate: new Date(),
+      }
+    });
+
+    // 2. Students
+    const studentsData = [
+      { idalu: '1001', fullName: 'Marc', lastName: 'Pérez', email: 'alumne1@brossa.cat' },
+      { idalu: '1002', fullName: 'Júlia', lastName: 'Soler', email: 'alumne2@brossa.cat' },
+    ];
+
+    for (const s of studentsData) {
+      const student = await prisma.student.upsert({
+        where: { idalu: s.idalu },
+        update: { email: s.email },
+        create: {
+          idalu: s.idalu,
+          fullName: s.fullName,
+          lastName: s.lastName,
+          email: s.email,
+          originCenterId: centerBrossa.centerId,
+        }
+      });
+
+      const enrollment = await prisma.enrollment.create({
+        data: {
+          studentId: student.studentId,
+          assignmentId: assignment.assignmentId,
+        }
+      });
+
+      // 3. Fake Survey Feedback for coordinator charts
+      if (s.idalu === '1002') { // Seed one survey, leave one pending
+        await prisma.studentSelfConsultation.create({
+          data: {
+            enrollmentId: enrollment.enrollmentId,
+            experienceRating: 9,
+            teacherRating: 10,
+            vocationalImpact: 'SI',
+            keyLearnings: "M'ha encantat la part de muntatge del robot.",
+            learningInterest: 9,
+            supportRating: 8,
+            materialQuality: 10,
+            workshopClarity: 9
+          }
+        });
+
+        // Also issue a certificate so it's in the ZIP
+        await prisma.certificate.create({
+          data: {
+            studentId: student.studentId,
+            assignmentId: assignment.assignmentId,
+            issuedAt: new Date()
+          }
+        });
+      }
+    }
+  }
+
   console.log('✅  Seeding completado con éxito.');
 }
 
