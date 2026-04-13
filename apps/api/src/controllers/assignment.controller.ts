@@ -133,8 +133,8 @@ export const getAssignmentById = async (req: Request, res: Response) => {
     // Transform
     const transformed = {
       ...assignment,
-      startDate: assignment.sessions[0]?.sessionDate || assignment.request?.preferredStartDate || null,
-      endDate: assignment.sessions[assignment.sessions.length - 1]?.sessionDate || assignment.request?.preferredEndDate || null,
+      startDate: assignment.startDate || assignment.sessions[0]?.sessionDate || null,
+      endDate: assignment.endDate || assignment.sessions[assignment.sessions.length - 1]?.sessionDate || null,
       enrollments: assignment.enrollments.map(flattenEnrollmentDocs)
     };
 

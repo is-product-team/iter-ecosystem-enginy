@@ -10,7 +10,7 @@ RUN npm config set fetch-retries 5 && \
 WORKDIR /app
 
 # Stage 2: Pruner (Separa dependencias de Web y API)
-FROM base AS pruner
+FROM base AS pruner-web
 RUN npm install -g turbo
 COPY . .
 RUN turbo prune @iter/web --docker
@@ -22,10 +22,10 @@ RUN mkdir -p out/full/apps/api/prisma && cp -r apps/api/prisma/* out/full/apps/a
 FROM base AS builder-web
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/package-lock.json ./package-lock.json
-RUN npm install --ignore-scripts
-COPY --from=pruner /app/out/full/ .
+COPY --from=pruner-web /app/out/json/ .
+COPY --from=pruner-web /app/out/package-lock.json ./package-lock.json
+RUN npm ci --ignore-scripts
+COPY --from=pruner-web /app/out/full/ .
 RUN npx turbo run build --filter=@iter/web
 
 # --- RUNNER WEB (PRODUCCIÓN) ---
