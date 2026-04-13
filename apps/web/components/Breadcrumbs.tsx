@@ -12,14 +12,15 @@ const Breadcrumbs: React.FC = () => {
   if (pathname === '/' || pathname === '/login') return null;
 
   const pathSegments = pathname.split('/').filter(Boolean);
-  // Remove locale segment from segments if present (next-intl usually has it as first)
-  const localePrefixes = ['ca', 'es'];
+  // Remove locale segment from segments if present
+  const localePrefixes = ['ca', 'es', 'en', 'ar'];
   const segments = pathSegments.filter(s => !localePrefixes.includes(s));
 
   // Mapping of segments to translation keys
   const segmentMap: Record<string, string> = {
     admin: 'home',
     center: 'home',
+    student: 'home',
     workshops: 'workshops',
     centers: 'centers',
     requests: 'requests',
@@ -30,7 +31,8 @@ const Breadcrumbs: React.FC = () => {
     teachers: 'teachers',
     assignments: 'assignments',
     sessions: 'sessions',
-    notifications: 'notifications'
+    notifications: 'notifications',
+    dashboard: 'home'
   };
 
   return (

@@ -24,6 +24,7 @@ interface Certificate {
 
 export default function StudentDashboardPage() {
     const t = useTranslations('Dashboards.student');
+    const tCommon = useTranslations('Common');
     const [user, setUser] = useState<User | null>(null);
     const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [loading, setLoading] = useState(true);
@@ -40,23 +41,18 @@ export default function StudentDashboardPage() {
         const fetchCertificates = async () => {
             try {
                 const api = getApi();
-                // We use the student's ID directly as students may be related via another mapping.
-                // Assuming the backend endpoint exists to get certificates by studentId
-                // If the user object doesn't have studentId, we'd need to fetch student details.
-                // Assuming `/api/certificates/my-certificates` uses the token to find the student
-                // Note: The API endpoint logic might need refinement depending on actual auth setup.
                 const res = await api.get('/certificates/my-certificates');
                 setCertificates(res.data);
             } catch (err) {
                 console.error("Error fetching certificates:", err);
-                toast.error("Could not load your certificates at this time.");
+                toast.error(tCommon('loading_error'));
             } finally {
                 setLoading(false);
             }
         };
 
         fetchCertificates();
-    }, [router]);
+    }, [router, tCommon]);
 
     if (loading || !user) {
         return <Loading fullScreen message={t('loading')} />;
@@ -83,7 +79,9 @@ export default function StudentDashboardPage() {
                              {certificates.map(cert => (
                                  <div key={`${cert.studentId}-${cert.assignmentId}`} className="border-2 border-gray-100 p-6 flex flex-col justify-between hover:border-[#00426B] transition-colors">
                                      <div>
-                                         <span className="text-[10px] font-black text-[#4197CB] uppercase tracking-widest bg-blue-50 px-2 py-1 inline-block mb-3">WORKSHOP</span>
+                                         <span className="text-[10px] font-black text-[#4197CB] uppercase tracking-widest bg-blue-50 px-2 py-1 inline-block mb-3">
+                                            {tCommon('badges.workshop')}
+                                         </span>
                                          <h4 className="font-black text-[#00426B] leading-tight mb-2 uppercase">{cert.assignment?.workshop?.title}</h4>
                                          <p className="text-xs text-gray-500 mb-6">{t('duration')}: {cert.assignment?.workshop?.durationHours}h</p>
                                      </div>

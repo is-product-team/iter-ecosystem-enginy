@@ -101,7 +101,7 @@ export default function CenterDashboard() {
                       className={`text-[11px] font-medium px-4 py-2 border ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}
                     >
                       {new Date(phase.startDate).toLocaleDateString(
-                        locale === 'ca' ? 'ca-ES' : 'es-ES',
+                        locale === 'ca' ? 'ca-ES' : locale === 'ar' ? 'ar-SA' : locale === 'en' ? 'en-GB' : 'es-ES',
                         { day: 'numeric', month: 'short' }
                       )}
                     </div>

@@ -20,6 +20,8 @@ interface Phase {
 
 export default function PhaseManagementPage() {
   const { user, loading: authLoading } = useAuth();
+  const t = useTranslations('Admin.Phases');
+  const tc = useTranslations('Common');
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<number | null>(null);
@@ -37,7 +39,7 @@ export default function PhaseManagementPage() {
   };
 
   useEffect(() => {
-    if (user && user.role.name === 'ADMIN') {
+    if (user && user.role.name === ROLES.ADMIN) {
       fetchPhases();
     }
   }, [user]);
@@ -49,9 +51,9 @@ export default function PhaseManagementPage() {
       const api = getApi();
       await api.put(`/phases/${id}`, { isActive: !currentActive });
       await fetchPhases();
-      toast.success("Phase activated successfully.");
+      toast.success(t('success_activate'));
     } catch (error) {
-      toast.error("Error updating the phase.");
+      toast.error(t('error_activate'));
     } finally {
       setUpdating(null);
     }
@@ -62,18 +64,20 @@ export default function PhaseManagementPage() {
       const api = getApi();
       await api.put(`/phases/${id}`, { [field]: value });
       setPhases(prev => prev.map(f => f.phaseId === id ? { ...f, [field]: value } : f));
-      toast.success("Date updated.");
+      toast.success(t('success_date'));
     } catch (error) {
-      toast.error("Error updating the date.");
+      toast.error(t('error_date'));
     }
   };
 
-  if (authLoading || !user || user.role.name !== 'ADMIN') return null;
+  if (authLoading || !user || user.role.name !== ROLES.ADMIN) {
+    return <Loading fullScreen message={tc('authenticating')} />;
+  }
 
   return (
     <DashboardLayout
-      title="Program Roadmap"
-      subtitle="Management and control of the academic phases"
+      title={t('roadmap_title')}
+      subtitle={t('roadmap_subtitle')}
     >
       <div className="w-full pb-20 space-y-12">
         {/* Institutional Notice */}
@@ -82,16 +86,15 @@ export default function PhaseManagementPage() {
             <Clock className="w-6 h-6 text-consorci-darkBlue dark:text-text-primary" strokeWidth={1.5} />
           </div>
           <div className="flex-1">
-            <h3 className="text-[13px] font-medium text-text-muted mb-2 uppercase tracking-wider">Temporal Control System</h3>
+            <h3 className="text-[13px] font-medium text-text-muted mb-2 uppercase tracking-wider">{t('institutional_notice_title')}</h3>
             <p className="text-[15px] text-text-primary font-medium leading-relaxed max-w-3xl">
-              Phases dictate the available tools for coordinators. 
-              Activating a phase shifts the entire platform context for all educational centers.
+              {t('institutional_notice_desc')}
             </p>
           </div>
         </div>
 
         {loading ? (
-          <Loading message="Synchronizing roadmap..." />
+          <Loading message={t('loading_roadmap')} />
         ) : (
           <div className="space-y-8">
             {phases.sort((a, b) => a.order - b.order).map((phase) => (
@@ -120,12 +123,12 @@ export default function PhaseManagementPage() {
                             {phase.isActive ? (
                               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-consorci-darkBlue/5 border border-consorci-darkBlue/20 text-consorci-darkBlue text-[11px] font-medium uppercase tracking-wider">
                                 <CheckCircle2 className="w-3 h-3" />
-                                Currently Active
+                                {t('currently_active')}
                               </div>
                             ) : (
                               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-background-subtle border border-border-subtle text-text-muted text-[11px] font-medium uppercase tracking-wider">
                                 <AlertCircle className="w-3 h-3" />
-                                Inactive
+                                {t('inactive')}
                               </div>
                             )}
                           </div>
@@ -141,7 +144,7 @@ export default function PhaseManagementPage() {
                       <div className="space-y-3">
                         <label className="flex items-center gap-2 text-[11px] font-medium text-text-muted uppercase tracking-widest">
                           <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
-                          Opening Date
+                          {t('opening_date')}
                         </label>
                         <input
                           type="date"
@@ -153,7 +156,7 @@ export default function PhaseManagementPage() {
                       <div className="space-y-3">
                         <label className="flex items-center gap-2 text-[11px] font-medium text-text-muted uppercase tracking-widest">
                           <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
-                          Closing Date
+                          {t('closing_date')}
                         </label>
                         <input
                           type="date"
@@ -179,15 +182,15 @@ export default function PhaseManagementPage() {
                         ? (
                           <div className="flex items-center justify-center gap-3">
                             <Loading size="mini" white />
-                            Processing...
+                            {t('processing')}
                           </div>
                         )
-                        : (phase.isActive ? 'Active' : 'Activate Phase')
+                        : (phase.isActive ? t('active') : t('activate_phase'))
                       }
                     </button>
                     {!phase.isActive && (
                       <p className="mt-4 text-[10px] text-text-muted font-medium text-center italic opacity-60">
-                        Activation overrides the current program state
+                        {t('activation_hint')}
                       </p>
                     )}
                   </div>

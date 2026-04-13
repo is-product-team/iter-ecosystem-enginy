@@ -145,7 +145,7 @@ export default function CalendarPage() {
 
               <div className="space-y-10">
                 <div className="space-y-6">
-                  <span className="block text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] opacity-60">Activitats</span>
+                  <span className="block text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] opacity-60">{tc('activities')}</span>
                   
                   <div className="flex items-start gap-5 group cursor-default">
                     <div>

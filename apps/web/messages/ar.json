@@ -80,7 +80,24 @@
     "Phases": {
       "title": "مراحل الدورة",
       "description": "ضبط التواريخ وحالة مراحل الدورة.",
-      "control_panel": "لوحة التحكم الزمنية"
+      "control_panel": "لوحة التحكم الزمنية",
+      "roadmap_title": "خارطة طريق البرنامج",
+      "roadmap_subtitle": "إدارة والتحكم في المراحل الأكاديمية",
+      "institutional_notice_title": "نظام التحكم الزمني",
+      "institutional_notice_desc": "تحدد المراحل الأدوات المتاحة للمنسقين. يؤدي تفعيل المرحلة إلى تغيير سياق المنصة بالكامل لجميع المراكز التعليمية.",
+      "loading_roadmap": "جاري مزامنة خارطة الطريق...",
+      "currently_active": "نشط حالياً",
+      "inactive": "غير نشط",
+      "opening_date": "تاريخ الافتتاح",
+      "closing_date": "تاريخ الإغلاق",
+      "activate_phase": "تفعيل المرحلة",
+      "active": "نشط",
+      "processing": "جاري المعالجة...",
+      "activation_hint": "التفعيل يلغي الحالة الحالية للبرنامج",
+      "success_activate": "تم تفعيل المرحلة بنجاح.",
+      "error_activate": "خطأ في تحديث المرحلة.",
+      "success_date": "تم تحديث التاريخ.",
+      "error_date": "خطأ في تحديث التاريخ."
     },
     "Stats": {
       "title": "الإحصائيات",
@@ -121,7 +138,9 @@
       "success_tetris": "اكتمل التعيين: {count} تعيينات جديدة.",
       "error_tetris": "خطأ في تشغيل التعيين التلقائي: ",
       "success_update": "تم تحديث الطلب بنجاح.",
-      "error_update": "خطأ في تحديث الطلب."
+      "error_update": "خطأ في تحديث الطلب.",
+      "students_label": "طلاب",
+      "observations_placeholder": "اكتب ملاحظات إضافية هنا..."
     },
     "Verifications": {
       "title": "التحقق من المستندات",
@@ -358,6 +377,7 @@
     "profile": "الملف الشخصي",
     "logout": "خروج",
     "educational_center": "المركز التعليمي",
+    "activities": "أنشطة",
     "workshops": "ورش ورش",
     "centers": "مراكز",
     "requests": "طلبات",
@@ -412,12 +432,23 @@
     "details": "تفاصيل",
     "status": "الحالة",
     "loading_error": "تعذر تحميل المعلومات",
+    "error_connectivity": "خطأ في الاتصال. يرجى التحقق مما إذا كان الخادم نشطًا.",
     "delete_success": "تم حذف العنصر بنجاح.",
     "delete_error": "حدث خطأ أثناء حذف العنصر.",
     "delete_confirm_title": "تأكيد الحذف",
     "delete_confirm_msg": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذه الخطوة.",
-    "new": "جديد"
-  },
+    "new": "جديد",
+    "system_default": "افتراضي النظام",
+    "select_language": "اختار اللغة",
+    "badges": {
+      "workshop": "ورشة",
+      "pending": "معلق",
+      "completed": "مكتمل",
+      "need_eval": "يحتاج تقييم",
+      "will_certify": "سيتم الاعتماد",
+      "no_cert": "بدون اعتماد"
+    }
+    },
   "Calendar": {
     "loading_auth": "جاري مزامنة تقويمك...",
     "title": "تقويم Iter",
@@ -568,7 +599,8 @@
   },
   "Metadata": {
     "title": "Iter Web",
-    "description": "تطبيق Iter ويب لإدارة التعلم."
+    "description": "تطبيق Iter ويب لإدارة التعلم.",
+    "logo_alt": "شعار Iter"
   },
   "Profile": {
     "title": "ملفي الشخصي",
@@ -586,7 +618,12 @@
       "light": "فاتح",
       "dark": "داكن",
       "system": "النظام"
-    }
+    },
+    "platform_settings": "إعدادات المنصة",
+    "language": "اللغة",
+    "coming_soon": "الميزة ستتوفر قريباً",
+    "sync_success": "تم إنشاء رمز المزامنة بنجاح",
+    "sync_error": "فشل في إنشاء رمز المزامنة"
   },
   "Navigation": {
     "home": "الرئيسية",

@@ -80,7 +80,24 @@
     "Phases": {
       "title": "Course Phases",
       "description": "Configure the dates and status of the course phases.",
-      "control_panel": "Temporal Control Panel"
+      "control_panel": "Temporal Control Panel",
+      "roadmap_title": "Program Roadmap",
+      "roadmap_subtitle": "Management and control of the academic phases",
+      "institutional_notice_title": "Temporal Control System",
+      "institutional_notice_desc": "Phases dictate the available tools for coordinators. Activating a phase shifts the entire platform context for all educational centers.",
+      "loading_roadmap": "Synchronizing roadmap...",
+      "currently_active": "Currently Active",
+      "inactive": "Inactive",
+      "opening_date": "Opening Date",
+      "closing_date": "Closing Date",
+      "activate_phase": "Activate Phase",
+      "active": "Active",
+      "processing": "Processing...",
+      "activation_hint": "Activation overrides the current program state",
+      "success_activate": "Phase activated successfully.",
+      "error_activate": "Error updating the phase.",
+      "success_date": "Date updated.",
+      "error_date": "Error updating the date."
     },
     "Stats": {
       "title": "Statistics",
@@ -121,7 +138,9 @@
       "success_tetris": "Assignment completed: {count} new assignments.",
       "error_tetris": "Error executing automatic assignment: ",
       "success_update": "Request updated successfully.",
-      "error_update": "Error updating the request."
+      "error_update": "Error updating the request.",
+      "students_label": "STUDENTS",
+      "observations_placeholder": "Write additional observations here..."
     },
     "Verifications": {
       "title": "Document Verification",
@@ -159,6 +178,10 @@
       "success_unvalidate": "Validation removed",
       "error_validate": "Error validating document",
       "error_load": "Could not load assignments",
+      "bulk_selection": "{count} documents selected",
+      "bulk_approve_btn": "APPROVE ALL",
+      "success_bulk_approve": "{count} documents approved successfully",
+      "error_bulk_approve": "Error in bulk approval",
       "doc_names": {
         "agreement": "Agreement",
         "mobility": "Mobility",
@@ -357,6 +380,7 @@
     "profile": "Profile",
     "logout": "Log Out",
     "educational_center": "Educational center",
+    "activities": "Activities",
     "workshops": "Workshops",
     "centers": "Centers",
     "requests": "Requests",
@@ -419,11 +443,28 @@
     "details": "Details",
     "status": "Status",
     "loading_error": "Could not load information",
+    "error_connectivity": "Connection error. Please check if the server is active.",
     "delete_success": "Item deleted successfully.",
     "delete_error": "An error occurred while deleting the item.",
     "delete_confirm_title": "Confirm deletion",
     "delete_confirm_msg": "Are you sure you want to delete this item? This action cannot be undone.",
-    "new": "New"
+    "new": "New",
+    "system_default": "System Default",
+    "select_language": "Select Language",
+    "roles": {
+      "ADMIN": "Administrator",
+      "COORDINATOR": "Coordinator",
+      "TEACHER": "Teacher",
+      "STUDENT": "Student"
+    },
+    "badges": {
+      "workshop": "WORKSHOP",
+      "pending": "PENDING",
+      "completed": "COMPLETED",
+      "need_eval": "NEED EVAL",
+      "will_certify": "WILL CERTIFY",
+      "no_cert": "NO CERT"
+    }
   },
   "Calendar": {
     "loading_auth": "Syncing your calendar...",
@@ -575,7 +616,8 @@
   },
   "Metadata": {
     "title": "Iter Web",
-    "description": "Iter web application for learning management."
+    "description": "Iter web application for learning management.",
+    "logo_alt": "Iter Logo"
   },
   "Profile": {
     "title": "My Profile",
@@ -593,7 +635,12 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
-    }
+    },
+    "platform_settings": "Platform Settings",
+    "language": "Language",
+    "coming_soon": "Feature coming soon",
+    "sync_success": "Sync token generated successfully",
+    "sync_error": "Failed to generate sync token"
   },
   "Navigation": {
     "home": "Home",
@@ -990,6 +1037,9 @@
     "apple_btn": "Add to Apple / Outlook",
     "copy_btn": "Copy iCal link",
     "copy_success": "Link copied to clipboard",
+    "token_regenerated": "Sync token regenerated",
+    "token_error": "Failed to generate token",
+    "obtaining_data": "Obtaining sync data...",
     "instructions_title": "How does it work?",
     "instructions_step1": "Click one of the buttons above to open your calendar application.",
     "instructions_step2": "If you prefer to do it manually, copy the iCal link and paste it as a 'URL Subscription' in your app.",

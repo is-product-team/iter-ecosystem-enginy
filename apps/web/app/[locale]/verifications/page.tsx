@@ -78,7 +78,7 @@ export default function DocumentVerificationPage() {
   });
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
+    if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
       router.push(`/${locale}/login`);
       return;
     }
@@ -196,11 +196,11 @@ export default function DocumentVerificationPage() {
         const batch = selectedDocs.slice(i, i + batchSize);
         await Promise.all(batch.map(doc => assignmentService.validateDocument(doc.enrollmentId, doc.field, true)));
       }
-      toast.success(t('success_bulk_approve', { count: selectedDocs.length }) || `Aprobados ${selectedDocs.length} documentos`);
+      toast.success(t('success_bulk_approve', { count: selectedDocs.length }));
       setSelectedDocs([]);
       loadData();
     } catch (error) {
-      toast.error(t('error_bulk_approve') || 'Error en la aprobación masiva');
+      toast.error(t('error_bulk_approve') || 'Error');
     } finally {
       setLoading(false);
     }
@@ -241,9 +241,9 @@ export default function DocumentVerificationPage() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2.5 bg-background-subtle border border-border-subtle font-medium text-[13px] outline-none min-w-[200px]"
           >
-            <option value="all">{t('all_statuses') || 'Todos los estados'}</option>
-            <option value="pending">{t('pending_validation') || 'Pendientes'}</option>
-            <option value="validated">{t('fully_validated') || 'Validados'}</option>
+            <option value="all">{t('all_statuses')}</option>
+            <option value="pending">{t('pending_validation')}</option>
+            <option value="validated">{t('fully_validated')}</option>
           </select>
         </div>
 
@@ -260,7 +260,7 @@ export default function DocumentVerificationPage() {
                     className="w-4 h-4 border-border-subtle rounded-none accent-consorci-darkBlue cursor-pointer"
                   />
                 </th>
-                <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-wider w-[25%]">{t('table_student') || 'Alumno'}</th>
+                <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-wider w-[25%]">{t('table_student')}</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-wider w-[25%]">{t('table_center_workshop')}</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-wider w-[40%]">{t('table_docs')}</th>
                 <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-wider w-[60px] text-right">{tc('actions')}</th>
@@ -366,7 +366,7 @@ export default function DocumentVerificationPage() {
               ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-20 text-center">
-                    <div className="text-text-muted text-[13px] font-medium italic opacity-60 italic">{tc('no_results') || 'No se han encontrado resultados'}</div>
+                    <div className="text-text-muted text-[13px] font-medium italic opacity-60 italic">{tc('no_results')}</div>
                   </td>
                 </tr>
               )}
@@ -380,7 +380,7 @@ export default function DocumentVerificationPage() {
           onPageChange={setCurrentPage}
           totalItems={filteredEnrollments.length}
           currentItemsCount={paginatedEnrollments.length}
-          itemName={tc('students') || 'alumnos'}
+          itemName={tc('students').toLowerCase()}
         />
       </div>
 
@@ -424,7 +424,7 @@ export default function DocumentVerificationPage() {
                                 : 'bg-green-600 text-white hover:bg-black shadow-lg shadow-green-500/20'
                             }`}
                           >
-                            {doc.valid ? t('btn_unvalidate') || 'Deshacer' : t('btn_validate') || 'Validar Ahora'}
+                            {doc.valid ? t('btn_unvalidate') : t('btn_validate')}
                           </button>
                           <button 
                             onClick={(e) => { e.stopPropagation(); handleOpenNotification(selectedRow, doc.id); }}
@@ -458,7 +458,7 @@ export default function DocumentVerificationPage() {
                   </div>
                 ) : (
                   <div className="py-12 border-2 border-dashed border-border-subtle text-center">
-                    <p className="text-[12px] font-medium text-text-muted opacity-40 italic">{t('doc_not_uploaded') || 'Documento no subido'}</p>
+                    <p className="text-[12px] font-medium text-text-muted opacity-40 italic">{t('doc_not_uploaded')}</p>
                   </div>
                 )}
               </div>
