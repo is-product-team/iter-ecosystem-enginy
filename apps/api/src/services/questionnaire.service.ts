@@ -89,4 +89,100 @@ export class QuestionnaireService {
             learnings: recentLearnings.map(l => l.keyLearnings).filter(Boolean)
         };
     }
+
+    /**
+     * Questionnaire System Methods
+     */
+
+    async getModels() {
+        return prisma.questionnaireModel.findMany({
+            include: { questions: true }
+        });
+    }
+
+    async createModel(data: any) {
+        const { name, target, questions } = data;
+        return prisma.questionnaireModel.create({
+            data: {
+                name,
+                target,
+                questions: {
+                    create: questions
+                }
+            },
+            include: { questions: true }
+        });
+    }
+
+    async getModelById(modelId: number) {
+        return prisma.questionnaireModel.findUnique({
+            where: { modelId },
+            include: { questions: true }
+        });
+    }
+
+    async trackSubmission(assignmentId: number, target: any) {
+        // Find if a questionnaire already exists for this assignment/target
+        // Or generate a new one with a token
+        const token = Math.random().toString(36).substring(2, 15);
+        return prisma.questionnaire.create({
+            data: {
+                assignmentId,
+                target,
+                token,
+                isCompleted: false
+            }
+        });
+    }
+
+    async submitResponses(token: string, responses: any[]) {
+        const questionnaire = await prisma.questionnaire.findUnique({
+            where: { token }
+        });
+
+        if (!questionnaire) throw new Error('Questionnaire not found');
+        if (questionnaire.isCompleted) throw new Error('Already submitted');
+
+        await prisma.$transaction([
+            ...responses.map(resp => prisma.questionnaireResponse.create({
+                data: {
+                    questionnaireId: questionnaire.questionnaireId,
+                    questionId: resp.questionId,
+                    value: String(resp.value)
+                }
+            })),
+            prisma.questionnaire.update({
+                where: { questionnaireId: questionnaire.questionnaireId },
+                data: { isCompleted: true, completedAt: new Date() }
+            })
+        ]);
+
+        return { success: true };
+    }
+
+    async submitStudentSelfConsultation(data: any) {
+        return this.submitPublicSurvey(data);
+    }
+
+    async getSatisfactionMetrics() {
+        // Global metrics (reusing the aggregation logic without assignment filter)
+        const aggregations = await prisma.studentSelfConsultation.aggregate({
+            _avg: {
+                workshopClarity: true,
+                materialQuality: true,
+                learningInterest: true,
+                supportRating: true,
+                experienceRating: true,
+                teacherRating: true,
+            },
+            _count: {
+                _all: true
+            }
+        });
+
+        return {
+            globalAverages: aggregations._avg,
+            totalSubmissions: aggregations._count._all
+        };
+    }
 }

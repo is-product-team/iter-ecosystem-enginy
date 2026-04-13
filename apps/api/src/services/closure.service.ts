@@ -15,18 +15,18 @@ export class ClosureService {
       include: {
         enrollments: {
           include: {
-            evaluation: true
+            evaluations: true
           }
         }
       }
-    });
+    }) as any;
 
     if (!assignment) throw new Error('Assignment not found');
 
     // Validation: At least some students should have evaluations
     // Requirement can be stricter: ALL students must have evaluations
     const totalEnrollments = assignment.enrollments.length;
-    const evaluatedCount = assignment.enrollments.filter(e => e.evaluation).length;
+    const evaluatedCount = assignment.enrollments.filter((e: any) => e.evaluations.length > 0).length;
 
     if (evaluatedCount === 0 && totalEnrollments > 0) {
       throw new Error('No teacher evaluations found. At least one evaluation is required to close.');

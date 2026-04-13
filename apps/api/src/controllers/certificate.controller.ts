@@ -18,21 +18,21 @@ export const generateCertificates = async (req: Request, res: Response) => {
             ...result
         });
     } catch (error: any) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
+        console.error('Generation error:', error);
+        res.status(500).json({ error: error.message || 'Error generating certificates' });
     }
 };
 
+// GET: List certificates for current user or filter by student (for Admin)
 export const getMyCertificates = async (req: Request, res: Response) => {
-    const user = (req as any).user;
-    
+    const { studentId } = req.query;
+
     try {
+        const where: any = {};
+        if (studentId) where.studentId = parseInt(studentId as string);
+
         const certificates = await prisma.certificate.findMany({
-            where: {
-                student: {
-                    userId: user.userId
-                }
-            },
+            where,
             include: {
                 assignment: {
                     include: { workshop: true }
@@ -40,63 +40,14 @@ export const getMyCertificates = async (req: Request, res: Response) => {
                 student: true
             }
         });
+
         res.json(certificates);
     } catch (_error) {
         res.status(500).json({ error: 'Error obtaining certificates' });
     }
 };
 
-export const downloadCertificate = async (req: Request, res: Response) => {
-    const { assignmentId } = req.params;
-    const user = (req as any).user;
-
-    try {
-        const enrollment = await prisma.enrollment.findFirst({
-            where: {
-                assignmentId: parseInt(assignmentId as string),
-                student: {
-                    userId: user.userId
-                }
-            },
-            include: {
-                selfConsultation: true
-            }
-        });
-
-        if (!enrollment) {
-            return res.status(404).json({ error: 'Evaluation or enrollment not found for this user.' });
-        }
-
-        if (!enrollment.selfConsultation) {
-            return res.status(403).json({ 
-                error: 'SURVEY_REQUIRED', 
-                message: 'Has de completar l’enquesta de satisfacció abans de descarregar el certificat.' 
-            });
-        }
-
-        const certificate = await prisma.certificate.findUnique({
-            where: {
-                studentId_assignmentId: {
-                    studentId: enrollment.studentId,
-                    assignmentId: enrollment.assignmentId
-                }
-            }
-        });
-
-        if (!certificate) {
-            return res.status(403).json({ error: 'Certificate not issued yet. Minimum attendance might not be met.' });
-        }
-
-        const pdfBuffer = await certificateService.getCertificateForStudent(enrollment.enrollmentId);
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=certificate_${assignmentId}.pdf`);
-        res.send(Buffer.from(pdfBuffer));
-    } catch (error) {
-        console.error('Download error:', error);
-        res.status(500).json({ error: 'Could not generate certificate' });
-    }
-};
-
+// GET: Bulk download certificates in ZIP (Admin/Coordinator only)
 export const downloadBulkCertificates = async (req: Request, res: Response) => {
     const { assignmentId } = req.params;
     const user = (req as any).user;
@@ -116,6 +67,7 @@ export const downloadBulkCertificates = async (req: Request, res: Response) => {
     }
 };
 
+// GET: Aggregated analytics for an assignment (Admin/Coordinator only)
 export const getAssignmentStats = async (req: Request, res: Response) => {
     const { assignmentId } = req.params;
 

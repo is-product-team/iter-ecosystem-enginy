@@ -8,13 +8,9 @@ import fs from 'fs';
 import path from 'path';
 import { z } from 'zod';
 import { SessionService } from '../services/session.service.js';
-import { PDFService } from '../services/pdf.service.js';
-import { EvaluationService } from '../services/evaluation.service.js';
 import { ClosureService } from '../services/closure.service.js';
 
 const closureService = new ClosureService();
-const evaluationService = new EvaluationService();
-const visionService = new VisionService();
 
 // Helper to flatten enrollment docsStatus for frontend compatibility
 const flattenEnrollmentDocs = (enrollment: any) => {
@@ -30,7 +26,6 @@ const flattenEnrollmentDocs = (enrollment: any) => {
   };
 };
 
-const MIN_ATTENDANCE_PERCENTAGE = 80;
 
 // Schema for bulk attendance update
 const AttendanceUpdateSchema = z.array(z.object({

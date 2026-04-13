@@ -87,14 +87,13 @@ export const submitPublicSurvey = async (req: Request, res: Response) => {
         const result = await prisma.studentSelfConsultation.create({
             data: {
                 enrollmentId: enrollment.enrollmentId,
-                taskPunctuality: surveyData.taskPunctuality || 10,
-                respectForMaterial: surveyData.respectForMaterial || 10,
+                workshopClarity: surveyData.workshopClarity || 10,
+                materialQuality: surveyData.materialQuality || 10,
                 learningInterest: surveyData.learningInterest || 10,
-                resolutionAutonomy: surveyData.resolutionAutonomy || 10,
+                supportRating: surveyData.supportRating || 10,
                 experienceRating: surveyData.experienceRating || 10,
                 teacherRating: surveyData.teacherRating || 10,
                 vocationalImpact: surveyData.vocationalImpact || 'SI',
-                personalImprovements: surveyData.personalImprovements,
                 keyLearnings: surveyData.keyLearnings,
             }
         });

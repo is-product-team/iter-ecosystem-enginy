@@ -7,7 +7,6 @@ import { getUser, User } from '@/lib/auth';
 import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService, { Assignment, Enrollment } from '@/services/assignmentService';
-import studentService, { Student } from '@/services/studentService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';

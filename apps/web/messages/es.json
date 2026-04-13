@@ -187,10 +187,13 @@
       "assignments_name": "talleres",
       "evaluations": "EVALUACIONES DOCENTES",
       "action_close": "Cerrar y Certificar",
+      "action_stats": "Estadísticas",
+      "action_download": "Descargar Certificados",
       "closed_status": "Taller Certificado",
       "closure_success": "Taller cerrado y certificados emitidos correctamente.",
       "closure_error": "Error al cerrar el taller. Revisa las evaluaciones pendientes.",
       "modal_title": "Confirmar Cierre de Ciclo",
+      "stats_modal_title": "Monitorización de Calidad",
       "evaluations_status": "Estado de Evaluaciones",
       "certificates_to_be_issued": "Certificados a Emitir",
       "missing_evaluations_warning": "Atención: Faltan {count} evaluaciones docentes. El cierre es posible, pero estos alumnos podrían no recibir el certificado correctamente.",
@@ -627,7 +630,7 @@
         "phase2": "Fase 2",
         "phase3": "Fase 3"
       }
-    },
+    }
   },
   "Forms": {
     "search": "Buscar...",
@@ -967,8 +970,8 @@
     "title": "Página no encontrada",
     "description": "Lo sentimos, pero la página que estás buscando no existe o ha sido movida.",
     "goHome": "Volver al inicio"
-  }
-  ,  "Common": {
+  },
+  "Common": {
     "general": "General",
     "configuration": "Configuración",
     "global": "Global",

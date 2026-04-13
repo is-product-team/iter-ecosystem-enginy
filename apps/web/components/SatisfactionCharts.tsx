@@ -102,20 +102,20 @@ export default function SatisfactionCharts({ data }: { data: StatsData }) {
             {/* Recent Learnings / Comments */}
             <div className="lg:col-span-2 bg-white border-2 border-gray-100 p-8 shadow-sm">
                 <h3 className="text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] mb-8 border-l-4 border-[#00426B] pl-4">
-                    Feedback Directe de l'Alumnat
+                    Feedback Directe de l&apos;Alumnat
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.learnings.length > 0 ? (
                         data.learnings.map((text, i) => (
                             <div key={i} className="bg-gray-50 p-6 border border-gray-100 relative">
-                                <span className="absolute top-2 right-4 text-4xl text-gray-200 font-serif leading-none italic">"</span>
+                                <span className="absolute top-2 right-4 text-4xl text-gray-200 font-serif leading-none italic">&quot;</span>
                                 <p className="text-[13px] font-medium text-gray-600 line-clamp-4 italic">
                                     {text}
                                 </p>
                             </div>
                         ))
                     ) : (
-                        <p className="text-xs text-gray-400 text-center col-span-full py-12">Encara no s'han rebut comentaris detallats.</p>
+                        <p className="text-xs text-gray-400 text-center col-span-full py-12">Encara no s&apos;han rebut comentaris detallats.</p>
                     )}
                 </div>
             </div>
