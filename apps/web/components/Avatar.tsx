@@ -3,15 +3,15 @@
 interface AvatarProps {
   url?: string | null;
   name: string;
-  id: string | number;
-  type: 'student' | 'user';
+  id?: string | number;
+  type?: 'student' | 'user';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   isCoordinator?: boolean;
   email?: string | null;
 }
 
-export default function Avatar({ url, name, size = 'md', className = '', isCoordinator, email }: AvatarProps) {
+export default function Avatar({ url, name, id, type, size = 'md', className = '', isCoordinator, email }: AvatarProps) {
   const sizeClasses = {
     xs: 'w-6 h-6 text-[8px]',
     sm: 'w-8 h-8 text-[10px]',
@@ -29,7 +29,7 @@ export default function Avatar({ url, name, size = 'md', className = '', isCoord
   const showPhoto = fullUrl && !isAdmin;
 
   return (
-    <div className={`relative shrink-0 overflow-hidden bg-background-subtle text-text-primary flex items-center justify-center font-medium ${currentSize} ${className}`}>
+    <div className={`relative shrink-0 overflow-hidden bg-background-subtle text-text-primary flex items-center justify-center font-medium keep-rounded ${currentSize} ${className}`}>
       {showPhoto ? (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img 

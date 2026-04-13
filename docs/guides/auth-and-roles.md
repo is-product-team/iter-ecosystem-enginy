@@ -38,4 +38,4 @@ To test the application locally, use the following credentials. All accounts sha
 ---
 
 > [!TIP]
-> If you need to refresh these users, run `docker compose exec setup npm run db:seed --filter=api`.
+> If you need to refresh these users, run `docker compose exec setup npm run db:seed --filter=@iter/api`.

@@ -4,13 +4,30 @@
       "title": "Inicio de Sesión",
       "subtitle": "Bienvenido de nuevo. Por favor, introduce tus credenciales para acceder a la plataforma.",
       "email": "Correo electrónico",
-      "email_placeholder": "tu_correo@ejemplo.com",
+      "email_placeholder": "example@example.com",
       "password": "Contraseña",
       "password_placeholder": "••••••••",
+      "tagline": "ecosistema de ingeniería y gestión educativa",
       "submit": "Iniciar Sesión",
       "loading": "Verificando credenciales...",
       "error": "Correo o contraseña incorrectos. Inténtalo de nuevo.",
-      "no_account": "¿No tienes cuenta? Contacta con tu centro.",
+      "no_account_link": "¿No tienes cuenta? Infórmate aquí",
+      "register_info": {
+        "title": "¿Cómo obtener acceso?",
+        "coordinator": {
+          "title": "Coordinación",
+          "desc": "Contacta con coordinacio@iter.cat para dar de alta tu centro en la plataforma."
+        },
+        "admin": {
+          "title": "Administración",
+          "desc": "Ponte en contacto con el equipo del proyecto para la gestión global."
+        },
+        "teacher": {
+          "title": "Profesorado",
+          "desc": "Gestiona tus sesiones e incidencias directamente desde la App de profesores."
+        },
+        "back": "Volver al inicio de sesión"
+      },
       "forgot_password": "¿Has olvidado la contraseña?",
       "access_mobile": "Acceso vía App Móvil",
       "teacher_mobile_hint": "Como profesor, debes utilizar la aplicación móvil Iter para gestionar tus sesiones.",
@@ -135,6 +152,14 @@
       "success_unvalidate": "Validación eliminada",
       "error_validate": "Error al validar el documento",
       "error_load": "No se han podido cargar las asignaciones",
+      "all_statuses": "Todos los estados",
+      "pending_validation": "Pendientes de validación",
+      "fully_validated": "Completamente validados",
+      "table_student": "Alumno",
+      "btn_validate": "Validar Ahora",
+      "btn_unvalidate": "Deshacer",
+      "doc_not_uploaded": "Documento no subido",
+      "success_bulk_approve": "Se han aprobado {count} documentos correctamente",
       "doc_names": {
         "agreement": "Acuerdo",
         "mobility": "Movilidad",
@@ -151,7 +176,9 @@
         "mobility": "Autorización de Movilidad",
         "image": "Derechos de Imagen",
         "all": "Toda la documentación"
-      }
+      },
+      "bulk_selection": "{count} documentos seleccionados",
+      "bulk_approve_btn": "APROBAR TODO"
     }
   },
   "Center": {
@@ -216,7 +243,12 @@
       "form_surnames": "Apellidos",
       "form_idalu": "Código IDALU",
       "form_course": "Curso / Nivel (Ej: 4º ESO)",
-      "save_btn": "Guardar alumno"
+      "save_btn": "Guardar alumno",
+      "selection_drawer": {
+        "title": "Registro Nominal",
+        "selected": "Seleccionados: {count} / {total}",
+        "search_placeholder": "Buscar por nombre o IDALU..."
+      }
     },
     "Sessions": {
       "title": "Planificación de Sesiones",
@@ -318,88 +350,6 @@
         "no_incidents": "No hay incidencias reportadas."
       }
     }
-  },
-  "Common": {
-    "general": "General",
-    "configuration": "Configuración",
-    "global": "Global",
-    "phase": "Fase",
-    "loading": "Cargando...",
-    "module_closed": "Módulo cerrado",
-    "loading_calendar": "Cargando calendario...",
-    "home": "Inicio",
-    "notifications": "Avisos",
-    "calendar": "Calendario",
-    "profile": "Perfil",
-    "logout": "Salir",
-    "educational_center": "Centro educativo",
-    "workshops": "Talleres",
-    "centers": "Centros",
-    "requests": "Solicitudes",
-    "phases": "Fases",
-    "students": "Alumnos",
-    "teachers": "Profesores",
-    "assignments": "Asignaciones",
-    "sessions": "Sesiones",
-    "uploading": "Subiendo...",
-    "validating_ai": "Validando (IA)...",
-    "force_manual_upload": "Forzar subida manual",
-    "change": "Cambiar",
-    "attach": "Adjuntar",
-    "document_validated": "Documento validado",
-    "view_document": "Ver documento",
-    "pending": "Pendiente",
-    "authenticating": "Autenticando...",
-    "upload_success": "{label} subido correctamente.",
-    "error_upload": "Error al subir el documento.",
-    "only_pdf_allowed": "Solo se permiten archivos PDF.",
-    "ai_mismatch": "La IA detecta un tipo diferente: {type}.",
-    "ai_no_signatures": "La IA no ha detectat las firmas requeridas.",
-    "ai_error": "Error al procesar la IA. Puedes forzar la subida.",
-    "showing": "Mostrando",
-    "of": "de",
-    "previous": "Anterior",
-    "page": "Página",
-    "next": "Siguiente",
-    "all_sectors": "Todos los sectores",
-    "all_modalities": "Todas las modalidades",
-    "all_centers": "Todos los centros",
-    "search_placeholder": "Ex: Carpintería, Robótica...",
-    "clear_filters": "Limpiar filtros",
-    "no_results": "No se han encontrado resultados",
-    "try_other_terms": "Prueba con otros términos de búsqueda.",
-    "search_by_title": "Buscar por título",
-    "filter_by_sector": "Filtrar por sector",
-    "filter_by_modality": "Filtrar por modalidad",
-    "actions": "Acciones",
-    "edit": "Editar",
-    "delete": "Eliminar",
-    "save": "Guardar",
-    "confirm": "Confirmar",
-    "cancel": "Cancelar",
-    "modality_label": "Modalidad {modality}",
-    "places_label": "{count} Plazas",
-    "duration_label": "{hours}h",
-    "id_label": "ID: {id}",
-    "status_label": "Estado: {status}",
-    "save_success": "Operación realizada correctamente.",
-    "error_loading": "Error al cargar los datos.",
-    "fill_all_fields": "Por favor, completa todos los campos.",
-    "ok": "De acuerdo",
-    "show": "Mostrar",
-    "hide": "Ocultar",
-    "table_info": "Información",
-    "table_idalu": "IDALU",
-    "table_course": "Curso",
-    "clear": "Limpiar",
-    "details": "Detalles",
-    "status": "Estado",
-    "loading_error": "No se ha podido cargar la información",
-    "delete_success": "Elemento eliminado correctamente.",
-    "delete_error": "Se ha producido un error al eliminar el elemento.",
-    "delete_confirm_title": "Confirmar eliminación",
-    "delete_confirm_msg": "¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer.",
-    "new": "Nuevo"
   },
   "Calendar": {
     "loading_auth": "Sincronizando tu calendario...",
@@ -882,26 +832,49 @@
     "send_error": "Error al enviar la solicitud.",
     "select_btn": "Seleccionar",
     "selected_label": "Seleccionado",
-    "edit_btn": "Editar"
+    "edit_btn": "Editar",
+    "duration": "Duración",
+    "max_students": "Plazas Máx.",
+    "description": "Descripción del Taller",
+    "workshop_details": "Información Técnica",
+    "status_pending": "Pendiente",
+    "status_approved": "Aprobado",
+    "status_rejected": "Rechazado",
+    "click_to_edit": "Haz clic para editar"
   },
-  "AssignmentDetailPage": {
+  "AssignmentWorkshopsPage": {
     "title_prefix": "GESTIÓN DEL TALLER: ",
     "modality_prefix": "MODALIDAD ",
     "referent_label": "Equipo Docente Referente",
     "center_label": "Centro Educativo",
     "students_title": "Alumnado Participante",
     "students_subtitle": "{occupied} de {total} plazas ocupadas.",
-    "nominal_register_btn": "Registro Nominal",
+    "select_students_btn": "Seleccionar Alumnos",
+    "table_info": "Alumno / Información",
     "no_students": "Aún no hay alumnos asignados",
-    "no_students_hint": "Haz clic aquí para comenzar el registro nominal",
     "remove_student_success": "Alumno eliminado correctamente.",
     "loading_msg": "Cargando detalles del taller...",
     "status": {
-      "DATA_ENTRY": "PENDIENTE GESTIÓN",
       "PROVISIONAL": "PROVISIONAL",
+      "PUBLISHED": "PUBLICADO",
+      "DATA_ENTRY": "PENDIENTE GESTIÓN",
+      "DATA_SUBMITTED": "DATOS ENVIADOS",
       "VALIDATED": "CONFIRMADO",
+      "READY_TO_START": "LISTO PARA EMPEZAR",
+      "VACANT": "VACANTE",
       "IN_PROGRESS": "EN EJECUCIÓN",
-      "COMPLETED": "FINALIZADO"
+      "COMPLETED": "FINALIZADO",
+      "CANCELLED": "CANCELADO",
+      "provisional": "Provisional",
+      "published": "Publicado",
+      "data_entry": "Pendiente gestión",
+      "data_submitted": "Datos enviados",
+      "validated": "Confirmado",
+      "ready_to_start": "Listo para empezar",
+      "vacant": "Vacante",
+      "in_progress": "En ejecución",
+      "completed": "Finalizado",
+      "cancelled": "Cancelado"
     },
     "docs": {
       "pedagogical_agreement": "Acuerdo Pedagógico",
@@ -925,6 +898,97 @@
       "pending_evals_error": "No se puede cerrar la asignación. Hay {count} evaluaciones pendientes.",
       "success": "¡Taller cerrado y certificados generados correctamente!",
       "error": "Error al cerrar el taller."
+    },
+    "Monitoring": {
+      "no_assignments": "No hay talleres activos en ejecución por ahora."
+    },
+    "ia_matcher_btn": "IA Matcher",
+    "ia_matcher_close_btn": "Cerrar IA Matcher",
+    "bulk_upload": {
+      "title": "Subida Masiva Inteligente",
+      "subtitle": "Arrastra tus PDFs aquí y la IA los asignará automáticamente",
+      "processing": "Procesando documentos con IA...",
+      "success": "Procesados: {count} documentos correctamente.",
+      "error": "{count} documentos no han podido procesarse."
     }
+  },
+  "Sync": {
+    "title": "Sincronizar",
+    "modal_title": "Lleva tu calendario a todas partes",
+    "modal_subtitle": "Sincroniza tus sesiones e hitos de Iter con tu aplicación de calendario favorita.",
+    "google_btn": "Añadir a Google Calendar",
+    "apple_btn": "Añadir a Apple / Outlook",
+    "copy_btn": "Copiar enlace iCal",
+    "copy_success": "Enlace copiado al portapapeles",
+    "instructions_title": "¿Cómo funciona?",
+    "instructions_step1": "Haz clic en uno de los botones superiores para abrir tu aplicación de calendario.",
+    "instructions_step2": "Si prefieres hacerlo manualmente, copia el enlace iCal y pégalo como 'Suscripción por URL' en tu aplicación.",
+    "instructions_privacy": "Este enlace es privado y contiene tu agenda personal. No lo compartas.",
+    "regenerate_btn": "Generar nuevo enlace",
+    "regenerate_confirm": "¿Si generas un nuevo enlace, el anterior dejará de funcionar en todas tus aplicaciones. ¿Quieres continuar?",
+    "close": "Cerrar"
+  },
+  "Services": {
+    "Risk": {
+      "alert_title": "Alerta: Riesgo de Abandono",
+      "alert_message": "Identificado un nivel de riesgo del {score}%. Factores principales: {factors}. Se recomienda intervención pedagógica inmediata.",
+      "factors": {
+        "absences": "Alto volumen de ausencias recientes",
+        "occasional": "Ausencias ocasionales registradas",
+        "lates": "Problemas persistentes de puntualidad",
+        "low_competency": "{count} evaluaciones de competencia bajas"
+      }
+    },
+    "Vision": {
+      "error_format": "Formato de archivo no soportado. Por favor, sube PDF o imágenes.",
+      "error_empty": "El documento parece estar vacío (menos de 1KB).",
+      "error_signature": "Firma manuscrita no detectada en la región esperada.",
+      "error_unavailable": "El motor de visión de IA local no está disponible actualmente."
+    },
+    "AutoAssignment": {
+      "no_requests": "No se encontraron solicitudes para procesar.",
+      "success": "Asignados {count} estudiantes al Centro {center} para el Taller {workshop}"
+    }
+  },
+  "NotFound": {
+    "title": "Página no encontrada",
+    "description": "Lo sentimos, pero la página que estás buscando no existe o ha sido movida.",
+    "goHome": "Volver al inicio"
+  }
+  ,  "Common": {
+    "general": "General",
+    "configuration": "Configuración",
+    "global": "Global",
+    "phase": "Fase",
+    "loading": "Cargando...",
+    "module_closed": "Módulo cerrado",
+    "loading_calendar": "Cargando calendario...",
+    "home": "Inicio",
+    "notifications": "Alertas",
+    "calendar": "Calendario",
+    "profile": "Perfil",
+    "logout": "Cerrar Sesión",
+    "educational_center": "Centro educativo",
+    "workshops": "Talleres",
+    "centers": "Centros",
+    "requests": "Solicitudes",
+    "phases": "Fases",
+    "students": "Alumnos",
+    "teachers": "Profesores",
+    "assignments": "Asignaciones",
+    "sessions": "Sesiones",
+    "uploading": "Subiendo...",
+    "validating_ai": "Validando (IA)...",
+    "force_manual_upload": "Forzar subida manual",
+    "change": "Cambiar",
+    "attach": "Adjuntar",
+    "document_validated": "Documento validado",
+    "view_document": "Ver documento",
+    "pending": "Pendiente",
+    "authenticating": "Verificando credenciales...",
+    "search": "Buscar...",
+    "actions": "Acciones",
+    "ok": "Aceptar",
+    "cancel": "Cancelar"
   }
 }

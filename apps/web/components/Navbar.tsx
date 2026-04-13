@@ -9,6 +9,9 @@ import { ROLES } from '@iter/shared';
 import notificationService from '@/services/notificationService';
 import { useEffect, useState } from 'react';
 
+import logoImg from '../public/logo.png';
+import logoInversImg from '../public/logo-invers.png';
+
 const Navbar: React.FC = () => {
   const t = useTranslations('Navigation');
   const commonT = useTranslations('Common');
@@ -61,14 +64,14 @@ const Navbar: React.FC = () => {
           <div className="flex items-center">
             <Link href={getHomePath()} className="flex items-center">
               <Image 
-                src="/logo.png" 
+                src={logoImg} 
                 alt="Iter Logo" 
                 width={40}
                 height={40}
                 className="w-10 h-10 object-contain block dark:hidden" 
               />
               <Image 
-                src="/logo-invers.png" 
+                src={logoInversImg} 
                 alt="Iter Logo" 
                 width={40}
                 height={40}

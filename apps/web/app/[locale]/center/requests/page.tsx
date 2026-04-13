@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
@@ -121,7 +121,7 @@ export default function RequestsPage() {
     setError(null);
   };
 
-  const cancelEdit = () => {
+  const closeModal = () => {
     setEditingRequestId(null);
     setSelectedWorkshopId(null);
     setStudentsAprox('');
@@ -131,6 +131,10 @@ export default function RequestsPage() {
     setError(null);
   };
 
+  const cancelEdit = () => {
+    closeModal();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedWorkshopId || !selectedWorkshop) return;
@@ -138,11 +142,7 @@ export default function RequestsPage() {
     setSubmitting(true);
     setError(null);
 
-    if (selectedWorkshop.modality === 'C' && studentsAprox !== '' && Number(studentsAprox) > 4) {
-      setError(t('max_students_alert'));
-      setSubmitting(false);
-      return;
-    }
+
 
     if (!teacher1Id || !teacher2Id) {
       setError(t('referents_required'));
@@ -194,13 +194,14 @@ export default function RequestsPage() {
   }
 
   return (
-    <DashboardLayout
+    <>
+      <DashboardLayout
       title={t('title')}
       subtitle={t('subtitle')}
     >
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Left Section: Catalog */}
-        <div className="flex-1 space-y-6">
+      <div className="space-y-6 animate-in fade-in duration-500">
+        {/* Catalog Section */}
+        <div className="space-y-6">
           {/* Filter Bar */}
           <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row gap-6 items-center">
             <div className="relative flex-1 group w-full">
@@ -229,10 +230,11 @@ export default function RequestsPage() {
           <div className="bg-background-surface border border-border-subtle overflow-hidden">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary w-12 text-center">Mod</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Workshop / Sector</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">Status / Action</th>
+                <tr className="bg-background-subtle border-b border-border-subtle uppercase tracking-wider">
+                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary w-16 text-center">{t('table_mod')}</th>
+                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary">{t('table_workshop')}</th>
+                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary hidden md:table-cell">{t('table_referents')}</th>
+                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary text-right">{t('table_status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle">
@@ -248,74 +250,96 @@ export default function RequestsPage() {
                     const isSelected = selectedWorkshopId === workshop._id;
 
                     return (
-                      <tr
-                        key={workshop._id}
-                        onClick={() => {
-                          if (!existingRequest && !editingRequestId) {
-                            setSelectedWorkshopId(isSelected ? null : workshop._id);
-                          }
-                        }}
-                        className={`group transition-colors ${existingRequest && existingRequest.status !== REQUEST_STATUSES.PENDING && !isSelected
-                          ? 'opacity-60 cursor-default'
-                          : isSelected
-                            ? 'bg-background-subtle cursor-pointer border-l-2 border-l-consorci-darkBlue'
-                            : (!existingRequest && !editingRequestId)
-                              ? 'hover:bg-background-subtle cursor-pointer border-l-2 border-l-transparent'
-                              : 'cursor-default border-l-2 border-l-transparent'
+                      <React.Fragment key={workshop._id}>
+                        <tr
+                          onClick={() => {
+                            if (existingRequest && existingRequest.status === REQUEST_STATUSES.PENDING) {
+                              handleEdit(existingRequest);
+                            } else {
+                              setSelectedWorkshopId(isSelected ? null : workshop._id);
+                            }
+                          }}
+                          className={`group transition-colors border-l-2 cursor-pointer ${
+                            isSelected
+                              ? 'bg-background-subtle border-l-consorci-darkBlue'
+                              : 'hover:bg-background-subtle border-l-transparent hover:border-l-consorci-lightBlue'
                           }`}
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-4">
-                            <div className={`w-8 h-8 flex items-center justify-center font-medium text-[11px] shrink-0 ${workshop.modality === 'A' ? 'bg-green-500/10 text-green-600' :
-                              workshop.modality === 'B' ? 'bg-orange-500/10 text-orange-600' :
-                                'bg-purple-500/10 text-purple-600'
-                              }`}>
-                              {workshop.modality}
-                            </div>
-                            <WorkshopIcon iconName={workshop.icon} className="w-5 h-5 text-text-primary" />
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="font-medium text-text-primary text-[14px] leading-tight mb-1">{workshop.title}</div>
-                          <div className="text-[11px] font-medium text-text-muted">{workshop.sector}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          {existingRequest && (
-                            <>
-                              <div className="text-xs font-medium text-gray-700">1. {existingRequest.teacher1?.name}</div>
-                              <div className="text-xs font-medium text-gray-700">2. {existingRequest.teacher2?.name || '-'}</div>
-                            </>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {existingRequest ? (
-                            existingRequest.status === REQUEST_STATUSES.PENDING ? (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEdit(existingRequest);
-                                }}
-                                className="text-[11px] font-medium border border-border-subtle px-3 py-1 text-text-primary hover:bg-background-subtle transition-colors"
-                              >
-                                Edit request
-                              </button>
-                            ) : (
-                              <span className={`text-[11px] font-medium border px-2 py-1 tracking-tight ${existingRequest.status === REQUEST_STATUSES.APPROVED
-                                ? 'border-green-500/20 bg-green-500/5 text-green-600'
-                                : 'border-red-500/20 bg-red-500/5 text-red-600'
+                        >
+                          <td className="px-6 py-5">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-10 h-10 flex items-center justify-center font-bold text-[12px] shrink-0 border ${workshop.modality === 'A' ? 'bg-green-500/5 text-green-600 border-green-500/20' :
+                                workshop.modality === 'B' ? 'bg-orange-500/5 text-orange-600 border-orange-500/20' :
+                                  'bg-purple-500/5 text-purple-600 border-purple-500/20'
                                 }`}>
-                                {existingRequest.status}
-                              </span>
-                            )
-                          ) : isSelected ? (
-                            <span className="text-[11px] font-medium border border-consorci-darkBlue px-2 py-1 text-consorci-darkBlue bg-background-subtle">Selected</span>
-                          ) : (
-                            !editingRequestId && (
-                              <span className="text-[11px] font-medium text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">Select</span>
-                            )
-                          )}
-                        </td>
-                      </tr>
+                                {workshop.modality}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5">
+                            <div className="flex items-start gap-4">
+                                <WorkshopIcon iconName={workshop.icon} className="w-5 h-5 text-text-primary mt-0.5 shrink-0" />
+                                <div>
+                                    <div className="font-semibold text-text-primary text-[15px] leading-tight mb-1">{workshop.title}</div>
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-text-muted">
+                                        <span className="uppercase text-text-secondary">{workshop.sector}</span>
+                                        <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
+                                        <span className="flex items-center gap-1">
+                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            {workshop.technicalDetails?.durationHours}h
+                                        </span>
+                                        <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
+                                        <span className="flex items-center gap-1">
+                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                            {workshop.technicalDetails?.maxPlaces} pax
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5 hidden md:table-cell">
+                            {existingRequest ? (
+                              <div className="flex flex-col gap-0.5">
+                                {existingRequest.teacher1Id && (
+                                  <div className="text-[12px] font-medium text-text-primary">
+                                    {teachers.find(t => t.teacherId === existingRequest.teacher1Id)?.name || t('loading_error')}
+                                  </div>
+                                )}
+                                {existingRequest.teacher2Id && (
+                                  <div className="text-[12px] font-medium text-text-primary">
+                                    {teachers.find(t => t.teacherId === existingRequest.teacher2Id)?.name || t('loading_error')}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-text-muted italic">---</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-5 text-right w-32">
+                            {existingRequest ? (
+                              <div className="flex flex-col items-end justify-center">
+                                <span className={`text-[10px] font-bold border px-3 py-1.5 tracking-widest uppercase font-sans ${
+                                  existingRequest.status === REQUEST_STATUSES.APPROVED
+                                    ? 'border-green-500/30 bg-green-500/5 text-green-500'
+                                    : existingRequest.status === REQUEST_STATUSES.PENDING
+                                      ? 'border-orange-500/30 bg-orange-500/5 text-orange-500'
+                                      : 'border-red-500/30 bg-red-500/5 text-red-500'
+                                }`}>
+                                  {existingRequest.status === REQUEST_STATUSES.PENDING ? t('status_pending') : 
+                                   existingRequest.status === REQUEST_STATUSES.APPROVED ? t('status_approved') : 
+                                   t('status_rejected')}
+                                </span>
+                              </div>
+                            ) : isSelected ? (
+                              <div className="flex items-center justify-end gap-2 text-consorci-darkBlue font-bold text-[11px] uppercase tracking-tight font-sans">
+                                <span>{t('selected_label')}</span>
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                              </div>
+                            ) : null}
+                          </td>
+                        </tr>
+
+
+                      </React.Fragment>
                     );
                   })
                 ) : (
@@ -337,157 +361,178 @@ export default function RequestsPage() {
             itemName={t('table_workshop')}
           />
         </div>
+      </div>
+      </DashboardLayout>
 
-        {/* Right Section: Form Sidebar */}
-        <div className="w-full lg:w-96">
-          <div className="bg-background-surface border border-border-subtle sticky top-8">
-            <div className="p-8 border-b border-border-subtle bg-background-subtle flex justify-between items-center">
-              <h3 className="text-[14px] font-medium text-text-primary flex items-center gap-3">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                {editingRequestId ? t('edit_request') : t('new_request')}
-              </h3>
-              {editingRequestId && (
-                <button
-                  onClick={cancelEdit}
-                  className="text-[11px] text-text-muted hover:text-red-500 font-medium"
-                >
-                  {t('cancel_btn')}
-                </button>
-              )}
-            </div>
+      {/* Workshop Solicitation Modal - Flat Sharp Look with Backdrop Blur */}
+      {(() => {
+        const workshopForModal = filteredWorkshops.find(w => w._id === selectedWorkshopId);
+        const existingRequestForModal = requests.find(r => r.workshopId === parseInt(selectedWorkshopId || "0"));
+        
+        if (!workshopForModal) return null;
 
-            <div className="p-8">
-              {error && (
-                <div className="mb-8 p-4 bg-red-500/5 border-l-2 border-red-500 text-red-600">
-                  <p className="text-[12px] font-medium mb-1 flex items-center gap-2">
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
-                    {t('error_title')}
-                  </p>
-                  <p className="text-[13px] opacity-90">{error}</p>
+        return (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop with Blur */}
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              onClick={closeModal}
+            ></div>
+            
+            {/* Modal Card - Sharp, No Shadow, Flat */}
+            <div className="relative w-full max-w-5xl bg-background-surface border border-border-subtle flex flex-col max-h-[90vh]">
+              {/* Header */}
+              <div className="px-8 py-6 border-b border-border-subtle bg-background-subtle flex justify-between items-center shrink-0">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-lg font-bold text-text-primary leading-tight uppercase tracking-tight font-sans">{workshopForModal.title}</h3>
+                  <p className="text-xs font-semibold text-text-secondary uppercase tracking-widest font-sans">{workshopForModal.sector}</p>
                 </div>
-              )}
-
-              {!selectedWorkshop ? (
-                <div className="text-center py-16 border border-dashed border-border-subtle bg-background-subtle/20">
-                  <div className="w-12 h-12 bg-background-subtle flex items-center justify-center mx-auto mb-4 border border-border-subtle">
-                    <svg className="w-6 h-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-                    </svg>
+                
+                <div className="flex items-center gap-6">
+                  <div className={`px-4 py-1.5 flex items-center justify-center font-bold text-[10px] tracking-widest border border-current font-sans ${workshopForModal.modality === 'A' ? 'text-green-500' :
+                    workshopForModal.modality === 'B' ? 'text-orange-500' :
+                      'text-purple-500'
+                    }`}>
+                    MODALIDAD {workshopForModal.modality}
                   </div>
-                  <p className="text-[12px] font-medium text-text-muted px-8">
-                    Select a workshop from the catalog to start your request
-                  </p>
+                  <button 
+                    onClick={closeModal}
+                    className="p-2 text-text-muted hover:text-text-primary transition-colors border border-transparent hover:border-border-subtle"
+                  >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  {/* Selected Workshop Info */}
-                  <div className="bg-background-subtle border border-border-subtle p-5">
-                    <div className="flex justify-between items-start mb-3">
-                      <span className="text-[10px] font-medium bg-consorci-darkBlue/10 text-consorci-darkBlue px-2 py-0.5 border border-consorci-darkBlue/20">MOD {selectedWorkshop.modality}</span>
-                      {!editingRequestId && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedWorkshopId(null)}
-                          className="text-text-muted hover:text-consorci-darkBlue transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                      )}
+              </div>
+
+              <div className="flex flex-col lg:flex-row overflow-y-auto">
+                {/* Left Panel: Info */}
+                <div className="lg:w-2/5 p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-border-subtle bg-background-subtle/30">
+                  <div className="space-y-10">
+                    <div>
+                      <h4 className="text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4 border-b border-border-subtle pb-2 inline-block">{t('workshop_details')}</h4>
+                      <p className="text-[15px] leading-relaxed text-text-secondary italic">
+                        {workshopForModal.technicalDetails?.description || "No description available."}
+                      </p>
                     </div>
-                    <h4 className="font-medium text-[15px] leading-snug text-consorci-darkBlue">{selectedWorkshop.title}</h4>
-                    <p className="text-[11px] font-medium text-text-muted mt-1 uppercase tracking-tight">{selectedWorkshop.sector}</p>
-                  </div>
 
-                  {/* Form Fields */}
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <label className="block text-[12px] font-medium text-text-primary px-1">Referring Teachers</label>
-                      <div className="space-y-2">
-                        <select
-                          value={teacher1Id}
-                          onChange={(e) => setTeacher1Id(e.target.value)}
-                          className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-5 p-5 border border-border-subtle bg-background-surface">
+                        <svg className="w-5 h-5 text-consorci-darkBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <div>
+                          <div className="text-[10px] uppercase font-bold text-text-muted mb-1">{t('duration')}</div>
+                          <div className="text-sm font-bold text-text-primary">{tCommon('duration_label', { hours: workshopForModal.technicalDetails?.durationHours || 0 })}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-5 p-5 border border-border-subtle bg-background-surface">
+                        <svg className="w-5 h-5 text-consorci-darkBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        <div>
+                          <div className="text-[10px] uppercase font-bold text-text-muted mb-1">{t('max_students')}</div>
+                          <div className="text-sm font-bold text-text-primary">{tCommon('places_label', { count: workshopForModal.technicalDetails?.maxPlaces || 0 })}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Panel: Form */}
+                <div className="lg:w-3/5 p-8 lg:p-10 bg-background-surface">
+                  <h4 className="text-[11px] font-bold text-text-muted uppercase tracking-widest mb-8 border-b border-border-subtle pb-2 inline-block">
+                    {editingRequestId ? t('edit_request') : t('new_request')}
+                  </h4>
+
+                  {error && (
+                    <div className="mb-6 p-4 border border-red-500/20 bg-red-500/5 text-red-600 font-bold text-sm tracking-tight capitalize">
+                      {error}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest">{t('referents_label')}</label>
+                        <div className="space-y-2">
+                          <select
+                            value={teacher1Id}
+                            onChange={(e) => setTeacher1Id(e.target.value)}
+                            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
+                            required
+                          >
+                            <option value="">{t('referent1_placeholder')}</option>
+                            {teachers.map(t => (
+                              <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={teacher2Id}
+                            onChange={(e) => setTeacher2Id(e.target.value)}
+                            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
+                            required
+                          >
+                            <option value="">{t('referent2_placeholder')}</option>
+                            {teachers.map(t => (
+                              <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest">{t('num_students_label')}</label>
+                        <input
+                          type="number"
+                          value={studentsAprox}
+                          onChange={(e) => setStudentsAprox(e.target.value === '' ? '' : parseInt(e.target.value))}
+                          placeholder={t('num_students_placeholder')}
+                          className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none font-sans"
+                          min="1"
                           required
-                        >
-                          <option value="">Select main referent *</option>
-                          {teachers.map(t => (
-                            <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
-                          ))}
-                        </select>
-                        <select
-                          value={teacher2Id}
-                          onChange={(e) => setTeacher2Id(e.target.value)}
-                          className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
-                          required
-                        >
-                          <option value="">Select second referent *</option>
-                          {teachers.map(t => (
-                            <option key={t.teacherId} value={t.teacherId}>{t.name}</option>
-                          ))}
-                        </select>
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      <label className="block text-[12px] font-medium text-text-primary px-1">Approx. Students</label>
-                      <input
-                        type="number"
-                        value={studentsAprox}
-                        onChange={(e) => setStudentsAprox(e.target.value === '' ? '' : parseInt(e.target.value))}
-                        placeholder="Ex: 4"
-                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
-                        min="1"
-                        max={selectedWorkshop.modality === 'C' ? 4 : 100}
-                        required
-                      />
-                      {selectedWorkshop.modality === 'C' && (
-                        <p className="mt-2 text-[11px] text-orange-600 font-medium italic bg-orange-500/5 p-2 border border-orange-200/30">
-                          * Maximum 4 students in Modality C.
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-3">
-                      <label className="block text-[12px] font-medium text-text-primary px-1">Reason for request</label>
+                      <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest">{t('reason_label')}</label>
                       <textarea
                         value={comments}
                         onChange={(e) => setComments(e.target.value)}
-                        placeholder="Brief explanation of student profile..."
-                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none min-h-[100px] resize-none appearance-none"
+                        placeholder={t('reason_placeholder')}
+                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none min-h-[120px] resize-none appearance-none"
                       />
                     </div>
-                  </div>
 
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className={`w-full py-4 font-medium text-[13px] flex items-center justify-center gap-3 transition-all ${submitting
-                      ? 'bg-background-subtle text-text-muted cursor-not-allowed'
-                      : 'bg-consorci-darkBlue text-white hover:bg-black active:scale-[0.98]'
-                      }`}
-                  >
-                    {submitting ? (
-                      <>
-                        <Loading size="mini" white />
-                        <span>Processing request...</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={editingRequestId ? "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" : "M12 19l9 2-9-18-9 18 9-2zm0 0v-8"} />
-                        </svg>
-                        <span>{editingRequestId ? t('update_btn') : t('send_btn')}</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              )}
+                    <div className="flex justify-end gap-10 pt-8 border-t border-border-subtle mt-10">
+                      <button
+                        type="button"
+                        onClick={cancelEdit}
+                        className="text-[11px] font-bold text-text-muted hover:text-text-primary uppercase tracking-[0.3em] transition-all"
+                      >
+                        {t('cancel_btn')}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className={`px-12 py-4 font-bold text-[11px] uppercase tracking-[0.3em] transition-all border ${submitting
+                          ? 'bg-background-subtle text-text-muted border-border-subtle cursor-not-allowed'
+                          : 'bg-consorci-darkBlue text-white border-consorci-darkBlue hover:bg-black hover:border-black'
+                          }`}
+                      >
+                        {submitting ? (
+                          <>
+                            <Loading size="mini" white />
+                            <span>{t('processing')}</span>
+                          </>
+                        ) : (
+                          <span>{editingRequestId ? t('update_btn') : t('send_btn')}</span>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </DashboardLayout>
+        );
+      })()}
+    </>
   );
 }

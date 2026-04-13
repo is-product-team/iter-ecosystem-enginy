@@ -1,0 +1,20 @@
+id: fix-phase-2-syntax-and-stability
+status: proposed
+created_at: '2026-04-10T08:35:00Z'
+updated_at: '2026-04-10T08:35:00Z'
+title: Fix Phase 2 Syntax and Stability
+description: Resolve 500 errors, syntax errors, and merge conflicts introduced during Phase 2 restructuring to ensure a stable coordinator workflow.
+author: antigravity
+artifacts:
+  - id: proposal
+    status: done
+    path: proposal.md
+  - id: design
+    status: done
+    path: design.md
+  - id: tasks
+    status: done
+    path: tasks.md
+apply:
+  requires:
+    - tasks

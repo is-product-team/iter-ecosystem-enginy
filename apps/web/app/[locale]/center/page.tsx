@@ -6,13 +6,14 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
-
+import Loading from '@/components/Loading';
 
 import phaseService, { Phase } from '@/services/phaseService';
 
 export default function CenterDashboard() {
   const t = useTranslations('Center');
   const tc = useTranslations('Common');
+  const tNav = useTranslations('Navigation');
   const locale = useLocale();
   const { user, loading: authLoading } = useAuth();
   const [phases, setPhases] = useState<Phase[]>([]);
@@ -31,7 +32,7 @@ export default function CenterDashboard() {
         const data = await phaseService.getAll();
         setPhases(data);
       } catch (error) {
-        console.error("Error fetching phases:", error);
+        console.error('Error fetching phases:', error);
       } finally {
         setLoadingPhases(false);
       }
@@ -43,16 +44,12 @@ export default function CenterDashboard() {
   }, [user]);
 
   const isPhaseActive = (phaseName: string) => {
-    const phase = phases.find(f => f.name === phaseName);
+    const phase = phases.find((f) => f.name === phaseName);
     return phase ? phase.isActive : false;
   };
 
   if (authLoading || !user) {
-    return (
-      <div className="flex min-h-screen justify-center items-center bg-background-page">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-consorci-darkBlue mx-auto"></div>
-      </div>
-    );
+    return <Loading fullScreen message={tc('authenticating')} />;
   }
 
   return (
@@ -62,51 +59,60 @@ export default function CenterDashboard() {
     >
       <div className="w-full pb-20 space-y-12">
         {/* Institutional Section Timeline */}
-      <section className="bg-background-surface border border-border-subtle p-12 mb-12 relative overflow-hidden">
+        <section className="bg-background-surface border border-border-subtle p-12 mb-12 relative overflow-hidden">
 
-        <h3 className="text-[12px] font-medium text-text-muted mb-8 text-center tracking-widest uppercase">
-          {t('dashboard.status_title')}
-        </h3>
+          <h3 className="text-[12px] font-medium text-text-muted mb-8 text-center tracking-widest uppercase">
+            {t('dashboard.status_title')}
+          </h3>
 
-        <div className="relative pt-4">
-          {/* Connector line */}
-          <div className="absolute top-10 left-0 w-full h-[2px] bg-gray-100 hidden md:block z-0"></div>
+          <div className="relative pt-4">
+            {/* Connector line */}
+            <div className="absolute top-10 left-0 w-full h-[2px] bg-gray-100 hidden md:block z-0"></div>
 
-          <div className="flex flex-col md:flex-row justify-between items-start gap-y-12 gap-x-8">
-            {loadingPhases ? (
-              <div className="w-full py-8 text-center text-[12px] font-medium text-text-muted">{tc('loading_calendar')}</div>
-            ) : (
-              phases.map((phase) => (
-                <div key={phase.phaseId} className="relative flex flex-col items-center text-center flex-1 group">
-                  {/* Square with number */}
-                  <div
-                    className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border transition-all ${phase.isActive
-                      ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
-                      : 'bg-background-surface text-text-muted border-border-subtle'
-                      }`}
-                  >
-                    <span className="text-base font-medium">
-                      {phase.order}
-                    </span>
-                  </div>
-
-                  {/* Name and Date */}
-                  <h4 className={`text-[12px] font-medium tracking-tight mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue font-medium' : 'text-text-muted'}`}>
-                    {phase.name}
-                  </h4>
-
-                  <div className={`text-[11px] font-medium px-4 py-2 border ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}>
-                    {new Date(phase.startDate).toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { day: 'numeric', month: 'short' })}
-                  </div>
+            <div className="flex flex-col md:flex-row justify-between items-start gap-y-12 gap-x-8">
+              {loadingPhases ? (
+                <div className="w-full py-8 text-center text-[12px] font-medium text-text-muted">
+                  {tc('loading_calendar')}
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
+              ) : (
+                phases.map((phase) => (
+                  <div
+                    key={phase.phaseId}
+                    className="relative flex flex-col items-center text-center flex-1 group"
+                  >
+                    {/* Square with number */}
+                    <div
+                      className={`w-12 h-12 flex items-center justify-center mb-6 z-10 border transition-all ${phase.isActive
+                          ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue'
+                          : 'bg-background-surface text-text-muted border-border-subtle'
+                        }`}
+                    >
+                      <span className="text-base font-medium">{phase.order}</span>
+                    </div>
 
-      {/* Direct Access - edubcn Style Cards */}
-      <div className="flex justify-center w-full pb-12">
+                    {/* Name and Date */}
+                    <h4
+                      className={`text-[12px] font-medium tracking-tight mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue font-medium' : 'text-text-muted'}`}
+                    >
+                      {phase.name}
+                    </h4>
+
+                    <div
+                      className={`text-[11px] font-medium px-4 py-2 border ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}
+                    >
+                      {new Date(phase.startDate).toLocaleDateString(
+                        locale === 'ca' ? 'ca-ES' : 'es-ES',
+                        { day: 'numeric', month: 'short' }
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
+              {/* Direct Access - edubcn Style Cards */}      <div className="flex justify-center w-full pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
           {[
             {
@@ -137,7 +143,7 @@ export default function CenterDashboard() {
               title: t('Assignments.title'),
               text: t('Assignments.description'),
               icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01",
-              path: "/center/assignments",
+              path: `/${locale}/center/assignments`,
               active: isPhaseActive(PHASES.PLANNING),
               phase: `${tc('phase')} 2`
             },
@@ -146,6 +152,14 @@ export default function CenterDashboard() {
               text: t('Sessions.description'),
               icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
               path: `/${locale}/center/sessions`,
+              active: isPhaseActive(PHASES.EXECUTION),
+              phase: `${tc('phase')} 3`
+            },
+            {
+              title: tNav('monitoring'),
+              text: t('Monitoring.subtitle'),
+              icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
+              path: `/${locale}/center/monitoring`,
               active: isPhaseActive(PHASES.EXECUTION),
               phase: `${tc('phase')} 3`
             },

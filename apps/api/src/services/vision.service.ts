@@ -48,30 +48,34 @@ export class VisionService {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: this.model,
-                    prompt: "Verifica si este documento tiene una firma manuscrita. ¿Hay una firma en el recuadro de firma? Responde con 'YES' o 'NO' y proporciona una puntuación de confianza de 0 a 1.",
+                    prompt: `Analiza este documento oficial de Iter Ecosystem.
+                    1. ¿Contiene las firmas manuscritas necesarias en la parte inferior?
+                    2. Responde estrictamente en formato JSON: {"hasSignature": boolean, "confidence": number, "reason": string}.
+                    Busca firmas en el recuadro de 'Firma del Coordinador', 'Firma del Alumno' y 'Firma Tutor'.`,
                     images: [base64Image],
-                    stream: false
+                    stream: false,
+                    format: 'json'
                 })
             });
 
             if (!response.ok) throw new Error('Ollama vision connection failed');
 
             const data = await response.json() as any;
-            const textResponse = data.response.toUpperCase();
+            const aiResult = JSON.parse(data.response);
 
-            const hasSignature = textResponse.includes('YES');
+            const hasSignature = aiResult.hasSignature;
             
             if (!hasSignature) {
-                errors.push("Firma manuscrita no detectada en la región esperada.");
+                errors.push(aiResult.reason || "Firma manuscrita no detectada en la región esperada.");
             }
 
             return {
                 valid: errors.length === 0,
                 errors,
                 metadata: {
-                    detectedType: 'Pedagogical_Agreement_v2',
+                    detectedType: 'Iter_Document_v1',
                     hasSignature,
-                    confidence: hasSignature ? 0.95 : 0.05
+                    confidence: aiResult.confidence || 0.5
                 }
             };
 

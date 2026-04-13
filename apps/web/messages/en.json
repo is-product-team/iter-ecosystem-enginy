@@ -4,13 +4,30 @@
       "title": "Login",
       "subtitle": "Welcome back. Please enter your credentials to access the platform.",
       "email": "Email",
-      "email_placeholder": "your_email@example.com",
+      "email_placeholder": "example@example.com",
       "password": "Password",
       "password_placeholder": "••••••••",
+      "tagline": "engineering and educational management ecosystem",
       "submit": "Log In",
       "loading": "Verifying credentials...",
       "error": "Incorrect email or password. Please try again.",
-      "no_account": "Don't have an account? Contact your center.",
+      "no_account_link": "Don't have an account? Find out here",
+      "register_info": {
+        "title": "How to get access?",
+        "coordinator": {
+          "title": "Coordination",
+          "desc": "Contact coordinacio@iter.cat to register your center on the platform."
+        },
+        "admin": {
+          "title": "Administration",
+          "desc": "Get in touch with the project team for global management."
+        },
+        "teacher": {
+          "title": "Teaching Staff",
+          "desc": "Manage your sessions and incidents directly from the Teachers App."
+        },
+        "back": "Back to login"
+      },
       "forgot_password": "Forgot your password?",
       "access_mobile": "Mobile App Access",
       "teacher_mobile_hint": "As a teacher, you must use the Iter mobile application to manage your sessions.",
@@ -111,13 +128,20 @@
       "subtitle": "Verify center documentation and report status.",
       "description": "Validate documentation presented by centers (Pedagogical Agreement, Mobility, etc.).",
       "table_center_workshop": "Center / Workshop",
+      "table_student": "Student",
       "table_dates": "Dates",
-      "table_docs": "Student Documentation",
+      "table_docs": "Documents",
+      "all_statuses": "All Statuses",
+      "pending_validation": "Pending Validation",
+      "fully_validated": "Fully Validated",
+      "btn_validate": "Approve Now",
+      "btn_unvalidate": "Unvalidate",
+      "doc_not_uploaded": "Document not uploaded",
+      "preview": "Notification Preview",
       "start": "Start",
       "end": "End",
       "dates_not_defined": "Dates not defined",
       "no_students": "No enrolled students",
-      "preview": "MESSAGE PREVIEW",
       "greeting": "Greeting",
       "doc_with_error": "Document with error",
       "reason_error": "Reason for the error",
@@ -882,15 +906,25 @@
     "send_error": "Error sending the request.",
     "select_btn": "Select",
     "selected_label": "Selected",
-    "edit_btn": "Edit"
+    "edit_btn": "Edit",
+    "duration": "Duration",
+    "max_students": "Max Places",
+    "description": "Workshop Description",
+    "workshop_details": "Technical Information",
+    "status_pending": "Pending",
+    "status_approved": "Approved",
+    "status_rejected": "Rejected",
+    "click_to_edit": "Click to edit"
   },
   "AssignmentWorkshopsPage": {
+    "table_info": "Student Information",
     "title_prefix": "WORKSHOP MANAGEMENT: ",
     "modality_prefix": "MODALITY ",
     "referent_label": "Referent Teaching Team",
     "center_label": "Educational Center",
     "students_title": "Participating Students",
     "students_subtitle": "{occupied} of {total} places occupied.",
+    "select_students_btn": "Select Students",
     "nominal_register_btn": "Nominal Register",
     "no_students": "No students assigned yet",
     "no_students_hint": "Click here to start nominal registration",
@@ -944,7 +978,9 @@
     },
     "Monitoring": {
       "no_assignments": "No active workshops in execution for now."
-    }
+    },
+    "ia_matcher_btn": "IA Matcher",
+    "ia_matcher_close_btn": "Close IA Matcher"
   },
   "Sync": {
     "title": "Synchronize",
@@ -980,8 +1016,12 @@
       "error_unavailable": "Local AI vision engine is currently unavailable."
     },
     "AutoAssignment": {
-      "no_requests": "No requests found for processing.",
-      "success": "Assigned {count} students to Center {center} for Workshop {workshop}"
+      "no_requests": "No requests found for processing."
     }
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "Sorry, the page you are looking for doesn't exist or has been moved.",
+    "goHome": "Go back home"
   }
 }

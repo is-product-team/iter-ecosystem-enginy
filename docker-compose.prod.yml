@@ -1,10 +1,7 @@
 services:
   # Backend API (Producción)
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runner-api
+    image: ghcr.io/is-product-team/iter-ecosystem-enginy/api:latest
     container_name: iter_api
     restart: always
     env_file:
@@ -17,7 +14,7 @@ services:
     networks:
       - red_proxy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/iter/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"] # La API no tiene basePath /iter internamente, solo el proxy
       interval: 30s
       timeout: 10s
       retries: 3
@@ -25,12 +22,7 @@ services:
 
   # Frontend Web (Producción)
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runner-web
-      args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://projects.kore29.com/iter/api}
+    image: ghcr.io/is-product-team/iter-ecosystem-enginy/web:latest
     container_name: iter_web
     restart: always
     env_file:
@@ -41,7 +33,7 @@ services:
     networks:
       - red_proxy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/iter"] # Next.js tiene basePath: /iter
       interval: 30s
       timeout: 10s
       retries: 3

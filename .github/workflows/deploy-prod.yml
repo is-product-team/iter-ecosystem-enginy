@@ -1,0 +1,141 @@
+name: Production Deployment
+
+on:
+  workflow_dispatch: # Permite ejecución manual para probar
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/**'
+      - 'shared/**'
+      - 'package.json'
+      - 'turbo.json'
+      - 'Dockerfile'
+      - 'docker-compose.prod.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_API: ${{ github.repository }}/api
+  IMAGE_NAME_WEB: ${{ github.repository }}/web
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔑 Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Extract metadata (tags, labels) for API
+        id: meta-api
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_API }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=long
+
+      - name: 🐳 Extract metadata (tags, labels) for Web
+        id: meta-web
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_WEB }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=long
+
+      - name: 🏗️ Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          target: runner-api
+          push: true
+          tags: ${{ steps.meta-api.outputs.tags }}
+          labels: ${{ steps.meta-api.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🏗️ Build and push Web image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          target: runner-web
+          push: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://projects.kore29.com/iter/api
+          tags: ${{ steps.meta-web.outputs.tags }}
+          labels: ${{ steps.meta-web.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: [self-hosted, Linux, X64]
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔑 Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔧 Create .env from secrets
+        run: |
+          echo "${{ secrets.PROD_ENV }}" > .env
+
+      - name: 🐳 Pull latest images
+        run: docker compose -f docker-compose.prod.yml pull
+
+      - name: 🗄️ Run Migrations (Safe)
+        run: |
+          # Usamos un contenedor temporal de la imagen que acabamos de bajar
+          # Importante: El contenedor de migración necesita acceder a la base de datos
+          docker run --rm \
+            --network red_proxy \
+            --env-file .env \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_API }}:latest \
+            sh -c "echo '🔍 Sincronizando esquema de base de datos...' && npx prisma db push --schema apps/api/prisma/schema.prisma --accept-data-loss"
+
+      - name: 🚀 Restart Services
+        run: docker compose -f docker-compose.prod.yml up -d
+
+      - name: ✅ Verify Health
+        run: |
+          echo "Waiting for services to be healthy..."
+          for i in {1..20}; do
+            API_HEALTH=$(docker inspect --format='{{json .State.Health.Status}}' iter_api | tr -d '"')
+            WEB_HEALTH=$(docker inspect --format='{{json .State.Health.Status}}' iter_web | tr -d '"')
+            
+            echo "API: $API_HEALTH, Web: $WEB_HEALTH"
+            
+            if [ "$API_HEALTH" == "healthy" ] && [ "$WEB_HEALTH" == "healthy" ]; then
+              echo "✅ All services are healthy!"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "❌ Health check timed out!"
+          docker logs iter_api
+          docker compose -f docker-compose.prod.yml ps
+          exit 1
+
+      - name: 🧹 Cleanup old images
+        run: docker image prune -f

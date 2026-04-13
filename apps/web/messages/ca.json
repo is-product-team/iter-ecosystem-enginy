@@ -4,13 +4,30 @@
       "title": "Inici de Sessió",
       "subtitle": "Benvingut de nou. Si us plau, introdueix les teves credencials per accedir a la plataforma.",
       "email": "Correu electrònic",
-      "email_placeholder": "el_teu_correu@exemple.com",
+      "email_placeholder": "example@example.com",
       "password": "Contrasenya",
       "password_placeholder": "••••••••",
+      "tagline": "ecosistema d'enginyeria i gestió educativa",
       "submit": "Iniciar Sessió",
       "loading": "Verificant credencials...",
       "error": "Correu o contrasenya incorrectes. Intenta-ho de nou.",
-      "no_account": "No tens compte? Contacta amb el teu centre.",
+      "no_account_link": "No tens compte? Informa-te'n aquí",
+      "register_info": {
+        "title": "Com obtenir accés?",
+        "coordinator": {
+          "title": "Coordinació",
+          "desc": "Contacta amb coordinacio@iter.cat per donar d'alta el teu centre a la plataforma."
+        },
+        "admin": {
+          "title": "Administració",
+          "desc": "Posa't en contacte amb l'equip del projecte per a la gestió global."
+        },
+        "teacher": {
+          "title": "Professorat",
+          "desc": "Gestiona les teves sessions i incidències directament des de l'App de professors."
+        },
+        "back": "Tornar a l'inici de sessió"
+      },
       "forgot_password": "Has oblidat la contrasenya?",
       "access_mobile": "Accés via App Mòbil",
       "teacher_mobile_hint": "Com a professor, has d'utilitzar l'aplicació mòbil Iter per gestionar les teves sessions.",
@@ -62,7 +79,7 @@
     },
     "Phases": {
       "title": "Fases del Curs",
-      "description": "Configura les dates i l'estat de les fases del curs.",
+      "description": "Configura les dates i l'estat de las fases del curs.",
       "control_panel": "Panell de Control Temporal"
     },
     "Stats": {
@@ -135,6 +152,14 @@
       "success_unvalidate": "Validació eliminada",
       "error_validate": "Error en validar el document",
       "error_load": "No s'han pogut carregar les assignacions",
+      "all_statuses": "Tots els estats",
+      "pending_validation": "Pendents de validació",
+      "fully_validated": "Completament validats",
+      "table_student": "Alumne",
+      "btn_validate": "Aprovar Ara",
+      "btn_unvalidate": "Desfer",
+      "doc_not_uploaded": "Document no pujat",
+      "success_bulk_approve": "S'han aprovat {count} documents correctament",
       "doc_names": {
         "agreement": "Acord",
         "mobility": "Mobilitat",
@@ -143,7 +168,7 @@
       "greetings": {
         "morning": "Hola, bon dia",
         "afternoon": "Hola, bona tarda",
-        "evening": "Hola, bon vespre"
+        "evening": "Hola, bona nit"
       },
       "docs": {
         "select": "Selecciona document...",
@@ -151,7 +176,9 @@
         "mobility": "Autorització de Mobilitat",
         "image": "Drets d'Imatge",
         "all": "Tota la documentació"
-      }
+      },
+      "bulk_selection": "{count} documents seleccionats",
+      "bulk_approve_btn": "APROVAR TOT"
     }
   },
   "Center": {
@@ -185,9 +212,9 @@
       "change_photo": "Canviar foto de perfil",
       "photo_success": "Foto actualitzada.",
       "photo_error": "Error en pujar la foto.",
-      "no_user_photo_error": "No es pot pujar una foto a un professor sense usuari vinculat.",
+      "no_user_photo_error": "No se pot pujar una foto a un professor sense usuari vinculat.",
       "delete_title": "Eliminar Professor",
-      "delete_confirm": "Estàs segur que vols eliminar aquest professor? També se li traurà l'accés a l'App mòbil.",
+      "delete_confirm": "Estàs segur que vols eliminar aquest professor? També se li retirarà l'accés a l'App mòbil.",
       "form_name": "Nom complet",
       "form_email": "Correu de contacte",
       "password_placeholder": "Contrasenya per a l'App mòbil",
@@ -216,7 +243,12 @@
       "form_surnames": "Cognoms",
       "form_idalu": "Codi IDALU",
       "form_course": "Curs / Nivell (Ex: 4t ESO)",
-      "save_btn": "Desar alumne"
+      "save_btn": "Desar alumne",
+      "selection_drawer": {
+        "title": "Registre Nominal",
+        "selected": "Seleccionats: {count} / {total}",
+        "search_placeholder": "Cercar per nom o IDALU..."
+      }
     },
     "Sessions": {
       "title": "Planificació de Sessions",
@@ -236,7 +268,7 @@
       "session_n": "Sessió {number}",
       "no_teacher_assigned": "Cap professor assignat",
       "specific_day": "Dia Específic",
-      "whole_workshop": "Taller Sencer",
+      "whole_workshop": "Taller Complet",
       "select_workshop": "Selecciona Taller",
       "select_day": "Selecciona Dia",
       "select_teacher": "Selecciona Professor",
@@ -319,92 +351,10 @@
       }
     }
   },
-  "Common": {
-    "general": "General",
-    "configuration": "Configuració",
-    "global": "Global",
-    "phase": "Fase",
-    "loading": "Carregant...",
-    "module_closed": "Mòdul tancat",
-    "loading_calendar": "Carregant calendari...",
-    "home": "Inici",
-    "notifications": "Avisos",
-    "calendar": "Calendari",
-    "profile": "Perfil",
-    "logout": "Sortir",
-    "educational_center": "Centre educatiu",
-    "workshops": "Tallers",
-    "centers": "Centres",
-    "requests": "Sol·licituds",
-    "phases": "Fases",
-    "students": "Alumnes",
-    "teachers": "Professors",
-    "assignments": "Assignacions",
-    "sessions": "Sessions",
-    "uploading": "Pujant...",
-    "validating_ai": "Validant (IA)...",
-    "force_manual_upload": "Forçar pujada manual",
-    "change": "Canviar",
-    "attach": "Adjuntar",
-    "document_validated": "Document validat",
-    "view_document": "Veure document",
-    "pending": "Pendent",
-    "authenticating": "Autenticant...",
-    "upload_success": "{label} pujat correctament.",
-    "error_upload": "Error en pujar el document.",
-    "only_pdf_allowed": "Només es permeten fitxers PDF.",
-    "ai_mismatch": "L'IA detecta un tipus diferent: {type}.",
-    "ai_no_signatures": "L'IA no ha detectat les signatures requerides.",
-    "ai_error": "Error al processar l'IA. Pots forçar la pujada.",
-    "showing": "Mostrant",
-    "of": "de",
-    "previous": "Anterior",
-    "page": "Pàgina",
-    "next": "Següent",
-    "all_sectors": "Tots els sectors",
-    "all_modalities": "Totes les modalitats",
-    "all_centers": "Tots els centres",
-    "search_placeholder": "Ex: Fusteria, Robòtica...",
-    "clear_filters": "Netejar filtres",
-    "no_results": "No s'han trobat resultats",
-    "try_other_terms": "Prova amb altres termes de cerca.",
-    "search_by_title": "Cercar per títol",
-    "filter_by_sector": "Filtrar per sector",
-    "filter_by_modality": "Filtrar per modalitat",
-    "actions": "Accions",
-    "edit": "Editar",
-    "delete": "Eliminar",
-    "save": "Desar",
-    "confirm": "Confirmar",
-    "cancel": "Cancel·lar",
-    "modality_label": "Modalitat {modality}",
-    "places_label": "{count} Places",
-    "duration_label": "{hours}h",
-    "id_label": "ID: {id}",
-    "status_label": "Estat: {status}",
-    "save_success": "Operació realitzada correctament.",
-    "error_loading": "Error en carregar les dades.",
-    "fill_all_fields": "Si us plau, emplena tots els camps.",
-    "ok": "D'acord",
-    "show": "Mostrar",
-    "hide": "Amagar",
-    "table_info": "Informació",
-    "table_idalu": "IDALU",
-    "table_course": "Curs",
-    "clear": "Netejar",
-    "details": "Detalls",
-    "status": "Estat",
-    "loading_error": "No s'ha pogut carregar la informació",
-    "delete_success": "Element eliminat correctament.",
-    "delete_error": "S'ha produït un error en eliminar l'element.",
-    "delete_confirm_title": "Confirmar eliminació",
-    "delete_confirm_msg": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
-    "new": "Nou"
-  },
   "Calendar": {
     "loading_auth": "Sincronitzant el teu calendari...",
     "title": "Calendari Iter",
-    "subtitle": "Visualitza totes les fites, tallers i terminis en un calendari complet.",
+    "subtitle": "Visualitza tots els fites, tallers i terminis en un calendari complet.",
     "active_fase": "Fase Actual: {nom}",
     "sync_phases": "Sincronitzant fases...",
     "view_legend": "Veure Llegenda",
@@ -450,9 +400,9 @@
       "options_label": "OPCIONS (SEPARADES PER COMA)",
       "add_question": "Afegir pregunta",
       "publish": "Publicar model de qüestionari",
-      "placeholder_title": "Ex: Enquesta de Satisfacció Tallers 2026",
+      "placeholder_title": "Ex: Enquesta de Satisfaccío Tallers 2026",
       "placeholder_question": "Què vols preguntar?",
-      "placeholder_options": "Opció 1, Opció 2, Opció 3...",
+      "placeholder_options": "Opció 1, Opció 2, Opción 3...",
       "save_success": "Model de qüestionari creat correctament.",
       "save_error": "Error en crear el qüestionari.",
       "types": {
@@ -467,7 +417,7 @@
     "title": "Informes i Resultats",
     "subtitle": "Anàlisi de l'impacte del programa Iter.",
     "student_exp": "Experiència de l'Alumne",
-    "teacher_sat": "Satisfaccó del Docent",
+    "teacher_sat": "Satisfacció del Docent",
     "workshops_completed": "Tallers Completats",
     "vs_last_year": "+5% vs 2023",
     "student_part": "Participació d'Alumnes",
@@ -498,7 +448,7 @@
       },
       "sections": {
         "attitude": {
-          "title": "Actitud i Comportament",
+          "title": "Actitud i Comportamiento",
           "questions": {
             "punctuality": "Has estat puntual en l'entrega de tasques?",
             "respect": "Has respectat el material i les instal·lacions?",
@@ -518,8 +468,8 @@
           "question": "T'ha ajudat a decidir-te pel teu futur professional?",
           "options": {
             "si": "Sí, m'ha aclarit les idees.",
-            "no": "No, ja ho tenia clar o no és per mi.",
-            "considerant": "Ho estic considerant ara mateix."
+            "no": "No, ja ho tenia clar o no és per a mi.",
+            "considerant": "M'ho estic considerant ara mateix."
           }
         },
         "feedback": {
@@ -882,26 +832,49 @@
     "send_error": "Error en enviar la sol·licitud.",
     "select_btn": "Seleccionar",
     "selected_label": "Seleccionat",
-    "edit_btn": "Editar"
+    "edit_btn": "Editar",
+    "duration": "Durada",
+    "max_students": "Places Màx.",
+    "description": "Descripció del Taller",
+    "workshop_details": "Informació Tècnica",
+    "status_pending": "Pendent",
+    "status_approved": "Aprovat",
+    "status_rejected": "Rebutjat",
+    "click_to_edit": "Fes clic per a editar"
   },
-  "AssignmentDetailPage": {
+  "AssignmentWorkshopsPage": {
     "title_prefix": "GESTIÓ DEL TALLER: ",
     "modality_prefix": "MODALITAT ",
     "referent_label": "Equip Docent Referent",
     "center_label": "Centre Educatiu",
     "students_title": "Alumnat Participant",
     "students_subtitle": "{occupied} de {total} places ocupades.",
-    "nominal_register_btn": "Registre Nominal",
+    "select_students_btn": "Seleccionar Alumnes",
+    "table_info": "Alumne / Informació",
     "no_students": "Encara no hi ha alumnes assignats",
-    "no_students_hint": "Fes clic aquí per començar el registre nominal",
     "remove_student_success": "Alumne eliminat correctament.",
     "loading_msg": "Carregant detalls del taller...",
     "status": {
-      "DATA_ENTRY": "PENDENT GESTIÓ",
       "PROVISIONAL": "PROVISIONAL",
+      "PUBLISHED": "PUBLICAT",
+      "DATA_ENTRY": "PENDENT GESTIÓ",
+      "DATA_SUBMITTED": "DADES ENVIADES",
       "VALIDATED": "CONFIRMAT",
+      "READY_TO_START": "LLEST PER COMENÇAR",
+      "VACANT": "VACANT",
       "IN_PROGRESS": "EN EXECUCIÓ",
-      "COMPLETED": "FINALITZAT"
+      "COMPLETED": "FINALITZAT",
+      "CANCELLED": "CANCEL·LAT",
+      "provisional": "Provisional",
+      "published": "Publicat",
+      "data_entry": "Pendent gestió",
+      "data_submitted": "Dades enviades",
+      "validated": "Confirmat",
+      "ready_to_start": "Llest per començar",
+      "vacant": "Vacant",
+      "in_progress": "En execució",
+      "completed": "Finalitzat",
+      "cancelled": "Cancel·lat"
     },
     "docs": {
       "pedagogical_agreement": "Acord Pedagògic",
@@ -925,6 +898,97 @@
       "pending_evals_error": "No es pot tancar l'assignació. Hi ha {count} avaluacions pendents.",
       "success": "Taller tancat i certificats generats correctament!",
       "error": "Error en tancar el taller."
+    },
+    "Monitoring": {
+      "no_assignments": "No hi ha tallers actius en execució hores d'ara."
+    },
+    "ia_matcher_btn": "IA Matcher",
+    "ia_matcher_close_btn": "Tancar IA Matcher",
+    "bulk_upload": {
+      "title": "Pujada Massiva Intel·ligent",
+      "subtitle": "Arrossega els teus PDFs aquí i l'IA els assignarà automàticament",
+      "processing": "Processant documents amb l'IA...",
+      "success": "Processats: {count} documents correctament.",
+      "error": "{count} documents no s'han pogut processar."
     }
+  },
+  "Sync": {
+    "title": "Sincronizar",
+    "modal_title": "Porta el teu calendari a tot arreu",
+    "modal_subtitle": "Sincronitza les teves sessions i fites d'Iter amb la teva aplicació de calendari preferida.",
+    "google_btn": "Afegir a Google Calendar",
+    "apple_btn": "Afegir a Apple / Outlook",
+    "copy_btn": "Copiar enllaç iCal",
+    "copy_success": "Enllaç copiat al porta-retalls",
+    "instructions_title": "Com funciona?",
+    "instructions_step1": "Fes clic en un dels botons superiors per obrir la teva aplicació de calendari.",
+    "instructions_step2": "Si prefereixes fer-ho manualment, copia l'enllaç iCal i enganxa'l com a 'Subscripció per URL' en la teva aplicació.",
+    "instructions_privacy": "Aquest enllaç és privat i conté la teva agenda personal. No el comparteixis.",
+    "regenerate_btn": "Generar nou enllaç",
+    "regenerate_confirm": "Si generes un nou enllaç, l'anterior deixarà de funcionar a totes les teves aplicacions. Vols continuar?",
+    "close": "Tancar"
+  },
+  "Services": {
+    "Risk": {
+      "alert_title": "Alerta: Risc d'Abandonament",
+      "alert_message": "Identificat un nivell de risc del {score}%. Factors principals: {factors}. Es recomana intervenció pedagògica immediata.",
+      "factors": {
+        "absences": "Alt volum d'absències recents",
+        "occasional": "Absències ocasionals registrades",
+        "lates": "Problemas persistents de puntualitat",
+        "low_competency": "{count} avaluacions de competència baixes"
+      }
+    },
+    "Vision": {
+      "error_format": "Format de fitxer no suportat. Si us plau, puja PDF o imatges.",
+      "error_empty": "El document sembla estar buit (menys d'1KB).",
+      "error_signature": "Signatura manuscrita no detectada en la regió esperada.",
+      "error_unavailable": "El motor de visió d'IA local no està disponible actualment."
+    },
+    "AutoAssignment": {
+      "no_requests": "No s'han trobat sol·licituds per processar.",
+      "success": "Assignats {count} estudiants al Centre {center} per al Taller {workshop}"
+    }
+  },
+  "NotFound": {
+    "title": "Pàgina no trobada",
+    "description": "Ho sentim, però la pàgina que estàs buscant no existeix o ha estat moguda.",
+    "goHome": "Tornar a l'inici"
+  },
+  "Common": {
+    "general": "General",
+    "configuration": "Configuració",
+    "global": "Global",
+    "phase": "Fase",
+    "loading": "Carregant...",
+    "module_closed": "Mòdul tancat",
+    "loading_calendar": "Carregant calendari...",
+    "home": "Inici",
+    "notifications": "Alertes",
+    "calendar": "Calendari",
+    "profile": "Perfil",
+    "logout": "Tancar Sessió",
+    "educational_center": "Centre educatiu",
+    "workshops": "Tallers",
+    "centers": "Centres",
+    "requests": "Sol·licituds",
+    "phases": "Fases",
+    "students": "Alumnes",
+    "teachers": "Professors",
+    "assignments": "Assignacions",
+    "sessions": "Sessions",
+    "uploading": "Pujant...",
+    "validating_ai": "Validant (IA)...",
+    "force_manual_upload": "Forçar pujada manual",
+    "change": "Canviar",
+    "attach": "Adjuntar",
+    "document_validated": "Document validat",
+    "view_document": "Veure document",
+    "pending": "Pendent",
+    "authenticating": "Verificant credencials...",
+    "search": "Cerca...",
+    "actions": "Accions",
+    "ok": "D'acord",
+    "cancel": "Cancel·lar"
   }
 }

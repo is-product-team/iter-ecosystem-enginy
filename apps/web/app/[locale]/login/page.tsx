@@ -12,15 +12,19 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
+import { Building2, ShieldCheck, Smartphone, ArrowRight, ArrowLeft, X } from 'lucide-react';
+
 export default function LoginPage() {
   const t = useTranslations('Auth.login');
   const tc = useTranslations('Common');
+  const [showInfo, setShowInfo] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showProfessorLink, setShowProfessorLink] = useState(false);
+  
   const router = useRouter();
   const params = useParams();
   const locale = params?.locale || 'ca';
@@ -62,7 +66,6 @@ export default function LoginPage() {
       }
     } catch (err) {
       const errorObj = err as { message: string };
-      // Improved error messaging based on backend response or common errors
       if (errorObj.message.includes('401') || errorObj.message.toLowerCase().includes('invalid')) {
         setError(t('error'));
       } else if (errorObj.message.includes('fetch') || errorObj.message.includes('network')) {
@@ -76,34 +79,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-background-page">
-      <div className="w-full max-w-md bg-background-surface p-12 border border-border-subtle">
+    <div className="relative flex min-h-screen items-center justify-center p-6 bg-background-page selection:bg-consorci-darkBlue/10 overflow-hidden">
+      {/* Login Card */}
+      <div className="w-full max-w-[440px] bg-background-surface p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] animate-in fade-in duration-700">
+        {/* Header Section */}
         <div className="text-center mb-12">
-          <div className="w-32 h-32 bg-background-surface flex items-center justify-center mx-auto mb-6">
+          <div className="w-24 h-24 bg-background-surface flex items-center justify-center mx-auto mb-6">
             <Image
               src={logoImg}
               alt="Iter Logo"
-              width={128}
-              height={128}
+              width={100}
+              height={100}
               priority
-              className="w-full h-full object-contain block dark:hidden"
+              className="w-full h-full object-contain block dark:hidden scale-90"
             />
             <Image
               src={logoInversImg}
               alt="Iter Logo"
-              width={128}
-              height={128}
+              width={100}
+              height={100}
               priority
-              className="w-full h-full object-contain hidden dark:block"
+              className="w-full h-full object-contain hidden dark:block scale-90"
             />
           </div>
-          <h2 className="text-2xl font-medium tracking-tight text-text-primary leading-none">Iter</h2>
-          <div className="h-0.5 w-8 bg-consorci-darkBlue mx-auto mt-4"></div>
-          <p className="text-text-muted text-[12px] font-medium mt-6">Learning Management Platform</p>
+          <h2 className="text-[32px] font-semibold tracking-tighter text-text-primary mb-1">Iter</h2>
+          <p className="text-text-muted text-[13px] font-medium opacity-60 px-4">
+            {t('tagline')}
+          </p>
         </div>
 
         {error && (
-          <div className="bg-background-subtle border border-red-200/30 text-red-500 px-5 py-4 mb-8 text-xs font-medium flex items-center gap-3">
+          <div className="bg-red-50 dark:bg-red-500/5 border border-red-200/20 text-red-600 dark:text-red-400 px-5 py-4 mb-8 text-[13px] font-medium flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
@@ -112,57 +118,54 @@ export default function LoginPage() {
         )}
 
         {showProfessorLink ? (
-          <div className="bg-background-subtle p-10 text-center animate-in fade-in zoom-in duration-300 border border-border-subtle">
-            <h3 className="text-xl font-medium text-text-primary mb-4">Access via Mobile App</h3>
-            <p className="text-xs text-text-muted leading-relaxed mb-8">
+          <div className="bg-background-subtle/50 p-10 text-center border border-black/5 dark:border-white/5 animate-in fade-in zoom-in-95 duration-500">
+            <h3 className="text-xl font-semibold text-text-primary mb-4">Access via Mobile App</h3>
+            <p className="text-[13px] text-text-muted leading-relaxed mb-8 opacity-80">
               As a teacher, you must use the Iter mobile app to manage your sessions.
             </p>
             <a
               href="#"
-              className="group relative flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
+              className="group flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white text-[13px] font-bold tracking-tight hover:bg-black transition-all active:scale-[0.98]"
               onClick={(e) => { e.preventDefault(); toast.info('Download link coming soon'); }}
             >
               <span>Download Iter App</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
             </a>
             <button
               onClick={() => setShowProfessorLink(false)}
-              className="mt-8 text-[12px] font-medium text-consorci-darkBlue hover:underline transition-all"
+              className="mt-8 text-[13px] font-semibold text-consorci-darkBlue hover:underline underline-offset-4"
             >
-              ← Back to login
+              {t('back_to_login')}
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-4">
-              <label className="block text-text-primary text-[12px] font-medium px-1">{t('email')}</label>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-text-primary text-[11px] uppercase tracking-widest font-bold opacity-50 px-1">{t('email')}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-medium text-sm text-text-primary placeholder:text-text-muted outline-none"
+                className="w-full px-5 py-3.5 bg-background-subtle/30 border border-black/5 dark:border-white/5 focus:border-consorci-darkBlue/30 focus:bg-background-surface transition-all font-medium text-[15px] text-text-primary placeholder:opacity-30 outline-none"
                 placeholder={t('email_placeholder')}
                 required
               />
             </div>
 
-            <div className="space-y-4">
-              <label className="block text-text-primary text-[12px] font-medium px-1">{t('password')}</label>
+            <div className="space-y-2">
+              <label className="block text-text-primary text-[11px] uppercase tracking-widest font-bold opacity-50 px-1">{t('password')}</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-5 py-4 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:bg-background-surface transition-all font-medium text-sm text-text-primary placeholder:text-text-muted pr-12 outline-none"
+                  className="w-full px-5 py-3.5 bg-background-subtle/30 border border-black/5 dark:border-white/5 focus:border-consorci-darkBlue/30 focus:bg-background-surface transition-all font-medium text-[15px] text-text-primary placeholder:opacity-30 pr-12 outline-none"
                   placeholder={t('password_placeholder')}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-consorci-darkBlue transition-colors p-1"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-consorci-darkBlue transition-colors p-1 opacity-40 hover:opacity-100"
                 >
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -179,21 +182,95 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-consorci-darkBlue hover:bg-black text-white text-[13px] font-medium transition-all duration-300 disabled:opacity-50 active:scale-[0.98] flex items-center justify-center gap-4"
-            >
-              {loading ? (
-                <>
-                  <Loading size="sm" white message="" />
-                  <span>{t('loading')}</span>
-                </>
-              ) : t('submit')}
-            </button>
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 bg-consorci-darkBlue hover:bg-black text-white text-[13px] font-bold tracking-tight transition-all duration-300 disabled:opacity-50 active:scale-[0.98] flex items-center justify-center min-h-[52px]"
+              >
+                {loading ? (
+                  <Loading size="mini" white message="" />
+                ) : (
+                  <span>{t('submit')}</span>
+                )}
+              </button>
+            </div>
+
+            <div className="text-center pt-8 border-t border-black/[0.03] dark:border-white/[0.03]">
+              <button 
+                type="button"
+                onClick={() => setShowInfo(true)}
+                className="text-[13px] font-semibold text-text-muted hover:text-consorci-darkBlue transition-colors"
+              >
+                {t('no_account_link')}
+              </button>
+            </div>
           </form>
         )}
       </div>
+
+      {/* Info Modal */}
+      {showInfo && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/20 dark:bg-black/60 backdrop-blur-xl"
+            onClick={() => setShowInfo(false)}
+          />
+          
+          {/* Modal Card */}
+          <div className="relative w-full max-w-[860px] bg-background-surface p-10 md:p-14 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 overflow-hidden">
+            <button 
+              onClick={() => setShowInfo(false)}
+              className="absolute right-6 top-6 p-2 text-text-muted hover:text-text-primary transition-colors rounded-full hover:bg-black/5"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="text-center mb-14">
+              <h3 className="text-[28px] font-semibold tracking-tight text-text-primary mb-4">
+                {t('register_info.title')}
+              </h3>
+              <div className="h-0.5 w-12 bg-consorci-darkBlue/20 mx-auto" />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14 mb-4">
+              {/* Coordinator */}
+              <div className="flex flex-col items-center text-center group">
+                <div className="w-16 h-16 rounded-full bg-consorci-darkBlue/[0.03] dark:bg-white/[0.02] flex items-center justify-center mb-6 text-consorci-darkBlue transition-transform group-hover:scale-110 duration-500">
+                  <Building2 size={28} strokeWidth={1.5} />
+                </div>
+                <h4 className="font-bold text-[16px] mb-4 tracking-tight">{t('register_info.coordinator.title')}</h4>
+                <p className="text-[13px] leading-relaxed text-text-muted opacity-80">
+                  {t('register_info.coordinator.desc')}
+                </p>
+              </div>
+
+              {/* Admin */}
+              <div className="flex flex-col items-center text-center group">
+                <div className="w-16 h-16 rounded-full bg-consorci-darkBlue/[0.03] dark:bg-white/[0.02] flex items-center justify-center mb-6 text-consorci-darkBlue transition-transform group-hover:scale-110 duration-500">
+                  <ShieldCheck size={28} strokeWidth={1.5} />
+                </div>
+                <h4 className="font-bold text-[16px] mb-4 tracking-tight">{t('register_info.admin.title')}</h4>
+                <p className="text-[13px] leading-relaxed text-text-muted opacity-80">
+                  {t('register_info.admin.desc')}
+                </p>
+              </div>
+
+              {/* Teacher */}
+              <div className="flex flex-col items-center text-center group">
+                <div className="w-16 h-16 rounded-full bg-consorci-darkBlue/[0.03] dark:bg-white/[0.02] flex items-center justify-center mb-6 text-consorci-darkBlue transition-transform group-hover:scale-110 duration-500">
+                  <Smartphone size={28} strokeWidth={1.5} />
+                </div>
+                <h4 className="font-bold text-[16px] mb-4 tracking-tight">{t('register_info.teacher.title')}</h4>
+                <p className="text-[13px] leading-relaxed text-text-muted opacity-80">
+                  {t('register_info.teacher.desc')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
