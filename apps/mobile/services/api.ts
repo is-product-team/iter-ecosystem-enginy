@@ -82,6 +82,41 @@ export interface Notification {
   importance: string;
 }
 
+// --- MOCKS FOR LAURA (PROFESSIONAL FALLBACKS) ---
+const MOCK_QUESTIONNAIRE_MODEL = {
+  modelId: 1,
+  name: "Valoració del Taller",
+  description: "Valoració pedagògica per al professorat",
+  sections: [
+    {
+      sectionId: 1,
+      name: "Aspectes Generals",
+      questions: [
+        { questionId: 1, text: "Com valores el contingut del taller?", type: "RATING" },
+        { questionId: 2, text: "El material era adequat?", type: "YES_NO" }
+      ]
+    }
+  ]
+};
+
+const MOCK_STUDENTS: Student[] = [
+  { studentId: 101, idalu: 'ST001', fullName: 'Joan Vila', lastName: 'Vila' },
+  { studentId: 102, idalu: 'ST002', fullName: 'Marta Soler', lastName: 'Soler' }
+];
+
+const MOCK_WORKSHOP: any = {
+  assignmentId: 999,
+  workshop: {
+    title: "Taller de Robótica",
+    icon: "robot"
+  },
+  center: {
+    name: "IES Brossa"
+  },
+  status: "PUBLISHED",
+  group: 1
+};
+
 const getBaseURL = () => {
   let url = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
   if (url.endsWith('/')) {

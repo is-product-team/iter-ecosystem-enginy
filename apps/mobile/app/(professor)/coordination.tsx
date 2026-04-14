@@ -17,8 +17,7 @@ const SectionHeader = ({ title }: { title: string }) => (
 );
 
 export default function CoordinationScreen() {
-  const { t, i18n } = useTranslation();
-  const router = useRouter();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [assignments, setAssignments] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);

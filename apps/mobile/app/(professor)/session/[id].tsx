@@ -23,7 +23,7 @@ export default function SessionScreen() {
   const [sessionMode, setSessionMode] = React.useState<'ATTENDANCE' | 'WORK'>('ATTENDANCE');
   const [showSuccess, setShowSuccess] = React.useState(false);
 
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
     setLoading(true);
     try {
       // 1. Get List of Enrollments (Standardized)
@@ -49,7 +49,7 @@ export default function SessionScreen() {
             }
             setIsSubmitted(true);
         }
-      } catch (err) {
+      } catch (_err) {
         // No existing attendance
       }
 
@@ -65,12 +65,12 @@ export default function SessionScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, isSubmitted, t]);
 
   useFocusEffect(
     React.useCallback(() => {
       fetchData();
-    }, [id])
+    }, [fetchData])
   );
 
   const updateStatus = (studentId: string, status: string) => {

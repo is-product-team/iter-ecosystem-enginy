@@ -1,9 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform, Linking, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
-import { useRouter } from 'expo-router';
 import WorkshopDetailModal from './WorkshopDetailModal';
 
 export interface CalendarEvent {
@@ -24,8 +22,6 @@ interface CalendarViewProps {
 }
 
 const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMonthChange, isLoading }) => {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -72,17 +68,17 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
     }
 
     return days;
-  }, [currentDate]);
+  }, [currentDate, year]);
 
-  const getEventsForDay = (dateStr: string) => {
+  const getEventsForDay = React.useCallback((dateStr: string) => {
     return events.filter(event => {
       const eStart = event.date.split('T')[0];
       const eEnd = (event.endDate || event.date).split('T')[0];
       return dateStr >= eStart && dateStr <= eEnd;
     });
-  };
+  }, [events]);
 
-  const dayEvents = useMemo(() => getEventsForDay(selectedDate), [selectedDate, events]);
+  const dayEvents = useMemo(() => getEventsForDay(selectedDate), [selectedDate, getEventsForDay]);
 
   const getEventColor = (type: string) => {
     switch (type) {
@@ -93,16 +89,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
     }
   };
 
-  const openMaps = (address: string, label: string) => {
-    if (!address) return;
-    const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
-    const url = Platform.select({
-      ios: `${scheme}${label}@${address}`,
-      android: `${scheme}0,0?q=${address}(${label})`
-    });
-
-    if (url) Linking.openURL(url);
-  };
 
   const handleEventClick = (event: CalendarEvent) => {
     setSelectedEvent(event);

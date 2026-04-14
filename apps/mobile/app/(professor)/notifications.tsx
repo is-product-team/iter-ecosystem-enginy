@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 
 export default function NotificationsTabScreen() {
   const { t, i18n } = useTranslation();
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const [notifications, setNotifications] = React.useState<Notification[]>([]);
   const [loading, setLoading] = React.useState(true);

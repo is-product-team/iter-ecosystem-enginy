@@ -94,7 +94,7 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
             letterSpacing: 1, 
             marginBottom: 16, 
           }}>
-            Estat d'Assistència
+            Estat d&apos;Assistència
           </Text>
           <AttendanceSegmentedControl 
             currentStatus={status} 
@@ -103,7 +103,7 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
           />
         </View>
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'between', paddingTop: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons 
                     name={status === 'ABSENT' ? 'close-circle' : status === 'LATE' ? 'time' : 'checkmark-circle'} 

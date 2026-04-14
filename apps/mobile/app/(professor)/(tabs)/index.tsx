@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { THEME, ROLES } from '@iter/shared';
+import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import { getMyAssignments, getPhases, getNotifications } from '../../../services/api';
 
@@ -69,7 +69,7 @@ const DashboardItem = ({
 );
 
 export default function DashboardScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [phases, setPhases] = React.useState<any[]>([]);
@@ -96,7 +96,7 @@ export default function DashboardScreen() {
             userData = await SecureStore.getItemAsync('user');
             userImage = await SecureStore.getItemAsync('user-avatar');
           }
-        } catch (storageError) {
+        } catch (_storageError) {
           router.replace('/login');
           return;
         }
@@ -188,12 +188,12 @@ export default function DashboardScreen() {
   useFocusEffect(
     React.useCallback(() => {
       checkRoleAndFetchData();
-    }, [])
+    }, [checkRoleAndFetchData])
   );
 
   const onRefresh = React.useCallback(() => {
     checkRoleAndFetchData(true);
-  }, []);
+  }, [checkRoleAndFetchData]);
 
   const nextWorkshop = getNextSession();
   const activePhase = phases.find(p => p.isActive);

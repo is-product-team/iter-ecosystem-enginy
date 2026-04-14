@@ -11,6 +11,7 @@
     "web": "expo start --web",
     "dev:tunnel": "npx expo start --tunnel --clear",
     "lint": "expo lint",
+    "type-check": "tsc --noEmit",
     "test": "echo 'No tests yet'"
   },
   "dependencies": {
