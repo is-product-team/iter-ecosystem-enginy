@@ -153,6 +153,7 @@ export default function AssignmentsPage() {
               className="px-8 py-3.5 text-[13px] font-medium text-text-muted hover:text-text-primary transition-all"
             >
               {tCommon('clear_filters')}
+              {tCommon('clear_filters')}
             </button>
           </div>
         </div>
@@ -163,56 +164,65 @@ export default function AssignmentsPage() {
           <div className="bg-background-surface border border-border-subtle overflow-hidden">
             <div className="premium-table-container">
               <table className="w-full text-left">
-              <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_workshop')}</th>
-                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_center')}</th>
-                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_planning')}</th>
-                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
-                  <th className="px-10 py-6 text-[12px] font-medium text-text-primary text-right">{t('table_actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {paginatedAssignments.map(a => (
-                  <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
-                    <td className="px-10 py-8">
-                      <div className="flex flex-col">
-                        <span className="text-[11px] font-medium text-consorci-darkBlue mb-1">{t('workshop_id')}</span>
-                        <span className="text-[15px] font-medium text-text-primary tracking-tight leading-tight">{a.workshop?.title}</span>
-                      </div>
-                    </td>
-                    <td className="px-10 py-8">
-                      <span className="text-[13px] font-medium text-text-primary">{a.center?.name || t('not_assigned')}</span>
-                    </td>
-                    <td className="px-10 py-8">
-                      <div className="text-[13px] text-text-muted">
-                        {a.startDate ? t('start_date', { date: new Date(a.startDate).toLocaleDateString() }) : '—'}
-                      </div>
-                    </td>
-                    <td className="px-10 py-8">
-                      <span className={`text-[11px] font-medium px-3 py-1 border ${a.status === 'VALIDATED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
+                <thead>
+                  <tr className="bg-background-subtle border-b border-border-subtle">
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_workshop')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_center')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_planning')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary text-right">{t('table_actions')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_workshop')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_center')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_planning')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary text-right">{t('table_actions')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-subtle">
+                  {paginatedAssignments.map(a => (
+                    <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
+                      <td className="px-10 py-8">
+                        <div className="flex flex-col">
+                          <span className="text-[11px] font-medium text-consorci-darkBlue mb-1">{t('workshop_id')}</span>
+                          <span className="text-[11px] font-medium text-consorci-darkBlue mb-1">{t('workshop_id')}</span>
+                          <span className="text-[15px] font-medium text-text-primary tracking-tight leading-tight">{a.workshop?.title}</span>
+                        </div>
+                      </td>
+                      <td className="px-10 py-8">
+                        <span className="text-[13px] font-medium text-text-primary">{a.center?.name || t('not_assigned')}</span>
+                        <span className="text-[13px] font-medium text-text-primary">{a.center?.name || t('not_assigned')}</span>
+                      </td>
+                      <td className="px-10 py-8">
+                        <div className="text-[13px] text-text-muted">
+                          {a.startDate ? t('start_date', { date: new Date(a.startDate).toLocaleDateString() }) : '—'}
+                        </div>
+                      </td>
+                      <td className="px-10 py-8">
+                        <span className={`text-[11px] font-medium px-3 py-1 border ${a.status === 'VALIDATED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
                           a.status === 'DATA_ENTRY' ? 'border-orange-500/20 bg-orange-500/5 text-orange-600' :
                             'border-border-subtle bg-background-subtle text-text-muted'
-                        }`}>
-                        {tCommon(`statuses.${a.status}`)}
-                      </span>
-                    </td>
-                    <td className="px-10 py-8 text-right">
-                      <button
-                        onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
-                        className="bg-consorci-darkBlue text-white py-2 px-6 text-[12px] font-medium transition-all hover:bg-black active:scale-[0.98]"
-                      >
-                        {t('manage_btn')}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          }`}>
+                          {tCommon(`statuses.${a.status}`)}
+                        </span>
+                      </td>
+                      <td className="px-10 py-8 text-right">
+                        <button
+                          onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
+                          className="bg-consorci-darkBlue text-white py-2 px-6 text-[12px] font-medium transition-all hover:bg-black active:scale-[0.98]"
+                        >
+                          {t('manage_btn')}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             {filteredAssignments.length === 0 && (
               <div className="p-20 text-center">
+                <p className="text-text-primary font-medium text-sm">{t('no_assignments')}</p>
+                <p className="text-text-muted text-[12px] font-medium mt-2">{t('adjust_filters')}</p>
                 <p className="text-text-primary font-medium text-sm">{t('no_assignments')}</p>
                 <p className="text-text-muted text-[12px] font-medium mt-2">{t('adjust_filters')}</p>
               </div>
@@ -233,7 +243,9 @@ export default function AssignmentsPage() {
         {isPhaseActive(PHASES.EXECUTION) && (
           <section className="mt-16 bg-background-surface p-10 border border-border-subtle">
             <h3 className="text-xl font-medium text-text-primary mb-3">{t('incidents_title')}</h3>
+            <h3 className="text-xl font-medium text-text-primary mb-3">{t('incidents_title')}</h3>
             <p className="text-[13px] font-medium text-text-muted mb-8">
+              {t('incidents_subtitle')}
               {t('incidents_subtitle')}
             </p>
 
@@ -241,6 +253,7 @@ export default function AssignmentsPage() {
               <input
                 id="incident-input"
                 type="text"
+                placeholder={t('incident_placeholder')}
                 placeholder={t('incident_placeholder')}
                 className="flex-1 px-4 py-4 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
               />

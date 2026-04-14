@@ -9,6 +9,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import Pagination from "@/components/Pagination";
 import { useTranslations } from 'next-intl';
+import { ROLES } from '@iter/shared';
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();

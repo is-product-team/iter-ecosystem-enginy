@@ -9,6 +9,8 @@ import { ROLES } from '@iter/shared';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
+import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface AssignmentDetail {
   workshop?: { title: string };
@@ -31,6 +33,8 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
   const [loading, setLoading] = useState(true);
   const [allTeachers, setAllTeachers] = useState<{ userId: number; fullName: string }[]>([]);
   const router = useRouter();
+  const t = useTranslations('Sessions');
+  const tCommon = useTranslations('Common');
 
   useEffect(() => {
     const currentUser = getUser();
@@ -57,7 +61,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
         setAssignment(resAssig.data);
         setAllTeachers(teachers);
       } catch (error) {
-        toast.error('Error loading data.');
+        toast.error(tCommon('error_loading'));
         router.push('/center/sessions');
       } finally {
         setLoading(false);
@@ -74,9 +78,9 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
 
       const res = await api.get(`/assignments/${id}`);
       setAssignment(res.data);
-      toast.success('Teacher added to session.');
+      toast.success(t('teacher_added'));
     } catch (error) {
-      toast.error('Error adding teacher to session.');
+      toast.error(t('error_add_teacher'));
     }
   };
 
@@ -87,25 +91,25 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
 
       const res = await api.get(`/assignments/${id}`);
       setAssignment(res.data);
-      toast.success('Teacher removed from session.');
+      toast.success(t('teacher_removed'));
     } catch (error) {
-      toast.error('Error removing teacher from session.');
+      toast.error(t('error_remove_teacher'));
     }
   };
 
-  if (loading || !assignment) return <Loading fullScreen message="Loading sessions..." />;
+  if (loading || !assignment) return <Loading fullScreen message={t('loading_sessions')} />;
 
   return (
     <DashboardLayout
-      title={`SESSIONS: ${assignment.workshop?.title}`}
-      subtitle="Manage the teaching team for each day."
+      title={t('page_title', { title: assignment.workshop?.title || '' })}
+      subtitle={t('page_subtitle')}
     >
       <div className="mb-8 p-6 bg-white border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
-          <h3 className="text-lg font-black text-[#00426B] uppercase">General Referent Team</h3>
+          <h3 className="text-lg font-black text-[#00426B] uppercase">{t('referent_team')}</h3>
           <div className="flex gap-4 mt-2">
-            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher1?.user?.fullName || 'Pending'}</span>
-            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher2?.user?.fullName || 'Pending'}</span>
+            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher1?.user?.fullName || tCommon('pending')}</span>
+            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher2?.user?.fullName || tCommon('pending')}</span>
           </div>
         </div>
         <button
@@ -113,7 +117,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
           className="text-xs font-bold text-[#4197CB] hover:text-[#00426B] uppercase tracking-widest flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-          Back to list
+          {t('back_to_list')}
         </button>
       </div>
 
@@ -122,7 +126,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
           <div key={session.sessionId} className="bg-white border border-gray-200 p-6 flex flex-col gap-4 group hover:border-[#4197CB] transition-all shadow-sm">
             <div className="flex justify-between items-start">
               <div className="flex flex-col">
-                <span className="text-[10px] font-black text-[#4197CB] uppercase tracking-widest">Session {idx + 1}</span>
+                <span className="text-[10px] font-black text-[#4197CB] uppercase tracking-widest">{t('session_n', { number: idx + 1 })}</span>
                 <span className="text-sm font-black text-[#00426B] uppercase">
                   {new Date(session.sessionDate).toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
@@ -133,7 +137,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
             </div>
 
             <div className="border-t border-gray-50 pt-4 flex flex-col gap-3">
-              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">SPECIFIC TEACHING TEAM</span>
+              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('specific_team')}</span>
               <div className="flex flex-wrap gap-2 min-h-[32px]">
                 {session.staff?.map((sp) => (
                   <div key={sp.userId} className="flex items-center gap-2 bg-[#F8FAFC] border border-gray-100 pl-2 pr-1 py-1 group/chip">
@@ -147,7 +151,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                   </div>
                 ))}
                 {(!session.staff || session.staff.length === 0) && (
-                  <span className="text-[10px] text-gray-300 italic font-medium">Use referent team</span>
+                  <span className="text-[10px] text-gray-300 italic font-medium">{t('use_referent_team')}</span>
                 )}
               </div>
             </div>
@@ -163,9 +167,9 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                 className="w-full text-[10px] font-bold uppercase tracking-widest bg-gray-50 border-none focus:ring-1 focus:ring-[#00426B] p-2 text-gray-500 cursor-pointer"
                 defaultValue=""
               >
-                <option value="" disabled>+ Modify teacher for day</option>
+                <option value="" disabled>{t('modify_teacher')}</option>
                 {allTeachers?.map((p) => (
-                  <option key={p.userId} value={p.userId}>{p.fullName} (TEACHER)</option>
+                  <option key={p.userId} value={p.userId}>{p.fullName} ({tCommon('roles.TEACHER')})</option>
                 ))}
               </select>
             </div>

@@ -67,10 +67,10 @@ const CreateWorkshopModal = ({
 
   React.useEffect(() => {
     if (visible && initialData) {
-      setTitle(initialData.title || "");
+      setTitle(initialData.title);
       setSectorId(initialData.sectorId || "");
-      setModality(initialData.modality || "A");
-      setTerm(initialData.term || "1st");
+      setModality(initialData.modality);
+      setTerm(initialData.term);
       setIcon(initialData.icon || "PUZZLE");
       setDescription(initialData.technicalDetails?.description || "");
       setDurationHours(initialData.technicalDetails?.durationHours?.toString() || "");
@@ -163,6 +163,7 @@ const CreateWorkshopModal = ({
             </h2>
             <p className="text-[11px] font-normal text-text-muted mt-1">
               {t('workshop_config_subtitle')}
+              {t('workshop_config_subtitle')}
             </p>
           </div>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
@@ -177,6 +178,7 @@ const CreateWorkshopModal = ({
           <div className="md:w-7/12 p-8 overflow-y-auto border-r border-border-subtle custom-scrollbar">
             <section className="mb-8">
               <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">{t('general_info')}</h3>
+              <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">{t('general_info')}</h3>
 
               <div className="space-y-6">
                 <div className="group">
@@ -186,6 +188,7 @@ const CreateWorkshopModal = ({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all placeholder:text-text-muted outline-none"
+                    placeholder={t('title_placeholder')}
                     placeholder={t('title_placeholder')}
                   />
                 </div>
@@ -208,6 +211,7 @@ const CreateWorkshopModal = ({
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-text-primary mb-2">{t('modality')} <span className="text-red-500">*</span></label>
+                    <label className="block text-[11px] font-medium text-text-primary mb-2">{t('modality')} <span className="text-red-500">*</span></label>
                     <select
                       value={modality}
                       onChange={(e) => setModality(e.target.value)}
@@ -222,11 +226,13 @@ const CreateWorkshopModal = ({
 
                 <div>
                   <label className="block text-[11px] font-medium text-text-primary mb-2">{t('description')}</label>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">{t('description')}</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
                     className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all placeholder:text-text-muted outline-none custom-scrollbar"
+                    placeholder={t('description_placeholder')}
                     placeholder={t('description_placeholder')}
                   />
                 </div>
@@ -235,8 +241,10 @@ const CreateWorkshopModal = ({
 
             <section>
               <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">{t('technical_details')}</h3>
+              <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">{t('technical_details')}</h3>
               <div className="grid grid-cols-3 gap-6">
                 <div>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">{t('duration')} (h)</label>
                   <label className="block text-[11px] font-medium text-text-primary mb-2">{t('duration')} (h)</label>
                   <input
                     type="number"
@@ -247,6 +255,7 @@ const CreateWorkshopModal = ({
                 </div>
                 <div>
                   <label className="block text-[11px] font-medium text-text-primary mb-2">{t('places')}</label>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">{t('places')}</label>
                   <input
                     type="number"
                     value={maxPlaces}
@@ -255,6 +264,7 @@ const CreateWorkshopModal = ({
                   />
                 </div>
                 <div>
+                  <label className="block text-[11px] font-medium text-text-primary mb-2">{t('icon')}</label>
                   <label className="block text-[11px] font-medium text-text-primary mb-2">{t('icon')}</label>
                   <div className="relative group/icon">
                     <button className="w-full flex items-center justify-between px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary group-hover/icon:border-consorci-darkBlue transition-all">
@@ -283,9 +293,11 @@ const CreateWorkshopModal = ({
               <h3 className="text-[11px] font-medium text-text-primary mb-6 flex items-center gap-2 border-b border-border-subtle pb-3">
                 <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 {t('schedule')}
+                {t('schedule')}
               </h3>
 
               <div className="bg-background-surface p-6 border border-border-subtle mb-8 relative">
+                <h4 className="text-[11px] font-medium text-text-muted mb-4 text-center">{t('add_slot')}</h4>
                 <h4 className="text-[11px] font-medium text-text-muted mb-4 text-center">{t('add_slot')}</h4>
                 <div className="space-y-4">
                   <div>
@@ -319,6 +331,7 @@ const CreateWorkshopModal = ({
               </div>
 
               <h4 className="text-[11px] font-medium text-text-muted mb-4 px-1">{t('configured_days')}</h4>
+              <h4 className="text-[11px] font-medium text-text-muted mb-4 px-1">{t('configured_days')}</h4>
               <div className="space-y-3">
                 {schedule.map((slot, idx) => (
                   <div key={idx} className="flex justify-between items-center bg-background-surface border border-border-subtle p-4 hover:border-consorci-darkBlue transition-colors group">
@@ -347,10 +360,12 @@ const CreateWorkshopModal = ({
             <div className="text-red-500 text-[11px] font-medium">{error}</div>
           ) : (
             <div className="text-text-muted text-[11px] font-normal">{t('review_data')}</div>
+            <div className="text-text-muted text-[11px] font-normal">{t('review_data')}</div>
           )}
 
           <div className="flex gap-4">
             <button onClick={onClose} className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors">
+              {tCommon('cancel')}
               {tCommon('cancel')}
             </button>
             <button
