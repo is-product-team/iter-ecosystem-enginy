@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, '..');
 
-const SINGLETON_PACKAGES = ['react', 'react-dom'];
+const SINGLETON_PACKAGES = ['react', 'react-dom']; 
 const VERIFIED_VERSIONS = ['typescript', 'zod'];
 
 async function getWorkspaces() {

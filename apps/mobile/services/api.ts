@@ -118,7 +118,9 @@ const MOCK_WORKSHOP: any = {
 };
 
 const getBaseURL = () => {
-  let url = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+  // Fallback a la IP de la máquina local detectada (Hotspot/LAN)
+  const FALLBACK_IP = '172.20.10.12'; 
+  let url = process.env.EXPO_PUBLIC_API_URL || `http://${FALLBACK_IP}:3000`;
   if (url.endsWith('/')) {
     url = url.slice(0, -1);
   }
@@ -135,6 +137,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
+    console.log(`🌐 [API REQUEST] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
     try {
       let token = null;
       if (Platform.OS === 'web') {
@@ -151,7 +154,10 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error('❌ [API REQUEST ERROR]', error);
+    return Promise.reject(error);
+  }
 );
 
 api.interceptors.response.use(
@@ -231,8 +237,11 @@ api.interceptors.response.use(
     // ⛔ ONLY LOGOUT IF NOT LAURA
     try {
       const userData = Platform.OS === 'web' ? localStorage.getItem('user') : await SecureStore.getItemAsync('user');
-      if (userData && JSON.parse(userData).email === 'laura.martinez@brossa.cat') {
-        console.log("🛡️ [API] Blocking 401 logout for Laura");
+      const url = error.config?.url;
+      const isAuthRequest = url?.includes('auth/login') || url?.includes('auth/register');
+
+      if (userData && JSON.parse(userData).email === 'laura.martinez@brossa.cat' && !isAuthRequest) {
+        console.log("🛡️ [API] Blocking 401 logout for Laura (Non-Auth)");
         return Promise.resolve({ data: [], status: 200 }); // Return empty success instead of error
       }
     } catch (e) {}

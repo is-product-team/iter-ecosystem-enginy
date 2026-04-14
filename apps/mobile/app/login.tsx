@@ -26,6 +26,11 @@ export default function LoginScreen() {
     try {
       const response = await login({ email, password });
       const { token, user } = response.data;
+      
+      if (!user) {
+        throw new Error('Invalid response: User data missing');
+      }
+
       const userAny: any = user;
 
       // Role restriction: Only TEACHERS can access the mobile app

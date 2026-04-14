@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import '../i18n'; // Initialize i18n
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -35,7 +35,11 @@ function RootLayout() {
     'Inter-Black': Inter_900Black,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (!React) {
+        console.error("⛔ [CRITICAL] React object is null in _layout.tsx! Resetting caches is required.");
+        return;
+    }
     if (loaded || error) {
       SplashScreen.hideAsync();
     }

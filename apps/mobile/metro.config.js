@@ -17,7 +17,7 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, 'node_modules'),
 ];
 
-// Force React and React-DOM resolution to workspace root to avoid duplicate instance errors
+// Force React and React-DOM resolution to workspace root (Singleton React 19)
 config.resolver.extraNodeModules = {
   'scheduler': path.resolve(workspaceRoot, 'node_modules/scheduler'),
   'react': path.resolve(workspaceRoot, 'node_modules/react'),
@@ -25,7 +25,6 @@ config.resolver.extraNodeModules = {
 };
 
 // Use the exclusionList from the internal metro-config to avoid export errors
-// This is the safer way in modern Metro versions
 const exclusionList = (() => {
   try {
     return require('metro-config/src/defaults/exclusionList');
@@ -33,12 +32,12 @@ const exclusionList = (() => {
     try {
       return require('metro-config/src/defaults/blacklist');
     } catch (e) {
-      // Fallback for very restrictive exports
       return () => /$.^/; 
     }
   }
 })();
 
+// Block duplicate React instances if any exist in sub-folders
 const blocklist = exclusionList([
   new RegExp(`${path.resolve(workspaceRoot, 'apps/mobile/node_modules/react/.*').replace(/[/\\\\]/g, '[/\\\\]')}`),
   new RegExp(`${path.resolve(workspaceRoot, 'apps/mobile/node_modules/react-dom/.*').replace(/[/\\\\]/g, '[/\\\\]')}`),

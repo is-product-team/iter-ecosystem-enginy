@@ -33,8 +33,13 @@ export default function Index() {
             const user = JSON.parse(userData);
             console.log("🔍 [DEBUG AUTH] User checking role:", JSON.stringify(user, null, 2));
 
-            // Support both object structure and flattened role string
-            const roleName = user.role?.roleName || user.roleName || user.role;
+            // Support English (Standard), Flattened, and Catalan (Legacy/Raw)
+            const roleName = user.role?.roleName || 
+                            user.rol?.nom_rol || 
+                            user.rol?.nom_role ||
+                            user.roleName || 
+                            user.role ||
+                            user.nom_rol;
             
             console.log("🔍 [DEBUG AUTH] Detected roleName:", roleName);
 
