@@ -1,9 +1,17 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays } from 'date-fns';
+import { enUS, ca, es, arSA } from 'date-fns/locale';
 import Loading from '../Loading';
+import { useTranslations, useLocale } from 'next-intl';
+
+const dateLocales: Record<string, any> = {
+  en: enUS,
+  ca: ca,
+  es: es,
+  ar: arSA,
+};
 
 export interface CalendarEvent {
   id: string;
@@ -29,10 +37,14 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange, isLoading }) => {
+  const t = useTranslations('Calendar');
+  const locale = useLocale();
+  const dateLocale = dateLocales[locale] || enUS;
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const monthName = format(currentDate, 'MMMM', { locale: enUS });
+  const monthName = format(currentDate, 'MMMM', { locale: dateLocale });
   const year = currentDate.getFullYear();
 
   // Notify parent on range change
@@ -60,7 +72,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
           date: format(currentIter, 'yyyy-MM-dd'),
           isCurrentMonth: currentIter.getMonth() === currentDate.getMonth(),
         });
-        currentIter = new Date(currentIter.getTime() + 24 * 60 * 60 * 1000);
+        currentIter = addDays(currentIter, 1);
       }
       weeks.push(week);
     }
@@ -104,7 +116,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
         <div className="flex items-center justify-between p-8 bg-background-surface border-b border-border-subtle">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-medium tracking-tight text-text-primary flex items-baseline gap-3">
-              {monthName} <span className="text-text-muted font-normal">{year}</span>
+              <span className="capitalize">{monthName}</span> <span className="text-text-muted font-normal">{year}</span>
             </h2>
             {isLoading && (
               <Loading size="sm" />
@@ -117,7 +129,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
               </svg>
             </button>
             <button onClick={() => setCurrentDate(new Date())} className="px-6 h-10 bg-background-surface border border-border-subtle text-[12px] font-medium text-text-primary hover:bg-background-subtle transition-colors">
-              Today
+              {t('today')}
             </button>
             <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center hover:bg-background-surface transition-colors text-text-muted">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -129,11 +141,15 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
 
         {/* Weekdays */}
         <div className="grid grid-cols-7 border-b border-border-subtle bg-background-subtle">
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
-            <div key={d} className="py-4 text-center">
-              <span className="text-[11px] font-medium text-text-muted">{d}</span>
-            </div>
-          ))}
+          {Array.from({ length: 7 }).map((_, i) => {
+            const date = addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), i);
+            const d = format(date, 'EEE', { locale: dateLocale });
+            return (
+              <div key={i} className="py-4 text-center">
+                <span className="text-[11px] font-medium text-text-muted capitalize">{d}</span>
+              </div>
+            );
+          })}
         </div>
 
         {/* Grid */}
@@ -234,11 +250,11 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
               {format(selectedDate, "d")}
             </span>
             <div className="flex flex-col">
-              <span className="text-lg font-semibold text-text-primary tracking-tight leading-none mb-1">
-                {format(selectedDate, "MMMM", { locale: enUS })}
+              <span className="text-lg font-semibold text-text-primary tracking-tight leading-none mb-1 capitalize">
+                {format(selectedDate, "MMMM", { locale: dateLocale })}
               </span>
               <span className="text-sm font-medium text-text-muted tracking-wide leading-none uppercase">
-                {format(selectedDate, "eeee", { locale: enUS })}
+                {format(selectedDate, "eeee", { locale: dateLocale })}
               </span>
             </div>
           </div>
@@ -252,7 +268,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <p className="text-[13px] font-medium text-text-muted tracking-tight opacity-50">No hi ha activitat planificada</p>
+              <p className="text-[13px] font-medium text-text-muted tracking-tight opacity-50">{t('no_events')}</p>
             </div>
           ) : (
             <div className="space-y-1">

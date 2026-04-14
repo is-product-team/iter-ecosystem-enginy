@@ -110,7 +110,12 @@ export default function StudentsCRUD() {
 
   const handleEdit = (student: Student) => {
     setEditingStudent(student);
-    setFormData({ fullName: student.fullName, lastName: student.lastName, idalu: student.idalu, grade: student.grade });
+    setFormData({ 
+      fullName: student.fullName || '', 
+      lastName: student.lastName || '', 
+      idalu: student.idalu || '', 
+      grade: student.grade || '' 
+    });
     setIsModalOpen(true);
   };
 

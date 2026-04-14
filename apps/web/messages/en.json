@@ -41,6 +41,24 @@
       "cancel": "Cancel"
     }
   },
+  "ProgramPhases": {
+    "Application": {
+      "name": "Application & Pre-registration",
+      "description": "Workshop application period for educational centers."
+    },
+    "Planning": {
+      "name": "Planning & Assignment",
+      "description": "Workshop assignment and vacancy management."
+    },
+    "Execution": {
+      "name": "Execution & Follow-up",
+      "description": "Workshop sessions and attendance tracking."
+    },
+    "Closure": {
+      "name": "Closure & Certification",
+      "description": "Workshop finalization and certificate issuance."
+    }
+  },
   "Admin": {
     "dashboard": {
       "title": "Admin Dashboard",
@@ -147,20 +165,13 @@
       "subtitle": "Verify center documentation and report status.",
       "description": "Validate documentation presented by centers (Pedagogical Agreement, Mobility, etc.).",
       "table_center_workshop": "Center / Workshop",
-      "table_student": "Student",
       "table_dates": "Dates",
       "table_docs": "Documents",
-      "all_statuses": "All Statuses",
-      "pending_validation": "Pending Validation",
-      "fully_validated": "Fully Validated",
-      "btn_validate": "Approve Now",
-      "btn_unvalidate": "Unvalidate",
-      "doc_not_uploaded": "Document not uploaded",
-      "preview": "Notification Preview",
       "start": "Start",
       "end": "End",
       "dates_not_defined": "Dates not defined",
       "no_students": "No enrolled students",
+      "preview": "Notification Preview",
       "greeting": "Greeting",
       "doc_with_error": "Document with error",
       "reason_error": "Reason for the error",
@@ -178,8 +189,13 @@
       "success_unvalidate": "Validation removed",
       "error_validate": "Error validating document",
       "error_load": "Could not load assignments",
-      "bulk_selection": "{count} documents selected",
-      "bulk_approve_btn": "APPROVE ALL",
+      "all_statuses": "All Statuses",
+      "pending_validation": "Pending Validation",
+      "fully_validated": "Fully Validated",
+      "table_student": "Student",
+      "btn_validate": "Approve Now",
+      "btn_unvalidate": "Unvalidate",
+      "doc_not_uploaded": "Document not uploaded",
       "success_bulk_approve": "{count} documents approved successfully",
       "error_bulk_approve": "Error in bulk approval",
       "doc_names": {
@@ -198,7 +214,35 @@
         "mobility": "Mobility Authorization",
         "image": "Image Rights",
         "all": "All documentation"
-      }
+      },
+      "bulk_selection": "{count} documents selected",
+      "bulk_approve_btn": "APPROVE ALL"
+    },
+    "Closure": {
+      "title": "Closure and Certification",
+      "subtitle": "Workshop completion, data locking, and issuance of official certificates.",
+      "description": "Final management of workshops, certificates, and impact evaluation.",
+      "search_placeholder": "Search by workshop or center...",
+      "assignments_name": "workshops",
+      "evaluations": "TEACHER EVALUATIONS",
+      "action_close": "Close and Certify",
+      "action_stats": "Statistics",
+      "action_download": "Download Certificates",
+      "closed_status": "Certified Workshop",
+      "closure_success": "Workshop closed and certificates issued correctly.",
+      "closure_error": "Error closing the workshop. Check pending evaluations.",
+      "modal_title": "Confirm Cycle Closure",
+      "stats_modal_title": "Quality Monitoring",
+      "evaluations_status": "Evaluations Status",
+      "certificates_to_be_issued": "Certificates to be Issued",
+      "pending_validation": "Pending validation",
+      "missing_evaluations_warning": "Attention: {count} teacher evaluations are missing. Closure is possible, but these students might not receive the certificate correctly.",
+      "effects_title": "CLOSURE EFFECTS",
+      "effect_lock_data": "Attendance and evaluation data will be locked (read-only).",
+      "effect_generate_pdf": "Official PDF files will be generated for eligible students.",
+      "effect_finish_phase": "The workshop will move to the COMPLETED status and the cycle will be closed.",
+      "closing_process": "Processing closure...",
+      "confirm_closure": "CONFIRM FINAL CLOSURE"
     }
   },
   "Center": {
@@ -263,7 +307,12 @@
       "form_surnames": "Last names",
       "form_idalu": "IDALU code",
       "form_course": "Course / Level (e.g., 4th ESO)",
-      "save_btn": "Save student"
+      "save_btn": "Save student",
+      "selection_drawer": {
+        "title": "Nominal Register",
+        "selected": "Selected: {count} / {total}",
+        "search_placeholder": "Search by name or IDALU..."
+      }
     },
     "Sessions": {
       "title": "Session Planning",
@@ -293,7 +342,33 @@
       "success_day": "Teacher assigned to the selected day",
       "error_assignment": "Error performing assignment",
       "success_remove": "Teacher removed successfully",
-      "error_remove": "Error removing teacher"
+      "error_remove": "Error removing teacher",
+      "back_to_list": "Back to list",
+      "page_title": "SESSIONS: {title}",
+      "page_subtitle": "Manage the teaching team for each day.",
+      "teacher_added": "Teacher added to session.",
+      "error_add_teacher": "Error adding teacher to session.",
+      "teacher_removed": "Teacher removed from session.",
+      "error_remove_teacher": "Error removing teacher from session.",
+      "loading_sessions": "Loading sessions..."
+    },
+    "Attendance": {
+      "title": "Session {num} Attendance",
+      "back_to_sessions": "Back to Sessions",
+      "save_attendance": "Save Attendance",
+      "saving": "Saving...",
+      "table_student": "Student",
+      "table_status": "Status",
+      "table_observations": "Observations",
+      "status_present": "Present",
+      "status_absent": "Absent",
+      "status_late": "Late",
+      "status_justified": "Justified",
+      "observations_none": "None",
+      "success_save": "Attendance saved successfully",
+      "error_save": "Error saving attendance",
+      "error_load": "Error loading attendance list",
+      "loading": "Loading attendance list..."
     },
     "Requests": {
       "title": "Request Workshops",
@@ -316,27 +391,6 @@
       "title": "Monitoring and Evaluation",
       "subtitle": "Review of the impact and results of the workshops."
     },
-    "Notifications": {
-      "title_user": "Alerts and Notifications",
-      "subtitle_user": "Stay up to date with phase changes, request resolutions, and official communications.",
-      "loading": "Loading official alerts...",
-      "empty": {
-        "title": "You have no pending alerts",
-        "subtitle": "When there are changes to your requests or key dates, they will appear here."
-      },
-      "btn": {
-        "read": "Mark as read",
-        "delete": "Delete"
-      },
-      "delete_dialog": {
-        "title": "Delete Alert",
-        "message": "Are you sure you want to delete this alert? This action cannot be undone."
-      },
-      "messages": {
-        "delete_ok": "Alert deleted.",
-        "delete_error": "Error deleting the alert."
-      }
-    },
     "Monitoring": {
       "title": "Operational Monitoring (Phase 3)",
       "subtitle": "Status of workshop execution and attendance at your center.",
@@ -355,6 +409,22 @@
         "attendance_ok": "Attendance up to date",
         "attendance_warning": "Attendance sheets missing"
       },
+      "tabs": {
+        "active": "Workshops in Execution",
+        "completed": "Results and Certificates (Phase 4)"
+      },
+      "no_active_assignments": "No active workshops at this time.",
+      "no_completed_assignments": "No recently completed workshops.",
+      "finished_on": "Completed on {date}",
+      "view_analytics": "View Analytics",
+      "certificates_zip": "Certificates (ZIP)",
+      "quality_report": "Quality Report",
+      "close": "Close",
+      "loading_analytics": "Loading analysis...",
+      "incident_id": "Incident #{id}",
+      "error_load_analytics": "Could not load analytics.",
+      "success_download_zip": "Download started successfully!",
+      "error_download_zip": "Error generating ZIP file.",
       "Today": {
         "title": "Today's Agenda",
         "no_sessions": "No sessions scheduled for today."
@@ -362,108 +432,16 @@
       "Incidents": {
         "title": "Latest Incidents",
         "report_new": "Report Incident",
-        "no_incidents": "No incidents reported."
+        "no_incidents": "No incidents reported.",
+        "incident_id": "Incident #{id}"
+      },
+      "no_active": "No active workshops at this time.",
+      "no_completed": "No recently completed workshops.",
+      "messages": {
+        "error_analytics": "Could not load analytics.",
+        "success_download": "Download started successfully!",
+        "error_zip": "Error generating ZIP file."
       }
-    }
-  },
-  "Common": {
-    "general": "General",
-    "configuration": "Configuration",
-    "global": "Global",
-    "phase": "Phase",
-    "loading": "Loading...",
-    "module_closed": "Module closed",
-    "loading_calendar": "Loading calendar...",
-    "home": "Home",
-    "notifications": "Alerts",
-    "calendar": "Calendar",
-    "profile": "Profile",
-    "logout": "Log Out",
-    "educational_center": "Educational center",
-    "activities": "Activities",
-    "workshops": "Workshops",
-    "centers": "Centers",
-    "requests": "Requests",
-    "phases": "Phases",
-    "students": "Students",
-    "teachers": "Teachers",
-    "assignments": "Assignments",
-    "sessions": "Sessions",
-    "uploading": "Uploading...",
-    "validating_ai": "Validating (AI)...",
-    "force_manual_upload": "Force manual upload",
-    "change": "Change",
-    "attach": "Attach",
-    "document_validated": "Document validated",
-    "view_document": "View document",
-    "pending": "Pending",
-    "authenticating": "Authenticating...",
-    "upload_success": "{label} uploaded successfully.",
-    "error_upload": "Error uploading the document.",
-    "only_pdf_allowed": "Only PDF files are allowed.",
-    "ai_mismatch": "AI detects a different type: {type}.",
-    "ai_no_signatures": "AI has not detected the required signatures.",
-    "ai_error": "Error processing AI. You can force the upload.",
-    "showing": "Showing",
-    "of": "of",
-    "previous": "Previous",
-    "page": "Page",
-    "next": "Next",
-    "all_sectors": "All sectors",
-    "all_modalities": "All modalities",
-    "all_centers": "All centers",
-    "search_placeholder": "Ex: Carpentry, Robotics...",
-    "clear_filters": "Clear filters",
-    "no_results": "No results found",
-    "try_other_terms": "Try other search terms.",
-    "search_by_title": "Search by title",
-    "filter_by_sector": "Filter by sector",
-    "filter_by_modality": "Filter by modality",
-    "actions": "Actions",
-    "edit": "Edit",
-    "delete": "Delete",
-    "save": "Save",
-    "confirm": "Confirm",
-    "cancel": "Cancel",
-    "modality_label": "Modality {modality}",
-    "places_label": "{count} Places",
-    "duration_label": "{hours}h",
-    "id_label": "ID: {id}",
-    "status_label": "Status: {status}",
-    "save_success": "Operation completed successfully.",
-    "error_loading": "Error loading data.",
-    "fill_all_fields": "Please complete all fields.",
-    "ok": "OK",
-    "show": "Show",
-    "hide": "Hide",
-    "table_info": "Information",
-    "table_idalu": "IDALU",
-    "table_course": "Course",
-    "clear": "Clear",
-    "details": "Details",
-    "status": "Status",
-    "loading_error": "Could not load information",
-    "error_connectivity": "Connection error. Please check if the server is active.",
-    "delete_success": "Item deleted successfully.",
-    "delete_error": "An error occurred while deleting the item.",
-    "delete_confirm_title": "Confirm deletion",
-    "delete_confirm_msg": "Are you sure you want to delete this item? This action cannot be undone.",
-    "new": "New",
-    "system_default": "System Default",
-    "select_language": "Select Language",
-    "roles": {
-      "ADMIN": "Administrator",
-      "COORDINATOR": "Coordinator",
-      "TEACHER": "Teacher",
-      "STUDENT": "Student"
-    },
-    "badges": {
-      "workshop": "WORKSHOP",
-      "pending": "PENDING",
-      "completed": "COMPLETED",
-      "need_eval": "NEED EVAL",
-      "will_certify": "WILL CERTIFY",
-      "no_cert": "NO CERT"
     }
   },
   "Calendar": {
@@ -486,7 +464,10 @@
     "legend_ok": "Understood",
     "event_details": "Event details",
     "close": "Close",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "today": "Today",
+    "no_events": "No activity planned",
+    "all_day": "All day"
   },
   "Questionnaires": {
     "title": "Questionnaires",
@@ -688,6 +669,10 @@
         "verifications": {
           "title": "Document Verification",
           "description": "Validate documents presented by centers."
+        },
+        "closure": {
+          "title": "Closure and Certification",
+          "description": "Finalize workshops and issue official certificates."
         }
       }
     },
@@ -738,6 +723,7 @@
     }
   },
   "Forms": {
+    "edit_title": "Edit",
     "search": "Search...",
     "search_by_title": "Search by title",
     "filter_by_sector": "Filter by sector",
@@ -775,7 +761,33 @@
     "tuesday": "Tuesday",
     "wednesday": "Wednesday",
     "thursday": "Thursday",
-    "friday": "Friday"
+    "friday": "Friday",
+    "Centers": {
+      "edit_title": "Edit Center",
+      "create_title": "Create New Center",
+      "edit_subtitle": "Modify educational center details",
+      "create_subtitle": "Enter data to register a new center.",
+      "code": "Center Code",
+      "name": "Center Name",
+      "address": "Address",
+      "phone": "Contact Phone",
+      "email": "Contact Email",
+      "required_error": "Center code and name are required.",
+      "update_error": "Could not update center.",
+      "create_error": "Could not create center.",
+      "code_placeholder": "Ex: 08012345",
+      "name_placeholder": "Ex: Pedralbes Institute",
+      "address_placeholder": "Ex: Gran Via Street, 123",
+      "phone_placeholder": "Ex: 931234567",
+      "email_placeholder": "Ex: contact@center.edu",
+      "save_changes": "Save Changes",
+      "create_center": "Create Center",
+      "processing": "Processing..."
+    },
+    "new_workshop": "New Workshop",
+    "edit_workshop": "Edit Workshop",
+    "workshop_title": "Workshop Title",
+    "professional_sector": "Professional Sector"
   },
   "WorkshopsPage": {
     "title": "Workshop Management",
@@ -863,7 +875,10 @@
     "incidents_subtitle": "REPORT BEHAVIOR PROBLEMS OR REQUEST VACANT PLACES.",
     "incident_placeholder": "Describe the problem...",
     "report_btn": "Report Incident",
-    "incident_success": "Incident reported. The CEB will review it soon."
+    "incident_success": "Incident reported. The CEB will review it soon.",
+    "search_assignments_title": "Search assignments",
+    "input_search_placeholder": "Search by workshop or center...",
+    "action_btn": "Action"
   },
   "StudentsPage": {
     "title": "Student Management",
@@ -964,7 +979,6 @@
     "click_to_edit": "Click to edit"
   },
   "AssignmentWorkshopsPage": {
-    "table_info": "Student Information",
     "title_prefix": "WORKSHOP MANAGEMENT: ",
     "modality_prefix": "MODALITY ",
     "referent_label": "Referent Teaching Team",
@@ -973,6 +987,7 @@
     "students_subtitle": "{occupied} of {total} places occupied.",
     "select_students_btn": "Select Students",
     "nominal_register_btn": "Nominal Register",
+    "table_info": "Student Information",
     "no_students": "No students assigned yet",
     "no_students_hint": "Click here to start nominal registration",
     "remove_student_success": "Student removed successfully.",
@@ -1027,7 +1042,14 @@
       "no_assignments": "No active workshops in execution for now."
     },
     "ia_matcher_btn": "IA Matcher",
-    "ia_matcher_close_btn": "Close IA Matcher"
+    "ia_matcher_close_btn": "Close IA Matcher",
+    "bulk_upload": {
+      "title": "Smart Bulk Upload",
+      "subtitle": "Drag your PDFs here and AI will assign them automatically",
+      "processing": "Processing documents with AI...",
+      "success": "Processed: {count} documents correctly.",
+      "error": "{count} documents could not be processed."
+    }
   },
   "Sync": {
     "title": "Synchronize",
@@ -1066,12 +1088,290 @@
       "error_unavailable": "Local AI vision engine is currently unavailable."
     },
     "AutoAssignment": {
-      "no_requests": "No requests found for processing."
+      "no_requests": "No requests found for processing.",
+      "success": "Asignados {count} estudiantes al Centro {center} para el Taller {workshop}"
     }
   },
   "NotFound": {
     "title": "Page not found",
     "description": "Sorry, the page you are looking for doesn't exist or has been moved.",
     "goHome": "Go back home"
+  },
+  "Widgets": {
+    "NextEvents": {
+      "title": "Upcoming Milestones",
+      "view_all": "view all",
+      "no_events": "No upcoming events",
+      "program_milestone": "Program Milestone",
+      "deadline": "Deadline",
+      "workshop": "Workshop"
+    }
+  },
+  "Common": {
+    "general": "General",
+    "configuration": "Configuration",
+    "global": "Global",
+    "phase": "Phase",
+    "phase_with_number": "Phase {number}",
+    "loading": "Loading...",
+    "module_closed": "Module closed",
+    "loading_calendar": "Loading calendar...",
+    "home": "Home",
+    "notifications": "Alerts",
+    "calendar": "Calendar",
+    "profile": "Profile",
+    "logout": "Log Out",
+    "educational_center": "Educational center",
+    "activities": "Activities",
+    "workshops": "Workshops",
+    "centers": "Centers",
+    "requests": "Requests",
+    "phases": "Phases",
+    "students": "Students",
+    "teachers": "Teachers",
+    "assignments": "Assignments",
+    "sessions": "Sessions",
+    "uploading": "Uploading...",
+    "validating_ai": "Validating (AI)...",
+    "force_manual_upload": "Force manual upload",
+    "change": "Change",
+    "attach": "Attach",
+    "document_validated": "Document validated",
+    "view_document": "View document",
+    "pending": "Pending",
+    "authenticating": "Authenticating...",
+    "search": "Search...",
+    "all_statuses": "All Statuses",
+    "actions": "Actions",
+    "ok": "OK",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "showing": "Showing",
+    "of": "of",
+    "previous": "Previous",
+    "page": "Page",
+    "next": "Next",
+    "close": "Close",
+    "table_info": "Information",
+    "loading_error": "Could not load information",
+    "error_connectivity": "Connection error. Please check if the server is active.",
+    "delete_success": "Item deleted successfully.",
+    "delete_error": "An error occurred while deleting the item.",
+    "delete_confirm_title": "Confirm deletion",
+    "delete_confirm_msg": "Are you sure you want to delete this item? This action cannot be undone.",
+    "places_label": "{count} Places",
+    "duration_label": "{hours}h",
+    "clear_filters": "Clear filters",
+    "no_results": "No results found",
+    "try_other_terms": "Try using other search terms.",
+    "search_by_title": "Search by title",
+    "filter_by_sector": "Filter by sector",
+    "filter_by_modality": "Filter by modality",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "all_sectors": "All sectors",
+    "all_modalities": "All modalities",
+    "modality_label": "Modality {modality}",
+    "no_description": "No description available.",
+    "new": "New",
+    "system_default": "System Default",
+    "select_language": "Select Language",
+    "all_centers": "All centers",
+    "search_placeholder": "Ex: Carpentry, Robotics...",
+    "id_label": "ID: {id}",
+    "save_success": "Operation completed successfully.",
+    "error_loading": "Error loading data.",
+    "fill_all_fields": "Please complete all fields.",
+    "show": "Show",
+    "hide": "Hide",
+    "details": "Details",
+    "status": "Status",
+    "status_label": "Status: {status}",
+    "table_idalu": "IDALU",
+    "table_course": "Course",
+    "clear": "Clear",
+    "upload_success": "{label} uploaded successfully.",
+    "error_upload": "Error uploading the document.",
+    "only_pdf_allowed": "Only PDF files are allowed.",
+    "ai_mismatch": "AI detects a different type: {type}.",
+    "ai_no_signatures": "AI has not detected the required signatures.",
+    "ai_error": "Error processing AI. You can force the upload.",
+    "roles": {
+      "ADMIN": "Administrator",
+      "COORDINATOR": "Coordinator",
+      "TEACHER": "Teacher",
+      "STUDENT": "Student"
+    },
+    "badges": {
+      "workshop": "WORKSHOP",
+      "pending": "PENDING",
+      "completed": "COMPLETED",
+      "need_eval": "NEED EVAL",
+      "will_certify": "WILL CERTIFY",
+      "no_cert": "NO CERT"
+    },
+    "upcoming_events": "Upcoming Milestones",
+    "view_all": "view all →",
+    "event_milestone": "Program Milestone",
+    "event_deadline": "Deadline",
+    "event_workshop": "Workshop",
+    "no_upcoming_events": "No upcoming events",
+    "no_planned_activity": "No planned activity",
+    "today": "Today",
+    "items": "items",
+    "statuses": {
+      "PROVISIONAL": "Provisional",
+      "PUBLISHED": "Published",
+      "DATA_ENTRY": "Pending Management",
+      "DATA_SUBMITTED": "Data Submitted",
+      "VALIDATED": "Confirmed",
+      "READY_TO_START": "Ready to Start",
+      "VACANT": "Vacant",
+      "IN_PROGRESS": "In Execution",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "Notifications": {
+    "title_user": "Alerts and Notifications",
+    "subtitle_user": "Stay up to date with phase changes, request resolutions, and official communications.",
+    "title_admin": "System Alerts Control",
+    "subtitle_admin": "Global communication and alert management for all users.",
+    "loading": "Loading official alerts...",
+    "Application": "Application and Pre-registration",
+    "Planning": "Planning and Assignment",
+    "Execution": "Execution and Monitoring",
+    "Closure": "Closure and Certification",
+    "Approved": "Approved",
+    "Rejected": "Rejected",
+    "phase_start_title": "New Phase: {name}",
+    "phase_start_msg": "The phase \"{name}\" has started. Check the calendar for details.",
+    "calendar_sync_title": "Calendar Synchronization (System)",
+    "calendar_sync_msg": "Background calendar check executed",
+    "session_reminder_title": "Reminder: Workshop Session",
+    "session_reminder_msg": "You have a session for the workshop \"{title}\" scheduled for today at {time}.",
+    "milestone_reminder_title": "Upcoming Milestone: {title}",
+    "milestone_reminder_msg": "Remember: The milestone \"{title}\" is scheduled for the next 24 hours.",
+    "request_status_title": "Request {status}",
+    "request_status_msg": "Your request for the workshop \"{title}\" has been {status_low}.",
+    "incorrect_doc_title": "Incorrect Documentation",
+    "incorrect_doc_msg": "Hello, the document {doc} of workshop {title} is incorrect. {comment}",
+    "registration_confirmed_title": "Registration Confirmed: Workshop in Progress",
+    "registration_confirmed_msg": "Registration for workshop \"{title}\" has been completed correctly. The workshop is now active and sessions have been generated in your calendar.",
+    "workshop_assigned_title": "Workshop Assigned (Tetris)!",
+    "workshop_assigned_msg": "Your request for the workshop \"{title}\" has been approved and assigned.",
+    "assignments_published_title": "Assignments Published",
+    "assignments_published_msg": "You can now consult the assignments and start entering data.",
+    "CALENDAR_CHECK_HEARTBEAT": "Calendar Synchronization (System)",
+    "Background calendar check executed": "Background calendar check executed",
+    "New Phase: Application": "New Phase: Application",
+    "New Phase: Planning": "New Phase: Planning",
+    "New Phase: Execution": "New Phase: Execution",
+    "New Phase: Closure": "New Phase: Closure",
+    "The phase \"Application\" has started Check the calendar for details": "The phase \"Application\" has started. Check the calendar for details.",
+    "The phase \"Planning\" has started Check the calendar for details": "The phase \"Planning\" has started. Check the calendar for details.",
+    "The phase \"Execution\" has started Check the calendar for details": "The phase \"Execution\" has started. Check the calendar for details.",
+    "The phase \"Closure\" has started Check the calendar for details": "The phase \"Closure\" has started. Check the calendar for details.",
+    "empty": {
+      "title": "You have no pending alerts",
+      "subtitle": "When there are changes to your requests or key dates, they will appear here."
+    },
+    "btn": {
+      "read": "Mark as read",
+      "delete": "Delete"
+    },
+    "delete_dialog": {
+      "title": "Delete Alert",
+      "message": "Are you sure you want to delete this alert? This action cannot be undone."
+    },
+    "messages": {
+      "delete_ok": "Alert deleted.",
+      "delete_error": "Error deleting the alert."
+    }
+  },
+  "DesignateTeachersPage": {
+    "page_title": "Designate Teachers: {title}",
+    "page_subtitle": "Designate the two referring teachers who will be responsible for monitoring.",
+    "selection_of_referents": "Selection of Referents",
+    "main_teacher": "Main Teacher",
+    "select": "Select...",
+    "second_teacher": "Second Teacher",
+    "saving": "Saving...",
+    "confirm_designation": "Confirm Designation",
+    "mandatory_requirement": "Mandatory Requirement",
+    "mandatory_description": "It is necessary to designate two teachers to ensure that there is always a referent available for students and for communications with the CEB.",
+    "teacher_designation_not_active": "The teacher designation period is not active.",
+    "assignment_not_found": "Assignment not found.",
+    "designate_two_teachers": "You must designate two referring teachers.",
+    "teachers_must_be_different": "The two teachers must be different people.",
+    "teachers_designated_correctly": "Teachers designated correctly.",
+    "error_saving_designation": "Error saving designation.",
+    "loading_designation": "Loading designation..."
+  },
+  "AssignmentEvaluationsPage": {
+    "page_title": "Competence Evaluation: {title}",
+    "page_subtitle": "Grade the performance of the students participating in the workshop.",
+    "back_to_assignments": "Back to Assignments",
+    "list_of_enrollments": "List of Enrollments",
+    "no_enrollments": "No enrollments found for this assignment.",
+    "idalu": "IDALU:",
+    "status_completed": "Completed",
+    "status_pending": "Pending",
+    "btn_view_edit": "View / Edit",
+    "btn_evaluate": "Evaluate",
+    "instructions_title": "Evaluation Instructions",
+    "instructions_desc": "Remember that the competence evaluation is an indispensable requirement for the certification of the student's educational attention. You must value both technical and transversal competences.",
+    "assignment_not_found": "Assignment not found.",
+    "loading_enrollments": "Loading enrollments..."
+  },
+  "AttendancePage": {
+    "error_loading_attendance": "Error loading attendance list",
+    "attendance_saved": "Attendance saved successfully",
+    "error_saving_attendance": "Error saving attendance",
+    "loading_attendance": "Loading attendance list...",
+    "page_title": "Session {num} Attendance",
+    "assignment": "Assignment {id}",
+    "back_to_sessions": "Back to Sessions",
+    "save_attendance": "Save Attendance",
+    "saving": "Saving...",
+    "student": "Student",
+    "observations": "Observations",
+    "none": "None",
+    "status_present": "Present",
+    "status_absent": "Absent",
+    "status_late": "Late",
+    "status_justified": "Justified"
+  },
+  "PublicSurvey": {
+    "title": "Iter Ecosystem",
+    "subtitle": "Workshop Self-Assessment",
+    "email_label": "Email address (xtec)",
+    "email_placeholder": "example@xtec.cat",
+    "verify_button": "Start Survey",
+    "verifying": "Verifying...",
+    "success_title": "Survey Completed!",
+    "success_message": "Thank you very much for your time. Your answers help us improve the Enginy Program.",
+    "subtitle_with_name": "How was the workshop, {name}?",
+    "error_no_survey": "We found no pending surveys for you.",
+    "submit_success": "Survey submitted successfully!",
+    "submit_error": "Error submitting the survey.",
+    "section_quality": "Quality and Content",
+    "section_experience": "Experience Assessment",
+    "section_vocational": "Vocational Impact",
+    "label_interest": "Did you find the topic interesting?",
+    "label_clarity": "Was the explanation of the activities clear and understandable?",
+    "label_material": "Were the materials and tools appropriate and of good quality?",
+    "label_support": "Did you feel helped and supported by the teacher?",
+    "label_overall": "How would you rate your overall experience today?",
+    "label_teacher": "How would you rate the teacher who taught the workshop?",
+    "label_future": "Has it helped you decide on your professional future?",
+    "label_comments": "Briefly tell us what you liked most (or what would you improve):",
+    "opt_future_yes": "Yes, it has clarified my ideas.",
+    "opt_future_no": "No, I already had it clear or it's not for me.",
+    "opt_future_maybe": "I'm considering it again now.",
+    "footer_note": "Anonymous feedback for the center. Be honest!",
+    "submit_button": "Submit Survey",
+    "submitting": "Submitting..."
   }
 }

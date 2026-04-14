@@ -431,14 +431,14 @@ export const publishAssignments = async (req: Request, res: Response) => {
     // Notify centers (simplified logic)
     await prisma.notification.create({
       data: {
-        title: 'Assignments Published',
-        message: 'You can now consult the assignments and start entering data.',
+        title: 'assignments_published_title',
+        message: 'assignments_published_msg',
         type: 'PHASE',
         importance: 'URGENT'
       }
     });
 
-    res.json({ message: `${result.count} assignments published correctly.` });
+    res.json({ message: `${result.count} asignaciones publicadas correctamente.` });
   } catch (_error) {
     res.status(500).json({ error: 'Error publishing assignments.' });
   }
@@ -618,12 +618,17 @@ export const sendDocumentNotification = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
-    const message = `${greeting}, the document ${documentName} of workshop ${assignment.workshop.title} is incorrect. ${comment}`;
-
     await createNotificationInternal({
       centerId: assignment.centerId,
-      title: 'Incorrect Documentation',
-      message,
+      title: 'incorrect_doc_title',
+      message: JSON.stringify({
+        key: 'incorrect_doc_msg',
+        params: {
+          doc: documentName,
+          title: assignment.workshop.title,
+          comment
+        }
+      }),
       type: 'SYSTEM',
       importance: 'WARNING'
     });
@@ -703,8 +708,11 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
     // 5. Send notification to center confirming start of workshop
     await createNotificationInternal({
       centerId: assignment.centerId,
-      title: 'Registration Confirmed: Workshop in Progress',
-      message: `Registration for workshop "${assignment.workshop.title}" has been completed correctly. The workshop is now active and sessions have been generated in your calendar.`,
+      title: 'registration_confirmed_title',
+      message: JSON.stringify({
+        key: 'registration_confirmed_msg',
+        params: { title: assignment.workshop.title }
+      }),
       type: 'PHASE',
       importance: 'INFO'
     });

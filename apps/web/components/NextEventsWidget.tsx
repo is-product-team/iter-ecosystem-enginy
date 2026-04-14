@@ -4,8 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { CalendarEvent } from './ui/Calendar';
 import getApi from '@/services/api';
 import { useRouter } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
+import { format } from 'date-fns';
+import { enUS, ca, es, arSA } from 'date-fns/locale';
+
+const dateLocales: Record<string, any> = {
+  en: enUS,
+  ca: ca,
+  es: es,
+  ar: arSA,
+};
 
 const NextEventsWidget: React.FC = () => {
+  const t = useTranslations('Widgets.NextEvents');
+  const locale = useLocale();
+  const dateLocale = dateLocales[locale] || enUS;
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -17,7 +30,7 @@ const NextEventsWidget: React.FC = () => {
         const response = await api.get('/calendar');
         // Filter upcoming events and sort by date
         const now = new Date();
-        const upcoming = response.data
+        const upcoming = (response.data || [])
           .filter((e: CalendarEvent) => new Date(e.date) >= now)
           .sort((a: CalendarEvent, b: CalendarEvent) => new Date(a.date).getTime() - new Date(b.date).getTime())
           .slice(0, 3);
@@ -53,12 +66,12 @@ const NextEventsWidget: React.FC = () => {
       </div>
 
       <h3 className="text-xs font-medium text-text-muted mb-6 flex items-center justify-between">
-        Upcoming Milestones
+        {t('title')}
         <button
           onClick={() => router.push('/calendar')}
-          className="text-consorci-darkBlue hover:text-consorci-lightBlue font-medium tracking-normal"
+          className="text-consorci-darkBlue hover:text-consorci-lightBlue font-medium tracking-normal flex items-center gap-1"
         >
-          view all →
+          {t('view_all')} <span className="text-[10px]">→</span>
         </button>
       </h3>
 
@@ -67,8 +80,8 @@ const NextEventsWidget: React.FC = () => {
           {events.map((event) => (
             <div key={event.id} className="flex items-center gap-4 group/item cursor-default">
               <div className="flex flex-col items-center justify-center w-12 h-12 bg-background-subtle border border-border-subtle group-hover/item:border-consorci-darkBlue transition-colors">
-                <span className="text-[10px] font-medium text-text-muted group-hover/item:text-consorci-darkBlue leading-none mb-1">
-                  {new Date(event.date).toLocaleDateString('ca-ES', { month: 'short' }).replace('.', '').toUpperCase()}
+                <span className="text-[10px] font-medium text-text-muted group-hover/item:text-consorci-darkBlue leading-none mb-1 capitalize">
+                  {format(new Date(event.date), 'MMM', { locale: dateLocale }).replace('.', '')}
                 </span>
                 <span className="text-sm font-semibold text-text-primary group-hover/item:text-consorci-darkBlue leading-none">
                   {new Date(event.date).getDate()}
@@ -77,7 +90,7 @@ const NextEventsWidget: React.FC = () => {
               <div className="flex-1 overflow-hidden">
                 <h4 className="text-sm font-medium text-text-primary truncate transition-colors">{event.title}</h4>
                 <p className="text-[10px] font-medium text-text-muted">
-                  {event.type === 'milestone' ? 'Program Milestone' : event.type === 'deadline' ? 'Deadline' : 'Workshop'}
+                  {event.type === 'milestone' ? t('program_milestone') : event.type === 'deadline' ? t('deadline') : t('workshop')}
                 </p>
               </div>
             </div>
@@ -85,7 +98,7 @@ const NextEventsWidget: React.FC = () => {
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <p className="text-text-muted text-xs font-medium">No upcoming events</p>
+          <p className="text-text-muted text-xs font-medium">{t('no_events')}</p>
         </div>
       )}
     </div>

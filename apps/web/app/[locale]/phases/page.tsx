@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
+import { ROLES } from "@iter/shared";
 import DashboardLayout from "@/components/DashboardLayout";
 import getApi from "@/services/api";
 import Loading from "@/components/Loading";
@@ -22,6 +24,7 @@ export default function PhaseManagementPage() {
   const { user, loading: authLoading } = useAuth();
   const t = useTranslations('Admin.Phases');
   const tc = useTranslations('Common');
+  const tp = useTranslations('ProgramPhases');
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<number | null>(null);
@@ -39,7 +42,7 @@ export default function PhaseManagementPage() {
   };
 
   useEffect(() => {
-    if (user && user.role.name === ROLES.ADMIN) {
+    if (user && user.role.name === 'ADMIN') {
       fetchPhases();
     }
   }, [user]);
@@ -70,7 +73,7 @@ export default function PhaseManagementPage() {
     }
   };
 
-  if (authLoading || !user || user.role.name !== ROLES.ADMIN) {
+  if (authLoading || !user || user.role.name !== 'ADMIN') {
     return <Loading fullScreen message={tc('authenticating')} />;
   }
 
@@ -118,7 +121,9 @@ export default function PhaseManagementPage() {
                           {phase.order}
                         </div>
                         <div>
-                          <h3 className="text-[20px] font-medium text-text-primary tracking-tight">{phase.name}</h3>
+                          <h3 className="text-[20px] font-medium text-text-primary tracking-tight">
+                            {tp.has(`${phase.name}.name`) ? tp(`${phase.name}.name`) : phase.name}
+                          </h3>
                           <div className="flex items-center gap-3 mt-2">
                             {phase.isActive ? (
                               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-consorci-darkBlue/5 border border-consorci-darkBlue/20 text-consorci-darkBlue text-[11px] font-medium uppercase tracking-wider">
@@ -137,7 +142,7 @@ export default function PhaseManagementPage() {
                     </div>
 
                     <p className="text-[14px] text-text-secondary font-medium leading-relaxed max-w-2xl">
-                      {phase.description}
+                      {tp.has(`${phase.name}.description`) ? tp(`${phase.name}.description`) : phase.description}
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">
@@ -148,7 +153,7 @@ export default function PhaseManagementPage() {
                         </label>
                         <input
                           type="date"
-                          value={phase.startDate.split('T')[0]}
+                          value={phase.startDate ? phase.startDate.split('T')[0] : ''}
                           onChange={(e) => updatePhaseDate(phase.phaseId, 'startDate', e.target.value)}
                           className="w-full bg-background-subtle border border-border-subtle text-[13px] font-medium text-text-primary px-5 py-3.5 focus:outline-none focus:border-consorci-darkBlue transition-all"
                         />
@@ -160,7 +165,7 @@ export default function PhaseManagementPage() {
                         </label>
                         <input
                           type="date"
-                          value={phase.endDate.split('T')[0]}
+                          value={phase.endDate ? phase.endDate.split('T')[0] : ''}
                           onChange={(e) => updatePhaseDate(phase.phaseId, 'endDate', e.target.value)}
                           className="w-full bg-background-subtle border border-border-subtle text-[13px] font-medium text-text-primary px-5 py-3.5 focus:outline-none focus:border-consorci-darkBlue transition-all"
                         />

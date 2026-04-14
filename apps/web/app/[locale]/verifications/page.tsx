@@ -9,6 +9,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import Pagination from "@/components/Pagination";
 import { useTranslations } from 'next-intl';
+import { ROLES } from '@iter/shared';
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
@@ -78,7 +79,7 @@ export default function DocumentVerificationPage() {
   });
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
+    if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
       router.push(`/${locale}/login`);
       return;
     }

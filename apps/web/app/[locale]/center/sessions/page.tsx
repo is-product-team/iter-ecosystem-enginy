@@ -277,8 +277,9 @@ export default function SessionsListPage() {
             <div className="divide-y divide-gray-100">
               {paginatedSessions.map((session) => {
                 const dateObj = new Date(session.sessionDate);
-                const dayName = dateObj.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { weekday: 'long' });
-                const dateStr = dateObj.toLocaleDateString(locale === 'ca' ? 'ca-ES' : 'es-ES', { day: 'numeric', month: 'long' });
+                const dateLocale = locale === 'ar' ? 'ar-SA' : locale === 'en' ? 'en-GB' : locale === 'ca' ? 'ca-ES' : 'es-ES';
+                const dayName = dateObj.toLocaleDateString(dateLocale, { weekday: 'long' });
+                const dateStr = dateObj.toLocaleDateString(dateLocale, { day: 'numeric', month: 'long' });
 
                 return (
                   <div key={session.sessionId} className={`p-8 flex flex-col md:flex-row md:items-center justify-between hover:bg-background-subtle border-b border-border-subtle transition-colors group ${session.isPending ? 'opacity-70' : ''}`}>

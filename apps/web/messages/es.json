@@ -41,6 +41,24 @@
       "cancel": "Cancelar"
     }
   },
+  "ProgramPhases": {
+    "Application": {
+      "name": "Solicitud y Pre-inscripción",
+      "description": "Periodo de solicitud de talleres por parte de los centros."
+    },
+    "Planning": {
+      "name": "Planificación y Asignación",
+      "description": "Asignación de talleres y gestión de vacantes."
+    },
+    "Execution": {
+      "name": "Ejecución y Seguimiento",
+      "description": "Realización de las sesiones y seguimiento de asistencia."
+    },
+    "Closure": {
+      "name": "Cierre y Certificación",
+      "description": "Finalización de talleres y emisión de certificados."
+    }
+  },
   "Admin": {
     "dashboard": {
       "title": "Panel de Administración",
@@ -143,7 +161,7 @@
       "observations_placeholder": "Escribe aquí observaciones adicionales..."
     },
     "Verifications": {
-      "title": "Verificación de Documents",
+      "title": "Verificación de Documentos",
       "subtitle": "Verifica la documentación de los centros e informa del estado.",
       "description": "Valida la documentación presentada por los centros (Acuerdo Pedagógico, Movilidad, etc).",
       "table_center_workshop": "Centro / Taller",
@@ -179,6 +197,7 @@
       "btn_unvalidate": "Deshacer",
       "doc_not_uploaded": "Documento no subido",
       "success_bulk_approve": "Se han aprobado {count} documentos correctamente",
+      "error_bulk_approve": "Error en la aprobación masiva",
       "doc_names": {
         "agreement": "Acuerdo",
         "mobility": "Movilidad",
@@ -202,6 +221,7 @@
     "Closure": {
       "title": "Cierre y Certificación",
       "subtitle": "Finalización de talleres, bloqueo de datos y emisión de certificados oficiales.",
+      "description": "Gestión final de talleres, certificados y evaluación de impacto.",
       "search_placeholder": "Buscar por taller o centro...",
       "assignments_name": "talleres",
       "evaluations": "EVALUACIONES DOCENTES",
@@ -215,6 +235,7 @@
       "stats_modal_title": "Monitorización de Calidad",
       "evaluations_status": "Estado de Evaluaciones",
       "certificates_to_be_issued": "Certificados a Emitir",
+      "pending_validation": "Pendientes de validación",
       "missing_evaluations_warning": "Atención: Faltan {count} evaluaciones docentes. El cierre es posible, pero estos alumnos podrían no recibir el certificado correctamente.",
       "effects_title": "EFECTOS DEL CIERRE",
       "effect_lock_data": "Los datos de asistencia y evaluación quedarán bloqueados (solo lectura).",
@@ -305,7 +326,7 @@
       "choose_session": "-- Selecciona una sesión --",
       "choose_teacher": "-- Selecciona un profesor --",
       "referent_team": "Equipo Referente General",
-      "specific_team": "EQUIP DOCENT ESPECÍFICO",
+      "specific_team": "EQUIPO DOCENTE ESPECÍFICO",
       "use_referent_team": "Utilizar equipo referente",
       "modify_teacher": "+ Modificar profesor por el día",
       "session_n": "Sesión {number}",
@@ -321,7 +342,33 @@
       "success_day": "Profesor asignado al día seleccionado",
       "error_assignment": "Error al realizar la asignación",
       "success_remove": "Profesor eliminado correctamente",
-      "error_remove": "Error al eliminar al profesor"
+      "error_remove": "Error al eliminar al profesor",
+      "back_to_list": "Volver al listado",
+      "page_title": "SESIONES: {title}",
+      "page_subtitle": "Gestiona el equipo docente para cada día.",
+      "teacher_added": "Profesor añadido a la sesión.",
+      "error_add_teacher": "Error al añadir el profesor a la sesión.",
+      "teacher_removed": "Profesor eliminado de la sesión.",
+      "error_remove_teacher": "Error al eliminar el profesor de la sesión.",
+      "loading_sessions": "Cargando sesiones..."
+    },
+    "Attendance": {
+      "title": "Asistencia Sesión {num}",
+      "back_to_sessions": "Volver a Sesiones",
+      "save_attendance": "Guardar Asistencia",
+      "saving": "Guardando...",
+      "table_student": "Alumno",
+      "table_status": "Estado",
+      "table_observations": "Observaciones",
+      "status_present": "Presente",
+      "status_absent": "Ausente",
+      "status_late": "Retraso",
+      "status_justified": "Justificado",
+      "observations_none": "Ninguna",
+      "success_save": "Asistencia guardada correctamente",
+      "error_save": "Error al guardar la asistencia",
+      "error_load": "Error al cargar la lista de asistencia",
+      "loading": "Cargando lista de asistencia..."
     },
     "Requests": {
       "title": "Solicitar Talleres",
@@ -344,27 +391,6 @@
       "title": "Seguimiento y Evaluación",
       "subtitle": "Revisión del impacto y resultados de los talleres."
     },
-    "Notifications": {
-      "title_user": "Avisos y Notificaciones",
-      "subtitle_user": "Estate al día de los cambios de fase, resoluciones de solicitudes y comunicaciones oficiales.",
-      "loading": "Cargando avisos oficiales...",
-      "empty": {
-        "title": "No tienes avisos pendientes",
-        "subtitle": "Cuando haya cambios en tus solicitudes o fechas clave, aparecerán aquí."
-      },
-      "btn": {
-        "read": "Marcar como leído",
-        "delete": "Eliminar"
-      },
-      "delete_dialog": {
-        "title": "Eliminar Aviso",
-        "message": "¿Estás seguro de que quieres eliminar este aviso? Esta acción no se puede deshacer."
-      },
-      "messages": {
-        "delete_ok": "Aviso eliminado.",
-        "delete_error": "Error al eliminar el aviso."
-      }
-    },
     "Monitoring": {
       "title": "Monitorización Operativa (Fase 3)",
       "subtitle": "Estado de la ejecución de talleres y asistencia en tu centro.",
@@ -383,6 +409,22 @@
         "attendance_ok": "Asistencia al día",
         "attendance_warning": "Faltan hojas por rellenar"
       },
+      "tabs": {
+        "active": "Talleres en Ejecución",
+        "completed": "Resultados y Certificados (Fase 4)"
+      },
+      "no_active_assignments": "No hay talleres activos en este momento.",
+      "no_completed_assignments": "No hay talleres finalizados recientemente.",
+      "finished_on": "Finalizado el {date}",
+      "view_analytics": "Ver Analítica",
+      "certificates_zip": "Certificados (ZIP)",
+      "quality_report": "Informe de Calidad",
+      "close": "Cerrar",
+      "loading_analytics": "Cargando análisis...",
+      "incident_id": "Incidencia #{id}",
+      "error_load_analytics": "No se ha podido cargar la analítica.",
+      "success_download_zip": "¡Descarga iniciada correctamente!",
+      "error_download_zip": "Error al generar el archivo ZIP.",
       "Today": {
         "title": "Agenda de Hoy",
         "no_sessions": "No hay sesiones programadas para hoy."
@@ -390,7 +432,15 @@
       "Incidents": {
         "title": "Últimas Incidencias",
         "report_new": "Informar Incidencia",
-        "no_incidents": "No hay incidencias reportadas."
+        "no_incidents": "No hay incidencias reportadas.",
+        "incident_id": "Incidencia #{id}"
+      },
+      "no_active": "No hay talleres activos en este momento.",
+      "no_completed": "No hay talleres finalizados recientemente.",
+      "messages": {
+        "error_analytics": "No se ha podido cargar la analítica.",
+        "success_download": "¡Descarga iniciada correctamente!",
+        "error_zip": "Error al generar el archivo ZIP."
       }
     }
   },
@@ -414,7 +464,10 @@
     "legend_ok": "Entendido",
     "event_details": "Detalles del evento",
     "close": "Cerrar",
-    "view_details": "Ver Detalles"
+    "view_details": "Ver detalles",
+    "today": "Hoy",
+    "no_events": "No hay actividad planificada",
+    "all_day": "Todo el día"
   },
   "Questionnaires": {
     "title": "Cuestionarios",
@@ -655,9 +708,22 @@
         "phase2": "Fase 2",
         "phase3": "Fase 3"
       }
+    },
+    "student": {
+      "title": "Bienvenido",
+      "subtitle": "Consulta tus talleres y descarga tus certificados.",
+      "certificates_title": "Mis Certificados",
+      "no_certificates": "No se han encontrado certificados.",
+      "no_certificates_desc": "Aún no has obtenido ningún certificado. Completa un taller para ganar uno.",
+      "download_pdf": "Descargar PDF",
+      "loading": "Cargando panel...",
+      "duration": "Duración",
+      "issued": "Emitido",
+      "pdf_not_implemented": "La generación de PDF no está implementada en esta demo."
     }
   },
   "Forms": {
+    "edit_title": "Editar",
     "search": "Buscar...",
     "search_by_title": "Buscar por título",
     "filter_by_sector": "Filtrar por sector",
@@ -695,7 +761,33 @@
     "tuesday": "Martes",
     "wednesday": "Miércoles",
     "thursday": "Jueves",
-    "friday": "Viernes"
+    "friday": "Viernes",
+    "Centers": {
+      "edit_title": "Editar Centro",
+      "create_title": "Crear Nuevo Centro",
+      "edit_subtitle": "Modifica los detalles del centro educativo",
+      "create_subtitle": "Introduce los datos para registrar un nuevo centro.",
+      "code": "Código del Centro",
+      "name": "Nombre del Centro",
+      "address": "Dirección",
+      "phone": "Teléfono de Contacto",
+      "email": "Email de Contacto",
+      "required_error": "El código y el nombre del centro son obligatorios.",
+      "update_error": "No se ha podido actualizar el centro.",
+      "create_error": "No se ha podido crear el centro.",
+      "code_placeholder": "Ej: 08012345",
+      "name_placeholder": "Ej: Institut Pedralbes",
+      "address_placeholder": "Ej: Carrer Gran Via, 123",
+      "phone_placeholder": "Ej: 931234567",
+      "email_placeholder": "Ej: contacto@centro.edu",
+      "save_changes": "Guardar Cambios",
+      "create_center": "Crear Centro",
+      "processing": "Procesando..."
+    },
+    "new_workshop": "Nuevo taller",
+    "edit_workshop": "Editar taller",
+    "workshop_title": "Título del taller",
+    "professional_sector": "Sector profesional"
   },
   "WorkshopsPage": {
     "title": "Gestión de Talleres",
@@ -783,7 +875,10 @@
     "incidents_subtitle": "INFORMA DE PROBLEMAS DE COMPORTAMIENTO O SOLICITA PLAZAS VACANTES.",
     "incident_placeholder": "Describe el problema...",
     "report_btn": "Informar Incidencia",
-    "incident_success": "Incidencia informada. El CEB la revisará pronto."
+    "incident_success": "Incidencia informada. El CEB la revisará pronto.",
+    "search_assignments_title": "Buscar asignaciones",
+    "input_search_placeholder": "Buscar por taller o centro...",
+    "action_btn": "Acción"
   },
   "StudentsPage": {
     "title": "Gestión de Alumnado",
@@ -891,9 +986,12 @@
     "students_title": "Alumnado Participante",
     "students_subtitle": "{occupied} de {total} plazas ocupadas.",
     "select_students_btn": "Seleccionar Alumnos",
+    "nominal_register_btn": "Registro Nominal",
     "table_info": "Alumno / Información",
     "no_students": "Aún no hay alumnos asignados",
+    "no_students_hint": "Haz clic aquí para iniciar el registro nominal",
     "remove_student_success": "Alumno eliminado correctamente.",
+    "remove_student_tooltip": "Eliminar alumno",
     "loading_msg": "Cargando detalles del taller...",
     "status": {
       "PROVISIONAL": "PROVISIONAL",
@@ -999,11 +1097,22 @@
     "description": "Lo sentimos, pero la página que estás buscando no existe o ha sido movida.",
     "goHome": "Volver al inicio"
   },
+  "Widgets": {
+    "NextEvents": {
+      "title": "Próximos eventos",
+      "view_all": "ver todo",
+      "no_events": "No hay eventos próximos",
+      "program_milestone": "Hito del programa",
+      "deadline": "Plazo",
+      "workshop": "Taller"
+    }
+  },
   "Common": {
     "general": "General",
     "configuration": "Configuración",
     "global": "Global",
     "phase": "Fase",
+    "phase_with_number": "Fase {number}",
     "loading": "Cargando...",
     "module_closed": "Módulo cerrado",
     "loading_calendar": "Cargando calendario...",
@@ -1032,18 +1141,62 @@
     "pending": "Pendiente",
     "authenticating": "Verificando credenciales...",
     "search": "Buscar...",
+    "all_statuses": "Todos los estados",
     "actions": "Acciones",
     "ok": "Aceptar",
+    "confirm": "Confirmar",
     "cancel": "Cancelar",
+    "showing": "Mostrando",
+    "of": "de",
+    "previous": "Anterior",
+    "page": "Página",
+    "next": "Siguiente",
+    "close": "Cerrar",
+    "table_info": "Información",
     "loading_error": "No se ha podido cargar la información",
     "error_connectivity": "Error de conexión. Por favor, verifica si el servidor está activo.",
     "delete_success": "Elemento eliminado correctamente.",
     "delete_error": "Se ha producido un error al eliminar el elemento.",
     "delete_confirm_title": "Confirmar eliminación",
     "delete_confirm_msg": "¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer.",
+    "places_label": "Plazas",
+    "duration_label": "Duración",
+    "clear_filters": "Limpiar filtros",
+    "no_results": "No se han encontrado resultados",
+    "try_other_terms": "Prueba con otros términos de búsqueda.",
+    "search_by_title": "Buscar por título",
+    "filter_by_sector": "Filtrar por sector",
+    "filter_by_modality": "Filtrar por modalidad",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "all_sectors": "Todos los sectores",
+    "all_modalities": "Todas las modalidades",
+    "modality_label": "Modalidad",
+    "no_description": "No hay descripción disponible.",
     "new": "Nuevo",
     "system_default": "Predeterminado del Sistema",
     "select_language": "Seleccionar Idioma",
+    "all_centers": "Todos los centros",
+    "search_placeholder": "Ej: Carpintería, Robótica...",
+    "id_label": "ID",
+    "save_success": "Operación completada con éxito.",
+    "error_loading": "Error al cargar los datos.",
+    "fill_all_fields": "Por favor, completa todos los campos.",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "details": "Detalles",
+    "status": "Estado",
+    "status_label": "Estado: {status}",
+    "table_idalu": "IDALU",
+    "table_course": "Curso",
+    "clear": "Limpiar",
+    "upload_success": "{label} subido correctamente.",
+    "error_upload": "Error al subir el documento.",
+    "only_pdf_allowed": "Solo se permiten archivos PDF.",
+    "ai_mismatch": "La IA detecta un tipo diferente: {type}.",
+    "ai_no_signatures": "La IA no ha detectado las firmas requeridas.",
+    "ai_error": "Error al procesar la IA. Puedes forzar la subida.",
     "roles": {
       "ADMIN": "Administrador",
       "COORDINATOR": "Coordinador",
@@ -1057,6 +1210,168 @@
       "need_eval": "NECESITA EVAL",
       "will_certify": "CERTIFICARÁ",
       "no_cert": "SIN CERT"
+    },
+    "upcoming_events": "Próximos hitos",
+    "view_all": "ver todo →",
+    "event_milestone": "Hito del programa",
+    "event_deadline": "Plazo",
+    "event_workshop": "Taller",
+    "no_upcoming_events": "No hay eventos próximos",
+    "no_planned_activity": "No hay actividad planificada",
+    "today": "Hoy",
+    "items": "elementos",
+    "statuses": {
+      "PROVISIONAL": "Provisional",
+      "PUBLISHED": "Publicado",
+      "DATA_ENTRY": "Pendiente de gestión",
+      "DATA_SUBMITTED": "Datos enviados",
+      "VALIDATED": "Confirmado",
+      "READY_TO_START": "Listo para empezar",
+      "VACANT": "Vacante",
+      "IN_PROGRESS": "En ejecución",
+      "COMPLETED": "Completado",
+      "CANCELLED": "Cancelado"
     }
+  },
+  "Notifications": {
+    "title_user": "Avisos y Notificaciones",
+    "subtitle_user": "Estate al día de los cambios de fase, resoluciones de solicitudes y comunicaciones oficiales.",
+    "title_admin": "Control de Alertas del Sistema",
+    "subtitle_admin": "Gestión global de comunicaciones y alertas para todos los usuarios.",
+    "loading": "Cargando avisos oficiales...",
+    "Application": "Solicitud y Pre-inscripción",
+    "Planning": "Planificación y Asignación",
+    "Execution": "Ejecución y Seguimiento",
+    "Closure": "Cierre y Certificación",
+    "Approved": "Aprobada",
+    "Rejected": "Rechazada",
+    "phase_start_title": "Nueva Fase: {name}",
+    "phase_start_msg": "La fase \"{name}\" ha comenzado. Consulta el calendario para más detalles.",
+    "calendar_sync_title": "Sincronización de Calendario (Sistema)",
+    "calendar_sync_msg": "Verificación de calendario en segundo plano ejecutada",
+    "session_reminder_title": "Recordatorio: Sesión de Taller",
+    "session_reminder_msg": "Tienes una sesión para el taller \"{title}\" programada para hoy a las {time}.",
+    "milestone_reminder_title": "Próximo Hito: {title}",
+    "milestone_reminder_msg": "Recordatorio: El hito \"{title}\" está programado para las próximas 24 horas.",
+    "request_status_title": "Solicitud {status}",
+    "request_status_msg": "Tu solicitud para el taller \"{title}\" ha sido {status_low}.",
+    "incorrect_doc_title": "Documentación Incorrecta",
+    "incorrect_doc_msg": "Hola, el documento {doc} del taller {title} es incorrecto. {comment}",
+    "registration_confirmed_title": "Matrícula Confirmada: Taller en Curso",
+    "registration_confirmed_msg": "La matrícula para el taller \"{title}\" se ha completado correctamente. El taller ya está activo y se han generado las sesiones en tu calendario.",
+    "workshop_assigned_title": "Taller Asignado (Tetris)!",
+    "workshop_assigned_msg": "Tu solicitud para el taller \"{title}\" ha sido aprobada y asignada.",
+    "assignments_published_title": "Asignaciones Publicadas",
+    "assignments_published_msg": "Ya puedes consultar las asignaciones y empezar a introducir los datos de los alumnos.",
+    "CALENDAR_CHECK_HEARTBEAT": "Sincronización de Calendario (Sistema)",
+    "Background calendar check executed": "Verificación de calendario en segundo plano ejecutada",
+    "New Phase: Application": "Nueva Fase: Solicitud y Pre-inscripción",
+    "New Phase: Planning": "Nueva Fase: Planificación y Asignación",
+    "New Phase: Execution": "Nueva Fase: Ejecución y Seguimiento",
+    "New Phase: Closure": "Nueva Fase: Cierre y Certificación",
+    "The phase \"Application\" has started Check the calendar for details": "La fase \"Solicitud\" ha comenzado. Consulta el calendario para más detalles.",
+    "The phase \"Planning\" has started Check the calendar for details": "La fase \"Planificación\" ha comenzado. Consulta el calendario para más detalles.",
+    "The phase \"Execution\" has started Check the calendar for details": "La fase \"Ejecución\" ha comenzado. Consulta el calendario para más detalles.",
+    "The phase \"Closure\" has started Check the calendar for details": "La fase \"Cierre\" ha comenzado. Consulta el calendario para más detalles.",
+    "empty": {
+      "title": "No tienes avisos pendientes",
+      "subtitle": "Cuando haya cambios en tus solicitudes o fechas clave, aparecerán aquí."
+    },
+    "btn": {
+      "read": "Marcar como leído",
+      "delete": "Eliminar"
+    },
+    "delete_dialog": {
+      "title": "Eliminar Aviso",
+      "message": "¿Estás seguro de que quieres eliminar este aviso? Esta acción no se puede deshacer."
+    },
+    "messages": {
+      "delete_ok": "Aviso eliminado.",
+      "delete_error": "Error al eliminar el aviso."
+    }
+  },
+  "DesignateTeachersPage": {
+    "page_title": "Designar Docentes: {title}",
+    "page_subtitle": "Designa los dos docentes referentes que se encargarán del seguimiento.",
+    "selection_of_referents": "Selección de Referentes",
+    "main_teacher": "Docente Principal",
+    "select": "Seleccionar...",
+    "second_teacher": "Segundo Docente",
+    "saving": "Guardando...",
+    "confirm_designation": "Confirmar Designación",
+    "mandatory_requirement": "Requisito Obligatorio",
+    "mandatory_description": "Es necesario designar a dos docentes para garantizar que siempre haya un referente disponible para el alumnado y para las comunicaciones con el CEB.",
+    "teacher_designation_not_active": "El periodo de designación de docentes no está activo.",
+    "assignment_not_found": "Asignación no encontrada.",
+    "designate_two_teachers": "Debes designar a dos docentes referentes.",
+    "teachers_must_be_different": "Los dos docentes deben ser personas diferentes.",
+    "teachers_designated_correctly": "Docentes designados correctamente.",
+    "error_saving_designation": "Error al guardar la designación.",
+    "loading_designation": "Cargando designación..."
+  },
+  "AssignmentEvaluationsPage": {
+    "page_title": "Evaluación Competencial: {title}",
+    "page_subtitle": "Califica el desempeño de los alumnos participantes en el taller.",
+    "back_to_assignments": "Volver a Asignaciones",
+    "list_of_enrollments": "Lista de Matriculaciones",
+    "no_enrollments": "No se han encontrado matriculaciones para esta asignación.",
+    "idalu": "IDALU:",
+    "status_completed": "Completado",
+    "status_pending": "Pendiente",
+    "btn_view_edit": "Ver / Editar",
+    "btn_evaluate": "Evaluar",
+    "instructions_title": "Instrucciones de Evaluación",
+    "instructions_desc": "Recuerda que la evaluación competencial es un requisito indispensable para la certificación de la atención educativa del alumno. Debes valorar tanto las competencias técnicas como las transversales.",
+    "assignment_not_found": "Asignación no encontrada.",
+    "loading_enrollments": "Cargando matriculaciones..."
+  },
+  "AttendancePage": {
+    "error_loading_attendance": "Error al cargar la lista de asistencia",
+    "attendance_saved": "Asistencia guardada correctamente",
+    "error_saving_attendance": "Error al guardar la asistencia",
+    "loading_attendance": "Cargando lista de asistencia...",
+    "page_title": "Asistencia Sesión {num}",
+    "assignment": "Asignación {id}",
+    "back_to_sessions": "Volver a Sesiones",
+    "save_attendance": "Guardar Asistencia",
+    "saving": "Guardando...",
+    "student": "Alumno",
+    "observations": "Observaciones",
+    "none": "Ninguna",
+    "status_present": "Presente",
+    "status_absent": "Ausente",
+    "status_late": "Retraso",
+    "status_justified": "Justificado"
+  },
+  "PublicSurvey": {
+    "title": "Iter Ecosystem",
+    "subtitle": "Auto-evaluación del taller",
+    "email_label": "Correo electrónico (xtec)",
+    "email_placeholder": "ejemplo@xtec.cat",
+    "verify_button": "Comenzar encuesta",
+    "verifying": "Verificando...",
+    "success_title": "¡Encuesta finalizada!",
+    "success_message": "Muchas gracias por tu tiempo. Tus respuestas nos ayudan a mejorar el Programa Enginy.",
+    "subtitle_with_name": "¿Cómo ha ido el taller, {name}?",
+    "error_no_survey": "No hemos encontrado ninguna encuesta pendiente para ti.",
+    "submit_success": "¡Encuesta enviada correctamente!",
+    "submit_error": "Error al enviar la encuesta.",
+    "section_quality": "Calidad y Contenido",
+    "section_experience": "Valoración de Experiencia",
+    "section_vocational": "Impacto Vocacional",
+    "label_interest": "¿Te ha parecido interesante el tema tratado?",
+    "label_clarity": "¿La explicación de las actividades ha sido clara y entendible?",
+    "label_material": "¿Los materiales y herramientas eran adecuados y de buena calidad?",
+    "label_support": "¿Te has sentido ayudado/a y acompañado/a por el docente?",
+    "label_overall": "¿Cómo valorarías tu experiencia global hoy?",
+    "label_teacher": "¿Cómo valorarías al docente que ha impartido el taller?",
+    "label_future": "¿Te ha ayudado a decidir tu futuro profesional?",
+    "label_comments": "Cuéntanos brevemente lo que más te ha gustado (o mejorarías):",
+    "opt_future_yes": "Sí, me ha aclarado las ideas.",
+    "opt_future_no": "No, ya lo tenía claro o no es para mí.",
+    "opt_future_maybe": "Me lo estoy considerando ahora de nuevo.",
+    "footer_note": "Feedback anónimo para el centro. ¡Sé sincero!",
+    "submit_button": "Enviar encuesta",
+    "submitting": "Enviando..."
   }
 }

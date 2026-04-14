@@ -41,13 +41,12 @@ export class ReminderService {
       const recentCheck = await prisma.notification.findFirst({
         where: {
           type: 'SYSTEM',
-          title: 'CALENDAR_CHECK_HEARTBEAT',
+          title: 'calendar_sync_title',
           createdAt: {
             gt: new Date(Date.now() - 30 * 60 * 1000)
           }
         }
       });
-
       if (recentCheck) {
         return;
       }
@@ -55,8 +54,8 @@ export class ReminderService {
       // Record this check heartbeat
       await prisma.notification.create({
         data: {
-          title: 'CALENDAR_CHECK_HEARTBEAT',
-          message: 'Background calendar check executed',
+          title: 'calendar_sync_title',
+          message: 'calendar_sync_msg',
           type: 'SYSTEM',
           importance: 'INFO',
           isRead: true
@@ -115,8 +114,14 @@ export class ReminderService {
             if (!existing) {
               await createNotificationInternal({
                 userId: user.userId,
-                title: `Reminder: Workshop Session`,
-                message: `You have a session for the workshop "${session.assignment.workshop.title}" scheduled for today at ${session.startTime || 'its usual time'}.`,
+                title: 'session_reminder_title',
+                message: JSON.stringify({
+                  key: 'session_reminder_msg',
+                  params: {
+                    title: session.assignment.workshop.title,
+                    time: session.startTime || 'su hora habitual'
+                  }
+                }),
                 type: 'SYSTEM',
                 importance: 'INFO'
               });
@@ -152,8 +157,11 @@ export class ReminderService {
 
           if (!existing) {
             await createNotificationInternal({
-              title: `Upcoming Milestone: ${milestone.title}`,
-              message: `Remember: The milestone "${milestone.title}" is scheduled for the next 24 hours.`,
+              title: 'milestone_reminder_title',
+              message: JSON.stringify({
+                key: 'milestone_reminder_msg',
+                params: { title: milestone.title }
+              }),
               type: 'PHASE',
               importance: 'WARNING'
             });

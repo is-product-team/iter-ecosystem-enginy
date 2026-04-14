@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
 import { useRouter } from 'expo-router';
 import WorkshopDetailModal from './WorkshopDetailModal';
+import { useTranslation } from 'react-i18next';
 
 export interface CalendarEvent {
   id: string;
@@ -24,6 +25,8 @@ interface CalendarViewProps {
 }
 
 const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMonthChange, isLoading }) => {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language === 'ca' ? 'ca-ES' : 'es-ES';
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -34,7 +37,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
   const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
 
-  const monthName = currentDate.toLocaleString('ca-ES', { month: 'long' });
+  const monthName = currentDate.toLocaleString(lang, { month: 'long' });
   const year = currentDate.getFullYear();
 
   const prevMonth = () => {
@@ -48,6 +51,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
     setCurrentDate(newDate);
     onMonthChange?.(newDate);
   };
+
+  const weekdays = useMemo(() => {
+    const baseDate = new Date(2024, 0, 1); // Monday, Jan 1st 2024
+    return Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date(baseDate);
+      d.setDate(d.getDate() + i);
+      return d.toLocaleDateString(lang, { weekday: 'short' }).slice(0, 2).toUpperCase();
+    });
+  }, [lang]);
 
   const calendarDays = useMemo(() => {
     const totalDays = daysInMonth(year, currentDate.getMonth());
@@ -138,7 +150,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
 
           {/* Weekdays */}
           <View className="flex-row mb-2">
-            {['DL', 'DT', 'DC', 'DJ', 'DV', 'DS', 'DG'].map(d => (
+            {weekdays.map(d => (
               <View key={d} className="flex-1 items-center">
                 <Text className="text-[10px] font-bold text-text-muted">{d}</Text>
               </View>
@@ -205,14 +217,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
       <View className="flex-1 px-4">
         <View className="py-3">
           <Text className="text-text-muted text-xs font-bold uppercase tracking-widest pl-2">
-             {new Date(selectedDate).toLocaleDateString('ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+             {new Date(selectedDate).toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'long' })}
           </Text>
         </View>
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
           {dayEvents.length === 0 ? (
             <View className="items-center justify-center py-10 rounded-2xl border-2 border-dashed border-border-subtle">
-              <Text className="text-text-muted font-medium text-sm">No hi ha esdeveniments</Text>
+              <Text className="text-text-muted font-medium text-sm">{t('Calendar.no_events')}</Text>
             </View>
           ) : (
             dayEvents.map(event => (
@@ -224,7 +236,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
                 {/* Time Column */}
                 <View className="w-16 border-r border-border-subtle mr-4 justify-center">
                   <Text className="text-text-primary font-bold text-sm">
-                    {event.metadata?.hora ? event.metadata.hora.split(' - ')[0] : 'Tot el dia'}
+                    {event.metadata?.hora ? event.metadata.hora.split(' - ')[0] : t('Calendar.all_day')}
                   </Text>
                   {event.metadata?.hora && (
                     <Text className="text-text-muted text-[10px] font-bold">

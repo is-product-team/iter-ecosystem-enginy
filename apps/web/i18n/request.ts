@@ -1,4 +1,4 @@
-// Reload trigger: 2026-04-09 10:35
+// Reload trigger: 2026-04-14 12:05
 import { getRequestConfig } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 

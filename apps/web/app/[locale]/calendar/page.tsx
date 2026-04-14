@@ -30,6 +30,7 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(false);
   const t = useTranslations('Calendar');
   const tc = useTranslations('Common');
+  const tp = useTranslations('ProgramPhases');
   const tSync = useTranslations('Sync');
 
   // Overlay states
@@ -59,9 +60,18 @@ export default function CalendarPage() {
         return "calendar-event-card event-milestone";
       };
 
+      const getLocalizedPhaseName = (name: string) => {
+        const n = name.toLowerCase();
+        if (n.includes("sol·licitud") || n.includes("inscripció") || n.includes("application") || n.includes("registration")) return tp('Application.name');
+        if (n.includes("planificació") || n.includes("assignació") || n.includes("planning") || n.includes("assignment")) return tp('Planning.name');
+        if (n.includes("execució") || n.includes("seguiment") || n.includes("execution") || n.includes("monitoring")) return tp('Execution.name');
+        if (n.includes("tancament") || n.includes("avaluació") || n.includes("closure") || n.includes("evaluation")) return tp('Closure.name');
+        return name;
+      };
+
       const phaseEvents = phasesData.map((f: Phase) => ({
         id: `phase-${f.phaseId}`,
-        title: `${tc('phase')}: ${f.name}`,
+        title: `${tc('phase')}: ${getLocalizedPhaseName(f.name)}`,
         date: f.startDate,
         endDate: f.endDate,
         type: 'milestone',
@@ -70,13 +80,19 @@ export default function CalendarPage() {
       }));
 
       setEvents([...eventsRes.data, ...phaseEvents]);
-      setActivePhase(phasesData.find((f: Phase) => f.isActive));
+      const currentActive = phasesData.find((f: Phase) => f.isActive);
+      if (currentActive) {
+        setActivePhase({
+          ...currentActive,
+          name: getLocalizedPhaseName(currentActive.name)
+        });
+      }
     } catch (error) {
       console.error("Error fetching calendar data:", error);
     } finally {
       setLoading(false);
     }
-  }, [user, tc]);
+  }, [user, tc, tp]);
 
   if (authLoading) return <Loading fullScreen message={t('loading_auth')} />;
 

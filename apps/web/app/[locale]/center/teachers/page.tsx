@@ -104,7 +104,11 @@ export default function TeachersCRUD() {
 
   const handleEdit = (teacher: Teacher) => {
     setEditingTeacher(teacher);
-    setFormData({ name: teacher.name, contact: teacher.contact, password: '' });
+    setFormData({ 
+      name: teacher.name || '', 
+      contact: teacher.contact || '', 
+      password: '' 
+    });
     setIsModalOpen(true);
   };
 

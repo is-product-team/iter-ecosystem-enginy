@@ -57,8 +57,11 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
 
     // Notify all centers about the start of the new phase
     await createNotificationInternal({
-      title: `New Phase: ${updatedPhase.name}`,
-      message: `The phase "${updatedPhase.name}" has started. Check the calendar for details.`,
+      title: 'phase_start_title',
+      message: JSON.stringify({
+        key: 'phase_start_msg',
+        params: { name: updatedPhase.name }
+      }),
       type: 'PHASE',
       importance: 'URGENT'
     });
