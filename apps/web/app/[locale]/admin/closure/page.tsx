@@ -11,7 +11,6 @@ import { toast } from 'sonner';
 import Pagination from '@/components/Pagination';
 import ClosureModal from '@/components/ClosureModal';
 import getApi from '@/services/api';
-import SatisfactionCharts from '@/components/SatisfactionCharts';
 
 export default function ClosurePage() {
   const t = useTranslations('Admin.Closure');
@@ -85,8 +84,6 @@ export default function ClosurePage() {
     }
   };
 
-
-
   const handleDownloadZip = async (assignmentId: number) => {
     try {
       const api = getApi();
@@ -154,7 +151,6 @@ export default function ClosurePage() {
                   <div className="text-right flex flex-col items-end gap-2">
                     <p className="text-[11px] font-bold text-text-muted uppercase opacity-50">ID: {assignment.assignmentId}</p>
                     <div className="flex gap-2">
-
                         {isCompleted && (
                             <button 
                                 onClick={() => handleDownloadZip(assignment.assignmentId)}
@@ -224,7 +220,6 @@ export default function ClosurePage() {
         onConfirm={handleConfirmClosure}
         onCancel={() => setIsModalOpen(false)}
       />
-
 
     </DashboardLayout>
   );
