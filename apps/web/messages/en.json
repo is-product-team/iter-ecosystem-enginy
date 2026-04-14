@@ -472,8 +472,21 @@
     "delete_confirm_title": "Confirm deletion",
     "delete_confirm_msg": "Are you sure you want to delete this item? This action cannot be undone.",
     "new": "New",
+    "items": "items",
     "system_default": "System Default",
     "select_language": "Select Language",
+    "statuses": {
+      "PROVISIONAL": "Provisional",
+      "PUBLISHED": "Published",
+      "DATA_ENTRY": "Pending Management",
+      "DATA_SUBMITTED": "Data Submitted",
+      "VALIDATED": "Confirmed",
+      "READY_TO_START": "Ready to Start",
+      "VACANT": "Vacant",
+      "IN_PROGRESS": "In Execution",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
     "roles": {
       "ADMIN": "Administrator",
       "COORDINATOR": "Coordinator",

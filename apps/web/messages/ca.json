@@ -102,7 +102,7 @@
       "roadmap_title": "Full de Ruta del Programa",
       "roadmap_subtitle": "Gestió i control de les fases acadèmiques",
       "institutional_notice_title": "Sistema de Control Temporal",
-      "institutional_notice_desc": "Les fases dicten les eines disponibles per als coordinadors. Activar una fase canvia el context de tota la plataforma per a tots els centres educatius.",
+      "institutional_notice_desc": "Les fases dicten les eines disponibles per als coordinadors. Activar una fase canvia el context de toda la plataforma per a tots els centres educatius.",
       "loading_roadmap": "Sincronitzant full de ruta...",
       "currently_active": "Actualment Activa",
       "inactive": "Inactiva",
@@ -637,7 +637,7 @@
       }
     },
     "center": {
-      "title": "Panell del Centre",
+      "title": "Panel del Centre",
       "subtitle": "Gestió del procés de tallers Iter.",
       "timeline_title": "Estat del Programa Iter 25-26",
       "loading_calendar": "Carregant calendari...",
@@ -898,7 +898,7 @@
     "table_teacher": "Professor",
     "table_contact": "Contacte",
     "edit_teacher_title": "Editar Professor",
-    "create_teacher_title": "Nou Professor",
+    "create_teacher_title": "Nuevo Profesor",
     "modify_data": "Modifica les dades del professor",
     "enter_data": "Introdueix les dades per al nou professor",
     "change_photo": "Canviar Foto",
@@ -944,7 +944,7 @@
     "max_students_alert": "En la Modalitat C, el nombre màxim d'alumnes és 4.",
     "referents_required": "Has de seleccionar dos professors referents.",
     "referents_different": "Els dos professors referents han de ser diferents.",
-    "send_error": "Error en enviar la sol·licitud.",
+    "send_error": "Error al enviar la sol·licitud.",
     "select_btn": "Seleccionar",
     "selected_label": "Seleccionat",
     "edit_btn": "Editar",
@@ -1028,7 +1028,7 @@
     }
   },
   "Sync": {
-    "title": "Sincronizar",
+    "title": "Sincronitzar",
     "modal_title": "Porta el teu calendari a tot arreu",
     "modal_subtitle": "Sincronitza les teves sessions i fites d'Iter amb la teva aplicació de calendari preferida.",
     "google_btn": "Afegir a Google Calendar",

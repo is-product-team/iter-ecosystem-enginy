@@ -16,9 +16,10 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   totalItems,
   currentItemsCount,
-  itemName = 'items'
+  itemName
 }) => {
   const t = useTranslations('Common');
+  const itemsLabel = itemName || t('items');
   if (totalPages <= 1) return null;
 
   return (
@@ -37,6 +38,7 @@ const Pagination: React.FC<PaginationProps> = ({
           {t('previous')}
         </button>
         <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-bold text-consorci-darkBlue dark:text-consorci-lightBlue tracking-[0.2em]">
+          {t('page')} {currentPage} {t('of')} {totalPages}
           {t('page')} {currentPage} {t('of')} {totalPages}
         </div>
         <button

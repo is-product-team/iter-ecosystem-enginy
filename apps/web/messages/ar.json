@@ -162,7 +162,7 @@
       "report_problem_hint": "أبلغ عن مشكلة في وثائق هذا الطالب",
       "report_problem_btn": "إبلاغ عن مشكلة",
       "no_assignments": "لا توجد تعيينات للتحقق منها",
-      "report_modal_title": "الإبلاغ عن مشكلة وثائقية",
+      "report_modal_title": "إبلاغ عن مشكلة وثائقية",
       "reason_placeholder": "صف سبب الخطأ هنا...",
       "error_no_comment": "يجب عليك كتابة تعليق",
       "success_notif": "تم إرسال الإشعار بنجاح",
@@ -416,7 +416,17 @@
     "delete_error": "حدث خطأ أثناء حذف العنصر.",
     "delete_confirm_title": "تأكيد الحذف",
     "delete_confirm_msg": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذه الخطوة.",
+    "places_label": "{count} مقاعد",
+    "duration_label": "{hours}ساعة",
     "new": "جديد",
+    "items": "عناصر",
+    "phase_with_number": "مرحلة {number}",
+    "phases_names": {
+      "APPLICATION": "تقديم الطلب",
+      "PLANNING": "تخطيط",
+      "EXECUTION": "تنفيذ",
+      "EVALUATION": "تقييم"
+    },
     "system_default": "افتراضي النظام",
     "select_language": "اختار اللغة",
     "badges": {
@@ -427,6 +437,7 @@
       "will_certify": "سيتم الاعتماد",
       "no_cert": "بدون اعتماد"
     }
+  },
   },
   "Calendar": {
     "loading_auth": "جاري مزامنة تقويمك...",

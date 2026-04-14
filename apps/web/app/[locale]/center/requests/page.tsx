@@ -222,7 +222,7 @@ export default function RequestsPage() {
               />
             </div>
             <div className="text-[12px] font-medium text-text-muted whitespace-nowrap">
-              {filteredWorkshops.length} Workshops available
+              {t('num_workshops', { count: filteredWorkshops.length })}
             </div>
           </div>
 
@@ -285,12 +285,12 @@ export default function RequestsPage() {
                                         <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
                                         <span className="flex items-center gap-1">
                                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            {workshop.technicalDetails?.durationHours}h
+                                            {tCommon('duration_label', { hours: workshop.technicalDetails?.durationHours })}
                                         </span>
                                         <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
                                         <span className="flex items-center gap-1">
                                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                            {workshop.technicalDetails?.maxPlaces} pax
+                                            {tCommon('places_label', { count: workshop.technicalDetails?.maxPlaces })}
                                         </span>
                                     </div>
                                 </div>
@@ -301,12 +301,12 @@ export default function RequestsPage() {
                               <div className="flex flex-col gap-0.5">
                                 {existingRequest.teacher1Id && (
                                   <div className="text-[12px] font-medium text-text-primary">
-                                    {teachers.find(t => t.teacherId === existingRequest.teacher1Id)?.name || t('loading_error')}
+                                    {teachers.find(t => t.teacherId === existingRequest.teacher1Id)?.name || tCommon('loading_error')}
                                   </div>
                                 )}
                                 {existingRequest.teacher2Id && (
                                   <div className="text-[12px] font-medium text-text-primary">
-                                    {teachers.find(t => t.teacherId === existingRequest.teacher2Id)?.name || t('loading_error')}
+                                    {teachers.find(t => t.teacherId === existingRequest.teacher2Id)?.name || tCommon('loading_error')}
                                   </div>
                                 )}
                               </div>
@@ -345,7 +345,7 @@ export default function RequestsPage() {
                 ) : (
                   <tr>
                     <td colSpan={4} className="px-6 py-12 text-center">
-                      <p className="text-text-muted text-[13px] font-medium">No workshops found</p>
+                      <p className="text-text-muted text-[13px] font-medium">{tCommon('no_results')}</p>
                     </td>
                   </tr>
                 )}
@@ -359,7 +359,7 @@ export default function RequestsPage() {
             onPageChange={setCurrentPage}
             totalItems={filteredWorkshops.length}
             currentItemsCount={paginatedWorkshops.length}
-            itemName={t('table_workshop')}
+            itemName={tCommon('workshops')}
           />
         </div>
       </div>
@@ -368,7 +368,6 @@ export default function RequestsPage() {
       {/* Workshop Solicitation Modal - Flat Sharp Look with Backdrop Blur */}
       {(() => {
         const workshopForModal = filteredWorkshops.find(w => w._id === selectedWorkshopId);
-        const existingRequestForModal = requests.find(r => r.workshopId === parseInt(selectedWorkshopId || "0"));
         
         if (!workshopForModal) return null;
 
@@ -394,7 +393,7 @@ export default function RequestsPage() {
                     workshopForModal.modality === 'B' ? 'text-orange-500' :
                       'text-purple-500'
                     }`}>
-                    MODALIDAD {workshopForModal.modality}
+                    {tCommon('modality_label', { modality: workshopForModal.modality })}
                   </div>
                   <button 
                     onClick={closeModal}
@@ -412,7 +411,7 @@ export default function RequestsPage() {
                     <div>
                       <h4 className="text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4 border-b border-border-subtle pb-2 inline-block">{t('workshop_details')}</h4>
                       <p className="text-[15px] leading-relaxed text-text-secondary italic">
-                        {workshopForModal.technicalDetails?.description || "No description available."}
+                        {workshopForModal.technicalDetails?.description || tCommon('no_description')}
                       </p>
                     </div>
 

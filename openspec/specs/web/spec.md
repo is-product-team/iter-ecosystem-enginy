@@ -24,3 +24,14 @@ The web application SHALL enforce an i18n-first approach for all UI components, 
 #### Scenario: Developer adds a new UI component
 - **WHEN** a new component is added to the `apps/web/components` directory
 - **THEN** it MUST use the `useTranslations` hook for all its text elements and reference keys in the central locale JSON files.
+
+### Requirement: Coordinator View Internationalization Compliance
+All pages and sub-pages under the Coordinator role view (`/center/**`) MUST be fully internationalized, following the `web-i18n` specification. Hardcoded English text is strictly forbidden.
+
+#### Scenario: Coordinator views assignments
+- **WHEN** a coordinator navigates to the `/center/assignments` page
+- **THEN** all UI text, including table headers, search placeholders, and empty state messages, MUST be translated.
+
+#### Scenario: Coordinator requests a workshop
+- **WHEN** a coordinator interacts with the workshop request form (`/center/requests`)
+- **THEN** all informational text, labels, and feedback messages MUST be fully internationalized.
