@@ -1136,6 +1136,10 @@ export const addTeachingStaff = async (req: Request, res: Response) => {
   const { idAssignment: assignmentId } = req.params;
   const { userId, isPrincipal } = req.body;
 
+  if (!userId || isNaN(parseInt(userId as string))) {
+    return res.status(400).json({ error: 'Valid userId is required' });
+  }
+
   try {
     const relation = await prisma.assignmentTeacher.upsert({
       where: {
@@ -1154,7 +1158,8 @@ export const addTeachingStaff = async (req: Request, res: Response) => {
       }
     });
     res.status(201).json(relation);
-  } catch (_error) {
+  } catch (error) {
+    console.error("Error adding teacher to team:", error);
     res.status(500).json({ error: 'Error adding teacher to the team' });
   }
 };
@@ -1181,6 +1186,10 @@ export const removeTeachingStaff = async (req: Request, res: Response) => {
 export const addSessionTeacher = async (req: Request, res: Response) => {
   const { idSession: sessionId } = req.params;
   const { userId } = req.body;
+
+  if (!userId || isNaN(parseInt(userId as string))) {
+    return res.status(400).json({ error: 'Valid userId is required' });
+  }
 
   try {
     const relation = await prisma.sessionTeacher.upsert({

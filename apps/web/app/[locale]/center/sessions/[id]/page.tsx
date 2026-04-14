@@ -67,10 +67,10 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
     fetchData();
   }, [id, router]);
 
-  const handleAddSessionStaff = async (sessionId: number, idUser: number) => {
+  const handleAddSessionStaff = async (sessionId: number, userId: number) => {
     try {
       const api = getApi();
-      await api.post(`/assignments/sessions/${sessionId}/staff`, { idUser });
+      await api.post(`/assignments/sessions/${sessionId}/staff`, { userId });
 
       const res = await api.get(`/assignments/${id}`);
       setAssignment(res.data);
