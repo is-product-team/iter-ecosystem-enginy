@@ -8,6 +8,7 @@
     "shared"
   ],
   "scripts": {
+    "hygiene": "node scripts/monorepo-hygiene.mjs",
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
     "lint": "turbo run lint",
@@ -49,6 +50,8 @@
   "overrides": {
     "next": "15.1.1",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "typescript": "^5.3.3",
+    "zod": "^3.24.2"
   }
 }
