@@ -225,9 +225,6 @@ export default function TeachersCRUD() {
                 <p className="text-text-muted text-[12px] font-medium mt-2">{tc('try_other_terms')}</p>
               </div>
             )}
-          </div>
-
-          {/* Paginació */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

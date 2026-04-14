@@ -253,73 +253,73 @@ export default function WorkshopAdminPage() {
       {loading ? (
         <Loading message={t("loading_catalog")} />
       ) : filteredWorkshops.length > 0 ? (
-        <div className="bg-background-surface border border-border-subtle overflow-hidden">
-          <div className="premium-table-container">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_info")}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_classification")}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_details")}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{t("table_actions")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {paginatedWorkshops.map((workshop) => (
-                  <tr key={workshop._id} className="hover:bg-background-subtle transition-colors group">
-                    <td className="px-6 py-6">
-                      <div className="flex items-center gap-5">
-                        <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
-                          <WorkshopIcon iconName={workshop.icon} className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="text-[15px] font-medium text-text-primary leading-tight">{workshop.title}</div>
-                          <div className="text-[12px] font-medium text-text-muted mt-1 uppercase tracking-tighter opacity-70">{tc("id_label", { id: workshop._id })}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-6 text-[13px] font-medium text-text-primary">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-consorci-darkBlue">{workshop.sector}</span>
-                        <span className="text-text-muted opacity-70">{tc("modality_label", { modality: workshop.modality })}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
-                          {tc("duration_label", { hours: workshop.technicalDetails?.durationHours ?? 0 })} • {tc("places_label", { count: workshop.technicalDetails?.maxPlaces ?? 0 })}
-                        </div>
-                        <div className="text-[12px] text-text-muted font-medium line-clamp-1 max-w-[240px] opacity-70">
-                          {workshop.technicalDetails?.description}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <div className="flex justify-end items-center gap-4">
-                        <button
-                          onClick={() => handleEdit(workshop)}
-                          className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
-                        >
-                          {tc("edit")}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(workshop._id)}
-                          className="p-2 text-text-muted hover:text-red-600 transition-all"
-                        >
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
+        <>
+          <div className="bg-background-surface border border-border-subtle overflow-hidden">
+            <div className="premium-table-container">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-background-subtle border-b border-border-subtle">
+                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_info")}</th>
+                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_classification")}</th>
+                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_details")}</th>
+                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{t("table_actions")}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border-subtle">
+                  {paginatedWorkshops.map((workshop) => (
+                    <tr key={workshop._id} className="hover:bg-background-subtle transition-colors group">
+                      <td className="px-6 py-6" title={workshop.title}>
+                        <div className="flex items-center gap-5">
+                          <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
+                            <WorkshopIcon iconName={workshop.icon} className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="text-[15px] font-medium text-text-primary leading-tight">{workshop.title}</div>
+                            <div className="text-[12px] font-medium text-text-muted mt-1 uppercase tracking-tighter opacity-70">{tc("id_label", { id: workshop._id })}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6 text-[13px] font-medium text-text-primary">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-consorci-darkBlue">{workshop.sector}</span>
+                          <span className="text-text-muted opacity-70">{tc("modality_label", { modality: workshop.modality })}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
+                            {tc("duration_label", { hours: workshop.technicalDetails?.durationHours ?? 0 })} • {tc("places_label", { count: workshop.technicalDetails?.maxPlaces ?? 0 })}
+                          </div>
+                          <div className="text-[12px] text-text-muted font-medium line-clamp-1 max-w-[240px] opacity-70">
+                            {workshop.technicalDetails?.description}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="flex justify-end items-center gap-4">
+                          <button
+                            onClick={() => handleEdit(workshop)}
+                            className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
+                          >
+                            {tc("edit")}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(workshop._id)}
+                            className="p-2 text-text-muted hover:text-red-600 transition-all"
+                          >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
-          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -328,7 +328,7 @@ export default function WorkshopAdminPage() {
             currentItemsCount={paginatedWorkshops.length}
             itemName={tc("workshops").toLowerCase()}
           />
-        </div>
+        </>
       ) : (
         <div className="text-center py-32 bg-background-surface border border-dashed border-border-subtle">
           <div className="w-16 h-16 bg-background-subtle flex items-center justify-center mx-auto mb-6">
