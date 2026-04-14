@@ -1,0 +1,14 @@
+
+> @iter/api@1.0.0 type-check
+> tsc --noEmit
+
+src/index.ts(68,23): error TS2304: Cannot find name 'PORT'.
+src/index.ts(69,50): error TS2304: Cannot find name 'PORT'.
+src/middlewares/authMiddleware.ts(29,34): error TS7006: Parameter 'err' implicitly has an 'any' type.
+npm error Lifecycle script `type-check` failed with error:
+npm error code 2
+npm error path /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api
+npm error workspace @iter/api@1.0.0
+npm error location /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api
+npm error command failed
+npm error command sh -c tsc --noEmit

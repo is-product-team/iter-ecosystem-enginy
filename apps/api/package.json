@@ -12,7 +12,8 @@
     "studio": "prisma studio",
     "lint": "eslint \"src/**/*.ts\"",
     "type-check": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --exclude __tests__/phase-lifecycle-sanity.test.ts",
+    "test:sanity": "vitest run __tests__/phase-lifecycle-sanity.test.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

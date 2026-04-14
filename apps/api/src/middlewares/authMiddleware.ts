@@ -26,7 +26,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 
   if (!token) return res.status(401).json({ error: 'Token no proporcionado' });
 
-  jwt.verify(token, JWT_SECRET, (err, user: any) => {
+  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
     if (err) {
 
       return res.status(401).json({ error: 'Token inválido o expirado' });

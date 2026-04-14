@@ -1,0 +1,81 @@
+
+ RUN  v4.1.4 /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api
+
+ ✓ src/services/vision.service.test.ts (3 tests) 3ms
+ ✓ src/services/nlp.service.test.ts (4 tests) 2ms
+stderr | __tests__/phase-lifecycle-sanity.test.ts
+❌ Error de validación en las variables de entorno:
+{
+  "DATABASE_URL": [
+    "Invalid url"
+  ]
+}
+
+ ❯ __tests__/phase-lifecycle-sanity.test.ts (0 test)
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > POST /auth/login - Cookie Security > should return a Set-Cookie header with the token on successful login
+[Auth] Login attempt for: test@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > should return a message if no requests found
+ℹ️ AutoAssignmentService: No pending requests found.
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+🚀 AutoAssignmentService: Processing 2 requests...
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+📊 AutoAssignment: Workshop "Workshop Test" (ID 1): Capacity: 10, Occupied (Enrollments): 0, Remaining: 10
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+✅ AutoAssignment: Assigned 5 students to Center 1 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+✅ AutoAssignment: Assigned 5 students to Center 2 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+🚀 AutoAssignmentService: Processing 2 requests...
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+📊 AutoAssignment: Workshop "Workshop Test" (ID 1): Capacity: 5, Occupied (Enrollments): 0, Remaining: 5
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+✅ AutoAssignment: Assigned 3 students to Center 1 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+✅ AutoAssignment: Assigned 2 students to Center 2 for Workshop 1
+
+ ✓ src/services/auto-assignment.service.test.ts (3 tests) 4ms
+ ✓ __tests__/auth.security.test.ts (2 tests) 408ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts [ __tests__/phase-lifecycle-sanity.test.ts ]
+Error: process.exit unexpectedly called with "1"
+ ❯ validateEnv src/config/env.ts:27:13
+     25|     console.error('❌ Error de validación en las variables de entorno:'…
+     26|     console.error(JSON.stringify(parsed.error.flatten().fieldErrors, n…
+     27|     process.exit(1);
+       |             ^
+     28|   }
+     29|
+ ❯ src/config/env.ts:33:20
+ ❯ src/controllers/auth.controller.ts:5:1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  12 passed (12)
+   Start at  08:37:01
+   Duration  635ms (transform 139ms, setup 0ms, import 669ms, tests 417ms, environment 0ms)
+

@@ -770,12 +770,19 @@ export const validateEnrollmentDocument = async (req: Request, res: Response) =>
 /**
  * HELPER: Log status changes
  */
-async function logStatusChange(assignmentId: number, oldState: string, newState: string) {
+async function logStatusChange(assignmentId: number, oldState: string, newState: string, userId?: number) {
   if (oldState === newState) return;
   try {
+    // If no userId is provided, we try to find the first admin as a fallback "System" user
+    let finalUserId = userId;
+    if (!finalUserId) {
+      const systemUser = await prisma.user.findFirst({ where: { role: { roleName: ROLES.ADMIN } } });
+      finalUserId = systemUser?.userId || 1; // Fallback to 1 if all fails, better than 0
+    }
+
     await prisma.auditLog.create({
       data: {
-        userId: 0, // System user or current user
+        userId: finalUserId,
         action: `Status change for assignment ${assignmentId} from ${oldState} to ${newState}`,
         details: { assignmentId, oldState, newState }
       }

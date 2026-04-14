@@ -1,0 +1,89 @@
+
+ RUN  v4.1.4 /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api
+
+ ✓ src/services/vision.service.test.ts (3 tests) 3ms
+ ✓ src/services/nlp.service.test.ts (4 tests) 2ms
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > POST /auth/login - Cookie Security > should return a Set-Cookie header with the token on successful login
+[Auth] Login attempt for: test@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+ ✓ __tests__/auth.security.test.ts (2 tests) 415ms
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > should return a message if no requests found
+ℹ️ AutoAssignmentService: No pending requests found.
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+🚀 AutoAssignmentService: Processing 2 requests...
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+📊 AutoAssignment: Workshop "Workshop Test" (ID 1): Capacity: 10, Occupied (Enrollments): 0, Remaining: 10
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+✅ AutoAssignment: Assigned 5 students to Center 1 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+✅ AutoAssignment: Assigned 5 students to Center 2 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+🚀 AutoAssignmentService: Processing 2 requests...
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+📊 AutoAssignment: Workshop "Workshop Test" (ID 1): Capacity: 5, Occupied (Enrollments): 0, Remaining: 5
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+✅ AutoAssignment: Assigned 3 students to Center 1 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+✅ AutoAssignment: Assigned 2 students to Center 2 for Workshop 1
+
+ ✓ src/services/auto-assignment.service.test.ts (3 tests) 4ms
+ ❯ __tests__/phase-lifecycle-sanity.test.ts (4 tests | 4 skipped) 25ms
+     ↓ Phase 1: Should create a Request as Coordinator and approve it as Admin
+     ↓ Phase 2: Should create an Assignment and enroll a student
+     ↓ Phase 3: Should validate documents and confirm registration (generating sessions)
+     ↓ Phase 4: Should close the assignment and verify certificate readiness
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test
+PrismaClientInitializationError: 
+Invalid `prisma.user.findFirst()` invocation in
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/__tests__/phase-lifecycle-sanity.test.ts:24:37
+
+  21   return;
+  22 }
+  23 // 1. Get seed data or create test baseline
+→ 24 const admin = await prisma.user.findFirst(
+Authentication failed against database server at `localhost`, the provided database credentials for `test` are not valid.
+
+Please make sure to provide valid database credentials for the database server at `localhost`.
+ ❯ $n.handleRequestError ../../node_modules/@prisma/client/runtime/library.js:121:7615
+ ❯ $n.handleAndLogRequestError ../../node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request ../../node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l ../../node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ __tests__/phase-lifecycle-sanity.test.ts:24:19
+     22|     }
+     23|     // 1. Get seed data or create test baseline
+     24|     const admin = await prisma.user.findFirst({ where: { email: 'admin…
+       |                   ^
+     25|     const coordinator = await prisma.user.findFirst({ where: { email: …
+     26|     const workshop = await prisma.workshop.findFirst();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  12 passed | 4 skipped (16)
+   Start at  08:40:20
+   Duration  976ms (transform 206ms, setup 0ms, import 1.50s, tests 449ms, environment 0ms)
+

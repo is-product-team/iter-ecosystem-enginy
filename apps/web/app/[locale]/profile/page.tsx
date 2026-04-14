@@ -18,6 +18,7 @@ export default function ProfilePage() {
   const pathname = usePathname();
   const currentLocale = useLocale();
   const t = useTranslations('Profile');
+  const tc = useTranslations('Common');
   const [syncToken, setSyncToken] = useState<string | null>(null);
   const [loadingToken, setLoadingToken] = useState(false);
   const [mounted, setMounted] = useState(false);

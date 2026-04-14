@@ -21,7 +21,7 @@ try {
   logger.warn(`⚠️ No se pudo asegurar la carpeta de uploads: ${uploadDir}. Puede ser normal si usas volúmenes de Docker.`);
 }
 
-const app = express();
+export const app = express();
 app.set('trust proxy', 1);
 
 const allowedOrigins = env.CORS_ORIGIN;
@@ -63,10 +63,10 @@ app.use(`${API_PREFIX}/`, routes);
 
 app.use(errorHandler);
 
-const PORT = env.PORT;
-
-const server = app.listen(PORT, async () => {
-  logger.info(`🚀 Servidor listo en el puerto: ${PORT}`);
+let server: any;
+if (env.NODE_ENV !== 'test') {
+  server = app.listen(env.PORT, async () => {
+  logger.info(`🚀 Servidor listo en el puerto: ${env.PORT}`);
   logger.info(`🌍 Entorno: ${env.NODE_ENV}`);
   
   // Conexión PostgreSQL (Opcional en el arranque)
@@ -80,6 +80,7 @@ const server = app.listen(PORT, async () => {
   // Start Background Services
   ReminderService.start();
 });
+}
 
 process.on('SIGINT', async () => {
   logger.info('Apagando servidor...');

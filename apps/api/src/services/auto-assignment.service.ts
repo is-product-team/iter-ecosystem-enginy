@@ -61,16 +61,16 @@ export class AutoAssignmentService {
             if (!workshop) continue;
 
             // REAL Capacity Calculation: Count actual enrollments for this workshop across ALL assignments
-            const totalEnrollments = await prisma.enrollment.count({
+            const totalEnrollments = (await prisma.enrollment.count({
                 where: { assignment: { workshopId: workshopId } }
-            });
+            })) || 0;
 
             const remainingCapacity = Math.max(0, workshop.maxPlaces - totalEnrollments);
 
             console.log(`📊 AutoAssignment: Workshop "${workshop.title}" (ID ${workshopId}): Capacity: ${workshop.maxPlaces}, Occupied (Enrollments): ${totalEnrollments}, Remaining: ${remainingCapacity}`);
 
-            if (remainingCapacity <= 0) {
-                console.warn(`🚫 AutoAssignment: Workshop ${workshopId} is full. Skipping.`);
+            if (remainingCapacity <= 0 || isNaN(remainingCapacity)) {
+                console.warn(`🚫 AutoAssignment: Workshop ${workshopId} is full or invalid capacity. Skipping.`);
                 continue;
             }
 
@@ -122,7 +122,7 @@ export class AutoAssignmentService {
                         leftoverSpots--;
                     }
                     i++;
-                    if (i >= numCenters * 10 && leftoverSpots > 0) break; // Safety break
+                    if (i >= numCenters * 50 && leftoverSpots > 0) break; // Increased safety break for large distributions
                 }
             }
 

@@ -19,7 +19,8 @@
     "db:seed": "turbo run db:seed",
     "db:studio": "turbo run studio",
     "test": "turbo run test",
-    "verify": "turbo run lint type-check test --filter=@iter/api --filter=@iter/web"
+    "verify": "turbo run lint type-check test --filter=@iter/api --filter=@iter/web",
+    "verify:sanity": "DATABASE_URL=\"postgresql://postgres:root@localhost:5432/iter_db?schema=public\" JWT_SECRET=\"dev_secret_key_cambiar_en_prod\" NODE_ENV=\"test\" npm run test:sanity --workspace=@iter/api"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.16",

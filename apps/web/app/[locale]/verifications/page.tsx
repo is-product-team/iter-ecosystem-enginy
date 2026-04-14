@@ -9,6 +9,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import Pagination from "@/components/Pagination";
 import { useTranslations } from 'next-intl';
+import { ROLES } from '@iter/shared';
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
@@ -42,6 +43,12 @@ export default function DocumentVerificationPage() {
   const params = useParams();
   const locale = params?.locale || 'ca';
 
+  const DOCUMENT_CONFIG = [
+    { id: 'pedagogical', field: 'isPedagogicalAgreementValidated', urlField: 'pedagogicalAgreementUrl', label: 'A', nameKey: 'doc_names.agreement' },
+    { id: 'mobility', field: 'isMobilityAuthorizationValidated', urlField: 'mobilityAuthorizationUrl', label: 'M', nameKey: 'doc_names.mobility' },
+    { id: 'image', field: 'isImageRightsValidated', urlField: 'imageRightsUrl', label: 'R', nameKey: 'doc_names.rights' }
+  ] as const;
+
   // Flat list transformation
   const flatEnrollments = assignments.flatMap(assig =>
     (assig.enrollments || []).map(ins => ({
@@ -62,17 +69,11 @@ export default function DocumentVerificationPage() {
 
     if (statusFilter === 'all') return matchesSearch;
 
-    const docs = [
-      { url: row.pedagogicalAgreementUrl, valid: row.isPedagogicalAgreementValidated },
-      { url: row.mobilityAuthorizationUrl, valid: row.isMobilityAuthorizationValidated },
-      { url: row.imageRightsUrl, valid: row.isImageRightsValidated }
-    ];
-
     if (statusFilter === 'pending') {
-      return matchesSearch && docs.some(d => d.url && !d.valid);
+      return matchesSearch && DOCUMENT_CONFIG.some(doc => row[doc.urlField] && !row[doc.field]);
     }
     if (statusFilter === 'validated') {
-      return matchesSearch && docs.every(d => d.valid);
+      return matchesSearch && DOCUMENT_CONFIG.every(doc => row[doc.field]);
     }
     return matchesSearch;
   });
@@ -149,15 +150,14 @@ export default function DocumentVerificationPage() {
   };
 
   const toggleRowSelection = (row: any) => {
-    const fields = ['isPedagogicalAgreementValidated', 'isMobilityAuthorizationValidated', 'isImageRightsValidated'];
-    const rowDocs = fields
-      .filter(f => row[f.replace('is', '').replace('Validated', 'Url')] && !row[f])
-      .map(f => ({ enrollmentId: row.enrollmentId, field: f }));
+    const rowDocs = DOCUMENT_CONFIG
+      .filter(doc => row[doc.urlField] && !row[doc.field])
+      .map(doc => ({ enrollmentId: row.enrollmentId, field: doc.field }));
 
     setSelectedDocs(prev => {
-      const isRowSelected = rowDocs.every(rd => prev.find(p => p.enrollmentId === rd.enrollmentId && p.field === rd.field));
+      const isRowFullySelected = rowDocs.length > 0 && rowDocs.every(rd => prev.some(p => p.enrollmentId === rd.enrollmentId && p.field === rd.field));
 
-      if (isRowSelected) {
+      if (isRowFullySelected) {
         // Unselect only those from this row
         return prev.filter(p => p.enrollmentId !== row.enrollmentId);
       } else {
@@ -172,15 +172,11 @@ export default function DocumentVerificationPage() {
     if (selectedDocs.length > 0) {
       setSelectedDocs([]);
     } else {
-      const allPending = paginatedEnrollments.flatMap(row => {
-        const fields = ['isPedagogicalAgreementValidated', 'isMobilityAuthorizationValidated', 'isImageRightsValidated'] as const;
-        return fields
-          .filter(f => {
-            const urlKey = f.replace('is', '').replace('Validated', 'Url') as keyof typeof row;
-            return row[urlKey] && !row[f];
-          })
-          .map(f => ({ enrollmentId: row.enrollmentId, field: f }));
-      });
+      const allPending = paginatedEnrollments.flatMap(row => 
+        DOCUMENT_CONFIG
+          .filter(doc => row[doc.urlField] && !row[doc.field])
+          .map(doc => ({ enrollmentId: row.enrollmentId, field: doc.field }))
+      );
       setSelectedDocs(allPending);
     }
   };
@@ -263,18 +259,13 @@ export default function DocumentVerificationPage() {
           <div className="premium-table-container">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 w-[60px]">
+                <tr className="bg-background-subtle border-b border-border-subtle">                  <th className="px-6 py-4 w-[60px]">
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
-                        checked={selectedDocs.length > 0 && selectedDocs.length === paginatedEnrollments.flatMap(r => {
-                          const fields = ['isPedagogicalAgreementValidated', 'isMobilityAuthorizationValidated', 'isImageRightsValidated'] as const;
-                          return fields.filter(f => {
-                            const urlKey = f.replace('is', '').replace('Validated', 'Url') as keyof typeof r;
-                            return r[urlKey] && !r[f];
-                          });
-                        }).length}
+                        checked={selectedDocs.length > 0 && selectedDocs.length === paginatedEnrollments.flatMap(r => 
+                          DOCUMENT_CONFIG.filter(doc => r[doc.urlField] && !r[doc.field])
+                        ).length}
                         onChange={toggleAllSelection}
                         className="w-4 h-4 border-border-subtle accent-consorci-darkBlue cursor-pointer"
                       />
@@ -295,8 +286,7 @@ export default function DocumentVerificationPage() {
                   </tr>
                 ) : paginatedEnrollments.length > 0 ? (
                   paginatedEnrollments.map((row) => {
-                    const hasPending = [row.isPedagogicalAgreementValidated, row.isMobilityAuthorizationValidated, row.isImageRightsValidated].some(v => v === false);
-                    const allDocsPresent = [row.pedagogicalAgreementUrl, row.mobilityAuthorizationUrl, row.imageRightsUrl].every(u => !!u);
+                    const hasPending = DOCUMENT_CONFIG.some(doc => row[doc.urlField] && !row[doc.field]);
 
                     return (
                       <tr
@@ -307,7 +297,7 @@ export default function DocumentVerificationPage() {
                           <div className="flex items-center justify-center">
                             <input
                               type="checkbox"
-                              checked={selectedDocs.some(d => d.enrollmentId === row.enrollmentId)}
+                              checked={DOCUMENT_CONFIG.some(doc => row[doc.urlField] && !row[doc.field] && selectedDocs.some(sd => sd.enrollmentId === row.enrollmentId && sd.field === doc.field))}
                               onChange={() => toggleRowSelection(row)}
                               className="w-4 h-4 border-border-subtle accent-consorci-darkBlue cursor-pointer"
                             />
@@ -323,24 +313,24 @@ export default function DocumentVerificationPage() {
                         </td>
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-3">
-                            {[
-                              { label: 'A', url: row.pedagogicalAgreementUrl, valid: row.isPedagogicalAgreementValidated },
-                              { label: 'M', url: row.mobilityAuthorizationUrl, valid: row.isMobilityAuthorizationValidated },
-                              { label: 'R', url: row.imageRightsUrl, valid: row.isImageRightsValidated }
-                            ].map((doc, idx) => (
-                              <div
-                                key={idx}
-                                title={doc.url ? (doc.valid ? 'Validat' : 'Pendent') : 'No pujat'}
-                                className={`w-8 h-8 flex items-center justify-center text-[11px] font-bold border ${doc.url
-                                    ? doc.valid
-                                      ? 'bg-green-50 border-green-200 text-green-700'
-                                      : 'bg-amber-50 border-amber-200 text-amber-700 animate-pulse'
-                                    : 'bg-background-subtle border-border-subtle text-text-muted opacity-40'
-                                  }`}
-                              >
-                                {doc.label}
-                              </div>
-                            ))}
+                            {DOCUMENT_CONFIG.map((docConfig) => {
+                              const url = row[docConfig.urlField];
+                              const valid = row[docConfig.field];
+                              return (
+                                <div
+                                  key={docConfig.id}
+                                  title={url ? (valid ? 'Validat' : 'Pendent') : 'No pujat'}
+                                  className={`w-8 h-8 flex items-center justify-center text-[11px] font-bold border ${url
+                                      ? valid
+                                        ? 'bg-green-50 border-green-200 text-green-700'
+                                        : 'bg-amber-50 border-amber-200 text-amber-700 animate-pulse'
+                                      : 'bg-background-subtle border-border-subtle text-text-muted opacity-40'
+                                    }`}
+                                >
+                                  {docConfig.label}
+                                </div>
+                              );
+                            })}
                           </div>
                         </td>
                         <td className="px-6 py-5 text-right">
@@ -395,71 +385,70 @@ export default function DocumentVerificationPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-8 space-y-12">
-              {[
-                { id: 'pedagogical', name: t('doc_names.agreement'), url: selectedRow.pedagogicalAgreementUrl, valid: selectedRow.isPedagogicalAgreementValidated, field: 'isPedagogicalAgreementValidated' },
-                { id: 'mobility', name: t('doc_names.mobility'), url: selectedRow.mobilityAuthorizationUrl, valid: selectedRow.isMobilityAuthorizationValidated, field: 'isMobilityAuthorizationValidated' },
-                { id: 'image', name: t('doc_names.rights'), url: selectedRow.imageRightsUrl, valid: selectedRow.isImageRightsValidated, field: 'isImageRightsValidated' }
-              ].map(doc => (
-                <div key={doc.id} className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${doc.url ? (doc.valid ? 'bg-green-500' : 'bg-amber-500') : 'bg-border-subtle'}`} />
-                      <h4 className="text-[13px] font-bold uppercase tracking-widest text-text-primary">{doc.name}</h4>
+              {DOCUMENT_CONFIG.map(doc => {
+                const url = selectedRow[doc.urlField];
+                const valid = selectedRow[doc.field];
+                return (
+                  <div key={doc.id} className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${url ? (valid ? 'bg-green-500' : 'bg-amber-500') : 'bg-border-subtle'}`} />
+                        <h4 className="text-[13px] font-bold uppercase tracking-widest text-text-primary">{t(doc.nameKey)}</h4>
+                      </div>
+                      <div className="flex gap-3">
+                        {url && (
+                          <>
+                            <button
+                              onClick={() => handleValidateDocument(selectedRow.enrollmentId, doc.field, !valid)}
+                              className={`px-6 py-2 text-[11px] font-bold transition-all ${valid
+                                  ? 'bg-red-50 text-red-600 border border-red-500/20 hover:bg-black hover:text-white'
+                                  : 'bg-green-600 text-white hover:bg-black'
+                                }`}
+                            >
+                              {valid ? t('btn_unvalidate') : t('btn_validate')}
+                            </button>
+                            <button
+                              onClick={() => handleOpenNotification(selectedRow, doc.id)}
+                              className="px-4 py-2 border border-border-subtle text-text-muted text-[11px] font-bold hover:bg-background-subtle"
+                            >
+                              {t('report_problem_btn')}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex gap-3">
-                      {doc.url && (
-                        <>
-                          <button
-                            onClick={() => handleValidateDocument(selectedRow.enrollmentId, doc.field, !doc.valid)}
-                            className={`px-6 py-2 text-[11px] font-bold transition-all ${doc.valid
-                                ? 'bg-red-50 text-red-600 border border-red-500/20 hover:bg-black hover:text-white'
-                                : 'bg-green-600 text-white hover:bg-black'
-                              }`}
-                          >
-                            {doc.valid ? t('btn_unvalidate') : t('btn_validate')}
-                            {doc.valid ? t('btn_unvalidate') : t('btn_validate')}
-                          </button>
-                          <button
-                            onClick={() => handleOpenNotification(selectedRow, doc.id)}
-                            className="px-4 py-2 border border-border-subtle text-text-muted text-[11px] font-bold hover:bg-background-subtle"
-                          >
-                            {t('report_problem_btn')}
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
 
-                  {doc.url ? (
-                    <div className="aspect-[1.41] w-full bg-background-subtle border border-border-subtle overflow-hidden relative group">
-                      <iframe
-                        src={`${process.env.NEXT_PUBLIC_API_URL}${doc.url}#toolbar=0`}
-                        className="w-full h-full"
-                        title={doc.name}
-                      />
-                      <div className="absolute inset-0 bg-black/5 pointer-events-none" />
-                      <a
-                        href={`${process.env.NEXT_PUBLIC_API_URL}${doc.url}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute top-4 right-4 bg-black text-white p-3 opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Abrir en pestaña nueva"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    {url ? (
+                      <div className="aspect-[1.41] w-full bg-background-subtle border border-border-subtle overflow-hidden relative group">
+                        <iframe
+                          src={`${process.env.NEXT_PUBLIC_API_URL}${url}#toolbar=0`}
+                          className="w-full h-full"
+                          title={t(doc.nameKey)}
+                        />
+                        <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_API_URL}${url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute top-4 right-4 bg-black text-white p-3 opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Abrir en pestaña nueva"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="py-16 border-2 border-dashed border-border-subtle flex flex-col items-center justify-center bg-background-subtle/30">
+                        <svg className="w-8 h-8 text-text-muted opacity-20 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                      </a>
-                    </div>
-                  ) : (
-                    <div className="py-16 border-2 border-dashed border-border-subtle flex flex-col items-center justify-center bg-background-subtle/30">
-                      <svg className="w-8 h-8 text-text-muted opacity-20 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <p className="text-[12px] font-bold text-text-muted opacity-40 uppercase tracking-widest">{t('doc_not_uploaded')}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+                        <p className="text-[12px] font-bold text-text-muted opacity-40 uppercase tracking-widest">{t('doc_not_uploaded')}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -22,6 +22,10 @@ function validateEnv() {
   const parsed = envSchema.safeParse(process.env);
 
   if (!parsed.success) {
+    if (process.env.NODE_ENV === 'test') {
+      console.warn('⚠️ Environment validation failed during test execution. Some tests might skip or fail.');
+      return process.env as any; // Return raw env during tests to avoid crash
+    }
     console.error('❌ Error de validación en las variables de entorno:');
     console.error(JSON.stringify(parsed.error.flatten().fieldErrors, null, 2));
     process.exit(1);
