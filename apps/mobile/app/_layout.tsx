@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import '../i18n'; // Initialize i18n
 import { SafeAreaProvider } from 'react-native-safe-area-context';

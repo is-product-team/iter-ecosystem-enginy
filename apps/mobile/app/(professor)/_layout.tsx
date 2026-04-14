@@ -1,7 +1,7 @@
+import * as React from 'react';
 import { Stack } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useTranslation } from 'react-i18next';
-import { THEME } from '@iter/shared';
 
 export default function ProfessorStackLayout() {
   const { t } = useTranslation();

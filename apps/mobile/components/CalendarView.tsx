@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Platform, Linking, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
-import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import WorkshopDetailModal from './WorkshopDetailModal';
 import { useTranslation } from 'react-i18next';
 
@@ -26,9 +25,6 @@ interface CalendarViewProps {
 
 const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMonthChange, isLoading }) => {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language === 'ca' ? 'ca-ES' : 'es-ES';
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -37,7 +33,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
   const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
 
-  const monthName = currentDate.toLocaleString(lang, { month: 'long' });
+  const monthName = currentDate.toLocaleString(i18n.language || 'ca-ES', { month: 'long' });
   const year = currentDate.getFullYear();
 
   const prevMonth = () => {
@@ -45,7 +41,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
     setCurrentDate(newDate);
     onMonthChange?.(newDate);
   };
-  
+
   const nextMonth = () => {
     const newDate = new Date(year, currentDate.getMonth() + 1, 1);
     setCurrentDate(newDate);
@@ -84,17 +80,17 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
     }
 
     return days;
-  }, [currentDate]);
+  }, [currentDate, year]);
 
-  const getEventsForDay = (dateStr: string) => {
+  const getEventsForDay = React.useCallback((dateStr: string) => {
     return events.filter(event => {
       const eStart = event.date.split('T')[0];
       const eEnd = (event.endDate || event.date).split('T')[0];
       return dateStr >= eStart && dateStr <= eEnd;
     });
-  };
+  }, [events]);
 
-  const dayEvents = useMemo(() => getEventsForDay(selectedDate), [selectedDate, events]);
+  const dayEvents = useMemo(() => getEventsForDay(selectedDate), [selectedDate, getEventsForDay]);
 
   const getEventColor = (type: string) => {
     switch (type) {
@@ -105,16 +101,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
     }
   };
 
-  const openMaps = (address: string, label: string) => {
-    if (!address) return;
-    const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
-    const url = Platform.select({
-      ios: `${scheme}${label}@${address}`,
-      android: `${scheme}0,0?q=${address}(${label})`
-    });
-
-    if (url) Linking.openURL(url);
-  };
 
   const handleEventClick = (event: CalendarEvent) => {
     setSelectedEvent(event);
@@ -123,11 +109,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
 
   return (
     <View className="flex-1 bg-background-page">
-      
+
       {/* Calendar Grid (Seamless) */}
       <View className="px-6 pb-4 pt-2">
         <View className="pb-4">
-          
+
           {/* Header */}
           <View className="flex-row items-center justify-between mb-4">
             <View className="flex-row items-baseline">
@@ -150,7 +136,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
 
           {/* Weekdays */}
           <View className="flex-row mb-2">
-            {weekdays.map(d => (
+            {[
+              t('Calendar.weekdays.dl'),
+              t('Calendar.weekdays.dt'),
+              t('Calendar.weekdays.dc'),
+              t('Calendar.weekdays.dj'),
+              t('Calendar.weekdays.dv'),
+              t('Calendar.weekdays.ds'),
+              t('Calendar.weekdays.dg'),
+            ].map(d => (
               <View key={d} className="flex-1 items-center">
                 <Text className="text-[10px] font-bold text-text-muted">{d}</Text>
               </View>
@@ -165,35 +159,33 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
               const dayEventsForDot = dateObj.date ? getEventsForDay(dateObj.date) : [];
 
               return (
-                <TouchableOpacity 
-                  key={idx} 
+                <TouchableOpacity
+                  key={idx}
                   onPress={() => dateObj.date && setSelectedDate(dateObj.date)}
                   className="w-[14.28%] aspect-square items-center justify-center"
                   disabled={!dateObj.date}
                 >
                   {dateObj.day && (
                     <View className="items-center">
-                      <View className={`w-8 h-8 items-center justify-center rounded-full mb-1 ${
-                        isSelected ? 'bg-primary' : isToday ? 'bg-primary/20 border border-primary/40' : ''
-                      }`}>
-                        <Text className={`text-sm font-bold ${
-                          isSelected ? 'text-white' : isToday ? 'text-primary' : 'text-text-primary'
+                      <View className={`w-8 h-8 items-center justify-center rounded-full mb-1 ${isSelected ? 'bg-primary' : isToday ? 'bg-primary/20 border border-primary/40' : ''
                         }`}>
+                        <Text className={`text-sm font-bold ${isSelected ? 'text-white' : isToday ? 'text-primary' : 'text-text-primary'
+                          }`}>
                           {dateObj.day}
                         </Text>
                       </View>
-                      
+
                       {/* Event Dots */}
                       <View className="flex-row space-x-[2px] h-1">
                         {dayEventsForDot.slice(0, 3).map((e, i) => (
-                          <View 
-                            key={i} 
+                          <View
+                            key={i}
                             className="w-1 h-1 rounded-full"
-                            style={{ 
-                              backgroundColor: e.type === 'milestone' ? '#6366F1' : 
-                                             e.type === 'deadline' ? '#EF4444' : 
-                                             e.type === 'assignment' ? THEME.colors.primary : THEME.colors.gray
-                            }} 
+                            style={{
+                              backgroundColor: e.type === 'milestone' ? '#6366F1' :
+                                e.type === 'deadline' ? '#EF4444' :
+                                  e.type === 'assignment' ? THEME.colors.primary : THEME.colors.gray
+                            }}
                           />
                         ))}
                       </View>
@@ -203,7 +195,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
               );
             })}
           </View>
-          
+
           {/* Subtle loading overlay on the grid */}
           {isLoading && (
             <View className="absolute inset-0 bg-white/30 items-center justify-center">
@@ -217,7 +209,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
       <View className="flex-1 px-4">
         <View className="py-3">
           <Text className="text-text-muted text-xs font-bold uppercase tracking-widest pl-2">
-             {new Date(selectedDate).toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'long' })}
+            {new Date(selectedDate).toLocaleDateString(i18n.language || 'ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
           </Text>
         </View>
 
@@ -228,7 +220,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
             </View>
           ) : (
             dayEvents.map(event => (
-              <TouchableOpacity 
+              <TouchableOpacity
                 key={event.id}
                 onPress={() => handleEventClick(event)}
                 className="bg-background-surface rounded-2xl p-4 mb-3 shadow-sm border border-border-subtle flex-row"
@@ -247,24 +239,24 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
 
                 {/* Content */}
                 <View className="flex-1 justify-center">
-                   <View className="flex-row items-center mb-1">
-                      <View className={`w-2 h-2 rounded-full mr-2`} style={{ backgroundColor: getEventColor(event.type) }} />
-                      <Text className="text-text-primary font-bold text-base flex-1" numberOfLines={1}>{event.title}</Text>
-                   </View>
-                  
+                  <View className="flex-row items-center mb-1">
+                    <View className={`w-2 h-2 rounded-full mr-2`} style={{ backgroundColor: getEventColor(event.type) }} />
+                    <Text className="text-text-primary font-bold text-base flex-1" numberOfLines={1}>{event.title}</Text>
+                  </View>
+
                   {event.metadata?.adreca && (
                     <View className="flex-row items-center">
-                        <Ionicons name="location" size={12} color={THEME.colors.gray} className="mr-1" />
-                        <Text className="text-text-secondary text-xs font-medium" numberOfLines={1}>
+                      <Ionicons name="location" size={12} color={THEME.colors.gray} className="mr-1" />
+                      <Text className="text-text-secondary text-xs font-medium" numberOfLines={1}>
                         {event.metadata.adreca}
-                        </Text>
+                      </Text>
                     </View>
                   )}
                 </View>
 
                 {/* Arrow */}
                 <View className="justify-center pl-2">
-                    <Ionicons name="chevron-forward" size={16} color={THEME.colors.gray} />
+                  <Ionicons name="chevron-forward" size={16} color={THEME.colors.gray} />
                 </View>
               </TouchableOpacity>
             ))
@@ -272,10 +264,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
         </ScrollView>
       </View>
 
-      <WorkshopDetailModal 
-        visible={modalVisible} 
-        onClose={() => setModalVisible(false)} 
-        event={selectedEvent} 
+      <WorkshopDetailModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        event={selectedEvent}
       />
     </View>
   );

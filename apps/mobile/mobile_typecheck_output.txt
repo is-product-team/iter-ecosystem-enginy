@@ -1,0 +1,24 @@
+
+> @iter/mobile@1.0.0 type-check
+> tsc --noEmit
+
+components/session/StudentSessionCard.tsx(106,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: ViewProps): View', gave the following error.
+    Type '{ flexDirection: "row"; alignItems: "center"; justifyContent: "between"; paddingTop: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+      Types of property 'justifyContent' are incompatible.
+        Type '"between"' is not assignable to type '"center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly" | undefined'.
+  Overload 2 of 2, '(props: ViewProps, context: any): View', gave the following error.
+    Type '{ flexDirection: "row"; alignItems: "center"; justifyContent: "between"; paddingTop: number; }' is not assignable to type 'StyleProp<ViewStyle>'.
+      Types of property 'justifyContent' are incompatible.
+        Type '"between"' is not assignable to type '"center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly" | undefined'.
+services/api.ts(135,19): error TS2304: Cannot find name 'MOCK_QUESTIONNAIRE_MODEL'.
+services/api.ts(164,19): error TS2304: Cannot find name 'MOCK_QUESTIONNAIRE_MODEL'.
+services/api.ts(188,73): error TS2304: Cannot find name 'MOCK_STUDENTS'.
+services/api.ts(189,44): error TS2304: Cannot find name 'MOCK_WORKSHOP'.
+npm error Lifecycle script `type-check` failed with error:
+npm error code 2
+npm error path /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile
+npm error workspace @iter/mobile@1.0.0
+npm error location /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile
+npm error command failed
+npm error command sh -c tsc --noEmit

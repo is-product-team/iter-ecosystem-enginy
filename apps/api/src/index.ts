@@ -21,19 +21,23 @@ try {
   logger.warn(`⚠️ No se pudo asegurar la carpeta de uploads: ${uploadDir}. Puede ser normal si usas volúmenes de Docker.`);
 }
 
-const app = express();
+export const app = express();
 app.set('trust proxy', 1);
 
 const allowedOrigins = env.CORS_ORIGIN;
 
 app.use(cors({
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // In development, allow all origins to simplify mobile connectivity
+    if (env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      logger.error(`[CORS] Rejected origin: ${origin}. Allowed: ${allowedOrigins.join(', ')}`);
+      logger.error(`[CORS] Rejected origin: ${origin}. Allowed: ${allowedOrigins}`);
       callback(new Error('CORS Policy: Origin not allowed'));
-      callback(new Error('Política CORS: Origen no permitido'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -52,7 +56,11 @@ app.get('/health', (req, res) => {
 
 // Logger global de peticiones para depuración
 app.use((req, res, next) => {
-  console.log(`[API] ${req.method} ${req.url}`);
+  const timestamp = new Date().toLocaleTimeString();
+  console.log(`\x1b[44m\x1b[37m[API INCOMING]\x1b[0m [${timestamp}] ${req.method} ${req.url}`);
+  if (req.method === 'POST') {
+    console.log(`\x1b[34m[API BODY]\x1b[0m`, JSON.stringify(req.body, null, 2));
+  }
   next();
 });
 
@@ -63,30 +71,32 @@ app.use(`${API_PREFIX}/`, routes);
 
 app.use(errorHandler);
 
-const PORT = env.PORT;
+let server: any;
+if (env.NODE_ENV !== 'test') {
+  // Bind to 0.0.0.0 to ensure accessibility from outside the container
+  server = app.listen(env.PORT, '0.0.0.0', async () => {
+    logger.info(`🚀 Servidor listo en el puerto: ${env.PORT}`);
+    logger.info(`🌍 Entorno: ${env.NODE_ENV}`);
 
-const server = app.listen(PORT, async () => {
-  logger.info(`🚀 Servidor listo en el puerto: ${PORT}`);
-  logger.info(`🌍 Entorno: ${env.NODE_ENV}`);
-  
-  // Conexión PostgreSQL (Opcional en el arranque)
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    logger.info(`🗄️  ESTADO BD: Conectado a PostgreSQL`);
-  } catch (_e) {
-    logger.error(`🗄️  ESTADO BD: Conexión a PostgreSQL fallida`);
-  }
+    // Conexión PostgreSQL (Opcional en el arranque)
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      logger.info(`🗄️  DATABASE STATUS: Connected to PostgreSQL`);
+    } catch (_e) {
+      logger.error(`🗄️  DATABASE STATUS: PostgreSQL Connection failed`);
+    }
 
-  // Start Background Services
-  ReminderService.start();
-});
+    // Start Background Services
+    ReminderService.start();
+  });
+}
 
 process.on('SIGINT', async () => {
-  logger.info('Apagando servidor...');
+  logger.info('Shutting down server...');
   ReminderService.stop();
   await prisma.$disconnect();
   server.close(() => {
-    logger.info('Servidor cerrado');
+    logger.info('Server closed');
     process.exit(0);
   });
 });

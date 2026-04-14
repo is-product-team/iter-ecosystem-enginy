@@ -1,0 +1,145 @@
+
+ RUN  v4.1.4 /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test
+[API] POST /auth/login
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test
+[Auth] Login attempt for: admin@admin.com
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test
+[API] POST /auth/login
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test
+[Auth] Login attempt for: coordinacion@brossa.cat
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 1: Should create a Request as Coordinator and approve it as Admin
+[API] POST /requests
+
+stderr | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 1: Should create a Request as Coordinator and approve it as Admin
+Phase 1 Request Error: { error: 'This center has already made a request for this workshop.' }
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 2: Should create an Assignment and enroll a student
+[API] POST /assignments/3/enrollments
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 3: Should validate documents and confirm registration (generating sessions)
+[API] PATCH /assignments/enrollments/3/validate
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 3: Should validate documents and confirm registration (generating sessions)
+[API] POST /assignments/3/confirm-registration
+
+stderr | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 3: Should validate documents and confirm registration (generating sessions)
+Error logging status change: PrismaClientKnownRequestError: 
+Invalid `prisma.auditLog.create()` invocation in
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/src/controllers/assignment.controller.ts:776:27
+
+  773 async function logStatusChange(assignmentId: number, oldState: string, newState: string) {
+  774   if (oldState === newState) return;
+  775   try {
+→ 776     await prisma.auditLog.create(
+Foreign key constraint violated: `logs_auditoria_id_user_fkey (index)`
+    at $n.handleRequestError (/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at l (/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at logStatusChange (/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/src/controllers/assignment.controller.ts:776:5)
+    at confirmLegalRegistration (/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/src/controllers/assignment.controller.ts:700:7) {
+  code: 'P2003',
+  clientVersion: '5.22.0',
+  meta: {
+    modelName: 'AuditLog',
+    field_name: 'logs_auditoria_id_user_fkey (index)'
+  }
+}
+
+ ❯ __tests__/phase-lifecycle-sanity.test.ts (4 tests | 3 failed) 239ms
+     × Phase 1: Should create a Request as Coordinator and approve it as Admin 10ms
+     ✓ Phase 2: Should create an Assignment and enroll a student 12ms
+     × Phase 3: Should validate documents and confirm registration (generating sessions) 36ms
+     × Phase 4: Should close the assignment and verify certificate readiness 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 1: Should create a Request as Coordinator and approve it as Admin
+AssertionError: expected 400 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 400
+
+ ❯ __tests__/phase-lifecycle-sanity.test.ts:85:27
+     83|       console.error('Phase 1 Request Error:', resReq.body);
+     84|     }
+     85|     expect(resReq.status).toBe(200);
+       |                           ^
+     86|     testRequestId = resReq.body.requestId;
+     87|     expect(resReq.body.status).toBe('PENDING');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 3: Should validate documents and confirm registration (generating sessions)
+AssertionError: expected 0 to be greater than 0
+ ❯ __tests__/phase-lifecycle-sanity.test.ts:150:29
+    148|     // 3. Verify sessions were generated
+    149|     const sessions = await prisma.session.findMany({ where: { assignme…
+    150|     expect(sessions.length).toBeGreaterThan(0);
+       |                             ^
+    151|   });
+    152|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 4: Should close the assignment and verify certificate readiness
+PrismaClientValidationError: 
+Invalid `prisma.evaluation.create()` invocation in
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/__tests__/phase-lifecycle-sanity.test.ts:155:29
+
+  152 
+  153 it('Phase 4: Should close the assignment and verify certificate readiness', async () => {
+  154   // 1. Add teacher evaluation (Prerequisite for Phase 4)
+→ 155   await prisma.evaluation.create({
+          data: {
+            assignmentId: 3,
+            evaluatorId: 4,
+            ~~~~~~~~~~~
+            evaluatorRole: "TEACHER",
+            content: {
+              score: 10,
+              feedback: "Excellent"
+            },
+        ?   evaluationId?: Int,
+        ?   enrollmentId?: Int | Null,
+        ?   attendancePercentage?: Float | Null,
+        ?   lateCount?: Int | Null,
+        ?   observations?: String | Null,
+        ?   responses?: NullableJsonNullValueInput | Json,
+        ?   sentAt?: DateTime,
+        ?   type?: EvaluationType | Null,
+        ?   competences?: CompetenceEvaluationUncheckedCreateNestedManyWithoutEvaluationInput
+          }
+        })
+
+Unknown argument `evaluatorId`. Did you mean `evaluationId`? Available options are marked with ?.
+ ❯ wn ../../node_modules/@prisma/client/runtime/library.js:29:1363
+ ❯ $n.handleRequestError ../../node_modules/@prisma/client/runtime/library.js:121:6958
+ ❯ $n.handleAndLogRequestError ../../node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request ../../node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l ../../node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ __tests__/phase-lifecycle-sanity.test.ts:155:5
+    153|   it('Phase 4: Should close the assignment and verify certificate read…
+    154|     // 1. Add teacher evaluation (Prerequisite for Phase 4)
+    155|     await prisma.evaluation.create({
+       |     ^
+    156|       data: {
+    157|         assignmentId: testAssignmentId,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  08:31:00
+   Duration  1.26s (transform 139ms, setup 0ms, import 922ms, tests 239ms, environment 0ms)
+

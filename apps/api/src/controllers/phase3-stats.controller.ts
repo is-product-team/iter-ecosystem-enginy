@@ -27,6 +27,7 @@ export const getCenterPhase3Stats = async (req: Request, res: Response) => {
             },
             include: {
                 workshop: true,
+                center: true,
                 _count: {
                     select: { sessions: true }
                 }
@@ -52,7 +53,7 @@ export const getCenterPhase3Stats = async (req: Request, res: Response) => {
                 totalSessions: health.totalSessions,
                 pendingAttendance: health.pendingCount,
                 modality: a.workshop.modality,
-                centerName: a.centerId.toString(), // We could fetch the name from elsewhere, but for now we'll use ID or omit
+                centerName: a.center.name,
                 hasStaffGap
             };
         }));

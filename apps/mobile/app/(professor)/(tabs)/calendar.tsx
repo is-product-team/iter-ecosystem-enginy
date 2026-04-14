@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import * as React from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { THEME } from '@iter/shared';
 import { getCalendar } from '../../../services/api';
@@ -11,20 +11,15 @@ export default function CalendarTabScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isRangeFetching, setIsRangeFetching] = useState(false);
+  const [calendarEvents, setCalendarEvents] = React.useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [isRangeFetching, setIsRangeFetching] = React.useState(false);
 
-  const fetchRangeData = useCallback(async (date: Date) => {
-    // Calculate start and end of month
+  const fetchRangeData = React.useCallback(async (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
-    
-    // Start of month (subtract 7 days to catch overlapping assignments)
     const start = new Date(year, month, 1 - 7);
-    // End of month (add 7 days)
     const end = new Date(year, month + 1, 7);
-
     const startStr = start.toISOString().split('T')[0];
     const endStr = end.toISOString().split('T')[0];
 
@@ -40,8 +35,7 @@ export default function CalendarTabScreen() {
     }
   }, []);
 
-  // Initial fetch
-  useEffect(() => {
+  React.useEffect(() => {
     fetchRangeData(new Date());
   }, [fetchRangeData]);
 
@@ -55,27 +49,28 @@ export default function CalendarTabScreen() {
 
   return (
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
-      {/* Professional Header */}
-      <View className="px-6 pb-6 pt-4 bg-background-surface border-b border-border-subtle mb-6">
-         <Text className="text-text-muted text-xs font-bold uppercase tracking-widest mb-1">
+      {/* Refined Left-Aligned Header */}
+      <View className="px-6 pt-8 pb-6 bg-background-surface border-b border-border-subtle">
+         <Text className="text-[11px] font-black text-text-muted uppercase tracking-[2px] mb-1">
            {t('Calendar.academic_agenda')}
          </Text>
-         <Text className="text-3xl font-extrabold text-text-primary leading-tight">
+         <Text className="text-2xl font-black text-text-primary tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
            {t('Calendar.title')}
          </Text>
       </View>
 
-      <CalendarView 
-        events={calendarEvents} 
-        isLoading={isRangeFetching}
-        onMonthChange={fetchRangeData}
-        onEventClick={(event) => {
-          if (event.type === 'assignment' && event.metadata?.assignmentId) {
-             // Navigate to assignment details
-             router.push(`/assignment/${event.metadata.assignmentId}`);
-          }
-        }}
-      />
+      <View className="flex-1">
+        <CalendarView 
+          events={calendarEvents} 
+          isLoading={isRangeFetching}
+          onMonthChange={fetchRangeData}
+          onEventClick={(event) => {
+            if (event.type === 'assignment' && event.metadata?.assignmentId) {
+               router.push(`/assignment/${event.metadata.assignmentId}`);
+            }
+          }}
+        />
+      </View>
     </View>
   );
 }

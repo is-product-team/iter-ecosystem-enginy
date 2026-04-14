@@ -166,13 +166,13 @@ export default function SessionsListPage() {
       if (mode === 'whole') {
         // Assign to the whole assignment (teaching staff)
         await api.post(`/assignments/${selectedAssignmentId}/staff`, {
-          idUser: parseInt(selectedTeacherId)
+          userId: parseInt(selectedTeacherId)
         });
 
         const targetAssignment = assignments.find(a => a.assignmentId === parseInt(selectedAssignmentId));
         if (targetAssignment?.sessions) {
           await Promise.all(targetAssignment.sessions.map((s: Session) =>
-            api.post(`/assignments/sessions/${s.sessionId}/staff`, { idUser: parseInt(selectedTeacherId) })
+            api.post(`/assignments/sessions/${s.sessionId}/staff`, { userId: parseInt(selectedTeacherId) })
               .catch(() => { }) // Ignore duplicates
           ));
         }
@@ -181,7 +181,7 @@ export default function SessionsListPage() {
       } else {
         // Single session
         await api.post(`/assignments/sessions/${selectedSessionId}/staff`, {
-          idUser: parseInt(selectedTeacherId)
+          userId: parseInt(selectedTeacherId)
         });
         toast.success(t('success_day'));
       }

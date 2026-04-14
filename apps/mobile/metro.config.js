@@ -4,7 +4,6 @@ const path = require('path');
 
 // Find the project and workspace root
 const projectRoot = __dirname;
-// This can be replaced with `find-up` if needed
 const workspaceRoot = path.resolve(projectRoot, '../..');
 
 const config = getDefaultConfig(projectRoot);
@@ -18,13 +17,40 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, 'node_modules'),
 ];
 
+// Force React and React-DOM resolution to workspace root (Singleton React 19)
+config.resolver.extraNodeModules = {
+  'scheduler': path.resolve(workspaceRoot, 'node_modules/scheduler'),
+  'react': path.resolve(workspaceRoot, 'node_modules/react'),
+  'react-dom': path.resolve(workspaceRoot, 'node_modules/react-dom'),
+  'expo-router': path.resolve(workspaceRoot, 'node_modules/expo-router'),
+};
+
+// Use the exclusionList from the internal metro-config to avoid export errors
+const exclusionList = (() => {
+  try {
+    return require('metro-config/src/defaults/exclusionList');
+  } catch (e) {
+    try {
+      return require('metro-config/src/defaults/blacklist');
+    } catch (e) {
+      return () => /$.^/; 
+    }
+  }
+})();
+
+// Block duplicate React instances if any exist in sub-folders
+const blocklist = exclusionList([
+  new RegExp(`${path.resolve(workspaceRoot, 'apps/mobile/node_modules/react/.*').replace(/[/\\\\]/g, '[/\\\\]')}`),
+  new RegExp(`${path.resolve(workspaceRoot, 'apps/mobile/node_modules/react-dom/.*').replace(/[/\\\\]/g, '[/\\\\]')}`),
+]);
+
+config.resolver.blocklist = blocklist;
+config.resolver.blacklistRE = blocklist;
+
 // 3. Make sure typescript files in the monorepo are discoverable
 config.resolver.sourceExts.push('mjs', 'ts', 'tsx');
 
-// Enable package exports support (required for semver v7 subpath imports)
-config.resolver.unstable_enablePackageExports = true;
-
-// Allow Metro to look up nested node_modules (required for hoisted dependencies with nested children)
-config.resolver.disableHierarchicalLookup = false;
-
-module.exports = withNativeWind(config, { input: './global.css' });
+module.exports = withNativeWind(config, { 
+  input: path.resolve(__dirname, 'global.css'),
+  configPath: path.resolve(__dirname, 'tailwind.config.js'),
+});

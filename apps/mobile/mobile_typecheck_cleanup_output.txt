@@ -1,0 +1,13 @@
+
+> @iter/mobile@1.0.0 type-check
+> tsc --noEmit
+
+app/(professor)/questionnaire/[id].tsx(20,7): error TS2448: Block-scoped variable 'loadQuestionnaire' used before its declaration.
+app/(professor)/questionnaire/[id].tsx(20,7): error TS2454: Variable 'loadQuestionnaire' is used before being assigned.
+npm error Lifecycle script `type-check` failed with error:
+npm error code 2
+npm error path /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile
+npm error workspace @iter/mobile@1.0.0
+npm error location /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/mobile
+npm error command failed
+npm error command sh -c tsc --noEmit

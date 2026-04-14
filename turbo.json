@@ -3,6 +3,9 @@
   "globalDependencies": ["**/.env"],
   "globalEnv": ["DATABASE_URL", "JWT_SECRET", "NODE_ENV", "PORT"],
   "tasks": {
+    "hygiene": {
+      "cache": false
+    },
     "db:generate": {
       "cache": false,
       "env": ["DATABASE_URL"]
@@ -20,11 +23,11 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build", "db:generate"],
+      "dependsOn": ["hygiene", "^build", "db:generate"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["hygiene", "db:generate"],
       "cache": false,
       "persistent": true
     },
@@ -39,7 +42,7 @@
       "cache": false
     },
     "test": {
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["hygiene", "db:generate"],
       "cache": false
     }
   }

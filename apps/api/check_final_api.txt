@@ -1,0 +1,187 @@
+
+ RUN  v4.1.4 /Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api
+
+ ✓ src/services/nlp.service.test.ts (4 tests) 2ms
+ ✓ src/services/vision.service.test.ts (3 tests) 2ms
+stderr | __tests__/phase-lifecycle-sanity.test.ts
+⚠️ Environment validation failed during test execution. Some tests might skip or fail.
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > POST /auth/login - Cookie Security > should return a Set-Cookie header with the token on successful login
+[Auth] Login attempt for: test@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+stdout | __tests__/auth.security.test.ts > Auth Security Integration > Rate Limiting > should return 429 after too many attempts
+[Auth] Login attempt for: test2@example.com
+
+ ✓ __tests__/auth.security.test.ts (2 tests) 424ms
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > should return a message if no requests found
+ℹ️ AutoAssignmentService: No pending requests found.
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+🚀 AutoAssignmentService: Processing 2 requests...
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+📊 AutoAssignment: Workshop "Workshop Test" (ID 1): Capacity: 10, Occupied (Enrollments): 0, Remaining: 10
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+✅ AutoAssignment: Assigned 5 students to Center 1 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should split capacity evenly among centers (Fair Share)
+✅ AutoAssignment: Assigned 5 students to Center 2 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+🚀 AutoAssignmentService: Processing 2 requests...
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+📊 AutoAssignment: Workshop "Workshop Test" (ID 1): Capacity: 5, Occupied (Enrollments): 0, Remaining: 5
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+✅ AutoAssignment: Assigned 3 students to Center 1 for Workshop 1
+
+stdout | src/services/auto-assignment.service.test.ts > AutoAssignmentService > Fair Distribution Logic > should assign remainders by priority (Earliest Timestamp)
+✅ AutoAssignment: Assigned 2 students to Center 2 for Workshop 1
+
+ ✓ src/services/auto-assignment.service.test.ts (3 tests) 8ms
+stderr | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test
+⏩ Skipping Phase Lifecycle Sanity Test: DATABASE_URL not set or points to internal Docker host.
+
+stdout | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 1: Should create a Request as Coordinator and approve it as Admin
+[API] POST /requests
+
+stderr | __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 1: Should create a Request as Coordinator and approve it as Admin
+Phase 1 Request Error: { error: 'Token no proporcionado' }
+
+ ❯ __tests__/phase-lifecycle-sanity.test.ts (4 tests | 4 failed) 18ms
+     × Phase 1: Should create a Request as Coordinator and approve it as Admin 13ms
+     × Phase 2: Should create an Assignment and enroll a student 2ms
+     × Phase 3: Should validate documents and confirm registration (generating sessions) 1ms
+     × Phase 4: Should close the assignment and verify certificate readiness 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 1: Should create a Request as Coordinator and approve it as Admin
+AssertionError: expected 401 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 401
+
+ ❯ __tests__/phase-lifecycle-sanity.test.ts:102:27
+    100|       console.error('Phase 1 Request Error:', resReq.body);
+    101|     }
+    102|     expect(resReq.status).toBe(200);
+       |                           ^
+    103|     testRequestId = resReq.body.requestId;
+    104|     expect(resReq.body.status).toBe('PENDING');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 2: Should create an Assignment and enroll a student
+PrismaClientInitializationError: 
+Invalid `prisma.assignment.create()` invocation in
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/__tests__/phase-lifecycle-sanity.test.ts:118:46
+
+  115 
+  116 it('Phase 2: Should create an Assignment and enroll a student', async () => {
+  117   // Create Assignment (Simulate Admin creating it)
+→ 118   const resAssig = await prisma.assignment.create(
+error: Environment variable not found: DATABASE_URL.
+  -->  schema.prisma:7
+   | 
+ 6 |   provider = "postgresql"
+ 7 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+ ❯ $n.handleRequestError ../../node_modules/@prisma/client/runtime/library.js:121:7615
+ ❯ $n.handleAndLogRequestError ../../node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request ../../node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l ../../node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ __tests__/phase-lifecycle-sanity.test.ts:118:22
+    116|   it('Phase 2: Should create an Assignment and enroll a student', asyn…
+    117|     // Create Assignment (Simulate Admin creating it)
+    118|     const resAssig = await prisma.assignment.create({
+       |                      ^
+    119|       data: {
+    120|         requestId: testRequestId,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 3: Should validate documents and confirm registration (generating sessions)
+PrismaClientInitializationError: 
+Invalid `prisma.enrollment.findFirst()` invocation in
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/__tests__/phase-lifecycle-sanity.test.ts:145:48
+
+  142 
+  143 it('Phase 3: Should validate documents and confirm registration (generating sessions)', async () => {
+  144   // 1. Manually validate document (Simulation)
+→ 145   const enrollment = await prisma.enrollment.findFirst(
+error: Environment variable not found: DATABASE_URL.
+  -->  schema.prisma:7
+   | 
+ 6 |   provider = "postgresql"
+ 7 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+ ❯ $n.handleRequestError ../../node_modules/@prisma/client/runtime/library.js:121:7615
+ ❯ $n.handleAndLogRequestError ../../node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request ../../node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l ../../node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ __tests__/phase-lifecycle-sanity.test.ts:145:24
+    143|   it('Phase 3: Should validate documents and confirm registration (gen…
+    144|     // 1. Manually validate document (Simulation)
+    145|     const enrollment = await prisma.enrollment.findFirst({ where: { as…
+       |                        ^
+    146|     expect(enrollment).toBeDefined();
+    147|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  __tests__/phase-lifecycle-sanity.test.ts > Phase Lifecycle Sanity Test > Phase 4: Should close the assignment and verify certificate readiness
+PrismaClientInitializationError: 
+Invalid `prisma.enrollment.findFirst()` invocation in
+/Users/kore/Documents/Code/Projects/iter-ecosystem-enginy/apps/api/__tests__/phase-lifecycle-sanity.test.ts:175:48
+
+  172 
+  173 it('Phase 4: Should close the assignment and verify certificate readiness', async () => {
+  174   // 1. Add teacher evaluation (Prerequisite for Phase 4)
+→ 175   const enrollment = await prisma.enrollment.findFirst(
+error: Environment variable not found: DATABASE_URL.
+  -->  schema.prisma:7
+   | 
+ 6 |   provider = "postgresql"
+ 7 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+ ❯ $n.handleRequestError ../../node_modules/@prisma/client/runtime/library.js:121:7615
+ ❯ $n.handleAndLogRequestError ../../node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request ../../node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l ../../node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ __tests__/phase-lifecycle-sanity.test.ts:175:24
+    173|   it('Phase 4: Should close the assignment and verify certificate read…
+    174|     // 1. Add teacher evaluation (Prerequisite for Phase 4)
+    175|     const enrollment = await prisma.enrollment.findFirst({ where: { as…
+       |                        ^
+    176|
+    177|     await prisma.evaluation.create({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  4 failed | 12 passed (16)
+   Start at  08:39:06
+   Duration  1.01s (transform 219ms, setup 0ms, import 1.58s, tests 454ms, environment 0ms)
+

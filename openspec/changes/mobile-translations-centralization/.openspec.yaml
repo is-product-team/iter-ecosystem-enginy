@@ -1,0 +1,5 @@
+id: mobile-translations-centralization
+status: proposed
+type: change
+apply:
+  requires: ["tasks"]

@@ -2,12 +2,14 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
     "paths": {
       "@/*": [
         "./*"
       ],
       "@iter/shared": [
-        "../../packages/shared/index.ts"
+        "../../shared/index.ts"
       ]
     }
   },

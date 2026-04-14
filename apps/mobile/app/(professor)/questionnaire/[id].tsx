@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
@@ -11,16 +10,12 @@ export default function WorkshopQualityScreen() {
   const { id } = useLocalSearchParams(); // This is assignmentId
   const router = useRouter();
   
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [model, setModel] = useState<any>(null);
-  const [answers, setAnswers] = useState<{[key: number]: any}>({});
+  const [loading, setLoading] = React.useState(true);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [model, setModel] = React.useState<any>(null);
+  const [answers, setAnswers] = React.useState<{[key: number]: any}>({});
   
-  useEffect(() => {
-    loadQuestionnaire();
-  }, []);
-
-  const loadQuestionnaire = async () => {
+  const loadQuestionnaire = React.useCallback(async () => {
     try {
         setLoading(true);
         // 1. Fetch all models
@@ -43,7 +38,11 @@ export default function WorkshopQualityScreen() {
     } finally {
         setLoading(false);
     }
-  };
+  }, [t, router]);
+
+  React.useEffect(() => {
+    loadQuestionnaire();
+  }, [loadQuestionnaire]);
 
   const handleSubmit = async () => {
     // Validate

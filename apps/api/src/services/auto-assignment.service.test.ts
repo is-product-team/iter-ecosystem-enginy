@@ -59,6 +59,7 @@ describe('AutoAssignmentService', () => {
 
       prismaMock.request.findMany.mockResolvedValue(mockRequests as any);
       prismaMock.assignment.findMany.mockResolvedValue([]); // No current assignments
+      prismaMock.enrollment.count.mockResolvedValue(0); 
       prismaMock.assignment.create.mockResolvedValue({ assignmentId: 1 } as any);
 
       const result = await service.generateAssignments();
@@ -101,6 +102,7 @@ describe('AutoAssignmentService', () => {
 
       prismaMock.request.findMany.mockResolvedValue(mockRequests as any);
       prismaMock.assignment.findMany.mockResolvedValue([]);
+      prismaMock.enrollment.count.mockResolvedValue(0);
       prismaMock.assignment.create.mockResolvedValue({ assignmentId: 1 } as any);
 
       await service.generateAssignments();

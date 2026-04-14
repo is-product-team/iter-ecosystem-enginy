@@ -1,51 +1,49 @@
-/** @type {import('tailwindcss').Config} */
-
-// Simulating import from shared/theme to avoid build issues in JS config
-const THEME = {
-  colors: {
-    primary: '#00426B',
-    secondary: '#4197CB',
-    tertiary: '#0775AB',
-    accent: '#F26178',
-    beige: '#E0C5AC',
-    yellow: '#F9C311',
-    gray: '#CFD2D3',
-    bgGray: '#F2F2F3',
-    secondaryBg: '#EAEFF2',
-  }
-};
+const path = require('path');
 
 module.exports = {
-  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  content: [
+    path.join(__dirname, "./app/**/*.{js,jsx,ts,tsx}"),
+    path.join(__dirname, "./components/**/*.{js,jsx,ts,tsx}"),
+    path.join(__dirname, "./App.{js,jsx,ts,tsx}"),
+  ],
   presets: [require("nativewind/preset")],
-  // darkMode: "class",
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
         // Semantic Tokens
         background: {
-          page: "var(--bg-page)",
-          surface: "var(--bg-surface)",
-          subtle: "var(--bg-subtle)",
+          page: "#f7f8f9",
+          surface: "#ffffff",
+          subtle: "#f3f4f6",
         },
         text: {
-          primary: "var(--text-primary)",
-          secondary: "var(--text-secondary)",
-          muted: "var(--text-muted)",
-          inverse: "var(--text-inverse)",
+          primary: "#111827",
+          secondary: "#374151",
+          muted: "#6b7280",
+          inverse: "#ffffff",
         },
         border: {
-          subtle: "var(--border-subtle)",
+          subtle: "#e5e7eb",
         },
         // Institutional / Brand
-        primary: {
-          DEFAULT: "var(--consorci-dark-blue)", 
+        consorci: {
+          darkBlue: "#00426b",
+          lightBlue: "#4197cb",
+          lightGray: "#cfd2d3",
+          pinkRed: "#f26178",
+          beige: "#e0c5ac",
+          yellow: "#f9c311",
         },
-        'light-blue': "var(--consorci-light-blue)",
-        'light-gray': "var(--consorci-light-gray)",
-        'pink-red': "var(--consorci-pink-red)",
-        beige: "var(--consorci-beige)",
-        yellow: "var(--consorci-yellow)",
+        primary: {
+          DEFAULT: "#00426b", 
+        },
+        secondary: {
+          DEFAULT: "#4197cb",
+        },
+        accent: {
+          DEFAULT: "#f26178",
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'], 

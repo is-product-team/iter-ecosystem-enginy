@@ -126,7 +126,7 @@ export default function DesignateTeachersPage({ params }: { params: Promise<{ id
                 >
                   <option value="">{t('select')}</option>
                   {teachers.map((p: Teacher) => (
-                    <option key={p.teacherId} value={p.teacherId}>{p.name} ({p.contact})</option>
+                    <option key={p.teacherId} value={p.user?.userId}>{p.name} ({p.contact})</option>
                   ))}
                 </select>
               </div>
@@ -140,7 +140,7 @@ export default function DesignateTeachersPage({ params }: { params: Promise<{ id
                 >
                   <option value="">{t('select')}</option>
                   {teachers.map((p: Teacher) => (
-                    <option key={p.teacherId} value={p.teacherId}>{p.name} ({p.contact})</option>
+                    <option key={p.teacherId} value={p.user?.userId}>{p.name} ({p.contact})</option>
                   ))}
                 </select>
               </div>

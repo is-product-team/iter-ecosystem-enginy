@@ -129,37 +129,42 @@ export class SessionService {
         // 1. Generate desired session dates and times
         let desiredSessions: Array<{ date: Date; startTime?: string; endTime?: string }> = [];
         
-        if (Array.isArray(scheduleData)) {
-            if (scheduleData.length > 0 && typeof scheduleData[0] === 'string') {
-                // Legacy format: string[]
-                const dates = this.generateDatesFromSchedule(assignment.startDate, scheduleData as string[]);
-                desiredSessions = dates.map(d => ({ date: d }));
-            } else {
-                // Object format: { dayOfWeek: number, startTime: string, endTime: string }[]
-                const { phase } = await prisma.phase.findFirst({
-                    where: { name: 'EXECUTION' }, // Assuming standard name
-                    select: { startDate: true, endDate: true }
-                }).then(p => ({ phase: p })) as any; // Fallback or use shared utility
+        const isLegacyFormat = Array.isArray(scheduleData) && scheduleData.length > 0 && typeof scheduleData[0] === 'string';
+        const isObjectFormat = Array.isArray(scheduleData) && scheduleData.length > 0 && typeof scheduleData[0] === 'object';
 
-                const startDate = assignment.startDate;
-                const endDate = assignment.endDate || phase?.endDate || addWeeks(startDate, 10);
+        if (isLegacyFormat) {
+            // Legacy format: string[]
+            const dates = this.generateDatesFromSchedule(assignment.startDate, scheduleData as string[]);
+            desiredSessions = dates.map(d => ({ date: d }));
+        } else if (isObjectFormat) {
+            // Object format: { dayOfWeek: number, startTime: string, endTime: string }[]
+            const phase = await prisma.phase.findFirst({
+                where: { name: 'EXECUTION' },
+                select: { startDate: true, endDate: true }
+            });
 
-                let current = startOfDay(startDate);
-                while (current <= endDate) {
-                    const dayOfWeek = getDay(current);
-                    const slots = (scheduleData as any[]).filter(s => s.dayOfWeek === dayOfWeek);
-                    
-                    for (const slot of slots) {
-                        desiredSessions.push({
-                            date: new Date(current),
-                            startTime: slot.startTime,
-                            endTime: slot.endTime
-                        });
-                    }
-                    current = addDays(current, 1);
-                    if (desiredSessions.length > 50) break; // Safety limit
+            const startDate = assignment.startDate;
+            const endDate = assignment.endDate || phase?.endDate || addWeeks(startDate, 10);
+
+            let current = startOfDay(startDate);
+            while (current <= endDate) {
+                const dayOfWeek = getDay(current);
+                const slots = (scheduleData as any[]).filter(s => s.dayOfWeek === dayOfWeek);
+                
+                for (const slot of slots) {
+                    desiredSessions.push({
+                        date: new Date(current),
+                        startTime: slot.startTime,
+                        endTime: slot.endTime
+                    });
                 }
+                current = addDays(current, 1);
+                if (desiredSessions.length > 50) break; // Safety limit
             }
+        } else {
+            // Default: 10 weekly sessions if no schedule is provided
+            const dates = this.generateSessionDates(assignment.startDate, 10);
+            desiredSessions = dates.map(d => ({ date: d }));
         }
 
         if (desiredSessions.length === 0) return;
