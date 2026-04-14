@@ -17,6 +17,13 @@ export interface NLPAnalysisResult {
 }
 
 export class NLPService {
+    private ollamaHost: string;
+    private model: string;
+
+    constructor() {
+        this.ollamaHost = process.env.OLLAMA_HOST || 'http://ollama:11434';
+        this.model = process.env.AI_MODEL_NLP || 'llama3';
+    }
 
     /**
      * Analyzes the teacher's input text to extract structured data.
