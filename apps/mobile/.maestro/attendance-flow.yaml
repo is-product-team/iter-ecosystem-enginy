@@ -1,0 +1,11 @@
+appId: com.consorci.iter
+---
+- runFlow: login-flow.yaml
+- tapOn: "Agenda"
+- tapOn: "Taller de Robótica"
+- assertVisible: "Gestió de la Sessió"
+- tapOn: "Pasar Llista"
+- tapOn:
+    id: "attendance-present-0"
+- tapOn: "Guardar"
+- assertVisible: "Assistència guardada"

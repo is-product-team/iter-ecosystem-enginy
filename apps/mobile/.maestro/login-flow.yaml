@@ -1,0 +1,10 @@
+appId: com.consorci.iter
+---
+- launchApp
+- assertVisible: "Inici de Sessió"
+- tapOn: "Correu electrònic"
+- inputText: "profe@iter.cat"
+- tapOn: "Contrasenya"
+- inputText: "password123"
+- tapOn: "Iniciar Sessió"
+- assertVisible: "Panell del Professor"

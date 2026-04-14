@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import WorkshopDetailModal from './WorkshopDetailModal';
-import { useTranslation } from 'react-i18next';
 
 export interface CalendarEvent {
   id: string;
@@ -53,9 +52,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
     return Array.from({ length: 7 }).map((_, i) => {
       const d = new Date(baseDate);
       d.setDate(d.getDate() + i);
-      return d.toLocaleDateString(lang, { weekday: 'short' }).slice(0, 2).toUpperCase();
+      return d.toLocaleDateString(i18n.language, { weekday: 'short' }).slice(0, 2).toUpperCase();
     });
-  }, [lang]);
+  }, [i18n.language]);
 
   const calendarDays = useMemo(() => {
     const totalDays = daysInMonth(year, currentDate.getMonth());

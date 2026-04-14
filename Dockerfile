@@ -1,6 +1,6 @@
 # Stage 1: Base (Node 22 + Librerías sistema)
-FROM node:22-alpine AS base
-RUN apk add --no-cache libc6-compat openssl curl
+FROM node:22-slim AS base
+RUN apt-get update && apt-get install -y openssl curl ca-certificates build-essential python3 && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
 ENV COREPACK_ENABLE=1
 ENV NEXT_TELEMETRY_DISABLED=1

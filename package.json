@@ -20,16 +20,17 @@
     "db:seed": "turbo run db:seed",
     "db:studio": "turbo run studio",
     "test": "turbo run test",
-    "verify": "turbo run lint type-check test --filter=@iter/api --filter=@iter/web",
+    "verify": "turbo run lint type-check test --filter=@iter/api --filter=@iter/web --filter=@iter/mobile",
     "verify:sanity": "DATABASE_URL=\"postgresql://postgres:root@localhost:5432/iter_db?schema=public\" JWT_SECRET=\"dev_secret_key_cambiar_en_prod\" NODE_ENV=\"test\" npm run test:sanity --workspace=@iter/api",
     "mobile:dev": "turbo run dev --filter=@iter/mobile",
     "mobile:tunnel": "npm run dev:tunnel --workspace=@iter/mobile",
     "mobile:android": "npm run android --workspace=@iter/mobile",
     "mobile:ios": "npm run ios --workspace=@iter/mobile",
-    "mobile:verify": "turbo run lint type-check --filter=@iter/mobile",
+    "mobile:verify": "turbo run lint type-check test --filter=@iter/mobile",
     "mobile:test": "npm run test --workspace=@iter/mobile"
   },
   "devDependencies": {
+    "@parcel/watcher": "^2.5.0",
     "ajv": "^8.18.0",
     "ajv-keywords": "^5.1.0",
     "autoprefixer": "^10.4.16",
@@ -39,6 +40,10 @@
     "typescript": "^5.6.3",
     "vite": "5.4.21",
     "vitest": "3.2.4"
+  },
+  "optionalDependencies": {
+    "@swc/core-linux-arm64-gnu": "^1.5.7",
+    "@swc/core-linux-x64-gnu": "^1.5.7"
   },
   "engines": {
     "node": ">=18.0.0"
