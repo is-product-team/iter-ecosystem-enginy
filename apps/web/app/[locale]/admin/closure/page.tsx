@@ -30,11 +30,6 @@ export default function ClosurePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Stats Modal state
-  const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
-  const [statsData, setStatsData] = useState<any>(null);
-  const [loadingStats, setLoadingStats] = useState(false);
-
   const fetchAssignments = useCallback(async () => {
     try {
       setLoading(true);
@@ -90,21 +85,7 @@ export default function ClosurePage() {
     }
   };
 
-  const handleViewStats = async (assignment: Assignment) => {
-    setSelectedAssignment(assignment);
-    setIsStatsModalOpen(true);
-    setLoadingStats(true);
-    try {
-      const api = getApi();
-      const res = await api.get(`/certificates/stats/${assignment.assignmentId}`);
-      setStatsData(res.data);
-    } catch (error) {
-      console.error(error);
-      toast.error("No s'han pogut carregar les estadístiques.");
-    } finally {
-      setLoadingStats(false);
-    }
-  };
+
 
   const handleDownloadZip = async (assignmentId: number) => {
     try {
@@ -173,15 +154,7 @@ export default function ClosurePage() {
                   <div className="text-right flex flex-col items-end gap-2">
                     <p className="text-[11px] font-bold text-text-muted uppercase opacity-50">ID: {assignment.assignmentId}</p>
                     <div className="flex gap-2">
-                        <button 
-                            onClick={() => handleViewStats(assignment)}
-                            title={t('action_stats')}
-                            className="p-2 bg-background-subtle border border-border-subtle hover:bg-[#00426B] hover:text-white transition-colors"
-                        >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        </button>
+
                         {isCompleted && (
                             <button 
                                 onClick={() => handleDownloadZip(assignment.assignmentId)}
@@ -252,33 +225,7 @@ export default function ClosurePage() {
         onCancel={() => setIsModalOpen(false)}
       />
 
-      {/* Stats Modal */}
-      {isStatsModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsStatsModalOpen(false)}></div>
-            <div className="bg-gray-50 dark:bg-gray-900 w-full max-w-6xl max-h-[90vh] overflow-y-auto relative shadow-2xl border border-gray-200">
-                <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex justify-between items-center z-10">
-                    <div>
-                        <h2 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">{t('stats_modal_title')}</h2>
-                        <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">{selectedAssignment?.workshop?.title} - {selectedAssignment?.center?.name}</p>
-                    </div>
-                    <button onClick={() => setIsStatsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                        <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <div className="p-8">
-                    {loadingStats ? (
-                        <div className="py-20 flex justify-center"><Loading message="Carregant anàlisi..." /></div>
-                    ) : (
-                        <SatisfactionCharts data={statsData} />
-                    )}
-                </div>
-            </div>
-        </div>
-      )}
+
     </DashboardLayout>
   );
 }
