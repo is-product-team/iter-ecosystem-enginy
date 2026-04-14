@@ -1,11 +1,16 @@
 import * as React from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Linking, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { THEME, ROLES } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import { login } from '../services/api';
+import { Button } from '../components/ui/Button';
+import { FormGroup } from '../components/ui/FormGroup';
+import { TextInput } from '../components/ui/TextInput';
+import { StatusBar } from 'expo-status-bar';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
@@ -26,15 +31,11 @@ export default function LoginScreen() {
     try {
       const response = await login({ email, password });
       const { token, user } = response.data;
-      
-      if (!user) {
-        throw new Error('Invalid response: User data missing');
-      }
+      if (!user) throw new Error('Invalid response: User data missing');
 
       const userAny: any = user;
-
-      // Role restriction: Only TEACHERS can access the mobile app
       const roleName = userAny.role?.roleName;
+
       if (roleName !== ROLES.TEACHER && roleName !== 'PROFESSOR') {
         setLoading(false);
         setRoleError(t('Auth.login.exclusive_use_error'));
@@ -42,8 +43,6 @@ export default function LoginScreen() {
       }
 
       setRoleError(null);
-
-      // Save token and user info
       if (Platform.OS === 'web') {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(userAny));
@@ -51,10 +50,8 @@ export default function LoginScreen() {
         await SecureStore.setItemAsync('token', token);
         await SecureStore.setItemAsync('user', JSON.stringify(userAny));
       }
-
       router.replace('/(professor)' as any);
     } catch (error: any) {
-      console.error('Login error:', error);
       const message = error.response?.data?.error || t('Auth.login.error_generic');
       Alert.alert(t('Auth.login.error_title'), message);
     } finally {
@@ -63,106 +60,110 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-      className="flex-1 bg-background-surface"
-    >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 px-8 pt-24 pb-12">
-          {/* Logo / Header Area */}
-          <View className="mb-16">
-            <View className="w-16 h-2 bg-pink-red mb-6" />
-            <Text className="text-4xl font-bold text-primary dark:text-white leading-[45px] tracking-tight">
-              {t('Auth.login.title')}
-            </Text>
-            <View className="flex-row items-center mt-4">
-              <Text className="text-text-muted font-bold text-xs uppercase tracking-widest">Plataforma Iter</Text>
-              <View className="h-[1px] flex-1 bg-border-subtle ml-4" />
-            </View>
-          </View>
+    <SafeAreaView className="flex-1 bg-white dark:bg-black">
+      <StatusBar style="auto" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+          bounces={true}
+        >
+          <View className="flex-1 px-8 pt-20 pb-12">
 
-          {/* Form */}
-          <View className="space-y-6">
-            <View>
-              <Text className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 ml-1">{t('Auth.login.email')}</Text>
-              <View className="flex-row items-center border border-border-subtle p-4 bg-background-subtle dark:bg-background-surface">
-                <Ionicons name="mail-outline" size={20} color={THEME.colors.primary} />
+            {/* Minimalist Apple-style Header */}
+            <View className="mb-14">
+              <Image
+                source={require('../assets/images/icon-simple.png')}
+                className="w-16 h-16 rounded-[16px] mb-6"
+                resizeMode="cover"
+              />
+              <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
+                {t('Auth.login.welcome_title')}
+              </Text>
+              <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+                {t('Auth.login.welcome_subtitle')}
+              </Text>
+            </View>
+
+            {/* Inset Grouped Form (Apple Native Look) */}
+            <View className="mb-8">
+              <FormGroup>
                 <TextInput
-                  className="flex-1 ml-4 font-bold text-text-primary dark:text-white"
+                  icon="mail-outline"
                   placeholder="exemple@email.cat"
-                  placeholderTextColor={THEME.colors.gray}
                   autoCapitalize="none"
                   keyboardType="email-address"
                   value={email}
                   onChangeText={setEmail}
+                  className="bg-transparent"
                 />
-              </View>
-            </View>
-
-            <View className="mt-6">
-              <Text className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2 ml-1">{t('Auth.login.password')}</Text>
-              <View className="flex-row items-center border border-border-subtle p-4 bg-background-subtle dark:bg-background-surface">
-                <Ionicons name="lock-closed-outline" size={20} color={THEME.colors.primary} />
                 <TextInput
-                  className="flex-1 ml-4 font-bold text-text-primary dark:text-white"
+                  icon="lock-closed-outline"
                   placeholder="••••••••"
-                  placeholderTextColor={THEME.colors.gray}
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
+                  className="bg-transparent"
+                  rightElement={
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="p-2">
+                      <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color={THEME.colors.gray} />
+                    </TouchableOpacity>
+                  }
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color={THEME.colors.gray} />
+              </FormGroup>
+            </View>
+
+            {roleError && (
+              <View className="mb-8 bg-pink-red/10 p-5 rounded-2xl">
+                <View className="flex-row items-center mb-1">
+                  <Ionicons name="warning" size={16} color="#F26178" />
+                  <Text className="ml-2 font-bold text-xs text-pink-red uppercase tracking-wider">{t('Auth.login.access_restricted')}</Text>
+                </View>
+                <Text className="text-[13px] font-medium text-black/70 dark:text-white/70 leading-relaxed mb-3 mt-2">
+                  {roleError}
+                </Text>
+                <TouchableOpacity onPress={() => Linking.openURL('https://iter.consorci.cat')}>
+                  <Text className="text-pink-red font-semibold text-[13px]">{t('Auth.login.go_to_web')} →</Text>
                 </TouchableOpacity>
               </View>
-            </View>
-          </View>
+            )}
 
-          {roleError && (
-            <View className="my-6 p-5 bg-pink-red/10 border-l-4 border-pink-red">
-              <View className="flex-row items-center mb-2">
-                <Ionicons name="warning-outline" size={18} color="#F26178" />
-                <Text className="ml-2 font-black text-[10px] text-pink-red uppercase tracking-widest">{t('Auth.login.access_restricted')}</Text>
-              </View>
-              <Text className="text-xs font-bold text-text-secondary leading-relaxed mb-4">
-                {roleError}
+            {/* Apple-style sticky full width button */}
+            <View className="mt-6 mb-2">
+              <Button
+                label={t('Auth.login.submit') as string || "Entrar"}
+                onPress={handleLogin}
+                loading={loading}
+                className="rounded-2xl"
+              />
+            </View>
+
+            {/* Minimalist secondary actions */}
+            <View className="items-center justify-center mt-6">
+              <Text className="text-gray-400 dark:text-gray-500 font-medium text-[13px] mb-1">
+                {t('Auth.login.login_problems')}
               </Text>
-              <TouchableOpacity 
-                onPress={() => Linking.openURL('https://iter.consorci.cat')}
-                className="flex-row items-center border-b border-pink-red self-start pb-0.5"
-              >
-                <Text className="text-pink-red font-black text-[10px] uppercase tracking-widest">{t('Auth.login.go_to_web')}</Text>
-                <Ionicons name="arrow-forward" size={12} color="#F26178" className="ml-2" />
+              <TouchableOpacity>
+                <Text className="text-primary font-bold text-[14px] dark:text-pink-red">
+                  {t('Auth.login.forgot_password')}
+                </Text>
               </TouchableOpacity>
             </View>
-          )}
 
-          <View className="mt-12">
-            <TouchableOpacity 
-              className={`bg-primary py-4 items-center justify-center ${loading ? 'opacity-70' : ''}`}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <Text className="text-white font-bold text-sm uppercase tracking-wider">{t('Auth.login.submit')}</Text>
-              )}
-            </TouchableOpacity>
+            {/* Privacy footer */}
+            <View className="mt-auto items-center pb-2 pt-12">
+              <Text className="text-center text-[12px] text-gray-400 dark:text-gray-500 leading-tight">
+                {t('Auth.login.privacy_footer')}
+              </Text>
+            </View>
 
-            <TouchableOpacity className="mt-8 items-center">
-              <Text className="text-text-muted font-bold text-xs uppercase tracking-widest">{t('Auth.login.forgot_password')}</Text>
-            </TouchableOpacity>
+
           </View>
-
-          {/* Footer Branding */}
-          <View className="mt-auto items-center">
-            <Text className="text-[9px] font-black text-text-muted opacity-40 uppercase tracking-[4px]">
-              {t('Common.branding')}
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

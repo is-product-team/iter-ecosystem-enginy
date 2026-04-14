@@ -21,7 +21,13 @@
     "address": "Direcció del Centre",
     "workshop_evaluated": "Taller Avaluat",
     "evaluate_workshop": "Avaluar Taller",
-    "status": "Estat"
+    "status": "Estat",
+    "today": "Avui",
+    "tomorrow": "Demà",
+    "email": "Email",
+    "not_available": "N/A",
+    "initials_fallback": "??",
+    "professor": "Professor"
   },
   "Auth": {
     "logout": {
@@ -41,7 +47,11 @@
       "forgot_password": "He oblidat la contrasenya",
       "access_restricted": "Accés Restringit",
       "go_to_web": "Anar a la Plataforma Web",
-      "submit": "Entrar"
+      "submit": "Entrar",
+      "welcome_title": "Te donem la benvinguda a Iter",
+      "welcome_subtitle": "Gestió avançada de mòduls duals i seguiment d'alumnes per a professors tècnics.",
+      "login_problems": "Tens problemes per accedir-hi?",
+      "privacy_footer": "En iniciar la sessió, acceptes la nostra Política de Privacitat i els Termes de Servei de la Plataforma Iter."
     }
   },
   "Profile": {
@@ -105,7 +115,17 @@
     "active": "Actiu",
     "loading_data": "Càrrega de dades",
     "evaluate_finished_workshop": "Avaluar taller finalitzat",
-    "in_progress": "En Curs"
+    "in_progress": "En Curs",
+    "greeting_morning": "Bon dia, {{name}}",
+    "greeting_afternoon": "Bona tarda, {{name}}",
+    "no_upcoming_sessions": "Sense sessions properes",
+    "session_today": "Tens una sessió avui",
+    "next_session_on": "Pròxima sessió el {{label}}",
+    "recent_workshops": "Tallers recents",
+    "none_new": "Cap de nou",
+    "phase_status": "Estat de la fase",
+    "pending_count_one": "{{count}} pendent",
+    "pending_count_other": "{{count}} pendents"
   },
   "Evaluation": {
     "title": "Avaluació Competencial",
@@ -149,7 +169,18 @@
   },
   "Calendar": {
     "academic_agenda": "Agenda Acadèmica",
-    "title": "El Meu Calendari"
+    "title": "El Meu Calendari",
+    "weekdays": {
+      "dl": "DL",
+      "dt": "DT",
+      "dc": "DC",
+      "dj": "DJ",
+      "dv": "DV",
+      "ds": "DS",
+      "dg": "DG"
+    },
+    "no_events": "No hi ha esdeveniments",
+    "all_day": "Tot el dia"
   },
   "Coordination": {
     "teacher_space": "Espai del Docent",

@@ -1,6 +1,6 @@
 {
   "name": "@iter/mobile",
-  "main": "expo-router/entry",
+  "main": "App.js",
   "version": "1.0.0",
   "scripts": {
     "dev": "npx expo start",
@@ -45,8 +45,8 @@
     "i18next": "^26.0.1",
     "nativewind": "^4.2.1",
     "prettier-plugin-tailwindcss": "^0.5.14",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-i18next": "^16.6.6",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",

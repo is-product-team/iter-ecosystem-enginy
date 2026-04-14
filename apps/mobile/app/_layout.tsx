@@ -36,10 +36,6 @@ function RootLayout() {
   });
 
   useEffect(() => {
-    if (!React) {
-        console.error("⛔ [CRITICAL] React object is null in _layout.tsx! Resetting caches is required.");
-        return;
-    }
     if (loaded || error) {
       SplashScreen.hideAsync();
     }

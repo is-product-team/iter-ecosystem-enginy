@@ -22,6 +22,7 @@ config.resolver.extraNodeModules = {
   'scheduler': path.resolve(workspaceRoot, 'node_modules/scheduler'),
   'react': path.resolve(workspaceRoot, 'node_modules/react'),
   'react-dom': path.resolve(workspaceRoot, 'node_modules/react-dom'),
+  'expo-router': path.resolve(workspaceRoot, 'node_modules/expo-router'),
 };
 
 // Use the exclusionList from the internal metro-config to avoid export errors
@@ -49,4 +50,7 @@ config.resolver.blacklistRE = blocklist;
 // 3. Make sure typescript files in the monorepo are discoverable
 config.resolver.sourceExts.push('mjs', 'ts', 'tsx');
 
-module.exports = withNativeWind(config, { input: './global.css' });
+module.exports = withNativeWind(config, { 
+  input: path.resolve(__dirname, 'global.css'),
+  configPath: path.resolve(__dirname, 'tailwind.config.js'),
+});

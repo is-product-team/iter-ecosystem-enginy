@@ -95,7 +95,7 @@ export default function CoordinationScreen() {
                                )}
                                <TouchableOpacity onPress={() => handleEmail(item.teacher.email || 'info@consorci.cat')} className="flex-row items-center bg-background-subtle px-3 py-1.5 rounded-lg border border-border-subtle">
                                  <Ionicons name="mail" size={14} color={THEME.colors.primary} />
-                                 <Text className="text-primary font-black text-[10px] uppercase ml-2 tracking-widest">Email</Text>
+                                 <Text className="text-primary font-black text-[10px] uppercase ml-2 tracking-widest">{t('Common.email')}</Text>
                                </TouchableOpacity>
                             </View>
                          </View>

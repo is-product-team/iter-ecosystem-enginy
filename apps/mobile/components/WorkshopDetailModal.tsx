@@ -75,7 +75,7 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
                     </View>
                     <Text className="text-text-muted text-xs font-bold uppercase tracking-wider mb-1">{t('Common.room')}</Text>
                     <Text className="text-text-primary font-bold text-lg" numberOfLines={1}>
-                        {event.metadata?.center || 'N/A'}
+                        {event.metadata?.center || t('Common.not_available')}
                     </Text>
                  </View>
                  
