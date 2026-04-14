@@ -600,7 +600,7 @@ export const validateCenterData = async (req: Request, res: Response) => {
 // POST: Send Notification of Incorrect Document
 export const sendDocumentNotification = async (req: Request, res: Response) => {
   const { idAssignment: assignmentId } = req.params;
-  const { documentName, comment, greeting } = req.body;
+  const { documentName, comment } = req.body;
   const { role } = req.user!;
 
   if (role !== ROLES.ADMIN) return res.status(403).json({ error: 'Unauthorized' });

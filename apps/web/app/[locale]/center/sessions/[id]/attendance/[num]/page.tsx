@@ -35,7 +35,6 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
   const [saving, setSaving] = useState(false);
   const [sessionDate, setSessionDate] = useState<string>('');
   const router = useRouter();
-  const t = useTranslations('AttendancePage');
   const tCommon = useTranslations('Common');
 
   useEffect(() => {
@@ -106,10 +105,6 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
     { value: 'ABSENT', label: t('status_absent'), color: 'bg-red-500', icon: 'M6 18L18 6M6 6l12 12' },
     { value: 'LATE', label: t('status_late'), color: 'bg-orange-500', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
     { value: 'JUSTIFIED_ABSENCE', label: t('status_justified'), color: 'bg-blue-500', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { value: 'PRESENT', label: t('status_present'), color: 'bg-green-500', icon: 'M5 13l4 4L19 7' },
-    { value: 'ABSENT', label: t('status_absent'), color: 'bg-red-500', icon: 'M6 18L18 6M6 6l12 12' },
-    { value: 'LATE', label: t('status_late'), color: 'bg-orange-500', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { value: 'JUSTIFIED_ABSENCE', label: t('status_justified'), color: 'bg-blue-500', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
   ];
 
   return (
@@ -124,7 +119,6 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           {t('back_to_sessions')}
-          {t('back_to_sessions')}
         </button>
 
         <button
@@ -132,7 +126,6 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
           disabled={saving}
           className={`px-10 py-3.5 text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-3 ${saving ? 'bg-background-subtle text-text-muted' : 'bg-consorci-darkBlue text-white hover:bg-black active:scale-[0.98]'}`}
         >
-          {saving ? t('saving') : t('save_attendance')}
           {saving ? t('saving') : t('save_attendance')}
           {!saving && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>}
         </button>

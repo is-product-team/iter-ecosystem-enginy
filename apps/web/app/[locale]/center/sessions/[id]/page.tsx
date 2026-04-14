@@ -9,7 +9,6 @@ import { ROLES } from '@iter/shared';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
-import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
 interface AssignmentDetail {
