@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
-import { useTranslations } from "next-intl";
 import { ROLES } from "@iter/shared";
 import DashboardLayout from "@/components/DashboardLayout";
 import getApi from "@/services/api";

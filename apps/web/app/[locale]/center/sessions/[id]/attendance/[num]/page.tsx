@@ -9,7 +9,6 @@ import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
-import { useTranslations } from 'next-intl';
 
 interface AttendanceRecord {
   attendanceId: number;

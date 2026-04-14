@@ -163,7 +163,6 @@ const CreateWorkshopModal = ({
             </h2>
             <p className="text-[11px] font-normal text-text-muted mt-1">
               {t('workshop_config_subtitle')}
-              {t('workshop_config_subtitle')}
             </p>
           </div>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
@@ -178,7 +177,6 @@ const CreateWorkshopModal = ({
           <div className="md:w-7/12 p-8 overflow-y-auto border-r border-border-subtle custom-scrollbar">
             <section className="mb-8">
               <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">{t('general_info')}</h3>
-              <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">{t('general_info')}</h3>
 
               <div className="space-y-6">
                 <div className="group">
@@ -188,7 +186,6 @@ const CreateWorkshopModal = ({
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all placeholder:text-text-muted outline-none"
-                    placeholder={t('title_placeholder')}
                     placeholder={t('title_placeholder')}
                   />
                 </div>
@@ -211,7 +208,6 @@ const CreateWorkshopModal = ({
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-text-primary mb-2">{t('modality')} <span className="text-red-500">*</span></label>
-                    <label className="block text-[11px] font-medium text-text-primary mb-2">{t('modality')} <span className="text-red-500">*</span></label>
                     <select
                       value={modality}
                       onChange={(e) => setModality(e.target.value)}
@@ -226,13 +222,11 @@ const CreateWorkshopModal = ({
 
                 <div>
                   <label className="block text-[11px] font-medium text-text-primary mb-2">{t('description')}</label>
-                  <label className="block text-[11px] font-medium text-text-primary mb-2">{t('description')}</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
                     className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue transition-all placeholder:text-text-muted outline-none custom-scrollbar"
-                    placeholder={t('description_placeholder')}
                     placeholder={t('description_placeholder')}
                   />
                 </div>
@@ -360,12 +354,10 @@ const CreateWorkshopModal = ({
             <div className="text-red-500 text-[11px] font-medium">{error}</div>
           ) : (
             <div className="text-text-muted text-[11px] font-normal">{t('review_data')}</div>
-            <div className="text-text-muted text-[11px] font-normal">{t('review_data')}</div>
           )}
 
           <div className="flex gap-4">
             <button onClick={onClose} className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors">
-              {tCommon('cancel')}
               {tCommon('cancel')}
             </button>
             <button

@@ -153,7 +153,6 @@ export default function AssignmentsPage() {
               className="px-8 py-3.5 text-[13px] font-medium text-text-muted hover:text-text-primary transition-all"
             >
               {tCommon('clear_filters')}
-              {tCommon('clear_filters')}
             </button>
           </div>
         </div>
@@ -223,8 +222,6 @@ export default function AssignmentsPage() {
               <div className="p-20 text-center">
                 <p className="text-text-primary font-medium text-sm">{t('no_assignments')}</p>
                 <p className="text-text-muted text-[12px] font-medium mt-2">{t('adjust_filters')}</p>
-                <p className="text-text-primary font-medium text-sm">{t('no_assignments')}</p>
-                <p className="text-text-muted text-[12px] font-medium mt-2">{t('adjust_filters')}</p>
               </div>
             )}
 
@@ -243,9 +240,7 @@ export default function AssignmentsPage() {
         {isPhaseActive(PHASES.EXECUTION) && (
           <section className="mt-16 bg-background-surface p-10 border border-border-subtle">
             <h3 className="text-xl font-medium text-text-primary mb-3">{t('incidents_title')}</h3>
-            <h3 className="text-xl font-medium text-text-primary mb-3">{t('incidents_title')}</h3>
             <p className="text-[13px] font-medium text-text-muted mb-8">
-              {t('incidents_subtitle')}
               {t('incidents_subtitle')}
             </p>
 
@@ -253,7 +248,6 @@ export default function AssignmentsPage() {
               <input
                 id="incident-input"
                 type="text"
-                placeholder={t('incident_placeholder')}
                 placeholder={t('incident_placeholder')}
                 className="flex-1 px-4 py-4 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
               />
