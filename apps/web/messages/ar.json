@@ -162,7 +162,7 @@
       "report_problem_hint": "أبلغ عن مشكلة في وثائق هذا الطالب",
       "report_problem_btn": "إبلاغ عن مشكلة",
       "no_assignments": "لا توجد تعيينات للتحقق منها",
-      "report_modal_title": "الإبلاغ عن مشكلة وثائقية",
+      "report_modal_title": "إبلاغ عن مشكلة وثائقية",
       "reason_placeholder": "صف سبب الخطأ هنا...",
       "error_no_comment": "يجب عليك كتابة تعليق",
       "success_notif": "تم إرسال الإشعار بنجاح",
@@ -437,7 +437,17 @@
     "delete_error": "حدث خطأ أثناء حذف العنصر.",
     "delete_confirm_title": "تأكيد الحذف",
     "delete_confirm_msg": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذه الخطوة.",
+    "places_label": "{count} مقاعد",
+    "duration_label": "{hours}ساعة",
     "new": "جديد",
+    "items": "عناصر",
+    "phase_with_number": "مرحلة {number}",
+    "phases_names": {
+      "APPLICATION": "تقديم الطلب",
+      "PLANNING": "تخطيط",
+      "EXECUTION": "تنفيذ",
+      "EVALUATION": "تقييم"
+    },
     "system_default": "افتراضي النظام",
     "select_language": "اختار اللغة",
     "badges": {
@@ -448,7 +458,7 @@
       "will_certify": "سيتم الاعتماد",
       "no_cert": "بدون اعتماد"
     }
-    },
+  },
   "Calendar": {
     "loading_auth": "جاري مزامنة تقويمك...",
     "title": "تقويم Iter",
@@ -894,5 +904,71 @@
     "max_students": "الأماكن القصوى",
     "description": "وصف الورشة",
     "workshop_details": "التفاصيل التقنية"
+  },
+  "AssignmentWorkshopsPage": {
+    "table_info": "معلومات الطالب",
+    "title_prefix": "إدارة الورشة: ",
+    "modality_prefix": "النمط ",
+    "referent_label": "الفريق التعليمي المرجعي",
+    "center_label": "المركز التعليمي",
+    "students_title": "الطلاب المشاركون",
+    "students_subtitle": "{occupied} من {total} مقاعد مشغولة.",
+    "select_students_btn": "اختيار الطلاب",
+    "nominal_register_btn": "السجل الاسمي",
+    "no_students": "لم يتم تعيين طلاب بعد",
+    "no_students_hint": "انقر هنا لبدء السجل الاسمي",
+    "remove_student_success": "تم حذف الطالب بنجاح.",
+    "remove_student_tooltip": "حذف الطالب",
+    "loading_msg": "جاري تحميل تفاصيل الورشة...",
+    "status": {
+      "PROVISIONAL": "مؤقت",
+      "PUBLISHED": "منشور",
+      "DATA_ENTRY": "في انتظار الإدارة",
+      "DATA_SUBMITTED": "تم تقديم البيانات",
+      "VALIDATED": "مؤكد",
+      "READY_TO_START": "جاهز للبدء",
+      "VACANT": "شاغر",
+      "IN_PROGRESS": "قيد التنفيذ",
+      "COMPLETED": "مكتمل",
+      "CANCELLED": "ملغى",
+      "provisional": "مؤقت",
+      "published": "منشور",
+      "data_entry": "في انتظار الإدارة",
+      "data_submitted": "تم تقديم البيانات",
+      "validated": "مؤكد",
+      "ready_to_start": "جاهز للبدء",
+      "vacant": "شاغر",
+      "in_progress": "قيد التنفيذ",
+      "completed": "مكتمل",
+      "cancelled": "ملغى"
+    },
+    "docs": {
+      "pedagogical_agreement": "اتفاقية بيداغوجية",
+      "mobility_authorization": "تصريح تنقل",
+      "image_rights": "حقوق الصورة"
+    },
+    "finalize_section": {
+      "ready_title": "✓ كل شيء جاهز للبدء",
+      "not_ready_title": "تأكيد الوثائق",
+      "ready_desc": "تم التحقق من جميع الوثائق. يمكنك الآن تأكيد التسجيل النهائي لتفعيل الورشة.",
+      "not_ready_desc": "بمجرد التحقق من جميع الوثائق، ستتمكن من تأكيد التسجيل النهائي.",
+      "confirm_btn": "تأكيد وتوليد الجلسات",
+      "confirm_dialog": "تأكيد التسجيل؟",
+      "success": "تم تأكيد التسجيل!"
+    },
+    "close_section": {
+      "title": "إغلاق الورشة",
+      "desc": "بمجرد انتهاء جميع الجلسات وتقييمات الكفاءة، يمكنك إغلاق الورشة. سيؤدي هذا الإجراء تلقائياً إلى توليد شهادات الحضور.",
+      "confirm_btn": "إغلاق الورشة",
+      "confirm_dialog": "هل أنت متأكد أنك تريد إغلاق هذه الورشة؟ هذا الإجراء غير قابل للتراجع وسيولد شهادات الإكمال.",
+      "pending_evals_error": "لا يمكن إغلاق التعيين. هناك {count} تقييمات معلقة.",
+      "success": "تم إغلاق الورشة وتوليد الشهادات بنجاح!",
+      "error": "خطأ في إغلاق الورشة."
+    },
+    "Monitoring": {
+      "no_assignments": "لا توجد ورش نشطة قيد التنفيذ حالياً."
+    },
+    "ia_matcher_btn": "IA Matcher",
+    "ia_matcher_close_btn": "إغلاق IA Matcher"
   }
 }

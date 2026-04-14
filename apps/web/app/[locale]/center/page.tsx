@@ -94,14 +94,14 @@ export default function CenterDashboard() {
                     <h4
                       className={`text-[12px] font-medium tracking-tight mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue font-medium' : 'text-text-muted'}`}
                     >
-                      {phase.name}
+                      {tc(`phases_names.${phase.name}`)}
                     </h4>
 
                     <div
                       className={`text-[11px] font-medium px-4 py-2 border ${phase.isActive ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-surface text-text-muted border-border-subtle'}`}
                     >
                       {new Date(phase.startDate).toLocaleDateString(
-                        locale === 'ca' ? 'ca-ES' : locale === 'ar' ? 'ar-SA' : locale === 'en' ? 'en-GB' : 'es-ES',
+                        locale === 'ar' ? 'ar-SA' : locale === 'en' ? 'en-GB' : locale === 'ca' ? 'ca-ES' : 'es-ES',
                         { day: 'numeric', month: 'short' }
                       )}
                     </div>
@@ -137,7 +137,7 @@ export default function CenterDashboard() {
               icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
               path: `/${locale}/center/requests`,
               active: isPhaseActive(PHASES.APPLICATION),
-              phase: `${tc('phase')} 1`
+              phase: tc('phase_with_number', { number: 1 })
             },
             {
               title: t('Assignments.title'),
@@ -145,7 +145,7 @@ export default function CenterDashboard() {
               icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01",
               path: `/${locale}/center/assignments`,
               active: isPhaseActive(PHASES.PLANNING),
-              phase: `${tc('phase')} 2`
+              phase: tc('phase_with_number', { number: 2 })
             },
             {
               title: t('Sessions.title'),
@@ -153,7 +153,7 @@ export default function CenterDashboard() {
               icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
               path: `/${locale}/center/sessions`,
               active: isPhaseActive(PHASES.EXECUTION),
-              phase: `${tc('phase')} 3`
+              phase: tc('phase_with_number', { number: 3 })
             },
             {
               title: tNav('monitoring'),
@@ -161,7 +161,7 @@ export default function CenterDashboard() {
               icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
               path: `/${locale}/center/monitoring`,
               active: isPhaseActive(PHASES.EXECUTION),
-              phase: `${tc('phase')} 3`
+              phase: tc('phase_with_number', { number: 3 })
             },
           ].map((item, idx) => (
             <div

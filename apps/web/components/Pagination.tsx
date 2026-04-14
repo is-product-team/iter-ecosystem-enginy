@@ -16,15 +16,16 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   totalItems,
   currentItemsCount,
-  itemName = 'items'
+  itemName
 }) => {
   const t = useTranslations('Common');
+  const itemsLabel = itemName || t('items');
   if (totalPages <= 1) return null;
 
   return (
     <div className="bg-background-subtle/50 border-t border-border-subtle p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
       <div className="text-[10px] font-black uppercase text-text-muted tracking-widest">
-        Showing <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{currentItemsCount}</span> of <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{totalItems}</span> {itemName}
+        {t('showing')} <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{currentItemsCount}</span> {t('of')} <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{totalItems}</span> {itemsLabel}
       </div>
       <div className="flex items-center gap-2">
         <button
@@ -37,7 +38,7 @@ const Pagination: React.FC<PaginationProps> = ({
           {t('previous')}
         </button>
         <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-bold text-consorci-darkBlue dark:text-consorci-lightBlue tracking-[0.2em]">
-          Page {currentPage} of {totalPages}
+          {t('page')} {currentPage} {t('of')} {totalPages}
         </div>
         <button
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
