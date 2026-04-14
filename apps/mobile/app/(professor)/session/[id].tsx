@@ -1,11 +1,12 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, TextInput } from 'react-native';
+import * as React from 'react';
+import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import api, { getStudents, getAttendance } from '../../../services/api';
+import StudentSessionCard from '../../../components/session/StudentSessionCard';
 
 export default function SessionScreen() {
   const { t } = useTranslation();
@@ -13,12 +14,14 @@ export default function SessionScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [enrollments, setEnrollments] = useState<any[]>([]);
-  const [attendance, setAttendance] = useState<{[key: string]: string}>({}); 
-  const [observations, setObservations] = useState('');
+  const [loading, setLoading] = React.useState(true);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const [enrollments, setEnrollments] = React.useState<any[]>([]);
+  const [attendance, setAttendance] = React.useState<{[key: string]: string}>({}); 
+  const [observations, setObservations] = React.useState('');
+  const [sessionMode, setSessionMode] = React.useState<'ATTENDANCE' | 'WORK'>('ATTENDANCE');
+  const [showSuccess, setShowSuccess] = React.useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -51,6 +54,10 @@ export default function SessionScreen() {
       }
 
       setAttendance(initialAttendance);
+      if (isSubmitted || Object.keys(initialAttendance).some(k => initialAttendance[k] !== 'PRESENT')) {
+          // If we have data, we might want to start in WORK mode, but for now let's respect isSubmitted
+          if (isSubmitted) setSessionMode('WORK');
+      }
 
     } catch (error) {
       console.error("Error fetching session data:", error);
@@ -61,21 +68,14 @@ export default function SessionScreen() {
   };
 
   useFocusEffect(
-    useCallback(() => {
+    React.useCallback(() => {
       fetchData();
     }, [id])
   );
 
-  const toggleStatus = (studentId: string) => {
-    if (isSubmitted) return;
-    setAttendance(prev => {
-        const current = prev[studentId];
-        let next = 'PRESENT';
-        if (current === 'PRESENT') next = 'ABSENT';
-        else if (current === 'ABSENT') next = 'LATE';
-        else if (current === 'LATE') next = 'PRESENT';
-        return { ...prev, [studentId]: next };
-    });
+  const updateStatus = (studentId: string, status: string) => {
+    if (isSubmitted && sessionMode === 'WORK') return;
+    setAttendance(prev => ({ ...prev, [studentId]: status }));
   };
 
   const submitAttendance = async () => {
@@ -90,9 +90,10 @@ export default function SessionScreen() {
 
         await api.post('attendance/batch', { attendance: payload, assignmentId: id }); 
         
-        Alert.alert(t('Common.success'), t('Session.attendance_sent_success'), [
-            { text: t('Common.ok'), onPress: () => router.back() }
-        ]);
+        setIsSubmitted(true);
+        setSessionMode('WORK');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 4000);
         
     } catch (error) {
         console.error("Error submitting attendance:", error);
@@ -114,118 +115,160 @@ export default function SessionScreen() {
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
       <Stack.Screen 
         options={{ 
-          title: t('Session.title'),
+          title: sessionMode === 'ATTENDANCE' ? t('Session.title_attendance') : t('Session.title_work'),
           headerBackTitle: t('Common.back'),
           headerShadowVisible: false,
+          headerStyle: { backgroundColor: THEME.colors.background },
+          headerTitleStyle: { 
+            fontFamily: THEME.fonts.primary, 
+            fontWeight: '800',
+            fontSize: 17 
+          }
         }} 
       />
       
-      <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
+      {showSuccess && (
+          <View style={{
+            position: 'absolute',
+            top: 20,
+            left: 24,
+            right: 24,
+            zIndex: 50,
+            backgroundColor: THEME.colors.success,
+            padding: 16,
+            borderRadius: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            shadowColor: THEME.colors.success,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.3,
+            shadowRadius: 12,
+            elevation: 8,
+          }}>
+              <Ionicons name="checkmark-circle" size={24} color="white" />
+              <Text style={{ 
+                color: 'white', 
+                fontWeight: '800', 
+                marginLeft: 12,
+                fontSize: 14,
+                fontFamily: THEME.fonts.primary
+              }}>{t('Session.attendance_sent_success')}</Text>
+          </View>
+      )}
+
+      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 24, paddingBottom: 120 }}>
          
-         <Text className="text-text-secondary text-sm mb-6 font-medium">
-            {t('Session.attendance_instruction')}
-         </Text>
-
-         {enrollments.map((item) => {
-             const student = item.student;
-             const status = attendance[item.studentId];
-             let statusColor = "bg-background-surface text-emerald-700 border-emerald-100";
-             let statusIcon = "checkmark-circle";
-             
-             if (status === 'ABSENT') {
-                 statusColor = "bg-background-surface text-rose-700 border-rose-100";
-                 statusIcon = "close-circle";
-             } else if (status === 'LATE') {
-                 statusColor = "bg-background-surface text-amber-700 border-amber-100";
-                 statusIcon = "time";
-             }
-
-             return (
-                 <View key={item.enrollmentId} className="bg-background-subtle rounded-3xl mb-3 overflow-hidden border border-border-subtle">
-                     {/* Attendance Row */}
-                     <TouchableOpacity 
-                        onPress={() => toggleStatus(String(item.studentId))}
-                        activeOpacity={0.7}
-                        className="p-5 flex-row items-center justify-between"
-                     >
-                        <View className="flex-row items-center flex-1">
-                            <View className="w-12 h-12 bg-background-surface rounded-full items-center justify-center mr-4">
-                                <Text className="font-bold text-text-muted text-lg">{student.fullName?.charAt(0)}</Text>
-                            </View>
-                            <View className="flex-1 mr-2">
-                                <Text className="font-bold text-text-primary text-base mb-0.5" numberOfLines={1} ellipsizeMode="tail">
-                                    {student.fullName} {student.lastName}
-                                </Text>
-                                <Text className="text-text-muted text-xs font-medium tracking-wide">ID: {student.idalu}</Text>
-                            </View>
-                        </View>
-
-                        <View className={`px-3 py-1.5 rounded-full border flex-row items-center ${statusColor.split(' ')[0]} ${statusColor.split(' ')[2]}`}>
-                            <Ionicons name={statusIcon as any} size={14} color={status === 'ABSENT' ? '#BE123C' : status === 'LATE' ? '#B45309' : '#047857'} />
-                            <Text className={`font-bold text-[10px] ml-1.5 uppercase tracking-wider ${statusColor.split(' ')[1]}`}>
-                                {t(`Session.status_${status.toLowerCase()}`)}
-                            </Text>
-                        </View>
-                     </TouchableOpacity>
-
-                     {/* Evaluation Action */}
-                     <View className="h-[1px] w-full bg-border-subtle" />
-                     {item.evaluated ? (
-                         <View className="flex-row items-center justify-center py-4 bg-background-subtle opacity-60">
-                             <Ionicons name="checkmark-done-circle" size={16} color={THEME.colors.success} />
-                             <Text className="ml-2 font-bold text-xs text-text-muted uppercase tracking-wider">
-                                 {t('Session.evaluated')}
-                             </Text>
-                         </View>
-                     ) : (
-                        <TouchableOpacity
-                            onPress={() => router.push(`/(professor)/evaluation/${item.enrollmentId}?assignmentId=${id}`)}
-                            className="flex-row items-center justify-center py-4 bg-background-surface active:bg-background-subtle"
-                        >
-                            <Ionicons name="ribbon-outline" size={16} color={THEME.colors.primary} />
-                            <Text className="ml-2 font-bold text-xs text-primary uppercase tracking-wider">
-                                {t('Session.evaluate_competencies')}
-                            </Text>
-                        </TouchableOpacity>
-                     )}
-                 </View>
-             );
-         })}
-
-         <View className="mt-6 mb-24">
-            <Text className="text-text-primary font-bold mb-3 ml-1">{t('Session.observations_label')}</Text>
-            <TextInput 
-                className="bg-background-subtle p-5 rounded-3xl text-text-primary h-32 leading-6 border border-border-subtle"
-                multiline
-                textAlignVertical="top"
-                placeholder={t('Session.observations_placeholder')}
-                placeholderTextColor={THEME.colors.gray}
-                value={observations}
-                onChangeText={setObservations}
-            />
+         <View style={{ marginBottom: 40, marginTop: 12, paddingHorizontal: 8 }}>
+            <Text style={{ 
+              color: THEME.colors.text.primary, 
+              fontSize: 34, 
+              fontWeight: '900', 
+              marginBottom: 12,
+              fontFamily: THEME.fonts.primary,
+              letterSpacing: -1
+            }}>
+                {sessionMode === 'ATTENDANCE' ? t('Session.attendance_header') : t('Session.work_header')}
+            </Text>
+            <Text style={{ 
+              color: THEME.colors.text.muted, 
+              fontSize: 15, 
+              fontWeight: '400', 
+              lineHeight: 24,
+              fontFamily: THEME.fonts.primary,
+              maxWidth: '90%'
+            }}>
+                {sessionMode === 'ATTENDANCE' 
+                    ? t('Session.attendance_instruction') 
+                    : t('Session.work_instruction')}
+            </Text>
          </View>
 
+         {enrollments.map((item) => (
+             <StudentSessionCard
+                key={item.enrollmentId}
+                student={item.student}
+                status={attendance[item.studentId]}
+                onStatusChange={(status) => updateStatus(String(item.studentId), status)}
+                onEvaluate={() => router.push(`/(professor)/evaluation/${item.enrollmentId}?assignmentId=${id}`)}
+                evaluated={item.evaluated}
+                mode={sessionMode}
+                disabled={isSubmitted && sessionMode === 'WORK'}
+             />
+         ))}
+
+         {sessionMode === 'ATTENDANCE' && (
+            <View className="mt-4">
+                <Text className="text-text-primary font-bold mb-3 ml-1">{t('Session.observations_label')}</Text>
+                <TextInput 
+                    className="bg-background-surface p-5 rounded-[32px] text-text-primary h-32 leading-6 border border-border-subtle shadow-sm"
+                    multiline
+                    textAlignVertical="top"
+                    placeholder={t('Session.observations_placeholder')}
+                    placeholderTextColor={THEME.colors.text.muted}
+                    value={observations}
+                    onChangeText={setObservations}
+                />
+            </View>
+         )}
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 p-6 bg-background-surface border-t border-border-subtle">
-         <TouchableOpacity 
-            onPress={submitAttendance}
-             disabled={submitting || isSubmitted}
-             className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg ${submitting || isSubmitted ? 'bg-background-subtle' : 'bg-primary shadow-slate-200'}`}
-          >
-              {submitting ? (
-                  <ActivityIndicator color="white" />
-              ) : isSubmitted ? (
-                  <View className="flex-row items-center">
-                    <Ionicons name="checkmark-circle" size={20} color={THEME.colors.success} style={{ marginRight: 8 }} />
-                    <Text className="text-text-muted text-lg font-bold tracking-wide uppercase">{t('Session.attendance_registered')}</Text>
-                  </View>
-              ) : (
-                  <Text className="text-white text-lg font-bold tracking-wide uppercase">{t('Session.finish_and_send')}</Text>
-              )}
-         </TouchableOpacity>
-      </View>
+      {sessionMode === 'ATTENDANCE' && (
+        <View style={{ 
+          position: 'absolute', 
+          bottom: 30, 
+          left: 20, 
+          right: 20, 
+          paddingBottom: insets.bottom / 2,
+        }}>
+            <Pressable 
+                onPress={submitAttendance}
+                disabled={submitting || isSubmitted}
+                style={({ pressed }) => [
+                  {
+                    width: '100%',
+                    height: 68,
+                    borderRadius: 22,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: submitting || isSubmitted ? '#CBD5E1' : '#0F172A',
+                    opacity: pressed ? 0.9 : 1,
+                    // Shadow Pro (Sutil y profunda)
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 12 },
+                    shadowOpacity: submitting || isSubmitted ? 0 : 0.15,
+                    shadowRadius: 20,
+                    elevation: 8,
+                  }
+                ]}
+            >
+                {submitting ? (
+                    <ActivityIndicator color="white" />
+                ) : (
+                    <Text style={{ 
+                      color: 'white', 
+                      fontSize: 16, 
+                      fontWeight: 'bold', 
+                      letterSpacing: 2,
+                      textTransform: 'uppercase'
+                    }}>
+                        {t('Session.finish_and_send')}
+                    </Text>
+                )}
+            </Pressable>
+        </View>
+      )}
 
+      {sessionMode === 'WORK' && !isSubmitted && (
+          <View className="absolute bottom-6 right-6">
+              <Pressable 
+                onPress={() => setSessionMode('ATTENDANCE')}
+                className="w-14 h-14 bg-white rounded-full items-center justify-center shadow-lg border border-border-subtle"
+                style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+              >
+                  <Ionicons name="list" size={24} color={THEME.colors.primary} />
+              </Pressable>
+          </View>
+      )}
     </View>
   );
 }

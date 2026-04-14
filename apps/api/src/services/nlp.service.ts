@@ -17,17 +17,9 @@ export interface NLPAnalysisResult {
 }
 
 export class NLPService {
-    private ollamaHost: string;
-    private model: string;
-
-    constructor() {
-        this.ollamaHost = process.env.OLLAMA_HOST || 'http://ollama:11434';
-        this.model = process.env.AI_MODEL_NLP || 'tinyllama';
-    }
 
     /**
-     * Analyzes the teacher's input text to extract structured data using Local AI.
-     * Specialized for 4GB RAM stack using TinyLlama (1.1B).
+     * Analyzes the teacher's input text to extract structured data.
      */
     public async processText(text: string): Promise<NLPAnalysisResult> {
         // Fallback for empty text

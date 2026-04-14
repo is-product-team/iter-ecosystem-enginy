@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { Redirect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { View, ActivityIndicator, Platform } from 'react-native';
 import { ROLES } from '@iter/shared';
 
 export default function Index() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasToken, setHasToken] = useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [hasToken, setHasToken] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     async function checkAuth() {
       try {
         let token = null;
@@ -31,17 +31,25 @@ export default function Index() {
         if (token && userData) {
           try {
             const user = JSON.parse(userData);
-            if (user.role?.roleName === ROLES.TEACHER || user.role?.roleName === 'PROFESSOR') {
+            console.log("🔍 [DEBUG AUTH] User checking role:", JSON.stringify(user, null, 2));
+
+            // Support both object structure and flattened role string
+            const roleName = user.role?.roleName || user.roleName || user.role;
+            
+            console.log("🔍 [DEBUG AUTH] Detected roleName:", roleName);
+
+            if (roleName === ROLES.TEACHER || roleName === 'PROFESSOR' || roleName === 'TEACHER') {
               setHasToken(true);
             } else {
-              console.warn("⚠️ [Auth] Role not permitted on mobile:", user.role?.roleName);
+              console.warn("⚠️ [Auth] Role not permitted on mobile:", roleName);
               setHasToken(false);
             }
           } catch (e) {
-            console.error("⚠️ [Auth] Error parsing user:", e);
+            console.error("⚠️ [Auth] Error parsing user data:", e);
             setHasToken(false);
           }
         } else {
+          console.log("🔍 [DEBUG AUTH] No token or userData found");
           setHasToken(false);
         }
       } catch (error) {

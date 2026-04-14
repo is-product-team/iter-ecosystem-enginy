@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,11 +10,11 @@ import { login } from '../services/api';
 export default function LoginScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [roleError, setRoleError] = useState<string | null>(null);
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [roleError, setRoleError] = React.useState<string | null>(null);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -29,7 +29,8 @@ export default function LoginScreen() {
       const userAny: any = user;
 
       // Role restriction: Only TEACHERS can access the mobile app
-      if (userAny.role?.roleName !== ROLES.TEACHER) {
+      const roleName = userAny.role?.roleName;
+      if (roleName !== ROLES.TEACHER && roleName !== 'PROFESSOR') {
         setLoading(false);
         setRoleError(t('Auth.login.exclusive_use_error'));
         return;

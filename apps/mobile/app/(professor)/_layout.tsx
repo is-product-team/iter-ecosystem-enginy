@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Stack } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useTranslation } from 'react-i18next';

@@ -6,7 +6,22 @@
     "back": "Volver",
     "success": "Éxito",
     "error": "Error",
-    "branding": "Consorci d'Educació de Barcelona"
+    "branding": "Consorci d'Educació de Barcelona",
+    "call": "Llamar",
+    "coming_soon": "Próximamente",
+    "no_description": "Sin descripción disponible",
+    "practical_workshop": "Taller Práctico",
+    "session": "Sesión",
+    "time": "Horario",
+    "all_day": "Todo el día",
+    "room": "Aula / Espacio",
+    "assigned_group": "Grupo Asignado",
+    "practice_group": "Grupo de prácticas",
+    "session_objectives": "Objetivos de la Sesión",
+    "address": "Dirección del Centro",
+    "workshop_evaluated": "Taller Evaluado",
+    "evaluate_workshop": "Evaluar Taller",
+    "status": "Estado"
   },
   "Auth": {
     "logout": {
@@ -17,6 +32,7 @@
     "login": {
       "title": "Inicio de\nSesión",
       "email": "Correo Electrónico",
+      "name": "Nombre",
       "password": "Contraseña",
       "fill_all_fields": "Por favor, rellena todos los campos.",
       "exclusive_use_error": "Esta aplicación es de uso exclusivo para profesores. Los administradores y coordinadores deben usar la plataforma web.",
@@ -33,6 +49,7 @@
     "title": "Mi Perfil",
     "role_professor": "Profesorado",
     "role_admin": "Administrador",
+    "information": "Información de la cuenta",
     "preferences": "Preferencias",
     "notifications": "Notificaciones Push",
     "appearance": "Apariencia",
@@ -42,7 +59,14 @@
       "system": "Sistema"
     },
     "security": "Seguridad y Contraseña",
-    "help": "Soporte y Ayuda"
+    "language": "Idioma / Lengua",
+    "languages": {
+      "ca": "Catalán",
+      "es": "Español"
+    },
+    "security_support": "Seguridad y Soporte",
+    "help": "Soporte y Ayuda",
+    "camera_permission_denied": "Se necesitan permisos para acceder a la galería."
   },
   "Routes": {
     "session": "Sesión",
@@ -75,6 +99,10 @@
     "manage_session": "Gestionar Sesión",
     "view_details": "Ver Detalles",
     "no_upcoming_workshops": "No tienes talleres próximos",
+    "overview": "Resumen del Dashboard",
+    "current_phase_label": "Fase Actual",
+    "total_workshops": "Total de Talleres",
+    "next_session_label": "Próxima Sesión",
     "active": "Activo",
     "loading_data": "Cargando datos",
     "evaluate_finished_workshop": "Evaluar taller finalizado",
@@ -112,5 +140,40 @@
     "mark_read": "Marcar como leído",
     "delete": "Eliminar",
     "empty": "No hay avisos nuevos"
+  },
+  "Tabs": {
+    "dashboard": "Inicio",
+    "notifications": "Avisos",
+    "calendar": "Calendario",
+    "coordination": "Coordinación",
+    "profile": "Perfil"
+  },
+  "Calendar": {
+    "academic_agenda": "Agenda Académica",
+    "title": "Mi Calendario"
+  },
+  "Coordination": {
+    "teacher_space": "Espacio del Docente",
+    "collaboration": "Coordinación y Soporte",
+    "teaching_team": "Equipo Docente",
+    "main_referent": "Referente Principal",
+    "secondary_referent": "Segundo Referente",
+    "no_referents_assigned": "No hay referentes asignados a este taller todavía.",
+    "no_contacts_yet": "Todavía no tienes contactos de coordinación.",
+    "group_chat_instruction": "Pronto podrás chatear directamente con el equipo de coordinación del centro."
+  },
+  "Session": {
+    "title_attendance": "Sesión - Asistencia",
+    "title_work": "Sesión - Seguimiento",
+    "attendance_header": "Registro de Sesión",
+    "attendance_instruction": "Marca la asistencia de cada alumno antes de empezar el seguimiento técnico.",
+    "work_header": "Seguimiento de Sesión",
+    "work_instruction": "Evalúa el progreso de las competencias durante el taller.",
+    "observations_label": "Observaciones de la sesión",
+    "observations_placeholder": "Añade cualquier incidencia o comentario relevante...",
+    "finish_and_send": "Finalizar y Enviar Lista",
+    "attendance_sent_success": "Lista de asistencia enviada correctamente",
+    "manage_session": "Gestionar Sesión",
+    "error_loading_students": "No se ha podido cargar la lista de alumnos"
   }
 }

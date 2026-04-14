@@ -1,44 +1,102 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl } from 'react-native';
+import * as React from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { THEME, PHASES } from '@iter/shared';
+import { THEME, ROLES } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
-import { getMyAssignments, getPhases } from '../../../services/api';
+import { getMyAssignments, getPhases, getNotifications } from '../../../services/api';
 
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
+
+// Reusable WhatsApp-style Section Header
+const SectionHeader = ({ title }: { title: string }) => (
+  <View className="px-6 pt-6 pb-2">
+    <Text className="text-text-muted text-[12px] font-bold uppercase tracking-wider">
+      {title}
+    </Text>
+  </View>
+);
+
+// Reusable Dashboard Item (WhatsApp Style)
+const DashboardItem = ({ 
+  icon, 
+  iconColor, 
+  title, 
+  subtitle, 
+  onPress, 
+  badge,
+  isLast = false 
+}: { 
+  icon: keyof typeof Ionicons.glyphMap;
+  iconColor: string;
+  title: string;
+  subtitle?: string;
+  onPress?: () => void;
+  badge?: number;
+  isLast?: boolean;
+}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.7}
+    className="flex-row items-center py-4 px-6 bg-background-surface"
+  >
+    <View className="w-10 h-10 rounded-full items-center justify-center mr-4 bg-background-subtle border border-border-subtle">
+      <Ionicons name={icon} size={20} color={iconColor} />
+    </View>
+    <View className="flex-1 justify-center">
+      <Text className="text-text-primary text-[16px] font-bold" style={{ fontFamily: THEME.fonts.primary }}>
+        {title}
+      </Text>
+      {subtitle && (
+        <Text className="text-text-muted text-[13px] mt-0.5" numberOfLines={1} style={{ fontFamily: THEME.fonts.primary }}>
+          {subtitle}
+        </Text>
+      )}
+    </View>
+    {badge !== undefined && badge > 0 && (
+      <View className="bg-primary px-2 py-0.5 rounded-full mr-2">
+        <Text className="text-white text-[10px] font-black">{badge}</Text>
+      </View>
+    )}
+    <Ionicons name="chevron-forward" size={16} color="#C7C7CC" />
+    {!isLast && (
+      <View className="absolute bottom-0 left-20 right-0 h-[0.5px] bg-border-subtle" />
+    )}
+  </TouchableOpacity>
+);
 
 export default function DashboardScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [phases, setPhases] = useState<any[]>([]);
-  const [assignments, setAssignments] = useState<any[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedWorkshop, setSelectedWorkshop] = useState<CalendarEvent | null>(null);
-  const [userName, setUserName] = useState('Professor');
+  const [phases, setPhases] = React.useState<any[]>([]);
+  const [assignments, setAssignments] = React.useState<any[]>([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [selectedWorkshop, setSelectedWorkshop] = React.useState<CalendarEvent | null>(null);
+  const [userName, setUserName] = React.useState('Professor');
+  const [userInitials, setUserInitials] = React.useState('??');
+  const [unreadCount, setUnreadCount] = React.useState(0);
+  const [avatar, setAvatar] = React.useState<string | null>(null);
   
-  // 1. Helpers
-  const isPhaseActive = (phaseName: string) => {
-    const phase = phases.find(p => p.name === phaseName);
-    return phase ? phase.isActive : false;
-  };
-
   const checkRoleAndFetchData = async (isRefresh = false) => {
       try {
         if (isRefresh) setRefreshing(true);
         let userData = null;
+        let userImage = null;
         try {
-          userData = Platform.OS === 'web' 
-            ? localStorage.getItem('user') 
-            : await SecureStore.getItemAsync('user');
+          if (Platform.OS === 'web') {
+            userData = localStorage.getItem('user');
+            userImage = localStorage.getItem('user-avatar');
+          } else {
+            userData = await SecureStore.getItemAsync('user');
+            userImage = await SecureStore.getItemAsync('user-avatar');
+          }
         } catch (storageError) {
-          console.warn("⚠️ [Dashboard] Error accessing storage:", storageError);
           router.replace('/login');
           return;
         }
@@ -48,7 +106,15 @@ export default function DashboardScreen() {
           if (user.firstName) setUserName(user.firstName);
           else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
           
-          if (user.role?.roleName !== 'PROFESSOR') {
+          if (user.fullName) {
+            const initials = user.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
+            setUserInitials(initials);
+          }
+          
+          if (userImage) setAvatar(userImage);
+
+          const roleName = user.role?.roleName;
+          if (roleName !== 'PROFESSOR' && roleName !== 'TEACHER') {
             router.replace('/login');
             return;
           }
@@ -57,14 +123,21 @@ export default function DashboardScreen() {
           return;
         }
 
-        const [phasesRes, assignmentsRes] = await Promise.all([
+        const [phasesRes, assignmentsRes, notifsRes] = await Promise.all([
           getPhases(),
-          getMyAssignments()
+          getMyAssignments(),
+          getNotifications()
         ]);
-        setPhases(phasesRes.data);
-        setAssignments(assignmentsRes.data);
+        
+        const phasesData = phasesRes.data as any;
+        const phasesArray = Array.isArray(phasesData) ? phasesData : phasesData.data;
+        setPhases(Array.isArray(phasesArray) ? phasesArray : []);
+        setAssignments(Array.isArray(assignmentsRes.data) ? assignmentsRes.data : []);
+        setUnreadCount(notifsRes.data.filter((n: any) => !n.isRead).length);
       } catch (error: any) {
         console.error("Error fetching dashboard data:", error);
+        setPhases([]);
+        setAssignments([]);
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -112,7 +185,6 @@ export default function DashboardScreen() {
       );
   };
 
-  // 2. Effects
   useFocusEffect(
     React.useCallback(() => {
       checkRoleAndFetchData();
@@ -123,7 +195,6 @@ export default function DashboardScreen() {
     checkRoleAndFetchData(true);
   }, []);
 
-  // 3. Derived State
   const nextWorkshop = getNextSession();
   const activePhase = phases.find(p => p.isActive);
   const activePhaseName = activePhase ? activePhase.name : '';
@@ -131,7 +202,6 @@ export default function DashboardScreen() {
 
   const handleWorkshopClick = (assignment: any) => {
     const evaluated = isEvaluated(assignment);
-
     const formattedEvent: CalendarEvent = {
         id: assignment.assignmentId,
         title: assignment.workshop.title,
@@ -139,7 +209,7 @@ export default function DashboardScreen() {
         type: 'assignment',
         description: assignment.workshop.description || t('Common.no_description'),
         metadata: {
-            time: new Date(assignment.startDate).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date(new Date(assignment.startDate).getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }), 
+            time: (assignment.startTime || "09:00") + ' - ' + (assignment.endTime || "13:00"), 
             center: assignment.center.name,
             address: assignment.center.address,
             assignmentId: assignment.assignmentId,
@@ -153,156 +223,119 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-[#F9FAFB]">
+      <View className="flex-1 justify-center items-center bg-background-page">
         <ActivityIndicator size="large" color={THEME.colors.primary} />
       </View>
     );
   }
 
-  // Filter assignments for pending tasks
   const pendingAssignments = assignments.filter(a => !isEvaluated(a));
 
   return (
-
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
       <ScrollView 
         className="flex-1" 
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={onRefresh} 
-            tintColor={THEME.colors.primary} 
-            colors={[THEME.colors.primary]} 
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.colors.primary} />
         }
       >
         
-        {/* Professional Header */}
-        <View className="px-6 pb-6 pt-4 bg-background-surface border-b border-border-subtle mb-6">
-          <View className="flex-row items-baseline">
-            <Text className="text-text-muted text-xs font-bold uppercase tracking-widest mr-2">
-              {new Date().toLocaleDateString(i18n.language, { weekday: 'long' })}
-            </Text>
-            <Text className="text-text-muted opacity-60 text-xs font-bold uppercase tracking-widest">
-              {new Date().toLocaleDateString(i18n.language, { day: 'numeric', month: 'long' })}
-            </Text>
-          </View>
-          <Text className="text-3xl font-extrabold text-text-primary leading-tight mt-1">
-            {t('Dashboard.welcome', { name: userName })}
-          </Text>
+        {/* Refined Left-Aligned Header */}
+        <View className="px-6 pt-8 pb-6 bg-background-surface border-b border-border-subtle flex-row justify-between items-end">
+           <View className="flex-1">
+              <Text className="text-[11px] font-black text-text-muted uppercase tracking-[2px] mb-1">
+                {t('Common.practical_workshop')}
+              </Text>
+              <Text className="text-2xl font-black text-text-primary tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
+                {t('Dashboard.welcome', { name: userName })}
+              </Text>
+           </View>
+           <TouchableOpacity 
+             onPress={() => router.push('/profile')}
+             activeOpacity={0.8}
+             className="w-12 h-12 rounded-full bg-primary items-center justify-center shadow-sm overflow-hidden mb-1"
+           >
+              {avatar ? (
+                <Image source={{ uri: avatar }} className="w-full h-full" />
+              ) : (
+                <Text className="text-sm font-black text-white">{userInitials}</Text>
+              )}
+           </TouchableOpacity>
         </View>
 
-        <View className="px-6">
-          
-          {/* Phase Status */}
-          <View className="w-full bg-background-subtle rounded-2xl p-4 flex-row items-center justify-between mb-8">
-             <View>
-                 <Text className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-1">{t('Dashboard.current_phase')}</Text>
-                 <Text className="text-xl font-bold text-text-primary tracking-tight">
-                    {phases.find(p => p.isActive)?.name || t('Dashboard.loading_data')}
-                 </Text>
-             </View>
-             <View className="flex-row items-center bg-background-surface px-3 py-1.5 rounded-full border border-border-subtle">
-                <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                <Text className="text-xs font-semibold text-text-secondary">{t('Dashboard.active')}</Text>
-             </View>
-          </View>
+        {/* Current Status Section */}
+        <SectionHeader title={t('Dashboard.overview')} />
+        <View className="bg-background-surface border-t border-b border-border-subtle p-6">
+           <View className="bg-background-subtle rounded-[24px] p-5 flex-row items-center border border-border-subtle">
+              <View className="w-10 h-10 rounded-xl bg-primary items-center justify-center">
+                 <Ionicons name="rocket" size={20} color="white" />
+              </View>
+              <View className="ml-4 flex-1">
+                 <Text className="text-text-muted text-[10px] font-black uppercase tracking-widest mb-0.5">{t('Dashboard.current_phase_label')}</Text>
+                 <Text className="text-text-primary text-base font-black">{activePhaseName || "N/A"}</Text>
+              </View>
+              <View className="bg-white/80 px-2.5 py-1 rounded-full border border-border-subtle">
+                 <Text className="text-primary text-[9px] font-black uppercase">{t('Dashboard.active')}</Text>
+              </View>
+           </View>
+        </View>
 
-           {/* Workshop Evaluation - Only in Phase 4 */}
-           {(isEvalPhase) && pendingAssignments.length > 0 && (
-             <View className="mb-8">
-               <Text className="text-text-primary text-lg font-bold mb-4">{t('Dashboard.pending_tasks')}</Text>
-               {pendingAssignments.map(assign => (
-                 <TouchableOpacity
-                    key={assign.assignmentId}
-                    onPress={() => router.push(`/(professor)/questionnaire/${assign.assignmentId}`)}
-                    className="w-full bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-5 border border-orange-200 dark:border-orange-800 mb-3 flex-row items-center justify-between"
-                 >
-                    <View className="flex-1 mr-4">
-                      <Text className="text-text-primary dark:text-orange-100 font-bold text-base mb-1">{assign.workshop.title}</Text>
-                      <Text className="text-text-secondary dark:text-orange-200/70 text-xs font-medium">{t('Dashboard.evaluate_finished_workshop')}</Text>
-                    </View>
-                    <View className="w-10 h-10 bg-orange-100 dark:bg-orange-800 rounded-full items-center justify-center">
-                       <Ionicons name="star" size={20} color="#F97316" />
-                    </View>
-                 </TouchableOpacity>
-               ))}
+        {/* Sessions & Tasks */}
+        <SectionHeader title={t('Dashboard.next_session')} />
+        <View className="border-t border-b border-border-subtle">
+           {nextWorkshop ? (
+             <DashboardItem 
+                icon="calendar"
+                iconColor="#007AFF"
+                title={nextWorkshop.workshop.title}
+                subtitle={`${nextWorkshop.center.name} • ${nextWorkshop.startTime || "09:00"}`}
+                onPress={() => handleWorkshopClick(nextWorkshop)}
+                isLast={pendingAssignments.length === 0}
+             />
+           ) : (
+             <View className="p-8 items-center bg-background-surface">
+                <Text className="text-text-muted text-sm italic">{t('Dashboard.no_upcoming_workshops')}</Text>
              </View>
            )}
 
-          {/* Next Session */}
-          <Text className="text-text-primary text-lg font-bold mb-4">{t('Dashboard.next_session')}</Text>
-
-          {nextWorkshop ? (
-             <TouchableOpacity 
-               onPress={() => handleWorkshopClick(nextWorkshop)}
-               activeOpacity={0.9}
-               className="w-full bg-slate-900 dark:bg-background-subtle rounded-3xl p-6 shadow-lg shadow-slate-200 relative overflow-hidden mb-8"
-             >
-                {/* Decorative circle */}
-                <View className="absolute -right-6 -top-6 w-32 h-32 bg-slate-800 dark:bg-background-surface rounded-full opacity-50" />
-                
-                <View>
-                    {/* Top Row: Time & Status */}
-                    <View className="flex-row justify-between items-center mb-4">
-                        <View className="flex-row items-center bg-slate-800 dark:bg-background-surface px-3 py-1.5 rounded-full border border-slate-700 dark:border-border-subtle">
-                           <Ionicons name="time" size={14} color="#94A3B8" />
-                           <Text className="text-gray-200 dark:text-text-primary text-xs font-bold ml-2">
-                              {nextWorkshop.startTime 
-                                ? `${nextWorkshop.startTime}${nextWorkshop.endTime ? ' - ' + nextWorkshop.endTime : ''}`
-                                : new Date(nextWorkshop.startDate).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })
-                              }
-                           </Text>
-                        </View>
-                        {isPhaseActive(PHASES.EXECUTION) && (
-                            <View className="bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/30">
-                                <Text className="text-emerald-400 text-[10px] font-black uppercase tracking-wide">{t('Dashboard.in_progress')}</Text>
-                            </View>
-                        )}
-                    </View>
-
-                    {/* Title */}
-                    <Text className="text-2xl font-black text-white dark:text-text-primary mb-2 leading-tight" numberOfLines={2}>
-                        {nextWorkshop.workshop.title}
-                    </Text>
-
-                    {/* Location */}
-                    <View className="flex-row items-center mb-6">
-                        <Ionicons name="location" size={16} color="#94A3B8" />
-                        <Text className="text-slate-400 dark:text-text-secondary text-sm font-medium ml-1.5" numberOfLines={1}>
-                            {nextWorkshop.center.name}
-                        </Text>
-                    </View>
-
-                    {/* Action Footer */}
-                    <View className="flex-row justify-between items-center pt-4 border-t border-slate-800 dark:border-border-subtle">
-                        <Text className="text-slate-400 dark:text-text-muted text-xs font-bold uppercase tracking-widest">
-                           {isEvalPhase 
-                             ? (isEvaluated(nextWorkshop) ? t('Dashboard.evaluated_workshop') : t('Dashboard.evaluate_workshop'))
-                             : (isPhaseActive(PHASES.EXECUTION) ? t('Dashboard.manage_session') : t('Dashboard.view_details'))
-                           }
-                        </Text>
-                        <View className="w-10 h-10 rounded-full bg-white/10 dark:bg-background-surface items-center justify-center">
-                            {isEvaluated(nextWorkshop) ? (
-                                <Ionicons name="checkmark" size={18} color="white" />
-                            ) : (
-                                <Ionicons name="arrow-forward" size={18} color="white" />
-                            )}
-                        </View>
-                    </View>
-                </View>
-             </TouchableOpacity>
-          ) : (
-            <View className="w-full items-center justify-center py-10 rounded-2xl border-2 border-dashed border-border-subtle mb-8">
-               <Text className="text-text-muted font-medium text-sm">{t('Dashboard.no_upcoming_workshops')}</Text>
-            </View>
-          )}
-
-          <View className="h-6" /> 
-
+           {isEvalPhase && pendingAssignments.map((assign, idx) => (
+             <DashboardItem 
+                key={assign.assignmentId}
+                icon="star"
+                iconColor="#FF9500"
+                title={assign.workshop.title}
+                subtitle={t('Dashboard.evaluate_finished_workshop')}
+                onPress={() => router.push(`/(professor)/questionnaire/${assign.assignmentId}`)}
+                isLast={idx === pendingAssignments.length - 1}
+             />
+           ))}
         </View>
+
+        {/* Communications */}
+        <SectionHeader title={t('Coordination.collaboration')} />
+        <View className="border-t border-b border-border-subtle">
+           <DashboardItem 
+              icon="notifications"
+              iconColor="#FF3B30"
+              title={t('Notifications.title')}
+              subtitle={unreadCount > 0 ? `${unreadCount} ${t('Notifications.empty').replace(t('Notifications.empty'), 'avisos pendents')}` : t('Notifications.empty')}
+              badge={unreadCount}
+              onPress={() => router.push('/(professor)/notifications')}
+           />
+           <DashboardItem 
+              icon="people"
+              iconColor="#34C759"
+              title={t('Coordination.collaboration')}
+              subtitle={t('Coordination.teacher_space')}
+              onPress={() => router.push('/(professor)/coordination')}
+              isLast
+           />
+        </View>
+
+        <View className="h-12" />
       </ScrollView>
+
       <WorkshopDetailModal 
         visible={modalVisible} 
         onClose={() => setModalVisible(false)} 

@@ -66,28 +66,28 @@ app.use(errorHandler);
 let server: any;
 if (env.NODE_ENV !== 'test') {
   server = app.listen(env.PORT, async () => {
-  logger.info(`🚀 Servidor listo en el puerto: ${env.PORT}`);
-  logger.info(`🌍 Entorno: ${env.NODE_ENV}`);
-  
-  // Conexión PostgreSQL (Opcional en el arranque)
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    logger.info(`🗄️  ESTADO BD: Conectado a PostgreSQL`);
-  } catch (_e) {
-    logger.error(`🗄️  ESTADO BD: Conexión a PostgreSQL fallida`);
-  }
+    logger.info(`🚀 Servidor listo en el puerto: ${env.PORT}`);
+    logger.info(`🌍 Entorno: ${env.NODE_ENV}`);
 
-  // Start Background Services
-  ReminderService.start();
-});
+    // Conexión PostgreSQL (Opcional en el arranque)
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      logger.info(`🗄️  DATABASE STATUS: Connected to PostgreSQL`);
+    } catch (_e) {
+      logger.error(`🗄️  DATABASE STATUS: PostgreSQL Connection failed`);
+    }
+
+    // Start Background Services
+    ReminderService.start();
+  });
 }
 
 process.on('SIGINT', async () => {
-  logger.info('Apagando servidor...');
+  logger.info('Shutting down server...');
   ReminderService.stop();
   await prisma.$disconnect();
   server.close(() => {
-    logger.info('Servidor cerrado');
+    logger.info('Server closed');
     process.exit(0);
   });
 });
