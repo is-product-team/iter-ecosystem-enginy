@@ -41,6 +41,24 @@
       "cancel": "Cancel·lar"
     }
   },
+  "ProgramPhases": {
+    "Application": {
+      "name": "Sol·licitud i Pre-inscripció",
+      "description": "Període de sol·licitud de tallers per part dels centres."
+    },
+    "Planning": {
+      "name": "Planificació i Assignació",
+      "description": "Assignació de tallers i gestió de vacants."
+    },
+    "Execution": {
+      "name": "Execució i Seguiment",
+      "description": "Realització de les sessions i seguiment d'assistència."
+    },
+    "Closure": {
+      "name": "Tancament i Certificació",
+      "description": "Finalització de tallers i emissió de certificats."
+    }
+  },
   "Admin": {
     "dashboard": {
       "title": "Panell d'Administració",
@@ -341,27 +359,6 @@
       "title": "Seguiment i Avaluació",
       "subtitle": "Revisió de l'impacte i resultats dels tallers."
     },
-    "Notifications": {
-      "title_user": "Avisos i Notificacions",
-      "subtitle_user": "Estigues al dia dels canvis de fase, resolucions de sol·licituds i comunicacions oficials.",
-      "loading": "Carregant avisos oficials...",
-      "empty": {
-        "title": "No tens avisos pendents",
-        "subtitle": "Quan hi hagi canvis en les teves sol·licituds o dates clau, apareixeran aquí."
-      },
-      "btn": {
-        "read": "Marcar com a llegit",
-        "delete": "Eliminar"
-      },
-      "delete_dialog": {
-        "title": "Eliminar Avís",
-        "message": "Estàs segur que vols eliminar aquest avís? Aquesta acció no es pot desfer."
-      },
-      "messages": {
-        "delete_ok": "Avís eliminat.",
-        "delete_error": "Error en eliminar l'avís."
-      }
-    },
     "Monitoring": {
       "title": "Monitorització Operativa (Fase 3)",
       "subtitle": "Estat de l'execució de tallers i assistència en el teu centre.",
@@ -380,6 +377,22 @@
         "attendance_ok": "Asistència al dia",
         "attendance_warning": "Falten fulls per omplir"
       },
+      "tabs": {
+        "active": "Tallers en Execució",
+        "completed": "Resultats i Certificats (Fase 4)"
+      },
+      "no_active_assignments": "No hi ha tallers actius en aquest moment.",
+      "no_completed_assignments": "No hi ha tallers finalitzats recents.",
+      "finished_on": "Finalitzat el {date}",
+      "view_analytics": "Veure Analítica",
+      "certificates_zip": "Certificats (ZIP)",
+      "quality_report": "Informe de Qualitat",
+      "close": "Tancar",
+      "loading_analytics": "Carregant anàlisi...",
+      "incident_id": "Incidència #{id}",
+      "error_load_analytics": "No s'ha pogut carregar l'analítica.",
+      "success_download_zip": "¡Descàrrega iniciada correctament!",
+      "error_download_zip": "Error en generar el fitxer ZIP.",
       "Today": {
         "title": "Agenda d'Avui",
         "no_sessions": "No hi ha sessions programades per avui."
@@ -411,8 +424,11 @@
     "legend_ok": "Entès",
     "event_details": "Detalls de l'esdeveniment",
     "close": "Tancar",
-    "view_details": "Veure Detalls"
-  },
+    "view_details": "Veure detalls",
+    "today": "Avui",
+    "no_events": "No hi ha activitat planificada",
+    "all_day": "Tot el dia"
+    },
   "Questionnaires": {
     "title": "Qüestionaris",
     "subtitle": "Gestió de models d'avaluació i satisfacció.",
@@ -685,6 +701,16 @@
     "submit_button": "Enviar enquesta",
     "submitting": "Enviant..."
   },
+  "Widgets": {
+    "NextEvents": {
+      "title": "Propers esdeveniments",
+      "view_all": "veure tot",
+      "no_events": "No hi ha esdeveniments propers",
+      "program_milestone": "Fita del programa",
+      "deadline": "Termini",
+      "workshop": "Taller"
+    }
+  },
   "Common": {
     "general": "General",
     "configuration": "Configuració",
@@ -699,6 +725,7 @@
     "profile": "Perfil",
     "logout": "Tancar Sessió",
     "educational_center": "Centre educatiu",
+    "activities": "Activitats",
     "workshops": "Tallers",
     "centers": "Centres",
     "requests": "Sol·licituds",
@@ -719,7 +746,30 @@
     "search": "Cerca...",
     "actions": "Accions",
     "ok": "D'acord",
-    "cancel": "Cancel·lar"
+    "cancel": "Cancel·lar",
+    "loading_error": "No s'ha pogut carregar la informació",
+    "error_connectivity": "Error de connexió. Si us plau, verifica si el servidor està actiu.",
+    "delete_success": "Element eliminat correctament.",
+    "delete_error": "S'ha produït un error en eliminar l'element.",
+    "delete_confirm_title": "Confirmar eliminació",
+    "delete_confirm_msg": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
+    "new": "Nou",
+    "system_default": "Predeterminat del Sistema",
+    "select_language": "Seleccionar Idioma",
+    "roles": {
+      "ADMIN": "Administrador",
+      "COORDINATOR": "Coordinador",
+      "TEACHER": "Professor",
+      "STUDENT": "Alumne"
+    },
+    "badges": {
+      "workshop": "TALLER",
+      "pending": "PENDENT",
+      "completed": "COMPLETAT",
+      "need_eval": "NECESSITA EVAL",
+      "will_certify": "CERTIFICARÀ",
+      "no_cert": "SENSE CERT"
+    }
   },
   "WorkshopsPage": {
     "title": "Gestió de Tallers",
@@ -1023,64 +1073,25 @@
     "description": "Ho sentim, però la pàgina que estàs buscant no existeix o ha estat moguda.",
     "goHome": "Tornar a l'inici"
   },
-  "Common": {
-    "general": "General",
-    "configuration": "Configuració",
-    "global": "Global",
-    "phase": "Fase",
-    "loading": "Carregant...",
-    "module_closed": "Mòdul tancat",
-    "loading_calendar": "Carregant calendari...",
-    "home": "Inici",
-    "notifications": "Alertes",
-    "calendar": "Calendari",
-    "profile": "Perfil",
-    "logout": "Tancar Sessió",
-    "educational_center": "Centre educatiu",
-    "activities": "Activitats",
-    "workshops": "Tallers",
-    "centers": "Centres",
-    "requests": "Sol·licituds",
-    "phases": "Fases",
-    "students": "Alumnes",
-    "teachers": "Professors",
-    "assignments": "Assignacions",
-    "sessions": "Sessions",
-    "uploading": "Pujant...",
-    "validating_ai": "Validant (IA)...",
-    "force_manual_upload": "Forçar pujada manual",
-    "change": "Canviar",
-    "attach": "Adjuntar",
-    "document_validated": "Document validat",
-    "view_document": "Veure document",
-    "pending": "Pendent",
-    "authenticating": "Verificant credencials...",
-    "search": "Cerca...",
-    "actions": "Accions",
-    "ok": "D'acord",
-    "cancel": "Cancel·lar",
-    "loading_error": "No s'ha pogut carregar la informació",
-    "error_connectivity": "Error de connexió. Si us plau, verifica si el servidor està actiu.",
-    "delete_success": "Element eliminat correctament.",
-    "delete_error": "S'ha produït un error en eliminar l'element.",
-    "delete_confirm_title": "Confirmar eliminació",
-    "delete_confirm_msg": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
-    "new": "Nou",
-    "system_default": "Predeterminat del Sistema",
-    "select_language": "Seleccionar Idioma",
-    "roles": {
-      "ADMIN": "Administrador",
-      "COORDINATOR": "Coordinador",
-      "TEACHER": "Professor",
-      "STUDENT": "Alumne"
+  "Notifications": {
+    "title_user": "Avisos i Notificacions",
+    "subtitle_user": "Estigues al dia dels canvis de fase, resolucions de sol·licituds i comunicacions oficials.",
+    "loading": "Carregant avisos oficials...",
+    "empty": {
+      "title": "No tens avisos pendents",
+      "subtitle": "Quan hi hagi canvis en les teves sol·licituds o dates clau, apareixeran aquí."
     },
-    "badges": {
-      "workshop": "TALLER",
-      "pending": "PENDENT",
-      "completed": "COMPLETAT",
-      "need_eval": "NECESSITA EVAL",
-      "will_certify": "CERTIFICARÀ",
-      "no_cert": "SENSE CERT"
+    "btn": {
+      "read": "Marcar com a llegit",
+      "delete": "Eliminar"
+    },
+    "delete_dialog": {
+      "title": "Eliminar Avís",
+      "message": "Estàs segur que vols eliminar aquest avís? Aquesta acció no es pot desfer."
+    },
+    "messages": {
+      "delete_ok": "Avís eliminat.",
+      "delete_error": "Error en eliminar l'avís."
     }
   }
 }

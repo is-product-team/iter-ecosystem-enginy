@@ -6,7 +6,15 @@
     "back": "Tornar",
     "success": "Èxit",
     "error": "Error",
-    "branding": "Consorci d'Educació de Barcelona"
+    "branding": "Consorci d'Educació de Barcelona",
+    "workshop": "Taller",
+    "milestone": "Fita",
+    "deadline": "Termini",
+    "session": "Sessió",
+    "pending": "Pendent",
+    "time": "Horari",
+    "location": "Ubicació",
+    "description": "Descripció"
   },
   "Auth": {
     "logout": {
@@ -112,5 +120,14 @@
     "mark_read": "Marcar com a llegit",
     "delete": "Eliminar",
     "empty": "No hi ha avisos nous"
+  },
+  "Calendar": {
+    "academic_agenda": "Agenda Acadèmica",
+    "title": "Calendari d'activitats",
+    "today": "Avui",
+    "no_events": "No hi ha esdeveniments",
+    "all_day": "Tot el dia",
+    "add_to_calendar": "Afegir al Calendari",
+    "remove_event": "Eliminar de la llista"
   }
 }

@@ -14,6 +14,7 @@ export default function CenterDashboard() {
   const t = useTranslations('Center');
   const tc = useTranslations('Common');
   const tNav = useTranslations('Navigation');
+  const tp = useTranslations('ProgramPhases');
   const locale = useLocale();
   const { user, loading: authLoading } = useAuth();
   const [phases, setPhases] = useState<Phase[]>([]);
@@ -94,7 +95,7 @@ export default function CenterDashboard() {
                     <h4
                       className={`text-[12px] font-medium tracking-tight mb-4 min-h-[3em] flex items-center justify-center ${phase.isActive ? 'text-consorci-darkBlue font-medium' : 'text-text-muted'}`}
                     >
-                      {phase.name}
+                      {tp.has(`${phase.name}.name`) ? tp(`${phase.name}.name`) : phase.name}
                     </h4>
 
                     <div

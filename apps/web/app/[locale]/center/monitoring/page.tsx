@@ -52,7 +52,7 @@ export default function MonitoringPage() {
       const response = await getApi().get(`/certificates/stats/${assignmentId}`);
       setSelectedAssignmentStats({ id: assignmentId, ...response.data });
     } catch (err) {
-      toast.error("No s'ha pogut carregar l'analítica.");
+      toast.error(t('error_load_analytics'));
     } finally {
       setLoadingStats(false);
     }
@@ -69,9 +69,9 @@ export default function MonitoringPage() {
       link.setAttribute('download', `certificats_taller_${assignmentId}.zip`);
       document.body.appendChild(link);
       link.click();
-      toast.success("Descàrrega iniciada corregidament!");
+      toast.success(t('success_download_zip'));
     } catch (err) {
-      toast.error("Error en generar el fitxer ZIP.");
+      toast.error(t('error_download_zip'));
     }
   };
 
@@ -107,13 +107,13 @@ export default function MonitoringPage() {
           onClick={() => setActiveTab('ACTIVE')}
           className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'ACTIVE' ? 'text-[#00426B] border-b-2 border-[#00426B]' : 'text-gray-400'}`}
         >
-          Tallers en Execució
+          {t('tabs.active')}
         </button>
         <button 
           onClick={() => setActiveTab('COMPLETED')}
           className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'COMPLETED' ? 'text-[#00426B] border-b-2 border-[#00426B]' : 'text-gray-400'}`}
         >
-          Resultats i Certificats (Fase 4)
+          {t('tabs.completed')}
         </button>
       </div>
 
@@ -140,7 +140,7 @@ export default function MonitoringPage() {
               ))}
               {activeAssignments.length === 0 && (
                 <div className="col-span-full py-12 text-center bg-background-subtle border border-dashed border-border-subtle text-text-muted text-[11px] font-medium uppercase tracking-widest">
-                  No hi ha tallers actius en aquest moment.
+                  {t('no_active_assignments')}
                 </div>
               )}
             </div>
@@ -150,20 +150,22 @@ export default function MonitoringPage() {
                 <div key={assignment.assignmentId} className="bg-white border-2 border-gray-100 p-6 flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm">
                   <div>
                     <h4 className="text-sm font-black text-[#00426B] uppercase tracking-tight">{assignment.title}</h4>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Finalitzat el {new Date().toLocaleDateString()}</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">
+                      {t('finished_on', { date: new Date().toLocaleDateString() })}
+                    </p>
                   </div>
                   <div className="flex gap-4 w-full md:w-auto">
                     <button 
                       onClick={() => handleFetchStats(assignment.assignmentId)}
                       className="flex-1 md:flex-none px-6 py-3 bg-gray-50 border border-gray-100 text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-all"
                     >
-                      Veure Analítica
+                      {t('view_analytics')}
                     </button>
                     <button 
                       onClick={() => handleDownloadZip(assignment.assignmentId)}
                       className="flex-1 md:flex-none px-6 py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all"
                     >
-                      Certificats (ZIP)
+                      {t('certificates_zip')}
                     </button>
                   </div>
                 </div>
@@ -173,8 +175,10 @@ export default function MonitoringPage() {
               {selectedAssignmentStats && (
                 <div className="mt-12 pt-12 border-t-2 border-dashed border-gray-100">
                   <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">Informe de Qualitat</h3>
-                    <button onClick={() => setSelectedAssignmentStats(null)} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tancar</button>
+                    <h3 className="text-xl font-black text-[#00426B] uppercase tracking-tighter">{t('quality_report')}</h3>
+                    <button onClick={() => setSelectedAssignmentStats(null)} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                      {t('close')}
+                    </button>
                   </div>
                   <SatisfactionCharts data={selectedAssignmentStats} />
                 </div>
@@ -182,7 +186,7 @@ export default function MonitoringPage() {
 
               {completedAssignments.length === 0 && (
                 <div className="py-12 text-center bg-background-subtle border border-dashed border-border-subtle text-text-muted text-[11px] font-medium uppercase tracking-widest">
-                  No hi ha tallers finalitzats recents.
+                  {t('no_completed_assignments')}
                 </div>
               )}
             </div>
@@ -193,7 +197,7 @@ export default function MonitoringPage() {
         <div className="lg:col-span-1">
           <IncidentFeed incidents={stats.incidents.map((inc: any) => ({
             id: inc.issueId,
-            title: `Incidència #${inc.issueId}`,
+            title: t('incident_id', { id: inc.issueId }),
             description: inc.description,
             type: inc.type,
             createdAt: inc.createdAt,

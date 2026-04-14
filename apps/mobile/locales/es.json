@@ -6,7 +6,15 @@
     "back": "Volver",
     "success": "Éxito",
     "error": "Error",
-    "branding": "Consorci d'Educació de Barcelona"
+    "branding": "Consorci d'Educació de Barcelona",
+    "workshop": "Taller",
+    "milestone": "Hito",
+    "deadline": "Plazo",
+    "session": "Sesión",
+    "pending": "Pendiente",
+    "time": "Horario",
+    "location": "Ubicación",
+    "description": "Descripción"
   },
   "Auth": {
     "logout": {
@@ -112,5 +120,14 @@
     "mark_read": "Marcar como leído",
     "delete": "Eliminar",
     "empty": "No hay avisos nuevos"
+  },
+  "Calendar": {
+    "academic_agenda": "Agenda Académica",
+    "title": "Calendario de actividades",
+    "today": "Hoy",
+    "no_events": "No hay eventos",
+    "all_day": "Todo el día",
+    "add_to_calendar": "Añadir al Calendario",
+    "remove_event": "Eliminar de la lista"
   }
 }

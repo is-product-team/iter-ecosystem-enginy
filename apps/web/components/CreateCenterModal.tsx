@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import centerService, { Center } from "../services/centerService";
 import Loading from "./Loading";
+import { useTranslations } from "next-intl";
 
 type CreateCenterModalProps = {
   visible: boolean;
@@ -17,6 +18,9 @@ const CreateCenterModal = ({
   onCenterSaved,
   initialData,
 }: CreateCenterModalProps) => {
+  const t = useTranslations('Forms.Centers');
+  const tCommon = useTranslations('Common');
+
   const [centerCode, setCenterCode] = useState("");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -29,8 +33,8 @@ const CreateCenterModal = ({
   React.useEffect(() => {
     if (visible) {
       if (initialData) {
-        setCenterCode(initialData.centerCode);
-        setName(initialData.name);
+        setCenterCode(initialData.centerCode || "");
+        setName(initialData.name || "");
         setAddress(initialData.address || "");
         setContactPhone(initialData.contactPhone || "");
         setContactEmail(initialData.contactEmail || "");
@@ -48,7 +52,7 @@ const CreateCenterModal = ({
 
   const handleSubmit = async () => {
     if (!centerCode || !name) {
-      setError("The center code and name are required.");
+      setError(t('required_error'));
       return;
     }
     setLoading(true);
@@ -73,7 +77,7 @@ const CreateCenterModal = ({
       onClose();
     } catch (err) {
       const errorMessage = (err as Error).message ||
-        (initialData ? "Could not update the center." : "Could not create the center.");
+        (initialData ? t('update_error') : t('create_error'));
       setError(errorMessage);
       console.error(err);
     } finally {
@@ -89,16 +93,16 @@ const CreateCenterModal = ({
         <div className="bg-background-subtle px-8 py-5 border-b border-border-subtle flex justify-between items-center sticky top-0 z-10">
           <div>
             <h2 className="text-xl font-medium text-text-primary">
-              {initialData ? "Edit Center" : "Create New Center"}
+              {initialData ? t('edit_title') : t('create_title')}
             </h2>
             <p className="text-[11px] font-normal text-text-muted mt-1">
-              {initialData ? "Modify educational center details" : "Enter details to register a new center."}
+              {initialData ? t('edit_subtitle') : t('create_subtitle')}
             </p>
           </div>
           <button
             onClick={onClose}
             className="text-text-muted hover:text-text-primary transition-colors"
-            aria-label="Close"
+            aria-label={tCommon('close') || "Close"}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
@@ -133,11 +137,11 @@ const CreateCenterModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[11px] font-medium text-text-primary mb-2">
-                Center Code <span className="text-red-500">*</span>
+                {t('code')} <span className="text-red-500">*</span>
               </label>
               <input
                 className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary placeholder:text-text-muted transition-all outline-none"
-                placeholder="Ex: 08012345"
+                placeholder={t('code_placeholder')}
                 value={centerCode}
                 onChange={(e) => setCenterCode(e.target.value)}
               />
@@ -145,11 +149,11 @@ const CreateCenterModal = ({
 
             <div>
               <label className="block text-[11px] font-medium text-text-primary mb-2">
-                Center Name <span className="text-red-500">*</span>
+                {t('name')} <span className="text-red-500">*</span>
               </label>
               <input
                 className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary placeholder:text-text-muted transition-all outline-none"
-                placeholder="Ex: Institut Pedralbes"
+                placeholder={t('name_placeholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -157,11 +161,11 @@ const CreateCenterModal = ({
 
             <div className="md:col-span-2">
               <label className="block text-[11px] font-medium text-text-primary mb-2">
-                Address
+                {t('address')}
               </label>
               <input
                 className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary placeholder:text-text-muted transition-all outline-none"
-                placeholder="Ex: Carrer Gran Via, 123"
+                placeholder={t('address_placeholder')}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
@@ -169,11 +173,11 @@ const CreateCenterModal = ({
 
             <div>
               <label className="block text-[11px] font-medium text-text-primary mb-2">
-                Contact Phone
+                {t('phone')}
               </label>
               <input
                 className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary placeholder:text-text-muted transition-all outline-none"
-                placeholder="Ex: 931234567"
+                placeholder={t('phone_placeholder')}
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
               />
@@ -181,11 +185,11 @@ const CreateCenterModal = ({
 
             <div>
               <label className="block text-[11px] font-medium text-text-primary mb-2">
-                Contact Email
+                {t('email')}
               </label>
               <input
                 className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary placeholder:text-text-muted transition-all outline-none"
-                placeholder="Ex: contact@centre.edu"
+                placeholder={t('email_placeholder')}
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
               />
@@ -198,7 +202,7 @@ const CreateCenterModal = ({
             onClick={onClose}
             className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors"
           >
-            Cancel
+            {tCommon('cancel')}
           </button>
           <button
             className={`px-8 py-3 text-[12px] font-medium text-white transition-all active:scale-[0.98] ${loading
@@ -211,10 +215,10 @@ const CreateCenterModal = ({
             {loading ? (
               <span className="flex items-center gap-2">
                 <Loading size="sm" white message="" />
-                Processing...
+                {t('processing')}
               </span>
             ) : (
-              initialData ? "Save Changes" : "Create Center"
+              initialData ? t('save_changes') : t('create_center')
             )}
           </button>
         </div>

@@ -73,7 +73,7 @@ const ClosureModal: React.FC<ClosureModalProps> = ({
                      // but in the backend it will be filtered.
                      // Just show a tentative count if possible.
                      return true; 
-                   }).length} (Pendientes de validación)
+                   }).length} ({t('pending_validation')})
                 </span>
               </div>
             </div>

@@ -45,8 +45,11 @@ export class TetrisService {
                 // 4. Notify center
                 await createNotificationInternal({
                     centerId: p.centerId,
-                    title: 'Workshop Assigned (Tetris)!',
-                    message: `Your request for the workshop "${vacancy.workshop.title}" has been approved and assigned.`,
+                    title: 'workshop_assigned_title',
+                    message: JSON.stringify({
+                        key: 'workshop_assigned_msg',
+                        params: { title: vacancy.workshop.title }
+                    }),
                     type: 'REQUEST',
                     importance: 'INFO'
                 });

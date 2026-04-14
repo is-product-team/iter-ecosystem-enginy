@@ -41,6 +41,24 @@
       "cancel": "Cancel"
     }
   },
+  "ProgramPhases": {
+    "Application": {
+      "name": "Application & Pre-registration",
+      "description": "Workshop application period for educational centers."
+    },
+    "Planning": {
+      "name": "Planning & Assignment",
+      "description": "Workshop assignment and vacancy management."
+    },
+    "Execution": {
+      "name": "Execution & Follow-up",
+      "description": "Workshop sessions and attendance tracking."
+    },
+    "Closure": {
+      "name": "Closure & Certification",
+      "description": "Workshop finalization and certificate issuance."
+    }
+  },
   "Admin": {
     "dashboard": {
       "title": "Admin Dashboard",
@@ -316,27 +334,6 @@
       "title": "Monitoring and Evaluation",
       "subtitle": "Review of the impact and results of the workshops."
     },
-    "Notifications": {
-      "title_user": "Alerts and Notifications",
-      "subtitle_user": "Stay up to date with phase changes, request resolutions, and official communications.",
-      "loading": "Loading official alerts...",
-      "empty": {
-        "title": "You have no pending alerts",
-        "subtitle": "When there are changes to your requests or key dates, they will appear here."
-      },
-      "btn": {
-        "read": "Mark as read",
-        "delete": "Delete"
-      },
-      "delete_dialog": {
-        "title": "Delete Alert",
-        "message": "Are you sure you want to delete this alert? This action cannot be undone."
-      },
-      "messages": {
-        "delete_ok": "Alert deleted.",
-        "delete_error": "Error deleting the alert."
-      }
-    },
     "Monitoring": {
       "title": "Operational Monitoring (Phase 3)",
       "subtitle": "Status of workshop execution and attendance at your center.",
@@ -355,6 +352,22 @@
         "attendance_ok": "Attendance up to date",
         "attendance_warning": "Attendance sheets missing"
       },
+      "tabs": {
+        "active": "Workshops in Execution",
+        "completed": "Results and Certificates (Phase 4)"
+      },
+      "no_active_assignments": "No active workshops at this time.",
+      "no_completed_assignments": "No recently completed workshops.",
+      "finished_on": "Completed on {date}",
+      "view_analytics": "View Analytics",
+      "certificates_zip": "Certificates (ZIP)",
+      "quality_report": "Quality Report",
+      "close": "Close",
+      "loading_analytics": "Loading analysis...",
+      "incident_id": "Incident #{id}",
+      "error_load_analytics": "Could not load analytics.",
+      "success_download_zip": "Download started successfully!",
+      "error_download_zip": "Error generating ZIP file.",
       "Today": {
         "title": "Today's Agenda",
         "no_sessions": "No sessions scheduled for today."
@@ -364,6 +377,16 @@
         "report_new": "Report Incident",
         "no_incidents": "No incidents reported."
       }
+    }
+  },
+  "Widgets": {
+    "NextEvents": {
+      "title": "Upcoming Milestones",
+      "view_all": "view all",
+      "no_events": "No upcoming events",
+      "program_milestone": "Program Milestone",
+      "deadline": "Deadline",
+      "workshop": "Workshop"
     }
   },
   "Common": {
@@ -486,7 +509,10 @@
     "legend_ok": "Understood",
     "event_details": "Event details",
     "close": "Close",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "today": "Today",
+    "no_events": "No activity planned",
+    "all_day": "All day"
   },
   "Questionnaires": {
     "title": "Questionnaires",
@@ -1073,5 +1099,64 @@
     "title": "Page not found",
     "description": "Sorry, the page you are looking for doesn't exist or has been moved.",
     "goHome": "Go back home"
+  },
+  "Notifications": {
+    "title_user": "Alerts and Notifications",
+    "subtitle_user": "Stay up to date with phase changes, request resolutions, and official communications.",
+    "title_admin": "System Alerts Control",
+    "subtitle_admin": "Global communication and alert management for all users.",
+    "loading": "Loading official alerts...",
+    "Application": "Application and Pre-registration",
+    "Planning": "Planning and Assignment",
+    "Execution": "Execution and Monitoring",
+    "Closure": "Closure and Certification",
+    "Approved": "Approved",
+    "Rejected": "Rejected",
+    "phase_start_title": "New Phase: {name}",
+
+    "phase_start_msg": "The phase \"{name}\" has started. Check the calendar for details.",
+    "calendar_sync_title": "Calendar Synchronization (System)",
+    "calendar_sync_msg": "Background calendar check executed",
+    "session_reminder_title": "Reminder: Workshop Session",
+    "session_reminder_msg": "You have a session for the workshop \"{title}\" scheduled for today at {time}.",
+    "milestone_reminder_title": "Upcoming Milestone: {title}",
+    "milestone_reminder_msg": "Remember: The milestone \"{title}\" is scheduled for the next 24 hours.",
+    "request_status_title": "Request {status}",
+    "request_status_msg": "Your request for the workshop \"{title}\" has been {status_low}.",
+    "incorrect_doc_title": "Incorrect Documentation",
+    "incorrect_doc_msg": "Hello, the document {doc} of workshop {title} is incorrect. {comment}",
+    "registration_confirmed_title": "Registration Confirmed: Workshop in Progress",
+    "registration_confirmed_msg": "Registration for workshop \"{title}\" has been completed correctly. The workshop is now active and sessions have been generated in your calendar.",
+    "workshop_assigned_title": "Workshop Assigned (Tetris)!",
+    "workshop_assigned_msg": "Your request for the workshop \"{title}\" has been approved and assigned.",
+    "assignments_published_title": "Assignments Published",
+    "assignments_published_msg": "You can now consult the assignments and start entering data.",
+    "CALENDAR_CHECK_HEARTBEAT": "Calendar Synchronization (System)",
+    "Background calendar check executed": "Background calendar check executed",
+    "New Phase: Application": "New Phase: Application",
+    "New Phase: Planning": "New Phase: Planning",
+    "New Phase: Execution": "New Phase: Execution",
+    "New Phase: Closure": "New Phase: Closure",
+    "The phase \"Application\" has started Check the calendar for details": "The phase \"Application\" has started. Check the calendar for details.",
+    "The phase \"Planning\" has started Check the calendar for details": "The phase \"Planning\" has started. Check the calendar for details.",
+    "The phase \"Execution\" has started Check the calendar for details": "The phase \"Execution\" has started. Check the calendar for details.",
+    "The phase \"Closure\" has started Check the calendar for details": "The phase \"Closure\" has started. Check the calendar for details.",
+
+    "empty": {
+      "title": "You have no pending alerts",
+      "subtitle": "When there are changes to your requests or key dates, they will appear here."
+    },
+    "btn": {
+      "read": "Mark as read",
+      "delete": "Delete"
+    },
+    "delete_dialog": {
+      "title": "Delete Alert",
+      "message": "Are you sure you want to delete this alert? This action cannot be undone."
+    },
+    "messages": {
+      "delete_ok": "Alert deleted.",
+      "delete_error": "Error deleting the alert."
+    }
   }
 }

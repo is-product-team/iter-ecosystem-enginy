@@ -254,12 +254,22 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
       await logStatusChange(requestIdInt, oldRequest.status, updated.status, req.user?.userId);
     }
 
+    const statusLabel = updated.status === 'APPROVED' ? 'Aprobada' : 'Rechazada';
+    const statusLow = updated.status === 'APPROVED' ? 'aprobada' : 'rechazada';
+
     await createNotificationInternal({
       centerId: updated.centerId,
-      title: `Request ${updated.status === RequestStatus.APPROVED ? 'Approved' : 'Rejected'}`,
-      message: `Your request for the workshop "${updated.workshop.title}" has been ${updated.status.toLowerCase()}.`,
+      title: 'request_status_title',
+      message: JSON.stringify({
+        key: 'request_status_msg',
+        params: {
+          status: statusLabel,
+          title: updated.workshop.title,
+          status_low: statusLow
+        }
+      }),
       type: 'REQUEST',
-      importance: updated.status === RequestStatus.APPROVED ? 'INFO' : 'WARNING'
+      importance: updated.status === 'APPROVED' ? 'INFO' : 'WARNING'
     });
 
     res.json(updated);

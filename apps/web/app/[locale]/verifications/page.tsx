@@ -78,7 +78,7 @@ export default function DocumentVerificationPage() {
   });
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
+    if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
       router.push(`/${locale}/login`);
       return;
     }

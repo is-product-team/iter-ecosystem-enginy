@@ -7,12 +7,14 @@ import notificationService, { Notification } from '@/services/notificationServic
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function NotificationsPage() {
   const { user } = useAuth();
+  const t = useTranslations('Notifications');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -56,23 +58,67 @@ export default function NotificationsPage() {
   const deleteNotif = (id: number) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Delete Alert',
-      message: 'Are you sure you want to delete this alert? This action cannot be undone.',
+      title: t('delete_dialog.title'),
+      message: t('delete_dialog.message'),
       isDestructive: true,
       onConfirm: async () => {
         try {
           await notificationService.delete(id);
           setNotifications(prev => prev.filter(n => n.notificationId !== id));
-          toast.success("Alert deleted.");
+          toast.success(t('messages.delete_ok'));
         } catch (_error) {
-          toast.error("Error deleting alert.");
+          toast.error(t('messages.delete_error'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
       }
     });
   };
 
+  const renderTranslation = (text: string) => {
+    if (!text) return '';
+    
+    // Check if it is a JSON string (for params)
+    if (text.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed.key) {
+          const params = { ...parsed.params };
+          // Translate specific parameters if they are keys
+          for (const key in params) {
+            const val = params[key];
+            if (typeof val === 'string' && !val.includes(' ')) {
+              try {
+                const transVal = t(val);
+                if (transVal !== val) params[key] = transVal;
+              } catch (e) { /* ignore */ }
+            }
+          }
+          return t(parsed.key, params);
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    // Normal translation
+    try {
+      // If it contains non-ascii, it is definitely not a key
+      if (/[^\x00-\x7F]/.test(text)) {
+        return text;
+      }
+      
+      // Normalize key by removing dots (next-intl doesnt like dots in keys)
+      const normalizedKey = text.replace(/\./g, '');
+      // Provide default empty values for common params to avoid FORMATTING_ERROR
+      const translated = t(normalizedKey, { name: '', title: '', status: '', status_low: '', doc: '', comment: '', time: '' });
+      
+      // If next-intl returns the key itself, it means it couldnt translate it
+      return translated === normalizedKey ? text : translated;
+    } catch (e) {
+      return text;
+    }
+  };
+
   const getImportanceStyles = (imp: string) => {
+
     switch (imp) {
       case 'URGENT': return 'bg-red-50 text-red-700 border-red-200';
       case 'WARNING': return 'bg-orange-50 text-orange-700 border-orange-200';
@@ -105,12 +151,12 @@ export default function NotificationsPage() {
 
   return (
     <DashboardLayout
-      title={user?.role.name === 'ADMIN' ? "System Alerts Control" : "Alerts and Notifications"}
-      subtitle={user?.role.name === 'ADMIN' ? "Global communication and alert management for all users." : "Stay up to date with phase changes, request resolutions, and official communications."}
+      title={user?.role.name === 'ADMIN' ? t('title_admin') : t('title_user')}
+      subtitle={user?.role.name === 'ADMIN' ? t('subtitle_admin') : t('subtitle_user')}
     >
       <div className="w-full pb-12">
         {loading ? (
-          <Loading message="Loading official alerts..." />
+          <Loading message={t('loading')} />
         ) : notifications.length > 0 ? (
           <div className="flex flex-col border border-border-subtle bg-background-subtle/30">
             {notifications.map((notif, _index) => (
@@ -134,12 +180,12 @@ export default function NotificationsPage() {
                           {notif.importance}
                         </span>
                         <h3 className={`font-medium tracking-tight leading-tight ${notif.isRead ? 'text-text-muted text-sm' : 'text-text-primary text-[17px]'}`}>
-                          {notif.title}
+                          {renderTranslation(notif.title)}
                         </h3>
                       </div>
 
                       <p className={`text-[14px] font-medium leading-relaxed mb-4 ${notif.isRead ? 'text-text-muted' : 'text-text-secondary'}`}>
-                        {notif.message}
+                        {renderTranslation(notif.message)}
                       </p>
 
                       <div className="text-[12px] font-medium text-text-muted flex items-center gap-2">
@@ -184,8 +230,8 @@ export default function NotificationsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
             </div>
-            <h4 className="text-text-primary font-medium text-[15px] mb-3">No pending alerts</h4>
-            <p className="text-text-muted text-[13px] font-medium leading-relaxed max-w-[280px] mx-auto">When there are changes to your requests or key dates, they will appear here.</p>
+            <h4 className="text-text-primary font-medium text-[15px] mb-3">{t('empty.title')}</h4>
+            <p className="text-text-muted text-[13px] font-medium leading-relaxed max-w-[280px] mx-auto">{t('empty.subtitle')}</p>
           </div>
         )}
       </div>
