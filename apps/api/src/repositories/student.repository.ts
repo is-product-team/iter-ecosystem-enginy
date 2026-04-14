@@ -19,6 +19,12 @@ export class StudentRepository extends BaseRepository<Student, Prisma.StudentCre
     });
   }
 
+  async findByEmail(email: string): Promise<Student | null> {
+    return this.prisma.student.findUnique({
+      where: { email }
+    });
+  }
+
   async findByCenter(centerId: number): Promise<Student[]> {
     return this.prisma.student.findMany({
       where: { originCenterId: centerId },

@@ -109,10 +109,10 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
       title={`Session ${num} Attendance`}
       subtitle={sessionDate ? new Date(sessionDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase() : `Assignment ${id}`}
     >
-      <div className="mb-8 flex justify-between items-center bg-white p-6 border border-gray-100 shadow-sm">
+      <div className="mb-10 flex justify-between items-center bg-background-surface p-8 border border-border-subtle">
         <button
           onClick={() => router.back()}
-          className="text-xs font-bold text-[#4197CB] hover:text-[#00426B] uppercase tracking-widest flex items-center gap-2"
+          className="text-[11px] font-bold text-text-muted hover:text-consorci-darkBlue uppercase tracking-widest flex items-center gap-2 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           Back to Sessions
@@ -121,25 +121,26 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
         <button
           onClick={handleSave}
           disabled={saving}
-          className={`bg-[#00426B] text-white px-10 py-3 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#0775AB] transition-all shadow-xl flex items-center gap-3 ${saving ? 'opacity-50' : ''}`}
+          className={`px-10 py-3.5 text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-3 ${saving ? 'bg-background-subtle text-text-muted' : 'bg-consorci-darkBlue text-white hover:bg-black active:scale-[0.98]'}`}
         >
           {saving ? 'Saving...' : 'Save Attendance'}
           {!saving && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>}
         </button>
       </div>
 
-      <div className="bg-white border border-gray-200 shadow-sm overflow-hidden mb-20">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-100">
-              <th className="px-8 py-5 text-[10px] font-black text-[#00426B] uppercase tracking-widest">Student</th>
-              <th className="px-8 py-5 text-[10px] font-black text-[#00426B] uppercase tracking-widest text-center">Status</th>
-              <th className="px-8 py-5 text-[10px] font-black text-[#00426B] uppercase tracking-widest">Observations</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {attendance.map((record) => (
-              <tr key={record.enrollmentId} className="hover:bg-gray-50/50 transition-colors">
+      <div className="bg-background-surface border border-border-subtle overflow-hidden mb-20">
+        <div className="premium-table-container">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-background-subtle border-b border-border-subtle">
+                <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">Student</th>
+                <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest text-center">Status</th>
+                <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">Observations</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border-subtle">
+              {attendance.map((record) => (
+                <tr key={record.enrollmentId} className="hover:bg-background-subtle/30 transition-colors">
                 <td className="px-8 py-6">
                   <div className="flex flex-col">
                     <span className="text-sm font-black text-[#00426B] uppercase tracking-tight">
@@ -182,6 +183,7 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
           </tbody>
         </table>
       </div>
+    </div>
     </DashboardLayout>
   );
 }

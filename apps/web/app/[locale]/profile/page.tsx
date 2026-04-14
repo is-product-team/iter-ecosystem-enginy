@@ -54,10 +54,10 @@ export default function ProfilePage() {
     try {
       const response = await api().post('/profile/sync-token');
       setSyncToken(response.data.syncToken);
-      toast.success('Sync token generated successfully');
+      toast.success(t('sync_success'));
     } catch (error) {
       console.error('Error generating sync token:', error);
-      toast.error('Failed to generate sync token');
+      toast.error(t('sync_error'));
     } finally {
       setLoadingToken(false);
     }
@@ -67,7 +67,7 @@ export default function ProfilePage() {
 
   if (!mounted || authLoading || !user) {
     return (
-      <Loading fullScreen message={authLoading ? "Verifying access..." : "Loading profile..."} />
+      <Loading fullScreen message={authLoading ? tc('authenticating') : tc('loading')} />
     );
   }
 
@@ -92,7 +92,7 @@ export default function ProfilePage() {
             <h2 className="text-3xl font-medium text-text-primary mb-2 tracking-tight">{user.fullName}</h2>
             <div className="flex flex-wrap justify-center md:justify-start gap-3 items-center">
               <span className="px-4 py-1.5 bg-consorci-darkBlue/5 border border-consorci-darkBlue/20 text-consorci-darkBlue text-[11px] font-bold uppercase tracking-widest">
-                {user.role.name}
+                {tc(`roles.${user.role.name}`)}
               </span>
               {user.center && (
                 <span className="px-4 py-1.5 bg-background-subtle border border-border-subtle text-text-muted text-[11px] font-bold uppercase tracking-widest">
@@ -102,7 +102,7 @@ export default function ProfilePage() {
             </div>
           </div>
           <button 
-            onClick={() => toast.info('Profile editing coming soon')}
+            onClick={() => toast.info(t('coming_soon'))}
             className="px-8 py-3 bg-consorci-darkBlue hover:bg-black text-white text-[13px] font-medium transition-all active:scale-[0.95]"
           >
             {t('edit_profile')}
@@ -144,7 +144,7 @@ export default function ProfilePage() {
               
               <div className="bg-background-surface border border-border-subtle p-8 shadow-sm">
                 <button 
-                  onClick={() => toast.info('Password change coming soon')}
+                  onClick={() => toast.info(t('coming_soon'))}
                   className="w-full py-3 bg-background-subtle border border-border-subtle text-text-primary hover:border-text-primary text-[13px] font-medium transition-all"
                 >
                   {t('change_password')}
@@ -158,7 +158,7 @@ export default function ProfilePage() {
             {/* Platform Settings */}
             <div className="space-y-8">
               <div className="border-b border-border-subtle pb-3">
-                <h3 className="text-[11px] font-bold text-text-primary uppercase tracking-[0.2em]">Platform Settings</h3>
+                <h3 className="text-[11px] font-bold text-text-primary uppercase tracking-[0.2em]">{t('platform_settings')}</h3>
               </div>
               
               <div className="space-y-8 bg-background-surface border border-border-subtle p-8 shadow-sm">
@@ -188,7 +188,7 @@ export default function ProfilePage() {
 
                 {/* Language Selection */}
                 <div>
-                  <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">Language</label>
+                  <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">{t('language')}</label>
                   <LanguageSelector />
                 </div>
               </div>

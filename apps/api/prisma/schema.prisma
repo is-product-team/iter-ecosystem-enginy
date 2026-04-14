@@ -92,6 +92,7 @@ model User {
   assignments     AssignmentTeacher[]
   sessionTeachers SessionTeacher[]
   teachers        Teacher[]
+  student         Student?
   logs            AuditLog[]
 
   @@map("usuaris")
@@ -235,10 +236,13 @@ model Student {
   idalu          String  @unique
   fullName       String  @map("nom")
   lastName       String  @map("cognoms")
+  email          String? @unique @map("email")
   grade          String? @map("curs")
   photoUrl       String? @map("url_foto")
   originCenterId Int?    @map("id_center_origin")
   centerOrigin   Center? @relation("CenterOrigin", fields: [originCenterId], references: [centerId])
+  userId         Int?    @unique @map("id_user")
+  user           User?   @relation(fields: [userId], references: [userId], onDelete: SetNull)
 
   enrollments  Enrollment[]
   certificates Certificate[]
@@ -482,14 +486,13 @@ model StudentSelfConsultation {
   enrollmentId       Int        @unique @map("id_enrollment")
   enrollment         Enrollment @relation(fields: [enrollmentId], references: [enrollmentId], onDelete: Cascade)
 
-  taskPunctuality     Int     @map("puntualitat_tasques")
-  respectForMaterial  Int     @map("respecte_material")
+  workshopClarity     Int     @map("claredat_taller")
+  materialQuality     Int     @map("qualitat_material")
   learningInterest    Int     @map("interes_aprenentatge")
-  resolutionAutonomy  Int     @map("autonomia_resolucio")
+  supportRating       Int     @map("acompanyament_docent")
   experienceRating    Int     @map("valoracio_experiencia")
   teacherRating       Int     @map("valoracio_docent")
   vocationalImpact    String  @map("impacte_vocacional")
-  personalImprovements String? @map("millores_personals") @db.Text
   keyLearnings        String? @map("aprenentatges_clau") @db.Text
   createdAt           DateTime @default(now()) @map("data_creacio")
 

@@ -9,13 +9,19 @@ RUN npm config set fetch-retries 5 && \
     npm config set fetch-retry-maxtimeout 120000
 WORKDIR /app
 
-# Stage 2: Pruner (Separa dependencias de Web y API)
-FROM base AS pruner-web
+# Stage 2: Pruner (Base para poda)
+FROM base AS pruner
 RUN npm install -g turbo
 COPY . .
+
+# Stage 2a: Pruning para Web
+FROM pruner AS pruner-web
 RUN turbo prune @iter/web --docker
+
+# Stage 2b: Pruning para API
+FROM pruner AS pruner-api
 RUN turbo prune @iter/api --docker
-# El fix definitivo: re-inyectar manualmente las migraciones que turbo prune borra
+# Fix: re-inyectar manualmente las migraciones que turbo prune borra
 RUN mkdir -p out/full/apps/api/prisma && cp -r apps/api/prisma/* out/full/apps/api/prisma/
 
 # --- BUILDER WEB ---
@@ -47,12 +53,12 @@ CMD ["node", "apps/web/server.js"]
 
 # --- BUILDER API ---
 FROM base AS builder-api
-COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/package-lock.json ./package-lock.json
+COPY --from=pruner-api /app/out/json/ .
+COPY --from=pruner-api /app/out/package-lock.json ./package-lock.json
 RUN npm install --ignore-scripts
-COPY --from=pruner /app/out/full/ .
+COPY --from=pruner-api /app/out/full/ .
 # Forzar inclusión de prisma y migraciones
-COPY --from=pruner /app/apps/api/prisma ./apps/api/prisma
+COPY --from=pruner-api /app/apps/api/prisma ./apps/api/prisma
 WORKDIR /app/apps/api
 RUN npx prisma generate
 WORKDIR /app

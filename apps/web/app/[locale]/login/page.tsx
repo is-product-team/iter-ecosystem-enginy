@@ -69,9 +69,9 @@ export default function LoginPage() {
       if (errorObj.message.includes('401') || errorObj.message.toLowerCase().includes('invalid')) {
         setError(t('error'));
       } else if (errorObj.message.includes('fetch') || errorObj.message.includes('network')) {
-        setError('Error de conexió. Si us plau, verifica si el servidor està actiu.');
+        setError(tc('error_connectivity'));
       } else {
-        setError(errorObj.message || 'S\x27ha produït un error inesperat.');
+        setError(errorObj.message || tc('loading_error'));
       }
     } finally {
       setLoading(false);
@@ -119,16 +119,16 @@ export default function LoginPage() {
 
         {showProfessorLink ? (
           <div className="bg-background-subtle/50 p-10 text-center border border-black/5 dark:border-white/5 animate-in fade-in zoom-in-95 duration-500">
-            <h3 className="text-xl font-semibold text-text-primary mb-4">Access via Mobile App</h3>
+            <h3 className="text-xl font-semibold text-text-primary mb-4">{t('access_mobile')}</h3>
             <p className="text-[13px] text-text-muted leading-relaxed mb-8 opacity-80">
-              As a teacher, you must use the Iter mobile app to manage your sessions.
+              {t('teacher_mobile_hint')}
             </p>
             <a
               href="#"
               className="group flex items-center justify-center w-full py-4 bg-consorci-darkBlue text-white text-[13px] font-bold tracking-tight hover:bg-black transition-all active:scale-[0.98]"
-              onClick={(e) => { e.preventDefault(); toast.info('Download link coming soon'); }}
+              onClick={(e) => { e.preventDefault(); toast.info(t('pdf_not_implemented')); }}
             >
-              <span>Download Iter App</span>
+              <span>{t('download_app')}</span>
             </a>
             <button
               onClick={() => setShowProfessorLink(false)}

@@ -1,5 +1,10 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
+import { CertificateService } from '../services/certificate.service.js';
+import { QuestionnaireService } from '../services/questionnaire.service.js';
+
+const certificateService = new CertificateService();
+const questionnaireService = new QuestionnaireService();
 
 // POST: Generate certificates for an assignment (Automatic on close)
 export const generateCertificates = async (req: Request, res: Response) => {
@@ -7,61 +12,18 @@ export const generateCertificates = async (req: Request, res: Response) => {
     const id = parseInt(assignmentId);
 
     try {
-        const assignment = await prisma.assignment.findUnique({
-            where: { assignmentId: id },
-            include: {
-                enrollments: {
-                    include: {
-                        student: true,
-                        attendance: true
-                    }
-                }
-            }
-        });
-
-        if (!assignment) return res.status(404).json({ error: 'Assignment not found' });
-
-        const totalSessions = 10; // This should ideally be dynamic based on the workshop
-        let certificatesIssued = 0;
-
-        for (const enrollment of assignment.enrollments) {
-            const attendedCount = (enrollment.attendance as any[]).filter((a: any) =>
-                a.status === 'PRESENT' || a.status === 'LATE'
-            ).length;
-
-            const percentage = (attendedCount / totalSessions) * 100;
-
-            if (percentage >= 80) {
-                await prisma.certificate.upsert({
-                    where: {
-                        studentId_assignmentId: {
-                            studentId: enrollment.studentId,
-                            assignmentId: id
-                        }
-                    },
-                    update: {},
-                    create: {
-                        studentId: enrollment.studentId,
-                        assignmentId: id,
-                        issuedAt: new Date()
-                    }
-                });
-                certificatesIssued++;
-            }
-        }
-
+        const result = await certificateService.issueCertificatesForAssignment(id);
         res.json({
             success: true,
-            message: `${certificatesIssued} certificates generated.`,
-            totalStudents: assignment.enrollments.length
+            ...result
         });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error generating certificates' });
+    } catch (error: any) {
+        console.error('Generation error:', error);
+        res.status(500).json({ error: error.message || 'Error generating certificates' });
     }
 };
 
+// GET: List certificates for current user or filter by student (for Admin)
 export const getMyCertificates = async (req: Request, res: Response) => {
     const { studentId } = req.query;
 
@@ -82,5 +44,38 @@ export const getMyCertificates = async (req: Request, res: Response) => {
         res.json(certificates);
     } catch (_error) {
         res.status(500).json({ error: 'Error obtaining certificates' });
+    }
+};
+
+// GET: Bulk download certificates in ZIP (Admin/Coordinator only)
+export const downloadBulkCertificates = async (req: Request, res: Response) => {
+    const { assignmentId } = req.params;
+    const user = (req as any).user;
+
+    if (user.role !== 'ADMIN' && user.role !== 'COORDINATOR') {
+        return res.status(403).json({ error: 'Unauthorized to download bulk certificates' });
+    }
+
+    try {
+        const zipBuffer = await certificateService.generateBulkZip(parseInt(assignmentId as string));
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename=certificats_taller_${assignmentId}.zip`);
+        res.send(zipBuffer);
+    } catch (error: any) {
+        console.error('Bulk download error:', error);
+        res.status(500).json({ error: error.message || 'Error generating bulk certificates' });
+    }
+};
+
+// GET: Aggregated analytics for an assignment (Admin/Coordinator only)
+export const getAssignmentStats = async (req: Request, res: Response) => {
+    const { assignmentId } = req.params;
+
+    try {
+        const stats = await questionnaireService.getAggregatedStats(parseInt(assignmentId as string));
+        res.json(stats);
+    } catch (error: any) {
+        console.error('Stats error:', error);
+        res.status(500).json({ error: 'Could not retrieve assignment statistics' });
     }
 };

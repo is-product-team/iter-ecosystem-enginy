@@ -239,7 +239,7 @@ const assignmentService = {
             lastName: i.student.lastName,
             grade: i.student.grade,
             idalu: i.student.idalu,
-          imageUrl: i.photoUrl,
+            photoUrl: i.student.photoUrl,
           },
           pedagogicalAgreementUrl: (i as any).pedagogicalAgreementUrl,
           isPedagogicalAgreementValidated: (i as any).isPedagogicalAgreementValidated ?? false,
@@ -295,7 +295,7 @@ const assignmentService = {
             lastName: i.student.lastName,
             grade: i.student.grade,
             idalu: i.student.idalu,
-          imageUrl: i.photoUrl,
+            photoUrl: i.student.photoUrl,
           },
           pedagogicalAgreementUrl: (i as any).pedagogicalAgreementUrl,
           isPedagogicalAgreementValidated: (i as any).isPedagogicalAgreementValidated ?? false,
@@ -368,6 +368,20 @@ const assignmentService = {
       return response.data;
     } catch (error) {
       console.error("Error in assignmentService.validateDocument:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Closes an assignment and triggers certificate generation.
+   */
+  closeAssignment: async (assignmentId: number): Promise<any> => {
+    const api = getApi();
+    try {
+      const response = await api.post(`/assignments/${assignmentId}/close`);
+      return response.data;
+    } catch (error) {
+      console.error("Error in assignmentService.closeAssignment:", error);
       throw error;
     }
   }

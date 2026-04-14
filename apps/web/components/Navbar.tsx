@@ -14,6 +14,7 @@ import logoInversImg from '../public/logo-invers.png';
 
 const Navbar: React.FC = () => {
   const t = useTranslations('Navigation');
+  const metaT = useTranslations('Metadata');
   const commonT = useTranslations('Common');
   const { user, logout } = useAuth();
   const pathname = usePathname();
@@ -65,14 +66,14 @@ const Navbar: React.FC = () => {
             <Link href={getHomePath()} className="flex items-center">
               <Image 
                 src={logoImg} 
-                alt="Iter Logo" 
+                alt={metaT('logo_alt')} 
                 width={40}
                 height={40}
                 className="w-10 h-10 object-contain block dark:hidden" 
               />
               <Image 
                 src={logoInversImg} 
-                alt="Iter Logo" 
+                alt={metaT('logo_alt')} 
                 width={40}
                 height={40}
                 className="w-10 h-10 object-contain hidden dark:block" 
@@ -117,7 +118,7 @@ const Navbar: React.FC = () => {
                   {user?.center?.name || commonT('educational_center')}
                 </span>
                 <span className="text-[11px] font-normal text-text-muted mt-0.5 truncate max-w-[180px]">
-                  {user?.role?.name} {user?.center?.centerCode ? `• ${user.center.centerCode}` : ''}
+                  {user?.role?.name ? commonT(`roles.${user.role.name}`) : ''} {user?.center?.centerCode ? `• ${user.center.centerCode}` : ''}
                 </span>
               </div>
               <button

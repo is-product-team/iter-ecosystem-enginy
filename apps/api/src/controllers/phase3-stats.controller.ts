@@ -19,11 +19,11 @@ export const getCenterPhase3Stats = async (req: Request, res: Response) => {
     try {
         const cId = parseInt(tCenterId);
 
-        // 1. Get all active assignments for the center
+        // 1. Get all relevant assignments for the center (Active and recently Completed)
         const assignments = await prisma.assignment.findMany({
             where: { 
                 centerId: cId,
-                status: 'IN_PROGRESS'
+                status: { in: ['IN_PROGRESS', 'COMPLETED'] }
             },
             include: {
                 workshop: true,
@@ -89,12 +89,15 @@ export const getCenterPhase3Stats = async (req: Request, res: Response) => {
 
         res.json({
             summary: {
-                activeAssignments: assignments.length,
+                activeAssignments: assignments.filter(a => a.status === 'IN_PROGRESS').length,
                 sessionsToday: sessionsToday.length,
                 totalPendingAttendance: assignmentStats.reduce((acc, curr) => acc + curr.pendingAttendance, 0),
                 totalIncidents: await prisma.issue.count({ where: { centerId: cId } })
             },
-            assignments: assignmentStats,
+            assignments: assignments.map((a, index) => ({
+                ...assignmentStats[index],
+                status: a.status
+            })),
             today: sessionsToday.map(s => ({
                 sessionId: s.sessionId,
                 title: s.assignment.workshop.title,

@@ -53,9 +53,9 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
     try {
       const response = await api().post('/profile/sync-token');
       setSyncToken(response.data.syncToken);
-      toast.success('Sync token regenerated');
+      toast.success(t('token_regenerated'));
     } catch (error) {
-      toast.error('Failed to generate token');
+      toast.error(t('token_error'));
     } finally {
       setLoading(false);
     }
@@ -114,7 +114,7 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
         <div className="p-8 space-y-8">
           {loading ? (
             <div className="py-12 flex flex-col items-center justify-center space-y-4">
-              <Loading size="md" message="Obtaining sync data..." />
+              <Loading size="md" message={t('obtaining_data')} />
             </div>
           ) : (
             <>

@@ -17,7 +17,7 @@ try {
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
-} catch (error) {
+} catch (_error) {
   logger.warn(`⚠️ No se pudo asegurar la carpeta de uploads: ${uploadDir}. Puede ser normal si usas volúmenes de Docker.`);
 }
 

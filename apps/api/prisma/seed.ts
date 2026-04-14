@@ -2,8 +2,36 @@ import { PrismaClient, Modality } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { PHASES, ROLES } from '@iter/shared';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 
-dotenv.config();
+// --- ROBUST ENV LOADING ---
+const rootEnvPath = path.resolve(process.cwd(), '../../.env');
+const localEnvPath = path.resolve(process.cwd(), '.env');
+
+if (fs.existsSync(rootEnvPath)) {
+  dotenv.config({ path: rootEnvPath });
+} else {
+  dotenv.config({ path: localEnvPath });
+}
+
+// Manual variable expansion for DATABASE_URL (e.g., ${POSTGRES_USER})
+if (process.env.DATABASE_URL) {
+  let url = process.env.DATABASE_URL;
+  // Replace ${VAR} with process.env.VAR
+  url = url.replace(/\${(\w+)}/g, (_, v) => process.env[v] || '');
+  
+  // Local host detection: if "@db" is in URL and we are NOT in a container, use localhost
+  // Note: Simple check, if we can't find /proc/1/cgroup and it has @db, it's likely host
+  const isDocker = fs.existsSync('/.dockerenv');
+  if (!isDocker && url.includes('@db')) {
+    console.log('🔄  Detectado entorno local (Host), cambiando "db" por "localhost" en DATABASE_URL...');
+    url = url.replace('@db', '@localhost');
+  }
+  
+  process.env.DATABASE_URL = url;
+}
+// --------------------------
 
 const prisma = new PrismaClient();
 
@@ -277,6 +305,72 @@ async function main() {
   await seedUsers(infra.roles, passDefault);
   await seedWorkshops(infra.sectors);
   await seedPhases();
+
+  // Operative data for testing (CLEAN START)
+  console.log('🧪  Preparando entorno de descubrimiento (Alumnos y Solicitudes Pendientes)...');
+  
+  const existingRequests = await prisma.request.count();
+  if (existingRequests > 0) {
+    console.log('⏭️  Database already has requests, skipping operative seeding to preserve your progress.');
+    return;
+  }
+
+  const centers = await prisma.center.findMany();
+  const workshops = await prisma.workshop.findMany();
+
+  if (centers.length >= 2 && workshops.length >= 2) {
+    // 1. Create 20 students per center in the "pool"
+    const firstNames = ['Marc', 'Júlia', 'Pau', 'Laia', 'Pol', 'Emma', 'Arnau', 'Clara', 'Biel', 'Ona', 'Oriol', 'Abril', 'Nil', 'Martina', 'Jan', 'Aina', 'Hugo', 'Lucía', 'Leo', 'Noa'];
+    const lastNames = ['Pérez', 'Soler', 'García', 'Martínez', 'López', 'Sánchez', 'Rodríguez', 'Fernández', 'Vila', 'Serra'];
+
+    for (const [index, center] of centers.entries()) {
+      console.log(`   - Generando pool de alumnos para ${center.name}...`);
+      for (let i = 0; i < 20; i++) {
+        const fName = firstNames[i % firstNames.length];
+        const lName = lastNames[Math.floor(i / 2) % lastNames.length];
+        const studentId = `${1000 + (index * 20) + i}`;
+        
+        await prisma.student.upsert({
+          where: { idalu: studentId },
+          update: {},
+          create: {
+            idalu: studentId,
+            fullName: fName,
+            lastName: lName,
+            email: `${fName.toLowerCase()}${i}@${center.centerCode}.edu`,
+            originCenterId: center.centerId,
+          }
+        });
+      }
+    }
+
+    // 2. Create 2 Pending Requests (Phase 1 Start)
+    console.log('   - Creando solicitudes PENDING para iniciar Fase 1...');
+    
+    // Request from Brossa
+    await prisma.request.create({
+      data: {
+        centerId: centers[0].centerId,
+        workshopId: workshops[0].workshopId,
+        status: 'PENDING',
+        studentsAprox: 15,
+        modality: workshops[0].modality,
+        comments: "Queremos iniciar a los alumnos en la robótica aplicada.",
+      }
+    });
+
+    // Request from Pau Claris
+    await prisma.request.create({
+      data: {
+        centerId: centers[1].centerId,
+        workshopId: workshops[1].workshopId,
+        status: 'PENDING',
+        studentsAprox: 12,
+        modality: workshops[1].modality,
+        comments: "Interés en la producción audiovisual creativa.",
+      }
+    });
+  }
 
   console.log('✅  Seeding completado con éxito.');
 }

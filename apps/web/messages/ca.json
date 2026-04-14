@@ -79,8 +79,25 @@
     },
     "Phases": {
       "title": "Fases del Curs",
-      "description": "Configura les dates i l'estat de las fases del curs.",
-      "control_panel": "Panell de Control Temporal"
+      "description": "Configura les dates i l'estat de les fases del curs.",
+      "control_panel": "Panell de Control Temporal",
+      "roadmap_title": "Full de Ruta del Programa",
+      "roadmap_subtitle": "Gestió i control de les fases acadèmiques",
+      "institutional_notice_title": "Sistema de Control Temporal",
+      "institutional_notice_desc": "Les fases dicten les eines disponibles per als coordinadors. Activar una fase canvia el context de tota la plataforma per a tots els centres educatius.",
+      "loading_roadmap": "Sincronitzant full de ruta...",
+      "currently_active": "Actualment Activa",
+      "inactive": "Inactiva",
+      "opening_date": "Data d'Obertura",
+      "closing_date": "Data de Tancament",
+      "activate_phase": "Activar Fase",
+      "active": "Activa",
+      "processing": "Processant...",
+      "activation_hint": "L'activació anul·la l'estat actual del programa",
+      "success_activate": "Fase activada correctament.",
+      "error_activate": "Error en actualitzar la fase.",
+      "success_date": "Data actualitzada.",
+      "error_date": "Error en actualitzar la data."
     },
     "Stats": {
       "title": "Estadístiques",
@@ -121,7 +138,9 @@
       "success_tetris": "Assignació completada: {count} noves assignacions.",
       "error_tetris": "Error en executar l'assignació automàtica: ",
       "success_update": "Sol·licitud actualitzada correctament.",
-      "error_update": "Error en actualitzar la sol·licitud."
+      "error_update": "Error en actualitzar la sol·licitud.",
+      "students_label": "ALUMNES",
+      "observations_placeholder": "Escriu aquí observacions addicionals..."
     },
     "Verifications": {
       "title": "Verificació de Documents",
@@ -179,6 +198,27 @@
       },
       "bulk_selection": "{count} documents seleccionats",
       "bulk_approve_btn": "APROVAR TOT"
+    },
+    "Closure": {
+      "title": "Tancament i Certificació",
+      "subtitle": "Finalització de tallers, bloqueig de dades i emissió de certificats oficials.",
+      "search_placeholder": "Cercar per taller o centre...",
+      "assignments_name": "tallers",
+      "evaluations": "AVALUACIONS DOCENTS",
+      "action_close": "Tancar i Certificar",
+      "closed_status": "Taller Certificat",
+      "closure_success": "Taller tancat i certificats emesos correctament.",
+      "closure_error": "Error en tancar el taller. Revisa les avaluacions pendents.",
+      "modal_title": "Confirmar Tancament de Cicle",
+      "evaluations_status": "Estat d'Avaluacions",
+      "certificates_to_be_issued": "Certificats a Emetre",
+      "missing_evaluations_warning": "Atenció: Falten {count} avaluacions docents. El tancament és possible, però aquests alumnes podrien no rebre el certificat correctament.",
+      "effects_title": "EFECTES DEL TANCAMENT",
+      "effect_lock_data": "Les dades d'asistència i avaluació quedaran bloquejades (només lectura).",
+      "effect_generate_pdf": "Es generaran els fitxers PDF oficials per als alumnes aptes.",
+      "effect_finish_phase": "El taller passarà a l'estat FINALITZAT i es donarà pel tancat el cicle.",
+      "closing_process": "Processant tancament...",
+      "confirm_closure": "CONFIRMAR TANCAMENT FINAL"
     }
   },
   "Center": {
@@ -501,7 +541,8 @@
   },
   "Metadata": {
     "title": "Iter Web",
-    "description": "Aplicación web de Iter per a la gestió d'aprenentatge."
+    "description": "Aplicación web de Iter per a la gestió d'aprenentatge.",
+    "logo_alt": "Logotip d'Iter"
   },
   "Profile": {
     "title": "El meu Perfil",
@@ -519,7 +560,12 @@
       "light": "Clar",
       "dark": "Fosc",
       "system": "Sistema"
-    }
+    },
+    "platform_settings": "Ajustos de la plataforma",
+    "language": "Idioma",
+    "coming_soon": "Funcionalitat disponible pròximament",
+    "sync_success": "Token de sincronització generat correctament",
+    "sync_error": "Error en generar el token de sincronització"
   },
   "Navigation": {
     "home": "Inici",
@@ -567,6 +613,10 @@
         "verifications": {
           "title": "Verificació de Documents",
           "description": "Valida la documentació presentada pels centres."
+        },
+        "closure": {
+          "title": "Tancament i Certificació",
+          "description": "Finalitza tallers i emet certificats oficials."
         }
       }
     },
@@ -602,59 +652,74 @@
         "phase2": "Fase 2",
         "phase3": "Fase 3"
       }
-    },
-    "student": {
-      "title": "Benvingut/da",
-      "subtitle": "Consulta els teus tallers i descarrega els teus certificats.",
-      "certificates_title": "Els meus Certificats",
-      "no_certificates": "No s'han trobat certificats.",
-      "no_certificates_desc": "Encara no has obtingut cap certificat. Completa un taller per guanyar-ne un.",
-      "download_pdf": "Descarregar PDF",
-      "loading": "Carregant panell...",
-      "duration": "Durada",
-      "issued": "Emès",
-      "pdf_not_implemented": "La generació de PDF no està implementada en aquesta demo."
     }
   },
-  "Forms": {
-    "search": "Cercar...",
-    "search_by_title": "Cercar per títol",
-    "filter_by_sector": "Filtrar per sector",
-    "filter_by_modality": "Filtrar per modalitat",
-    "all_sectors": "Tots els sectors",
-    "all_modalities": "Totes les modalitats",
-    "name": "Nom",
-    "title": "Títol",
-    "description": "Descripció",
-    "sector": "Sector",
-    "modality": "Modalitat",
-    "places": "Places",
-    "duration": "Durada",
-    "location": "Ubicació",
-    "icon": "Icona",
-    "select_sector": "Selecciona un sector...",
-    "required_fields": "Els camps marcats amb * són obligatoris.",
-    "workshop_config_subtitle": "Configuració del Taller i Horari Setmanal",
-    "general_info": "Informació General",
-    "technical_details": "Detalls Tècnics",
-    "title_placeholder": "Introdueix el nom del taller...",
-    "description_placeholder": "Breu explicació del contingut...",
-    "modality_a": "Modalitat A (3 Trimestres)",
-    "modality_b": "Modalitat B (2 Trimestres)",
-    "modality_c": "Modalitat C (1 Trimestre)",
-    "review_data": "Revisa les dades abans de guardar.",
-    "schedule": "Horari Setmanal",
-    "add_slot": "Afegir Franja",
-    "add_day": "Afegir Dia",
-    "configured_days": "Dies Configurats",
-    "no_days": "Cap dia configurat encara",
-    "save_workshop": "Guardar Taller",
-    "saving": "Guardant...",
-    "monday": "Dilluns",
-    "tuesday": "Dimarts",
-    "wednesday": "Dimecres",
-    "thursday": "Dijous",
-    "friday": "Divendres"
+  "PublicSurvey": {
+    "title": "Iter Ecosystem",
+    "subtitle": "Autoavaluació del taller",
+    "email_label": "Correu electrònic (xtec)",
+    "email_placeholder": "exemple@xtec.cat",
+    "verify_button": "Començar enquesta",
+    "verifying": "Verificant...",
+    "success_title": "Enquesta finalitzada!",
+    "success_message": "Moltes gràcies pel teu temps. Les teves respostes ens ajuden a millorar el Programa Enginy.",
+    "subtitle_with_name": "Com ha anat el taller, {name}?",
+    "error_no_survey": "No hem trobat cap enquesta pendent per a tu.",
+    "submit_success": "Enquesta enviada correctament!",
+    "submit_error": "Error en enviar l'enquesta.",
+    "section_quality": "Qualitat i Contingut",
+    "section_experience": "Valoració d'Experiència",
+    "section_vocational": "Impacte Vocational",
+    "label_interest": "T'ha semblat interessant el tema tractat?",
+    "label_clarity": "L'explicació de les activitats ha estat clara i entenedora?",
+    "label_material": "Els materials i eines eren adequats i de bona qualitat?",
+    "label_support": "T'has sentit ajudat/ada i acompanyat/ada pel docent?",
+    "label_overall": "Com valoraries la teva experiència global avui?",
+    "label_teacher": "Com valoraries el/la docent que ha impartit el taller?",
+    "label_future": "T'ha ajudat a decidir el teu futur professional?",
+    "label_comments": "Explica'ns breument el que més t'ha agradat (o milloraries):",
+    "opt_future_yes": "Sí, m'ha aclarit les idees.",
+    "opt_future_no": "No, ja ho tenia clar o no és per a mi.",
+    "opt_future_maybe": "M'ho estic considerant ara de nou.",
+    "footer_note": "Feedback anònim per al centre. Sigues sincer!",
+    "submit_button": "Enviar enquesta",
+    "submitting": "Enviant..."
+  },
+  "Common": {
+    "general": "General",
+    "configuration": "Configuració",
+    "global": "Global",
+    "phase": "Fase",
+    "loading": "Carregant...",
+    "module_closed": "Mòdul tancat",
+    "loading_calendar": "Carregant calendari...",
+    "home": "Inici",
+    "notifications": "Alertes",
+    "calendar": "Calendari",
+    "profile": "Perfil",
+    "logout": "Tancar Sessió",
+    "educational_center": "Centre educatiu",
+    "workshops": "Tallers",
+    "centers": "Centres",
+    "requests": "Sol·licituds",
+    "phases": "Fases",
+    "students": "Alumnes",
+    "teachers": "Professors",
+    "assignments": "Assignacions",
+    "sessions": "Sessions",
+    "uploading": "Pujant...",
+    "validating_ai": "Validant (IA)...",
+    "force_manual_upload": "Forçar pujada manual",
+    "change": "Canviar",
+    "attach": "Adjuntar",
+    "document_validated": "Document validat",
+    "view_document": "Veure document",
+    "pending": "Pendent",
+    "authenticating": "Verificant credencials...",
+    "search": "Cerca...",
+    "actions": "Accions",
+    "ok": "D'acord",
+    "cancel": "Cancel·lar"
   },
   "WorkshopsPage": {
     "title": "Gestió de Tallers",
@@ -920,6 +985,9 @@
     "apple_btn": "Afegir a Apple / Outlook",
     "copy_btn": "Copiar enllaç iCal",
     "copy_success": "Enllaç copiat al porta-retalls",
+    "token_regenerated": "Token de sincronització regenerat",
+    "token_error": "Error en generar el token",
+    "obtaining_data": "Obtenint dades de sincronització...",
     "instructions_title": "Com funciona?",
     "instructions_step1": "Fes clic en un dels botons superiors per obrir la teva aplicació de calendari.",
     "instructions_step2": "Si prefereixes fer-ho manualment, copia l'enllaç iCal i enganxa'l com a 'Subscripció per URL' en la teva aplicació.",
@@ -969,6 +1037,7 @@
     "profile": "Perfil",
     "logout": "Tancar Sessió",
     "educational_center": "Centre educatiu",
+    "activities": "Activitats",
     "workshops": "Tallers",
     "centers": "Centres",
     "requests": "Sol·licituds",
@@ -989,6 +1058,29 @@
     "search": "Cerca...",
     "actions": "Accions",
     "ok": "D'acord",
-    "cancel": "Cancel·lar"
+    "cancel": "Cancel·lar",
+    "loading_error": "No s'ha pogut carregar la informació",
+    "error_connectivity": "Error de connexió. Si us plau, verifica si el servidor està actiu.",
+    "delete_success": "Element eliminat correctament.",
+    "delete_error": "S'ha produït un error en eliminar l'element.",
+    "delete_confirm_title": "Confirmar eliminació",
+    "delete_confirm_msg": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
+    "new": "Nou",
+    "system_default": "Predeterminat del Sistema",
+    "select_language": "Seleccionar Idioma",
+    "roles": {
+      "ADMIN": "Administrador",
+      "COORDINATOR": "Coordinador",
+      "TEACHER": "Professor",
+      "STUDENT": "Alumne"
+    },
+    "badges": {
+      "workshop": "TALLER",
+      "pending": "PENDENT",
+      "completed": "COMPLETAT",
+      "need_eval": "NECESSITA EVAL",
+      "will_certify": "CERTIFICARÀ",
+      "no_cert": "SENSE CERT"
+    }
   }
 }

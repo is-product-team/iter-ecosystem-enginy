@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from '@/i18n/routing';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Globe, ChevronDown, Check } from 'lucide-react';
 
 const LANGUAGES = [
@@ -18,6 +18,7 @@ export default function LanguageSelector() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
+  const t = useTranslations('Common');
 
   const activeLanguage = LANGUAGES.find(lang => lang.id === currentLocale) || LANGUAGES[1];
 
@@ -63,7 +64,7 @@ export default function LanguageSelector() {
         <div className="absolute z-50 mt-2 w-64 right-0 ltr:right-0 rtl:left-0 bg-background-page/95 backdrop-blur-xl border border-border-subtle shadow-2xl animate-in fade-in zoom-in-95 duration-200 origin-top">
           <div className="py-2">
             <div className="px-4 py-2 border-b border-border-subtle mb-1">
-              <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Select Language</span>
+              <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{t('select_language')}</span>
             </div>
             
             {LANGUAGES.map((lang) => (
@@ -93,7 +94,7 @@ export default function LanguageSelector() {
                 <div className="w-5 flex justify-center">
                   <span className="text-[10px] opacity-60">⚙️</span>
                 </div>
-                <span className="text-[12px] font-medium italic">System Default</span>
+                <span className="text-[12px] font-medium italic">{t('system_default')}</span>
               </button>
             </div>
           </div>

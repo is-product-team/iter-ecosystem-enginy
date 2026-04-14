@@ -80,7 +80,24 @@
     "Phases": {
       "title": "Fases del Curso",
       "description": "Configura las fechas y el estado de las fases del curso.",
-      "control_panel": "Panel de Control Temporal"
+      "control_panel": "Panel de Control Temporal",
+      "roadmap_title": "Hoja de Ruta del Programa",
+      "roadmap_subtitle": "Gestión y control de las fases académicas",
+      "institutional_notice_title": "Sistema de Control Temporal",
+      "institutional_notice_desc": "Las fases dictan las herramientas disponibles para los coordinadores. Activar una fase cambia el contexto de toda la plataforma para todos los centros educativos.",
+      "loading_roadmap": "Sincronizando hoja de ruta...",
+      "currently_active": "Actualmente Activa",
+      "inactive": "Inactiva",
+      "opening_date": "Fecha de Apertura",
+      "closing_date": "Fecha de Cierre",
+      "activate_phase": "Activar Fase",
+      "active": "Activa",
+      "processing": "Procesando...",
+      "activation_hint": "La activación anula el estado actual del programa",
+      "success_activate": "Fase activada correctamente.",
+      "error_activate": "Error al actualizar la fase.",
+      "success_date": "Fecha actualizada.",
+      "error_date": "Error al actualizar la fecha."
     },
     "Stats": {
       "title": "Estadísticas",
@@ -121,7 +138,9 @@
       "success_tetris": "Asignación completada: {count} nuevas asignaciones.",
       "error_tetris": "Error al ejecutar la asignación automática: ",
       "success_update": "Solicitud actualizada correctamente.",
-      "error_update": "Error al actualizar la solicitud."
+      "error_update": "Error al actualizar la solicitud.",
+      "students_label": "ALUMNOS",
+      "observations_placeholder": "Escribe aquí observaciones adicionales..."
     },
     "Verifications": {
       "title": "Verificación de Documents",
@@ -179,6 +198,30 @@
       },
       "bulk_selection": "{count} documentos seleccionados",
       "bulk_approve_btn": "APROBAR TODO"
+    },
+    "Closure": {
+      "title": "Cierre y Certificación",
+      "subtitle": "Finalización de talleres, bloqueo de datos y emisión de certificados oficiales.",
+      "search_placeholder": "Buscar por taller o centro...",
+      "assignments_name": "talleres",
+      "evaluations": "EVALUACIONES DOCENTES",
+      "action_close": "Cerrar y Certificar",
+      "action_stats": "Estadísticas",
+      "action_download": "Descargar Certificados",
+      "closed_status": "Taller Certificado",
+      "closure_success": "Taller cerrado y certificados emitidos correctamente.",
+      "closure_error": "Error al cerrar el taller. Revisa las evaluaciones pendientes.",
+      "modal_title": "Confirmar Cierre de Ciclo",
+      "stats_modal_title": "Monitorización de Calidad",
+      "evaluations_status": "Estado de Evaluaciones",
+      "certificates_to_be_issued": "Certificados a Emitir",
+      "missing_evaluations_warning": "Atención: Faltan {count} evaluaciones docentes. El cierre es posible, pero estos alumnos podrían no recibir el certificado correctamente.",
+      "effects_title": "EFECTOS DEL CIERRE",
+      "effect_lock_data": "Los datos de asistencia y evaluación quedarán bloqueados (solo lectura).",
+      "effect_generate_pdf": "Se generarán los archivos PDF oficiales para los alumnos aptos.",
+      "effect_finish_phase": "El taller pasará al estado FINALIZADO y se dará por cerrado el ciclo.",
+      "closing_process": "Procesando cierre...",
+      "confirm_closure": "CONFIRMAR CIERRE FINAL"
     }
   },
   "Center": {
@@ -501,7 +544,8 @@
   },
   "Metadata": {
     "title": "Iter Web",
-    "description": "Aplicación web de Iter para la gestión de aprendizaje."
+    "description": "Aplicación web de Iter para la gestión de aprendizaje.",
+    "logo_alt": "Logo de Iter"
   },
   "Profile": {
     "title": "Mi Perfil",
@@ -519,7 +563,12 @@
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema"
-    }
+    },
+    "platform_settings": "Ajustes de la plataforma",
+    "language": "Idioma",
+    "coming_soon": "Funcionalidad disponible próximamente",
+    "sync_success": "Token de sincronización generado correctamente",
+    "sync_error": "Error al generar el token de sincronización"
   },
   "Navigation": {
     "home": "Inicio",
@@ -567,6 +616,10 @@
         "verifications": {
           "title": "Verificación de Documentos",
           "description": "Valida la documentación presentada por los centros."
+        },
+        "closure": {
+          "title": "Cierre y Certificación",
+          "description": "Finaliza talleres y emite certificados oficiales."
         }
       }
     },
@@ -602,18 +655,6 @@
         "phase2": "Fase 2",
         "phase3": "Fase 3"
       }
-    },
-    "student": {
-      "title": "Bienvenido/a",
-      "subtitle": "Consulta tus talleres y descarga tus certificados.",
-      "certificates_title": "Mis Certificados",
-      "no_certificates": "No se han encontrado certificados.",
-      "no_certificates_desc": "Aún no has obtenido ningún certificado. Completa un taller para ganar uno.",
-      "download_pdf": "Descargar PDF",
-      "loading": "Cargando panel...",
-      "duration": "Duración",
-      "issued": "Emitido",
-      "pdf_not_implemented": "La generación de PDF no está implementada en esta demo."
     }
   },
   "Forms": {
@@ -920,6 +961,9 @@
     "apple_btn": "Añadir a Apple / Outlook",
     "copy_btn": "Copiar enlace iCal",
     "copy_success": "Enlace copiado al portapapeles",
+    "token_regenerated": "Token de sincronización regenerado",
+    "token_error": "Error al generar el token",
+    "obtaining_data": "Obteniendo datos de sincronización...",
     "instructions_title": "¿Cómo funciona?",
     "instructions_step1": "Haz clic en uno de los botones superiores para abrir tu aplicación de calendario.",
     "instructions_step2": "Si prefieres hacerlo manualmente, copia el enlace iCal y pégalo como 'Suscripción por URL' en tu aplicación.",
@@ -954,8 +998,8 @@
     "title": "Página no encontrada",
     "description": "Lo sentimos, pero la página que estás buscando no existe o ha sido movida.",
     "goHome": "Volver al inicio"
-  }
-  ,  "Common": {
+  },
+  "Common": {
     "general": "General",
     "configuration": "Configuración",
     "global": "Global",
@@ -969,6 +1013,7 @@
     "profile": "Perfil",
     "logout": "Cerrar Sesión",
     "educational_center": "Centro educativo",
+    "activities": "Actividades",
     "workshops": "Talleres",
     "centers": "Centros",
     "requests": "Solicitudes",
@@ -989,6 +1034,29 @@
     "search": "Buscar...",
     "actions": "Acciones",
     "ok": "Aceptar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "loading_error": "No se ha podido cargar la información",
+    "error_connectivity": "Error de conexión. Por favor, verifica si el servidor está activo.",
+    "delete_success": "Elemento eliminado correctamente.",
+    "delete_error": "Se ha producido un error al eliminar el elemento.",
+    "delete_confirm_title": "Confirmar eliminación",
+    "delete_confirm_msg": "¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer.",
+    "new": "Nuevo",
+    "system_default": "Predeterminado del Sistema",
+    "select_language": "Seleccionar Idioma",
+    "roles": {
+      "ADMIN": "Administrador",
+      "COORDINATOR": "Coordinador",
+      "TEACHER": "Profesor",
+      "STUDENT": "Alumno"
+    },
+    "badges": {
+      "workshop": "TALLER",
+      "pending": "PENDIENTE",
+      "completed": "COMPLETADO",
+      "need_eval": "NECESITA EVAL",
+      "will_certify": "CERTIFICARÁ",
+      "no_cert": "SIN CERT"
+    }
   }
 }

@@ -161,7 +161,8 @@ export default function AssignmentsPage() {
           <Loading />
         ) : (
           <div className="bg-background-surface border border-border-subtle overflow-hidden">
-            <table className="w-full text-left">
+            <div className="premium-table-container">
+              <table className="w-full text-left">
               <thead>
                 <tr className="bg-background-subtle border-b border-border-subtle">
                   <th className="px-10 py-6 text-[12px] font-medium text-text-primary">Assigned Workshop</th>
@@ -208,6 +209,7 @@ export default function AssignmentsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
 
             {filteredAssignments.length === 0 && (
               <div className="p-20 text-center">
