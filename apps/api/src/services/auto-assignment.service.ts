@@ -38,12 +38,13 @@ export class AutoAssignmentService {
         });
 
         if (requests.length === 0) {
-            console.log('ℹ️ AutoAssignmentService: No se han encontrado solicitudes aprobadas de Modalidad C que no estén asignadas todavía.');
+            console.log('ℹ️ AutoAssignmentService: No pending requests found.');
             return { message: 'No se encontraron solicitudes para procesar.' };
         }
 
         console.log(`🚀 AutoAssignmentService: Processing ${requests.length} requests...`);
-        console.log(`🚀 AutoAssignmentService: Procesando ${requests.length} solicitudes de Modalidad C...`);
+
+        const results = [];
 
         // 2. Group Requests by Workshop
         const workshopMap = new Map<number, typeof requests>();
@@ -54,30 +55,26 @@ export class AutoAssignmentService {
             workshopMap.get(r.workshopId)?.push(r);
         });
 
-        const results = [];
-
         // 3. Process each Workshop
         for (const [workshopId, workshopRequests] of workshopMap.entries()) {
             const workshop = await prisma.workshop.findUnique({ where: { workshopId: workshopId } });
             if (!workshop) continue;
 
-            // Calculate Capacity
-            const existingAssignments = await prisma.assignment.findMany({
-                where: { workshopId: workshopId },
-                include: { enrollments: true }
+            // REAL Capacity Calculation: Count actual enrollments for this workshop across ALL assignments
+            const totalEnrollments = await prisma.enrollment.count({
+                where: { assignment: { workshopId: workshopId } }
             });
 
-            const occupiedPlaces = existingAssignments.reduce((sum: number, a: any) => sum + (a.enrollments?.length || 0), 0);
-            const remainingCapacity = workshop.maxPlaces - occupiedPlaces;
+            const remainingCapacity = Math.max(0, workshop.maxPlaces - totalEnrollments);
 
-            console.log(`📊 AutoAssignment: Taller ID ${workshopId} (${workshop.title}): Capacidad: ${workshop.maxPlaces}, Ocupado: ${occupiedPlaces}, Restante: ${remainingCapacity}`);
+            console.log(`📊 AutoAssignment: Workshop "${workshop.title}" (ID ${workshopId}): Capacity: ${workshop.maxPlaces}, Occupied (Enrollments): ${totalEnrollments}, Remaining: ${remainingCapacity}`);
 
             if (remainingCapacity <= 0) {
-                console.warn(`🚫 AutoAssignment: El taller ${workshopId} está lleno. Omitiendo.`);
+                console.warn(`🚫 AutoAssignment: Workshop ${workshopId} is full. Skipping.`);
                 continue;
             }
 
-            // Group by Center
+            // Group by Center to handle overall demand per center
             const centerMap = new Map<number, PendingCenter>();
 
             workshopRequests.forEach((r) => {
@@ -103,24 +100,20 @@ export class AutoAssignmentService {
             });
 
             const centers = Array.from(centerMap.values());
-            const totalDemand = centers.reduce((sum: number, c) => sum + (c.demand || 0), 0);
+            const totalWorkshopDemand = centers.reduce((sum, c) => sum + (c.demand || 0), 0);
 
-            if (totalDemand <= remainingCapacity) {
+            // Fair Distribution Logic
+            if (totalWorkshopDemand <= remainingCapacity) {
                 centers.forEach((c) => c.assignedCount = c.demand || 0);
             } else {
-                const numCenters = centers.length;
-                const baseShare = Math.floor(remainingCapacity / numCenters);
-
+                // Distribute limited capacity fairly
                 let leftoverSpots = remainingCapacity;
-
-                centers.forEach((c) => {
-                    const allocation = Math.min(c.demand || 0, baseShare);
-                    c.assignedCount = allocation;
-                    leftoverSpots -= allocation;
-                });
-
+                const numCenters = centers.length;
+                
+                // Sort centers by priority (FIFO)
                 centers.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
+                // Greedy distribution with a minimum "fair share" if possible
                 let i = 0;
                 while (leftoverSpots > 0) {
                     const center = centers[i % numCenters];
@@ -129,13 +122,26 @@ export class AutoAssignmentService {
                         leftoverSpots--;
                     }
                     i++;
-                    if (i >= numCenters * 2 && leftoverSpots > 0) break;
+                    if (i >= numCenters * 10 && leftoverSpots > 0) break; // Safety break
                 }
             }
 
+            // 4. Create Assignments with Rational Splitting
             for (const center of centers) {
                 if (center.assignedCount > 0) {
-                    await this.persistAssignment(center, workshopId);
+                    let remainingToAssign = center.assignedCount;
+                    let groupNum = 1;
+                    const RATIONAL_LIMIT = 25; // Define "Rational" size as 25
+
+                    while (remainingToAssign > 0) {
+                        const currentGroupSize = Math.min(remainingToAssign, RATIONAL_LIMIT);
+                        
+                        // Pass currentGroupSize to help logic if needed, but primarily split assignments
+                        await this.persistAssignment(center, workshopId, groupNum);
+                        
+                        remainingToAssign -= currentGroupSize;
+                        groupNum++;
+                    }
                     results.push(center);
                 }
             }
@@ -144,11 +150,14 @@ export class AutoAssignmentService {
         return { processed: results.length };
     }
 
-    private async persistAssignment(center: PendingCenter, workshopId: number) {
-        await prisma.request.update({
-            where: { requestId: center.requestId },
-            data: { status: REQUEST_STATUSES.APPROVED as RequestStatus }
-        });
+    private async persistAssignment(center: PendingCenter, workshopId: number, groupNum: number = 1) {
+        // Only update request to APPROVED on the first group
+        if (groupNum === 1) {
+            await prisma.request.update({
+                where: { requestId: center.requestId },
+                data: { status: REQUEST_STATUSES.APPROVED as RequestStatus }
+            });
+        }
 
         // Get default startDate from Phase 3 if not provided
         const { phase } = await isPhaseActive(PHASES.EXECUTION);
@@ -156,9 +165,10 @@ export class AutoAssignmentService {
 
         const assignment = await prisma.assignment.create({
             data: {
-                requestId: center.requestId,
+                requestId: groupNum === 1 ? center.requestId : null, // Unique constraint: only first group linked to request ID
                 centerId: center.centerId,
                 workshopId: workshopId,
+                group: groupNum,
                 status: AssignmentStatus.PUBLISHED,
                 startDate: startDate,
                 checklist: {

@@ -200,7 +200,7 @@ export default function WorkshopAdminPage() {
               onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-4 h-4.5 w-4.5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
@@ -254,7 +254,7 @@ export default function WorkshopAdminPage() {
         <Loading message={t("loading_catalog")} />
       ) : filteredWorkshops.length > 0 ? (
         <div className="bg-background-surface border border-border-subtle overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="premium-table-container">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-background-subtle border-b border-border-subtle">
@@ -317,6 +317,7 @@ export default function WorkshopAdminPage() {
               </tbody>
             </table>
           </div>
+        </div>
 
           {/* Pagination */}
           <Pagination

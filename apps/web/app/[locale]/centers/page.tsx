@@ -207,7 +207,7 @@ export default function CentersScreen() {
         <Loading message={t('loading')} />
       ) : filteredCenters.length > 0 ? (
         <div className="bg-background-surface border border-border-subtle overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="premium-table-container">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-background-subtle border-b border-border-subtle">

@@ -2,8 +2,36 @@ import { PrismaClient, Modality } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { PHASES, ROLES } from '@iter/shared';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 
-dotenv.config();
+// --- ROBUST ENV LOADING ---
+const rootEnvPath = path.resolve(process.cwd(), '../../.env');
+const localEnvPath = path.resolve(process.cwd(), '.env');
+
+if (fs.existsSync(rootEnvPath)) {
+  dotenv.config({ path: rootEnvPath });
+} else {
+  dotenv.config({ path: localEnvPath });
+}
+
+// Manual variable expansion for DATABASE_URL (e.g., ${POSTGRES_USER})
+if (process.env.DATABASE_URL) {
+  let url = process.env.DATABASE_URL;
+  // Replace ${VAR} with process.env.VAR
+  url = url.replace(/\${(\w+)}/g, (_, v) => process.env[v] || '');
+  
+  // Local host detection: if "@db" is in URL and we are NOT in a container, use localhost
+  // Note: Simple check, if we can't find /proc/1/cgroup and it has @db, it's likely host
+  const isDocker = fs.existsSync('/.dockerenv');
+  if (!isDocker && url.includes('@db')) {
+    console.log('🔄  Detectado entorno local (Host), cambiando "db" por "localhost" en DATABASE_URL...');
+    url = url.replace('@db', '@localhost');
+  }
+  
+  process.env.DATABASE_URL = url;
+}
+// --------------------------
 
 const prisma = new PrismaClient();
 
@@ -278,75 +306,70 @@ async function main() {
   await seedWorkshops(infra.sectors);
   await seedPhases();
 
-  // Operative data for testing
-  console.log('🧪  Generando datos operativos (Alumnos, Inscripciones, Encuestas)...');
+  // Operative data for testing (CLEAN START)
+  console.log('🧪  Preparando entorno de descubrimiento (Alumnos y Solicitudes Pendientes)...');
   
-  const centerBrossa = await prisma.center.findUnique({ where: { centerCode: '08014231' } });
-  const workshop = await prisma.workshop.findFirst({ where: { title: 'Robótica e IoT' } });
+  const existingRequests = await prisma.request.count();
+  if (existingRequests > 0) {
+    console.log('⏭️  Database already has requests, skipping operative seeding to preserve your progress.');
+    return;
+  }
 
-  if (centerBrossa && workshop) {
-    // 1. Assignment Completed
-    const assignment = await prisma.assignment.create({
-      data: {
-        centerId: centerBrossa.centerId,
-        workshopId: workshop.workshopId,
-        status: 'COMPLETED',
-        startDate: new Date(),
-      }
-    });
+  const centers = await prisma.center.findMany();
+  const workshops = await prisma.workshop.findMany();
 
-    // 2. Students
-    const studentsData = [
-      { idalu: '1001', fullName: 'Marc', lastName: 'Pérez', email: 'alumne1@brossa.cat' },
-      { idalu: '1002', fullName: 'Júlia', lastName: 'Soler', email: 'alumne2@brossa.cat' },
-    ];
+  if (centers.length >= 2 && workshops.length >= 2) {
+    // 1. Create 20 students per center in the "pool"
+    const firstNames = ['Marc', 'Júlia', 'Pau', 'Laia', 'Pol', 'Emma', 'Arnau', 'Clara', 'Biel', 'Ona', 'Oriol', 'Abril', 'Nil', 'Martina', 'Jan', 'Aina', 'Hugo', 'Lucía', 'Leo', 'Noa'];
+    const lastNames = ['Pérez', 'Soler', 'García', 'Martínez', 'López', 'Sánchez', 'Rodríguez', 'Fernández', 'Vila', 'Serra'];
 
-    for (const s of studentsData) {
-      const student = await prisma.student.upsert({
-        where: { idalu: s.idalu },
-        update: { email: s.email },
-        create: {
-          idalu: s.idalu,
-          fullName: s.fullName,
-          lastName: s.lastName,
-          email: s.email,
-          originCenterId: centerBrossa.centerId,
-        }
-      });
-
-      const enrollment = await prisma.enrollment.create({
-        data: {
-          studentId: student.studentId,
-          assignmentId: assignment.assignmentId,
-        }
-      });
-
-      // 3. Fake Survey Feedback for coordinator charts
-      if (s.idalu === '1002') { // Seed one survey, leave one pending
-        await prisma.studentSelfConsultation.create({
-          data: {
-            enrollmentId: enrollment.enrollmentId,
-            experienceRating: 9,
-            teacherRating: 10,
-            vocationalImpact: 'SI',
-            keyLearnings: "M'ha encantat la part de muntatge del robot.",
-            learningInterest: 9,
-            supportRating: 8,
-            materialQuality: 10,
-            workshopClarity: 9
-          }
-        });
-
-        // Also issue a certificate so it's in the ZIP
-        await prisma.certificate.create({
-          data: {
-            studentId: student.studentId,
-            assignmentId: assignment.assignmentId,
-            issuedAt: new Date()
+    for (const [index, center] of centers.entries()) {
+      console.log(`   - Generando pool de alumnos para ${center.name}...`);
+      for (let i = 0; i < 20; i++) {
+        const fName = firstNames[i % firstNames.length];
+        const lName = lastNames[Math.floor(i / 2) % lastNames.length];
+        const studentId = `${1000 + (index * 20) + i}`;
+        
+        await prisma.student.upsert({
+          where: { idalu: studentId },
+          update: {},
+          create: {
+            idalu: studentId,
+            fullName: fName,
+            lastName: lName,
+            email: `${fName.toLowerCase()}${i}@${center.centerCode}.edu`,
+            originCenterId: center.centerId,
           }
         });
       }
     }
+
+    // 2. Create 2 Pending Requests (Phase 1 Start)
+    console.log('   - Creando solicitudes PENDING para iniciar Fase 1...');
+    
+    // Request from Brossa
+    await prisma.request.create({
+      data: {
+        centerId: centers[0].centerId,
+        workshopId: workshops[0].workshopId,
+        status: 'PENDING',
+        studentsAprox: 15,
+        modality: workshops[0].modality,
+        comments: "Queremos iniciar a los alumnos en la robótica aplicada.",
+      }
+    });
+
+    // Request from Pau Claris
+    await prisma.request.create({
+      data: {
+        centerId: centers[1].centerId,
+        workshopId: workshops[1].workshopId,
+        status: 'PENDING',
+        studentsAprox: 12,
+        modality: workshops[1].modality,
+        comments: "Interés en la producción audiovisual creativa.",
+      }
+    });
   }
 
   console.log('✅  Seeding completado con éxito.');

@@ -349,7 +349,8 @@ export default function AdminRequestsPage() {
                 </div>
 
                 <div className="bg-background-surface border border-border-subtle overflow-hidden mb-8">
-                  <table className="w-full text-left border-collapse">
+                  <div className="premium-table-container">
+                    <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-background-subtle/50 border-b border-border-subtle">
                         <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_center_date')}</th>
@@ -426,7 +427,8 @@ export default function AdminRequestsPage() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                    </table>
+                  </div>
                 </div>
               </section>
             );

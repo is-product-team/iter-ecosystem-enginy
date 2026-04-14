@@ -175,7 +175,7 @@ export default function TeachersCRUD() {
       ) : (
         <>
           <div className="bg-background-surface border border-border-subtle overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="premium-table-container">
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-background-subtle border-b border-border-subtle">
@@ -218,6 +218,7 @@ export default function TeachersCRUD() {
                 </tbody>
               </table>
             </div>
+          </div>
             {filteredTeachers.length === 0 && (
               <div className="p-20 text-center">
                 <p className="text-text-primary font-medium text-sm">{tc('no_results')}</p>

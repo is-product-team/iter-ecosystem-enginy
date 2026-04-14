@@ -599,7 +599,7 @@ export const validateCenterData = async (req: Request, res: Response) => {
 
 // POST: Send Notification of Incorrect Document
 export const sendDocumentNotification = async (req: Request, res: Response) => {
-  const { assignmentId } = req.params;
+  const { idAssignment: assignmentId } = req.params;
   const { documentName, comment, greeting } = req.body;
   const { role } = req.user!;
 
@@ -651,7 +651,7 @@ export const generateAutomaticAssignments = async (req: Request, res: Response) 
 
 // POST: Confirm CEB Registration (Center) and Generate Sessions
 export const confirmLegalRegistration = async (req: Request, res: Response) => {
-  const { assignmentId } = req.params;
+  const { idAssignment: assignmentId } = req.params;
   try {
     const result = await prisma.$transaction(async (tx) => {
       // 1. Mark enrollments as confirmed
@@ -720,13 +720,16 @@ export const confirmLegalRegistration = async (req: Request, res: Response) => {
  * PATCH: Validate a specific document of an enrollment
  */
 export const validateEnrollmentDocument = async (req: Request, res: Response) => {
-  const { enrollmentId } = req.params;
+  const { idEnrollment } = req.params;
   const { field, valid } = req.body;
   const { role } = req.user!;
 
-  if (role !== ROLES.ADMIN) {
-    return res.status(403).json({ error: 'Only admins can validate documents.' });
+  // Allow ADMIN or COORDINATOR (if it's their center)
+  if (role !== ROLES.ADMIN && role !== ROLES.COORDINATOR) {
+    return res.status(403).json({ error: 'Only admins or coordinators can validate documents.' });
   }
+
+  const enrollmentIdInt = parseInt(idEnrollment as string);
 
   const permittedFields = ['isPedagogicalAgreementValidated', 'isMobilityAuthorizationValidated', 'isImageRightsValidated'];
   if (!permittedFields.includes(field)) {
@@ -734,14 +737,25 @@ export const validateEnrollmentDocument = async (req: Request, res: Response) =>
   }
 
   try {
-    const enrollment = await prisma.enrollment.findUnique({ where: { enrollmentId: parseInt(enrollmentId as string) } });
+    const enrollment = await prisma.enrollment.findUnique({ 
+      where: { enrollmentId: enrollmentIdInt },
+      include: { assignment: true }
+    });
+
+    if (!enrollment) return res.status(404).json({ error: 'Enrollment not found.' });
+
+    // Extra security check for Coordinators
+    if (role === ROLES.COORDINATOR && Number(enrollment.assignment.centerId) !== Number(req.user?.centerId)) {
+        return res.status(403).json({ error: 'Access denied: You can only validate documents for your own center.' });
+    }
+
     const docsStatus = (enrollment?.docsStatus as any) || {};
 
     const updated = await prisma.enrollment.update({
-      where: { enrollmentId: parseInt(enrollmentId as string) },
+      where: { enrollmentId: enrollmentIdInt },
       data: {
         docsStatus: {
-          ...docsStatus,
+          ...(docsStatus as any),
           [field]: !!valid
         }
       }
@@ -840,6 +854,15 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
     const { student, assignment } = enrollment;
     const workshop = assignment.workshop;
 
+    // Security check: Only Admins or the Center's Coordinator can upload
+    const { role, centerId } = req.user!;
+    if (role !== ROLES.ADMIN && role !== ROLES.COORDINATOR) {
+        return res.status(403).json({ error: 'Access denied' });
+    }
+    if (role === ROLES.COORDINATOR && Number(assignment.centerId) !== Number(centerId)) {
+        return res.status(403).json({ error: 'Access denied: You can only upload documents for your own center.' });
+    }
+
     const fileExt = path.extname(req.file.originalname);
 
     // Generate descriptive name
@@ -898,7 +921,7 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
       where: { enrollmentId: parseInt(enrollmentId as string) },
       data: {
         docsStatus: {
-          ...docsStatus,
+          ...(docsStatus as any),
           [updateField]: url,
           [`${documentType}Present`]: true,
           [`${documentType}Validated`]: aiResult.valid,
@@ -1130,7 +1153,7 @@ export const addTeachingStaff = async (req: Request, res: Response) => {
 };
 
 export const removeTeachingStaff = async (req: Request, res: Response) => {
-  const { idAssignment: assignmentId, userId } = req.params;
+  const { idAssignment: assignmentId, idUser: userId } = req.params;
 
   try {
     await prisma.assignmentTeacher.delete({
@@ -1174,7 +1197,7 @@ export const addSessionTeacher = async (req: Request, res: Response) => {
 };
 
 export const removeSessionTeacher = async (req: Request, res: Response) => {
-  const { idSession: sessionId, userId } = req.params;
+  const { idSession: sessionId, idUser: userId } = req.params;
 
   try {
     await prisma.sessionTeacher.delete({

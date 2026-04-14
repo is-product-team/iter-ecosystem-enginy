@@ -226,9 +226,9 @@ export default function RequestsPage() {
             </div>
           </div>
 
-          {/* Workshop Table */}
           <div className="bg-background-surface border border-border-subtle overflow-hidden">
-            <table className="w-full text-left">
+            <div className="premium-table-container">
+              <table className="w-full text-left">
               <thead>
                 <tr className="bg-background-subtle border-b border-border-subtle uppercase tracking-wider">
                   <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary w-16 text-center">{t('table_mod')}</th>
@@ -352,6 +352,7 @@ export default function RequestsPage() {
               </tbody>
             </table>
           </div>
+        </div>
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

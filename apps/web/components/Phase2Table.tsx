@@ -23,7 +23,7 @@ export default function Phase2Table({
 
   return (
     <div className="bg-background-surface border border-border-subtle overflow-hidden">
-      <div className="overflow-x-auto">
+      <div className="premium-table-container">
         <table className="w-full text-left">
           <thead>
             <tr className="bg-background-subtle border-b border-border-subtle">
