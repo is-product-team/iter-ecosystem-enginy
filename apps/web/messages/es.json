@@ -80,7 +80,24 @@
     "Phases": {
       "title": "Fases del Curso",
       "description": "Configura las fechas y el estado de las fases del curso.",
-      "control_panel": "Panel de Control Temporal"
+      "control_panel": "Panel de Control Temporal",
+      "roadmap_title": "Hoja de Ruta del Programa",
+      "roadmap_subtitle": "Gestión y control de las fases académicas",
+      "institutional_notice_title": "Sistema de Control Temporal",
+      "institutional_notice_desc": "Las fases dictan las herramientas disponibles para los coordinadores. Activar una fase cambia el contexto de toda la plataforma para todos los centros educativos.",
+      "loading_roadmap": "Sincronizando hoja de ruta...",
+      "currently_active": "Actualmente Activa",
+      "inactive": "Inactiva",
+      "opening_date": "Fecha de Apertura",
+      "closing_date": "Fecha de Cierre",
+      "activate_phase": "Activar Fase",
+      "active": "Activa",
+      "processing": "Procesando...",
+      "activation_hint": "La activación anula el estado actual del programa",
+      "success_activate": "Fase activada correctamente.",
+      "error_activate": "Error al actualizar la fase.",
+      "success_date": "Fecha actualizada.",
+      "error_date": "Error al actualizar la fecha."
     },
     "Stats": {
       "title": "Estadísticas",
@@ -121,7 +138,9 @@
       "success_tetris": "Asignación completada: {count} nuevas asignaciones.",
       "error_tetris": "Error al ejecutar la asignación automática: ",
       "success_update": "Solicitud actualizada correctamente.",
-      "error_update": "Error al actualizar la solicitud."
+      "error_update": "Error al actualizar la solicitud.",
+      "students_label": "ALUMNOS",
+      "observations_placeholder": "Escribe aquí observaciones adicionales..."
     },
     "Verifications": {
       "title": "Verificación de Documents",
@@ -525,7 +544,8 @@
   },
   "Metadata": {
     "title": "Iter Web",
-    "description": "Aplicación web de Iter para la gestión de aprendizaje."
+    "description": "Aplicación web de Iter para la gestión de aprendizaje.",
+    "logo_alt": "Logo de Iter"
   },
   "Profile": {
     "title": "Mi Perfil",
@@ -543,7 +563,12 @@
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema"
-    }
+    },
+    "platform_settings": "Ajustes de la plataforma",
+    "language": "Idioma",
+    "coming_soon": "Funcionalidad disponible próximamente",
+    "sync_success": "Token de sincronización generado correctamente",
+    "sync_error": "Error al generar el token de sincronización"
   },
   "Navigation": {
     "home": "Inicio",
@@ -936,6 +961,9 @@
     "apple_btn": "Añadir a Apple / Outlook",
     "copy_btn": "Copiar enlace iCal",
     "copy_success": "Enlace copiado al portapapeles",
+    "token_regenerated": "Token de sincronización regenerado",
+    "token_error": "Error al generar el token",
+    "obtaining_data": "Obteniendo datos de sincronización...",
     "instructions_title": "¿Cómo funciona?",
     "instructions_step1": "Haz clic en uno de los botones superiores para abrir tu aplicación de calendario.",
     "instructions_step2": "Si prefieres hacerlo manualmente, copia el enlace iCal y pégalo como 'Suscripción por URL' en tu aplicación.",
@@ -985,6 +1013,7 @@
     "profile": "Perfil",
     "logout": "Cerrar Sesión",
     "educational_center": "Centro educativo",
+    "activities": "Actividades",
     "workshops": "Talleres",
     "centers": "Centros",
     "requests": "Solicitudes",
@@ -1005,37 +1034,29 @@
     "search": "Buscar...",
     "actions": "Acciones",
     "ok": "Aceptar",
-    "cancel": "Cancelar"
-  },
-  "PublicSurvey": {
-    "title": "Iter Ecosystem",
-    "subtitle": "Autoevaluación del taller",
-    "email_label": "Correo electrónico (xtec)",
-    "email_placeholder": "ejemplo@xtec.cat",
-    "verify_button": "Comenzar encuesta",
-    "verifying": "Verificando...",
-    "success_title": "¡Encuesta finalizada!",
-    "success_message": "Muchas gracias por tu tiempo. Tus respuestas nos ayudan a mejorar el Programa Enginy.",
-    "subtitle_with_name": "¿Cómo ha ido el taller, {name}?",
-    "error_no_survey": "No hemos encontrado ninguna encuesta pendiente para ti.",
-    "submit_success": "¡Encuesta enviada correctamente!",
-    "submit_error": "Error al enviar la encuesta.",
-    "section_quality": "Calidad y Contenido",
-    "section_experience": "Valoración de Experiencia",
-    "section_vocational": "Impacto Vocacional",
-    "label_interest": "¿Te ha parecido interesante el tema tratado?",
-    "label_clarity": "¿La explicación de las actividades ha sido clara y entendible?",
-    "label_material": "¿Los materiales y herramientas eran adecuados y de buena calidad?",
-    "label_support": "¿Te has sentido ayudado/a y acompañado/a por el docente?",
-    "label_overall": "¿Cómo valorarías tu experiencia global hoy?",
-    "label_teacher": "¿Cómo valorarías al/la docente que ha impartido el taller?",
-    "label_future": "¿Te ha ayudado a decidir tu futuro profesional?",
-    "label_comments": "Cuéntanos brevemente lo que más te ha gustado (o mejorarías):",
-    "opt_future_yes": "Sí, me ha aclarado las ideas.",
-    "opt_future_no": "No, ya lo tenía claro o no es para mí.",
-    "opt_future_maybe": "Me lo estoy considerando ahora de nuevo.",
-    "footer_note": "Feedback anónimo para el centro. ¡Sé sincero!",
-    "submit_button": "Enviar encuesta",
-    "submitting": "Enviando..."
+    "cancel": "Cancelar",
+    "loading_error": "No se ha podido cargar la información",
+    "error_connectivity": "Error de conexión. Por favor, verifica si el servidor está activo.",
+    "delete_success": "Elemento eliminado correctamente.",
+    "delete_error": "Se ha producido un error al eliminar el elemento.",
+    "delete_confirm_title": "Confirmar eliminación",
+    "delete_confirm_msg": "¿Estás seguro de que quieres eliminar este elemento? Esta acción no se puede deshacer.",
+    "new": "Nuevo",
+    "system_default": "Predeterminado del Sistema",
+    "select_language": "Seleccionar Idioma",
+    "roles": {
+      "ADMIN": "Administrador",
+      "COORDINATOR": "Coordinador",
+      "TEACHER": "Profesor",
+      "STUDENT": "Alumno"
+    },
+    "badges": {
+      "workshop": "TALLER",
+      "pending": "PENDIENTE",
+      "completed": "COMPLETADO",
+      "need_eval": "NECESITA EVAL",
+      "will_certify": "CERTIFICARÁ",
+      "no_cert": "SIN CERT"
+    }
   }
 }

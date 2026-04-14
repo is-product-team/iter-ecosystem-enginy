@@ -43,7 +43,7 @@ export default function DocumentVerificationPage() {
   const locale = params?.locale || 'ca';
 
   // Flat list transformation
-  const flatEnrollments = assignments.flatMap(assig => 
+  const flatEnrollments = assignments.flatMap(assig =>
     (assig.enrollments || []).map(ins => ({
       ...ins,
       workshopTitle: assig.workshop?.title,
@@ -57,11 +57,11 @@ export default function DocumentVerificationPage() {
 
   // Filtered list
   const filteredEnrollments = flatEnrollments.filter(row => {
-    const matchesSearch = row.student?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          row.centerName?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch = row.student?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.centerName?.toLowerCase().includes(searchTerm.toLowerCase());
+
     if (statusFilter === 'all') return matchesSearch;
-    
+
     const docs = [
       { url: row.pedagogicalAgreementUrl, valid: row.isPedagogicalAgreementValidated },
       { url: row.mobilityAuthorizationUrl, valid: row.isMobilityAuthorizationValidated },
@@ -78,7 +78,7 @@ export default function DocumentVerificationPage() {
   });
 
   useEffect(() => {
-    if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
+    if (!authLoading && (!user || user.role.name !== ROLES.ADMIN)) {
       router.push(`/${locale}/login`);
       return;
     }
@@ -156,7 +156,7 @@ export default function DocumentVerificationPage() {
 
     setSelectedDocs(prev => {
       const isRowSelected = rowDocs.every(rd => prev.find(p => p.enrollmentId === rd.enrollmentId && p.field === rd.field));
-      
+
       if (isRowSelected) {
         // Unselect only those from this row
         return prev.filter(p => p.enrollmentId !== row.enrollmentId);
@@ -187,7 +187,7 @@ export default function DocumentVerificationPage() {
 
   const handleBulkApprove = async () => {
     if (selectedDocs.length === 0) return;
-    
+
     setLoading(true);
     try {
       // Execute in small batches to avoid timeout
@@ -196,11 +196,11 @@ export default function DocumentVerificationPage() {
         const batch = selectedDocs.slice(i, i + batchSize);
         await Promise.all(batch.map(doc => assignmentService.validateDocument(doc.enrollmentId, doc.field, true)));
       }
-      toast.success(t('success_bulk_approve', { count: selectedDocs.length }) || `Aprobados ${selectedDocs.length} documentos`);
+      toast.success(t('success_bulk_approve', { count: selectedDocs.length }));
       setSelectedDocs([]);
       loadData();
     } catch (error) {
-      toast.error(t('error_bulk_approve') || 'Error en la aprobación masiva');
+      toast.error(t('error_bulk_approve') || 'Error');
     } finally {
       setLoading(false);
     }
@@ -208,8 +208,8 @@ export default function DocumentVerificationPage() {
 
   const totalPages = Math.ceil(filteredEnrollments.length / itemsPerPage);
   const paginatedEnrollments = filteredEnrollments.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   if (authLoading || !user) {
@@ -224,8 +224,8 @@ export default function DocumentVerificationPage() {
         {/* Filter Bar */}
         <div className="flex flex-col md:flex-row gap-6 bg-background-surface border border-border-subtle p-6">
           <div className="flex-1 relative">
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder={tc('search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -235,7 +235,7 @@ export default function DocumentVerificationPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <select 
+          <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-6 py-3 bg-background-subtle border border-border-subtle font-medium text-[13px] outline-none min-w-[220px] cursor-pointer"
@@ -245,7 +245,7 @@ export default function DocumentVerificationPage() {
             <option value="validated">{t('fully_validated') || 'Tots Validats'}</option>
           </select>
           {selectedDocs.length > 0 && (
-            <button 
+            <button
               onClick={handleBulkApprove}
               disabled={loading}
               className="px-8 py-3 bg-green-600 text-white font-bold text-[13px] hover:bg-black transition-all flex items-center gap-2"
@@ -266,8 +266,8 @@ export default function DocumentVerificationPage() {
                 <tr className="bg-background-subtle border-b border-border-subtle">
                   <th className="px-6 py-4 w-[60px]">
                     <div className="flex items-center justify-center">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={selectedDocs.length > 0 && selectedDocs.length === paginatedEnrollments.flatMap(r => {
                           const fields = ['isPedagogicalAgreementValidated', 'isMobilityAuthorizationValidated', 'isImageRightsValidated'] as const;
                           return fields.filter(f => {
@@ -297,16 +297,16 @@ export default function DocumentVerificationPage() {
                   paginatedEnrollments.map((row) => {
                     const hasPending = [row.isPedagogicalAgreementValidated, row.isMobilityAuthorizationValidated, row.isImageRightsValidated].some(v => v === false);
                     const allDocsPresent = [row.pedagogicalAgreementUrl, row.mobilityAuthorizationUrl, row.imageRightsUrl].every(u => !!u);
-                    
+
                     return (
-                      <tr 
-                        key={row.enrollmentId} 
+                      <tr
+                        key={row.enrollmentId}
                         className={`group hover:bg-background-subtle/30 transition-colors ${selectedRow?.enrollmentId === row.enrollmentId ? 'bg-consorci-darkBlue/5' : ''}`}
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center">
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               checked={selectedDocs.some(d => d.enrollmentId === row.enrollmentId)}
                               onChange={() => toggleRowSelection(row)}
                               className="w-4 h-4 border-border-subtle accent-consorci-darkBlue cursor-pointer"
@@ -328,16 +328,15 @@ export default function DocumentVerificationPage() {
                               { label: 'M', url: row.mobilityAuthorizationUrl, valid: row.isMobilityAuthorizationValidated },
                               { label: 'R', url: row.imageRightsUrl, valid: row.isImageRightsValidated }
                             ].map((doc, idx) => (
-                              <div 
+                              <div
                                 key={idx}
                                 title={doc.url ? (doc.valid ? 'Validat' : 'Pendent') : 'No pujat'}
-                                className={`w-8 h-8 flex items-center justify-center text-[11px] font-bold border ${
-                                  doc.url 
-                                    ? doc.valid 
-                                      ? 'bg-green-50 border-green-200 text-green-700' 
+                                className={`w-8 h-8 flex items-center justify-center text-[11px] font-bold border ${doc.url
+                                    ? doc.valid
+                                      ? 'bg-green-50 border-green-200 text-green-700'
                                       : 'bg-amber-50 border-amber-200 text-amber-700 animate-pulse'
                                     : 'bg-background-subtle border-border-subtle text-text-muted opacity-40'
-                                }`}
+                                  }`}
                               >
                                 {doc.label}
                               </div>
@@ -366,7 +365,7 @@ export default function DocumentVerificationPage() {
             </table>
           </div>
         </div>
-        
+
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
@@ -382,7 +381,7 @@ export default function DocumentVerificationPage() {
         <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setSelectedRow(null)} />
-          
+
           {/* Drawer Content */}
           <div className="relative w-full max-w-2xl bg-background-surface border-l border-border-subtle flex flex-col animate-in slide-in-from-right duration-300">
             <div className="p-8 border-b border-border-subtle bg-background-subtle flex justify-between items-center">
@@ -410,17 +409,17 @@ export default function DocumentVerificationPage() {
                     <div className="flex gap-3">
                       {doc.url && (
                         <>
-                          <button 
+                          <button
                             onClick={() => handleValidateDocument(selectedRow.enrollmentId, doc.field, !doc.valid)}
-                            className={`px-6 py-2 text-[11px] font-bold transition-all ${
-                              doc.valid 
-                                ? 'bg-red-50 text-red-600 border border-red-500/20 hover:bg-black hover:text-white' 
+                            className={`px-6 py-2 text-[11px] font-bold transition-all ${doc.valid
+                                ? 'bg-red-50 text-red-600 border border-red-500/20 hover:bg-black hover:text-white'
                                 : 'bg-green-600 text-white hover:bg-black'
-                            }`}
+                              }`}
                           >
                             {doc.valid ? t('btn_unvalidate') : t('btn_validate')}
+                            {doc.valid ? t('btn_unvalidate') : t('btn_validate')}
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleOpenNotification(selectedRow, doc.id)}
                             className="px-4 py-2 border border-border-subtle text-text-muted text-[11px] font-bold hover:bg-background-subtle"
                           >
@@ -433,13 +432,13 @@ export default function DocumentVerificationPage() {
 
                   {doc.url ? (
                     <div className="aspect-[1.41] w-full bg-background-subtle border border-border-subtle overflow-hidden relative group">
-                      <iframe 
+                      <iframe
                         src={`${process.env.NEXT_PUBLIC_API_URL}${doc.url}#toolbar=0`}
                         className="w-full h-full"
                         title={doc.name}
                       />
                       <div className="absolute inset-0 bg-black/5 pointer-events-none" />
-                      <a 
+                      <a
                         href={`${process.env.NEXT_PUBLIC_API_URL}${doc.url}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -548,9 +547,8 @@ export default function DocumentVerificationPage() {
                 <button
                   onClick={sendNotification}
                   disabled={sendingNotif || notificationData.documentName === 'select' || !notificationData.comment}
-                  className={`flex-[2] py-4 font-bold text-[13px] flex items-center justify-center gap-3 transition-all ${
-                    sendingNotif || notificationData.documentName === 'select' || !notificationData.comment ? 'bg-background-subtle text-text-muted' : 'bg-consorci-darkBlue text-white hover:bg-black'
-                  }`}
+                  className={`flex-[2] py-4 font-bold text-[13px] flex items-center justify-center gap-3 transition-all ${sendingNotif || notificationData.documentName === 'select' || !notificationData.comment ? 'bg-background-subtle text-text-muted' : 'bg-consorci-darkBlue text-white hover:bg-black'
+                    }`}
                 >
                   {sendingNotif ? <Loading size="mini" white /> : t('send_notification')}
                 </button>

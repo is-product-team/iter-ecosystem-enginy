@@ -162,7 +162,7 @@ export default function WorkshopAdminPage() {
     });
   };
 
-  if (authLoading || !user || user.role.name !== 'ADMIN') {
+  if (authLoading || !user || user.role.name !== ROLES.ADMIN) {
     return <Loading fullScreen message={tc("authenticating")} />;
   }
 

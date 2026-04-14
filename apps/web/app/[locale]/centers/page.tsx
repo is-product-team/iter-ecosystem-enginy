@@ -126,7 +126,7 @@ export default function CentersScreen() {
   };
 
   if (authLoading || !user || user.role.name !== ROLES.ADMIN) {
-    return <Loading fullScreen message="Verifying administrator permissions..." />;
+    return <Loading fullScreen message={tCommon('authenticating')} />;
   }
 
   const headerActions = (
@@ -155,11 +155,11 @@ export default function CentersScreen() {
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-background-surface border border-border-subtle p-8">
         {/* Cercador */}
         <div className="flex-1">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">Search by name or code</label>
+          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_label')}</label>
           <div className="relative">
             <input
               type="text"
-              placeholder="Ej: Institut Pedralbes, 08012345..."
+              placeholder={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -182,7 +182,7 @@ export default function CentersScreen() {
             }}
             className="w-full lg:w-auto px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-all border border-transparent h-[46px]"
           >
-            Clear filters
+            {tCommon('clear_filters')}
           </button>
         </div>
       </div>
@@ -211,11 +211,11 @@ export default function CentersScreen() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Center</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Address</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Email</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">Phone</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">Actions</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_center')}</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_address')}</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_email')}</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_phone')}</th>
+                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{tCommon('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle">
@@ -230,12 +230,12 @@ export default function CentersScreen() {
                         </div>
                         <div>
                           <div className="text-sm font-medium text-text-primary tracking-tight">{center.name}</div>
-                          <div className="text-[10px] font-medium text-text-muted mt-0.5">Code: {center.centerCode}</div>
+                          <div className="text-[10px] font-medium text-text-muted mt-0.5">{t('center_code')}: {center.centerCode}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5 text-[11px] font-medium text-text-primary">
-                      {center.address || "No address"}
+                      {center.address || t('no_address')}
                     </td>
                     <td className="px-6 py-5 text-[11px] font-medium text-text-primary">
                       {center.contactEmail || "N/A"}
@@ -274,7 +274,7 @@ export default function CentersScreen() {
             onPageChange={setCurrentPage}
             totalItems={filteredCenters.length}
             currentItemsCount={paginatedCenters.length}
-            itemName="centers"
+            itemName={tCommon('centers').toLowerCase()}
           />
         </div>
       ) : (
@@ -284,8 +284,8 @@ export default function CentersScreen() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <p className="text-text-primary font-medium text-sm">No centers found</p>
-          <p className="text-text-muted text-[12px] font-medium mt-2">Try other search terms.</p>
+          <p className="text-text-primary font-medium text-sm">{t('empty')}</p>
+          <p className="text-text-muted text-[12px] font-medium mt-2">{t('empty_desc')}</p>
         </div>
       )}
 

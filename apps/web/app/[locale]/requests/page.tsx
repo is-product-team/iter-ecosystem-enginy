@@ -473,14 +473,14 @@ export default function AdminRequestsPage() {
                     value={editFormData.studentsAprox || ''}
                     onChange={(e) => setEditFormData({ ...editFormData, studentsAprox: e.target.value === '' ? 0 : parseInt(e.target.value) })}
                   />
-                  <div className="absolute right-4 top-3.5 text-xs font-bold text-text-muted pointer-events-none">ALUMNOS</div>
+                  <div className="absolute right-4 top-3.5 text-xs font-bold text-text-muted pointer-events-none">{t('students_label')}</div>
                 </div>
               </div>
               <div className="space-y-2.5">
                 <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{t('comments')}</label>
                 <textarea
                   className="w-full bg-background-subtle border border-border-subtle px-4 py-3.5 text-sm text-text-primary font-medium focus:border-consorci-lightBlue outline-none h-40 resize-none transition-all"
-                  placeholder="Escribe aquí observaciones adicionales..."
+                  placeholder={t('observations_placeholder')}
                   value={editFormData.comments}
                   onChange={(e) => setEditFormData({ ...editFormData, comments: e.target.value })}
                 />
