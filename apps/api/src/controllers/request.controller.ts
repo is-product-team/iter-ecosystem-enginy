@@ -46,7 +46,9 @@ export const getRequests = async (req: Request, res: Response) => {
         take,
         include: {
           center: true,
-          workshop: true
+          workshop: true,
+          teacher1: true,
+          teacher2: true
         },
         orderBy: {
           createdAt: 'desc'
@@ -82,8 +84,8 @@ export const createRequest = async (req: Request, res: Response) => {
   } = req.body;
   const { centerId } = req.user!;
 
-  if (!workshopId || !centerId || !prof1Id || !prof2Id) {
-    return res.status(400).json({ error: 'Missing mandatory fields (workshopId, centerId, prof1Id, prof2Id)' });
+  if (!workshopId || !centerId || !prof1Id) {
+    return res.status(400).json({ error: 'Missing mandatory fields (workshopId, centerId, prof1Id)' });
   }
 
   // --- PHASE VERIFICATION ---
@@ -101,7 +103,7 @@ export const createRequest = async (req: Request, res: Response) => {
   }
 
   // --- TEACHER VALIDATION ---
-  const teacherCheck = await RequestService.verifyTeachersExist(parseInt(prof1Id), parseInt(prof2Id));
+  const teacherCheck = await RequestService.verifyTeachersExist(parseInt(prof1Id), prof2Id ? parseInt(prof2Id) : undefined);
   if (!teacherCheck.valid) {
     return res.status(400).json({ error: teacherCheck.error });
   }
@@ -135,7 +137,7 @@ export const createRequest = async (req: Request, res: Response) => {
         status: REQUEST_STATUSES.PENDING as RequestStatus,
         modality: modality as Modality,
         prof1Id: parseInt(prof1Id),
-        prof2Id: parseInt(prof2Id),
+        prof2Id: prof2Id ? parseInt(prof2Id) : null,
       },
       include: {
         workshop: true
@@ -217,8 +219,8 @@ export const updateRequest = async (req: Request, res: Response) => {
       data: {
         studentsAprox: studentsAprox ? parseInt(studentsAprox) : undefined,
         comments,
-        prof1Id: parseInt(prof1Id),
-        prof2Id: parseInt(prof2Id),
+        prof1Id: prof1Id ? parseInt(prof1Id) : undefined,
+        prof2Id: prof2Id ? parseInt(prof2Id) : null,
         modality: modality as Modality,
       },
       include: {

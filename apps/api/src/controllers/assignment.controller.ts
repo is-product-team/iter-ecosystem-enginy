@@ -522,7 +522,7 @@ export const designateTeachers = async (req: Request, res: Response) => {
   try {
     // 1. Validate that teachers are different
     if (teacher1Id && teacher2Id && teacher1Id === teacher2Id) {
-      return res.status(400).json({ error: 'You must designate two different teachers.' });
+      return res.status(400).json({ error: 'You must designate two different teachers if providing more than one.' });
     }
 
     const oldAssignment = await prisma.assignment.findUnique({ where: { assignmentId: parseInt(assignmentId as string) } });
@@ -553,8 +553,8 @@ export const designateTeachers = async (req: Request, res: Response) => {
         stepName: CHECKLIST_STEPS.DESIGNATE_TEACHERS
       },
       data: {
-        isCompleted: !!(teacher1Id && teacher2Id),
-        completedAt: (teacher1Id && teacher2Id) ? new Date() : null
+        isCompleted: !!teacher1Id,
+        completedAt: teacher1Id ? new Date() : null
       }
     });
 

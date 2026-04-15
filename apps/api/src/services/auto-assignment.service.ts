@@ -118,17 +118,27 @@ export class AutoAssignmentService {
                 let allocatedTotal = 0;
                 centers.forEach((center, index) => {
                     const share = weights[index] / totalWeight;
-                    center.assignedCount = Math.floor(share * remainingCapacity);
+                    const distributedShare = Math.floor(share * remainingCapacity);
+                    // CAP BY DEMAND: Never give more than requested
+                    center.assignedCount = Math.min(center.demand || 0, distributedShare);
                     allocatedTotal += center.assignedCount;
                 });
 
                 // Distribute rounding remainder one by one starting from the first center (FIFO)
+                // BUT only if they haven't reached their demand yet
                 let remainder = remainingCapacity - allocatedTotal;
-                let i = 0;
-                while (remainder > 0 && numCenters > 0) {
-                    centers[i % numCenters].assignedCount++;
-                    remainder--;
-                    i++;
+                if (remainder > 0) {
+                    let assignedAny = true;
+                    while (remainder > 0 && assignedAny) {
+                        assignedAny = false;
+                        for (const center of centers) {
+                            if (remainder > 0 && center.assignedCount < (center.demand || 0)) {
+                                center.assignedCount++;
+                                remainder--;
+                                assignedAny = true;
+                            }
+                        }
+                    }
                 }
                 
                 console.log(`⚖️ AutoAssignment: Distributed ${remainingCapacity} spots among ${numCenters} centers.`);

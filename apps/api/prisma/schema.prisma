@@ -94,6 +94,8 @@ model User {
   teachers        Teacher[]
   student         Student?
   logs            AuditLog[]
+  requests1       Request[]           @relation("RequestTeacher1")
+  requests2       Request[]           @relation("RequestTeacher2")
 
   @@map("usuaris")
 }
@@ -129,6 +131,8 @@ model Request {
   // Requested teachers (optional)
   prof1Id Int? @map("prof1_id")
   prof2Id Int? @map("prof2_id")
+  teacher1 User? @relation("RequestTeacher1", fields: [prof1Id], references: [userId])
+  teacher2 User? @relation("RequestTeacher2", fields: [prof2Id], references: [userId])
 
   assignment Assignment?
 
