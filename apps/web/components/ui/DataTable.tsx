@@ -29,6 +29,22 @@ interface DataTableProps<T> {
   onRowClick?: (item: T) => void;
 }
 
+const TableSkeleton = ({ columns, rows = 5 }: { columns: Column<any>[], rows?: number }) => {
+  return (
+    <>
+      {[...Array(rows)].map((_, rowIndex) => (
+        <tr key={rowIndex} className="border-b border-border-subtle last:border-0 animate-pulse">
+          {columns.map((column, colIndex) => (
+            <td key={colIndex} className="px-8 py-6">
+              <div className={`h-4 bg-background-subtle rounded-sm w-full opacity-60`}></div>
+            </td>
+          ))}
+        </tr>
+      ))}
+    </>
+  );
+};
+
 export default function DataTable<T>({
   data,
   columns,
@@ -45,7 +61,7 @@ export default function DataTable<T>({
   };
 
   return (
-    <div className="bg-background-surface border border-border-subtle overflow-hidden">
+    <div className="bg-background-surface border border-border-subtle border-t-2 border-t-consorci-darkBlue overflow-hidden transition-all duration-300">
       <div className="premium-table-container">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -53,7 +69,7 @@ export default function DataTable<T>({
               {columns.map((column, index) => (
                 <th
                   key={index}
-                  className={`px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest ${
+                  className={`px-8 py-5 text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] ${
                     alignClasses[column.align || 'left']
                   } ${column.headerClassName || ''}`}
                 >
@@ -64,20 +80,21 @@ export default function DataTable<T>({
           </thead>
           <tbody className="divide-y divide-border-subtle">
             {loading ? (
-              <tr>
-                <td colSpan={columns.length} className="px-8 py-12">
-                  <Loading size="md" />
-                </td>
-              </tr>
+              <TableSkeleton columns={columns} />
             ) : data.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-8 py-20 text-center"
+                  className="px-8 py-32 text-center"
                 >
-                  <p className="text-text-muted text-xs font-black uppercase tracking-widest">
-                    {emptyMessage}
-                  </p>
+                  <div className="flex flex-col items-center justify-center opacity-40">
+                    <svg className="w-12 h-12 mb-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                    </svg>
+                    <p className="text-text-muted text-[10px] font-bold uppercase tracking-[0.2em]">
+                      {emptyMessage}
+                    </p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -87,14 +104,14 @@ export default function DataTable<T>({
                   <tr
                     key={rowIndex}
                     onClick={() => onRowClick?.(item)}
-                    className={`hover:bg-background-subtle/30 transition-colors group ${
+                    className={`border-l-2 border-l-transparent hover:border-l-consorci-darkBlue hover:bg-background-subtle/30 even:bg-background-subtle/10 transition-all duration-300 group ${
                       onRowClick ? 'cursor-pointer' : ''
                     } ${customRowClass}`}
                   >
                     {columns.map((column, colIndex) => (
                       <td
                         key={colIndex}
-                        className={`px-8 py-6 ${
+                        className={`px-8 py-6 text-[13px] font-medium text-text-primary ${
                           alignClasses[column.align || 'left']
                         } ${column.cellClassName || ''}`}
                       >
