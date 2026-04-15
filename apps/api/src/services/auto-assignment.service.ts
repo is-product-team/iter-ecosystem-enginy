@@ -79,7 +79,6 @@ export class AutoAssignmentService {
 
             workshopRequests.forEach((r) => {
                 const demand = r.studentsAprox || 0;
-                if (demand === 0) return;
 
                 if (!centerMap.has(r.centerId)) {
                     centerMap.set(r.centerId, {
@@ -100,30 +99,39 @@ export class AutoAssignmentService {
             });
 
             const centers = Array.from(centerMap.values());
-            const totalWorkshopDemand = centers.reduce((sum, c) => sum + (c.demand || 0), 0);
 
-            // Fair Distribution Logic
-            if (totalWorkshopDemand <= remainingCapacity) {
-                centers.forEach((c) => c.assignedCount = c.demand || 0);
-            } else {
-                // Distribute limited capacity fairly
+            // NEW Logic: Maximize workshop capacity usage (filling the workshop)
+            // Divide the total remaining capacity among all centers that have at least one request.
+            if (centers.length > 0) {
                 let leftoverSpots = remainingCapacity;
                 const numCenters = centers.length;
                 
                 // Sort centers by priority (FIFO)
                 centers.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-                // Greedy distribution with a minimum "fair share" if possible
+                // Weighted Priority Algorithm (FIFO):
+                // Earlier centers get a higher share. Weight formula: 1.0 + (N - 1 - index) * 0.5
+                // For 2 centers, this results in a 60/40 ratio (e.g., 12/8 for 20 spots).
+                const weights = centers.map((_, i) => 1.0 + (numCenters - 1 - i) * 0.5);
+                const totalWeight = weights.reduce((acc, w) => acc + w, 0);
+
+                let allocatedTotal = 0;
+                centers.forEach((center, index) => {
+                    const share = weights[index] / totalWeight;
+                    center.assignedCount = Math.floor(share * remainingCapacity);
+                    allocatedTotal += center.assignedCount;
+                });
+
+                // Distribute rounding remainder one by one starting from the first center (FIFO)
+                let remainder = remainingCapacity - allocatedTotal;
                 let i = 0;
-                while (leftoverSpots > 0) {
-                    const center = centers[i % numCenters];
-                    if (center.assignedCount < (center.demand || 0)) {
-                        center.assignedCount++;
-                        leftoverSpots--;
-                    }
+                while (remainder > 0 && numCenters > 0) {
+                    centers[i % numCenters].assignedCount++;
+                    remainder--;
                     i++;
-                    if (i >= numCenters * 50 && leftoverSpots > 0) break; // Increased safety break for large distributions
                 }
+                
+                console.log(`⚖️ AutoAssignment: Distributed ${remainingCapacity} spots among ${numCenters} centers.`);
             }
 
             // 4. Create Assignments with Rational Splitting
@@ -147,7 +155,7 @@ export class AutoAssignmentService {
             }
         }
 
-        return { processed: results.length };
+        return { assignmentsCreated: results.length };
     }
 
     private async persistAssignment(center: PendingCenter, workshopId: number, groupNum: number = 1) {
@@ -155,7 +163,10 @@ export class AutoAssignmentService {
         if (groupNum === 1) {
             await prisma.request.update({
                 where: { requestId: center.requestId },
-                data: { status: REQUEST_STATUSES.APPROVED as RequestStatus }
+                data: { 
+                    status: REQUEST_STATUSES.APPROVED as RequestStatus,
+                    studentsAprox: center.assignedCount
+                }
             });
         }
 

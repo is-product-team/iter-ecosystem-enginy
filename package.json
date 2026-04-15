@@ -18,6 +18,7 @@
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",
     "db:seed": "turbo run db:seed",
+    "db:clean": "turbo run db:clean",
     "db:studio": "turbo run studio",
     "test": "turbo run test",
     "verify": "turbo run lint type-check test --filter=@iter/api --filter=@iter/web --filter=@iter/mobile",
