@@ -9,10 +9,14 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - OLLAMA_HOST=http://ollama:11434
+      - AI_MODEL_VISION=moondream
     volumes:
       - ./uploads:/app/uploads
     networks:
       - red_proxy
+    depends_on:
+      - ollama
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"] # La API no tiene basePath /iter internamente, solo el proxy
       interval: 30s
@@ -39,6 +43,23 @@ services:
       retries: 3
       start_period: 40s
 
+  # IA Local (Especializada en documentos)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: iter_ollama
+    restart: always
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - red_proxy
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
 networks:
   red_proxy:
     external: true
+
+volumes:
+  ollama_data:
