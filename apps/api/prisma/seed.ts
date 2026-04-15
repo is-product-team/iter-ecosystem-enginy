@@ -257,18 +257,20 @@ async function seedPhases() {
     // Sequential dates logic
     switch (phase.name) {
       case PHASES.APPLICATION:
-        // Set Application active starting 1 week ago until 3 months from now
-        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0);
-        isActive = true; // Set APPLICATION as the active phase for testing
+        // Set Application active starting 1 month ago until today
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        isActive = false;
         break;
       case PHASES.PLANNING:
-        startDate = new Date(now.getFullYear(), now.getMonth() + 3, 1);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 4, 0);
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         break;
       case PHASES.EXECUTION:
-        startDate = new Date(now.getFullYear(), now.getMonth() + 4, 1);
-        endDate = new Date(now.getFullYear(), now.getMonth() + 7, 0);
+        // Set EXECUTION active starting today until 3 months from now
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth() + 3, 0);
+        isActive = true; // Set EXECUTION as the active phase
         break;
       case PHASES.CLOSURE:
       default:
