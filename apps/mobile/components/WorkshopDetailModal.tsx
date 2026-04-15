@@ -132,7 +132,7 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
                         className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg shadow-slate-200 ${
                             event.metadata.isEvaluation 
                                 ? (event.metadata.isEvaluated ? 'bg-green-600' : 'bg-orange-500') 
-                                : 'bg-slate-900 dark:bg-primary'
+                                : 'bg-[#4197CB]'
                         }`}
                         disabled={event.metadata.isEvaluated}
                      >

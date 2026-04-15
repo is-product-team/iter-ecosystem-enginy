@@ -100,7 +100,7 @@ export default function EvaluationScreen() {
                       <TouchableOpacity
                         key={num}
                         onPress={() => setRatings(prev => ({ ...prev, [compId]: num }))}
-                        className={`flex-1 aspect-square items-center justify-center rounded-full border-2 shadow-sm ${isSelected ? 'bg-primary border-primary shadow-primary/30' : 'bg-background-subtle border-transparent'}`}
+                        className={`flex-1 aspect-square items-center justify-center rounded-full border-2 shadow-sm ${isSelected ? 'bg-[#4197CB] border-[#4197CB]' : 'bg-background-subtle border-transparent'}`}
                       >
                         <Text className={`font-bold text-lg ${isSelected ? 'text-white' : 'text-text-muted'}`}>{num}</Text>
                       </TouchableOpacity>
@@ -145,10 +145,16 @@ export default function EvaluationScreen() {
         </View>
 
         <TouchableOpacity 
-          className={`py-4 items-center mb-10 rounded-2xl shadow-lg active:opacity-90 ${submitting ? 'bg-background-subtle' : 'bg-primary'}`}
+          className={`py-4 items-center mb-10 rounded-2xl active:opacity-90 ${submitting ? 'bg-background-subtle' : 'bg-[#4197CB]'}`}
           onPress={handleSave}
           disabled={submitting}
-          style={{ shadowColor: THEME.colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 }}
+          style={{ 
+            shadowColor: '#000', 
+            shadowOffset: { width: 0, height: 4 }, 
+            shadowOpacity: 0.1, 
+            shadowRadius: 10, 
+            elevation: 4 
+          }}
         >
           {submitting ? <ActivityIndicator color="white" /> : <Text className="text-white font-bold text-lg tracking-wide">{t('Evaluation.save_button')}</Text>}
         </TouchableOpacity>

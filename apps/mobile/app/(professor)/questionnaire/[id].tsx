@@ -126,7 +126,7 @@ export default function WorkshopQualityScreen() {
                             <TouchableOpacity
                                 key={num}
                                 onPress={() => setAnswers(prev => ({ ...prev, [qId]: num }))}
-                                className={`flex-1 h-12 items-center justify-center rounded-xl border ${answers[qId] === num ? 'bg-primary border-primary' : 'bg-background-subtle border-border-subtle'}`}
+                                className={`flex-1 h-12 items-center justify-center rounded-xl border ${answers[qId] === num ? 'bg-[#4197CB] border-[#4197CB]' : 'bg-background-subtle border-border-subtle'}`}
                             >
                                 <Text className={`font-bold text-lg ${answers[qId] === num ? 'text-white' : 'text-text-muted'}`}>{num}</Text>
                             </TouchableOpacity>
@@ -148,9 +148,16 @@ export default function WorkshopQualityScreen() {
         })}
 
         <TouchableOpacity 
-          className={`py-4 items-center mb-24 rounded-2xl shadow-lg ${submitting ? 'bg-background-subtle' : 'bg-primary shadow-slate-200'}`}
+          className={`py-4 items-center mb-24 rounded-2xl ${submitting ? 'bg-background-subtle' : 'bg-[#4197CB]'}`}
           onPress={handleSubmit}
           disabled={submitting}
+          style={{ 
+            shadowColor: '#000', 
+            shadowOffset: { width: 0, height: 4 }, 
+            shadowOpacity: 0.1, 
+            shadowRadius: 10, 
+            elevation: 4 
+          }}
         >
           {submitting ? <ActivityIndicator color="white" /> : <Text className="text-white font-bold text-base uppercase tracking-wider">{t('Questionnaire.submit_button')}</Text>}
         </TouchableOpacity>

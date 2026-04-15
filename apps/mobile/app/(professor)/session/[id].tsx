@@ -139,7 +139,7 @@ export default function SessionScreen() {
         contentContainerStyle={{ 
             paddingTop: insets.top + 60, 
             paddingBottom: 40,
-            paddingHorizontal: 24 
+            paddingHorizontal: 32 
         }}
       >
          

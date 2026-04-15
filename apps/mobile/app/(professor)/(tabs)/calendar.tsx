@@ -48,10 +48,10 @@ export default function CalendarTabScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white dark:bg-black">
-      {/* Apple-style Header */}
-      <View className="px-8 pt-20 pb-8 bg-white dark:bg-black">
-         <Text className="text-[13px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+    <View style={{ paddingTop: insets.top }} className="flex-1 bg-white dark:bg-black">
+      {/* Apple-style Large Header */}
+      <View className="px-8 pb-10">
+         <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
            {t('Calendar.academic_agenda')}
          </Text>
          <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">

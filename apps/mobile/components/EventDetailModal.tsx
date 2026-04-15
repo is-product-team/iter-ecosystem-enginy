@@ -141,8 +141,14 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ visible, onClose, e
                          onClose();
                          router.push(`/(professor)/session/${event.metadata.assignmentId}`);
                        }}
-                       className="w-full bg-primary h-14 rounded-2xl items-center justify-center shadow-lg shadow-primary/20"
-                    >
+                       className="w-full bg-[#4197CB] h-14 rounded-2xl items-center justify-center shadow-lg"
+                       style={{ 
+                         shadowColor: '#000', 
+                         shadowOffset: { width: 0, height: 4 }, 
+                         shadowOpacity: 0.1, 
+                         shadowRadius: 10, 
+                         elevation: 4 
+                       }}                    >
                         <Text className="text-white text-lg font-bold tracking-wide uppercase">{t('Session.manage_session')}</Text>
                     </TouchableOpacity>
                  )}

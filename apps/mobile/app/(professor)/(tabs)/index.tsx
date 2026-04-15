@@ -272,7 +272,7 @@ export default function DashboardScreen() {
         }
       >
         {/* ── Apple-style Header ── */}
-        <View className="px-8 pt-16 pb-10 flex-row justify-between items-start">
+        <View className="px-8 pt-6 pb-10 flex-row justify-between items-start">
           <View className="flex-1 mr-4">
             <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
               {greeting}

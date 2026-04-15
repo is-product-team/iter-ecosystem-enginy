@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { THEME } from '@iter/shared';
 import api, { getNotifications } from '../../services/api';
 import type { Notification } from '../../services/api';
@@ -68,14 +68,24 @@ export default function NotificationsTabScreen() {
   }
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
+    <View style={{ paddingTop: insets.top + 60 }} className="flex-1 bg-background-page">
+      <Stack.Screen 
+        options={{ 
+          headerShown: true, 
+          headerTitle: '', 
+          headerTransparent: true,
+          headerShadowVisible: false,
+          headerBackTitle: t('Common.back'),
+          headerTintColor: '#4197CB',
+        }} 
+      />
       
-      {/* Refined Left-Aligned Header */}
-      <View className="px-6 pt-8 pb-6 bg-background-surface border-b border-border-subtle">
-         <Text className="text-[11px] font-black text-text-muted uppercase tracking-[2px] mb-1">
+      {/* Apple-style Large Header */}
+      <View className="px-8 pb-10">
+         <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
            {t('Notifications.tagline')}
          </Text>
-         <Text className="text-2xl font-black text-text-primary tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
+         <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
            {t('Notifications.title')}
          </Text>
       </View>
