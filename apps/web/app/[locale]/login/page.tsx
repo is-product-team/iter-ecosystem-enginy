@@ -36,6 +36,10 @@ export default function LoginPage() {
         router.push(`/${locale}/admin`);
       } else if (user.role.name === ROLES.COORDINATOR) {
         router.push(`/${locale}/center`);
+      } else if (user.role.name === ROLES.STUDENT) {
+        router.push(`/${locale}/student/dashboard`);
+      } else if (user.role.name === ROLES.TEACHER) {
+        setShowProfessorLink(true);
       }
     }
   }, [user, authLoading, router, locale]);
@@ -62,6 +66,8 @@ export default function LoginPage() {
           router.push(`/${locale}/admin`);
         } else if (user.role.name === ROLES.COORDINATOR) {
           router.push(`/${locale}/center`);
+        } else if (user.role.name === ROLES.STUDENT) {
+          router.push(`/${locale}/student/dashboard`);
         }
       }
     } catch (err) {

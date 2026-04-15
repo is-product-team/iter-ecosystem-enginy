@@ -7,8 +7,6 @@
     "moduleResolution": "bundler",
     "types": ["@types/jest", "@testing-library/jest-native"],
     "paths": {
-      "react": ["../../node_modules/@types/react"],
-      "react-dom": ["../../node_modules/@types/react-dom"],
       "@/*": [
         "./*"
       ],

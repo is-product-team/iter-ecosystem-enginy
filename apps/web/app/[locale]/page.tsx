@@ -20,6 +20,12 @@ export default function Home() {
           router.push(`/${locale}/admin`);
         } else if (user.role.name === ROLES.COORDINATOR) {
           router.push(`/${locale}/center`);
+        } else if (user.role.name === ROLES.STUDENT) {
+          router.push(`/${locale}/student/dashboard`);
+        } else {
+          // For TEACHER or unknown roles, redirect to login
+          // The login page will handle showing appropriate messages
+          router.push(`/${locale}/login`);
         }
       } else {
         router.push(`/${locale}/login`);
