@@ -215,7 +215,7 @@ api.interceptors.response.use(
         // NO AUTH MOCK: Favor real backend login.
 
         // --- DATA FALLBACKS ---
-        const matches = (pattern: string) => url.includes(pattern);
+        const matches = (pattern: string) => config.url?.includes(pattern);
 
         // NO DATA MOCKS: Favor real backend data.
       } catch (e) {

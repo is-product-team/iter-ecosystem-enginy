@@ -1,7 +1,8 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES, CHECKLIST_STEPS } from '@iter/shared';
+import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES, CHECKLIST_STEPS, PHASES } from '@iter/shared';
 import { createNotificationInternal } from './notification.controller.js';
+import { isPhaseActive } from '../lib/phaseUtils.js';
 import { VisionService } from '../services/vision.service.js';
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';
 import fs from 'fs';
@@ -411,8 +412,8 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
         startDate: startDate,
         teachers: {
           create: [
-            ...(request.teacher1?.userId ? [{ userId: request.teacher1.userId, isPrincipal: true }] : []),
-            ...(request.teacher2?.userId ? [{ userId: request.teacher2.userId, isPrincipal: false }] : [])
+            ...((request as any).teacher1?.userId ? [{ userId: (request as any).teacher1.userId, isPrincipal: true }] : []),
+            ...((request as any).teacher2?.userId ? [{ userId: (request as any).teacher2.userId, isPrincipal: false }] : [])
           ]
         },
         // Initialize default checklist for Phase 2
@@ -1105,7 +1106,7 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
     const rawAttendance = await prisma.attendance.findMany({
       where: {
         sessionId: targetSession.sessionId
-      },
+      } as any,
       include: {
         enrollment: {
           include: {
@@ -1115,8 +1116,8 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
       }
     });
 
-    const attendance = rawAttendance.map((r) => {
-      const docsStatus = (r.enrollment.docsStatus as any) || {};
+    const attendance = rawAttendance.map((r: any) => {
+      const docsStatus = (r.enrollment?.docsStatus as any) || {};
       return {
         attendanceId: r.attendanceId,
         enrollmentId: r.enrollmentId,
@@ -1126,9 +1127,9 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
         observations: r.observations,
         enrollment: {
           student: {
-            fullName: r.enrollment.student.fullName,
-            lastName: r.enrollment.student.lastName,
-            idalu: r.enrollment.student.idalu
+            fullName: r.enrollment?.student?.fullName,
+            lastName: r.enrollment?.student?.lastName,
+            idalu: r.enrollment?.student?.idalu
           },
           imageRightsValidated: !!docsStatus.image_rightsValidated
         }
