@@ -50,7 +50,7 @@ export default function DashboardScreen() {
   const [unreadCount, setUnreadCount] = React.useState(0);
   const [avatar, setAvatar] = React.useState<string | null>(null);
 
-  const checkRoleAndFetchData = async (isRefresh = false) => {
+  const checkRoleAndFetchData = React.useCallback(async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       let userData = null;
@@ -109,7 +109,7 @@ export default function DashboardScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [router, t]);
 
   useFocusEffect(
     React.useCallback(() => {

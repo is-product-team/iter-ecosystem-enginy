@@ -118,9 +118,10 @@ const MOCK_WORKSHOP: any = {
 };
 
 const getBaseURL = () => {
-  // Fallback a la IP de la máquina local detectada (Hotspot/LAN)
-  const FALLBACK_IP = '172.20.10.12'; 
+  // Variable de entorno directa (o fallback dinámico usando la IP local definida en .env)
+  const FALLBACK_IP = process.env.EXPO_PUBLIC_LOCAL_IP || '127.0.0.1';
   let url = process.env.EXPO_PUBLIC_API_URL || `http://${FALLBACK_IP}:3000`;
+  
   if (url.endsWith('/')) {
     url = url.slice(0, -1);
   }
@@ -129,7 +130,7 @@ const getBaseURL = () => {
 
 const api = axios.create({
   baseURL: getBaseURL().endsWith('/') ? getBaseURL() : `${getBaseURL()}/`,
-  timeout: 10000, // 10s timeout to prevent hanging on unreachable IPs
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
