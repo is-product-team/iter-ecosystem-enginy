@@ -1108,6 +1108,11 @@
     }
   },
   "Common": {
+    "success": "Success",
+    "view": "View",
+    "notif_preamble": "You have pending documents for",
+    "notif_mid": "and",
+    "notif_reason": "Please upload them to complete the process.",
     "general": "General",
     "configuration": "Configuration",
     "global": "Global",
@@ -1244,6 +1249,8 @@
     "Execution": "Execution and Monitoring",
     "Closure": "Closure and Certification",
     "Approved": "Approved",
+    "Aprobada": "Approved",
+    "aprobada": "Approved",
     "Rejected": "Rejected",
     "phase_start_title": "New Phase: {name}",
     "phase_start_msg": "The phase \"{name}\" has started. Check the calendar for details.",

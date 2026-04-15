@@ -1108,6 +1108,11 @@
     }
   },
   "Common": {
+    "success": "Éxito",
+    "view": "Ver",
+    "notif_preamble": "Tienes documentos pendientes para",
+    "notif_mid": "y",
+    "notif_reason": "Por favor, súbelos para completar el proceso.",
     "general": "General",
     "configuration": "Configuración",
     "global": "Global",
@@ -1244,6 +1249,8 @@
     "Execution": "Ejecución y Seguimiento",
     "Closure": "Cierre y Certificación",
     "Approved": "Aprobada",
+    "Aprobada": "Aprobada",
+    "aprobada": "Aprobada",
     "Rejected": "Rechazada",
     "phase_start_title": "Nueva Fase: {name}",
     "phase_start_msg": "La fase \"{name}\" ha comenzado. Consulta el calendario para más detalles.",

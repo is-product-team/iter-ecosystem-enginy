@@ -259,7 +259,8 @@ export default function DocumentVerificationPage() {
           <div className="premium-table-container">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">                  <th className="px-6 py-4 w-[60px]">
+                <tr className="bg-background-subtle border-b border-border-subtle">
+                  <th className="px-6 py-4 w-[60px]">
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"

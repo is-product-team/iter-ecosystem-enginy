@@ -1108,6 +1108,11 @@
     }
   },
   "Common": {
+    "success": "Èxit",
+    "view": "Veure",
+    "notif_preamble": "Tens documents pendents per a",
+    "notif_mid": "i",
+    "notif_reason": "Si us plau, puja'ls per completar el procés.",
     "general": "General",
     "configuration": "Configuració",
     "global": "Global",
@@ -1244,6 +1249,8 @@
     "Execution": "Execució i Seguiment",
     "Closure": "Tancament i Certificació",
     "Approved": "Aprovada",
+    "Aprobada": "Aprovada",
+    "aprobada": "Aprovada",
     "Rejected": "Rebutjada",
     "phase_start_title": "Nova Fase: {name}",
     "phase_start_msg": "La fase \"{name}\" ha començat. Consulta el calendari per a més detalls.",
