@@ -1252,6 +1252,8 @@
     "Aprobada": "Approved",
     "aprobada": "Approved",
     "Rejected": "Rejected",
+    "Rechazada": "Rejected",
+    "rechazada": "Rejected",
     "phase_start_title": "New Phase: {name}",
     "phase_start_msg": "The phase \"{name}\" has started. Check the calendar for details.",
     "calendar_sync_title": "Calendar Synchronization (System)",

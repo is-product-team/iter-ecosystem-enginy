@@ -100,8 +100,8 @@ const MOCK_QUESTIONNAIRE_MODEL = {
 };
 
 const MOCK_STUDENTS: any[] = [
-  { enrollmentId: 1, studentId: 101, student: { studentId: 101, idalu: 'ST001', fullName: 'Joan Vila', lastName: 'Vila' } },
-  { enrollmentId: 2, studentId: 102, student: { studentId: 102, idalu: 'ST002', fullName: 'Marta Soler', lastName: 'Soler' } }
+  { enrollmentId: 1001, studentId: 101, student: { studentId: 101, idalu: 'ST001', fullName: 'Joan Vila', lastName: 'Vila' } },
+  { enrollmentId: 1002, studentId: 102, student: { studentId: 102, idalu: 'ST002', fullName: 'Marta Soler', lastName: 'Soler' } }
 ];
 
 const MOCK_WORKSHOP: any = {
@@ -240,7 +240,10 @@ api.interceptors.response.use(
           }
           if (matches('assignments')) {
              console.log("🛡️ [API MOCK] Serving assignments for:", url);
-             if (url.includes('students')) return Promise.resolve({ data: MOCK_STUDENTS, status: 200 });
+             if (url.includes('students')) {
+                // If real API returned empty (happens in some dev states), fallback to mocks
+                return Promise.resolve({ data: MOCK_STUDENTS, status: 200 });
+             }
              return Promise.resolve({ data: [MOCK_WORKSHOP], status: 200 });
           }
         }

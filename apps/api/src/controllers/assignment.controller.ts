@@ -223,16 +223,17 @@ export const getStudents = async (req: Request, res: Response) => {
       where: { assignmentId: parseInt(assignmentId as string) },
       include: {
         student: true,
-        evaluations: { select: { evaluationId: true } } // include evaluation check
+        evaluations: { select: { evaluationId: true } }
       }
     });
 
-    // Flatten structure to return just students with relevant info + evaluated status
-    const students = enrollments.map((i: any) => ({
-      ...i.student,
-      evaluated: i.evaluations.length > 0 // true if exists, false otherwise
+    // We return the enrollment list so the frontend can have both IDs (enrollment and student)
+    const transformed = enrollments.map((i: any) => ({
+      ...i,
+      evaluated: i.evaluations.length > 0
     }));
-    res.json(students);
+
+    res.json(transformed);
   } catch (_error) {
     res.status(500).json({ error: 'Error obtaining students' });
   }

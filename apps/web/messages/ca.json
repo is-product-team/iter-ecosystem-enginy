@@ -1252,6 +1252,8 @@
     "Aprobada": "Aprovada",
     "aprobada": "Aprovada",
     "Rejected": "Rebutjada",
+    "Rechazada": "Rebutjada",
+    "rechazada": "Rebutjada",
     "phase_start_title": "Nova Fase: {name}",
     "phase_start_msg": "La fase \"{name}\" ha començat. Consulta el calendari per a més detalls.",
     "calendar_sync_title": "Sincronització de Calendari (Sistema)",
