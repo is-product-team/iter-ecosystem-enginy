@@ -10,6 +10,10 @@
     "call": "Trucar",
     "coming_soon": "Pròximament",
     "no_description": "Sense descripció disponible",
+    "description": "Descripció",
+    "location": "Ubicació",
+    "pending": "Pendent",
+    "workshop": "Taller",
     "practical_workshop": "Taller Pràctic",
     "session": "Sessió",
     "time": "Horari",
@@ -49,7 +53,7 @@
       "go_to_web": "Anar a la Plataforma Web",
       "submit": "Entrar",
       "welcome_title": "Te donem la benvinguda a Iter",
-      "welcome_subtitle": "Gestió avançada de mòduls duals i seguiment d'alumnes per a professors tècnics.",
+      "welcome_subtitle": "Gestió avançada de mòduls duales i seguiment d'alumnes per a professors tècnics.",
       "login_problems": "Tens problemes per accedir-hi?",
       "privacy_footer": "En iniciar la sessió, acceptes la nostra Política de Privacitat i els Termes de Servei de la Plataforma Iter."
     }
@@ -74,6 +78,7 @@
       "ca": "Català",
       "es": "Español"
     },
+    "security_support": "Seguretat i Suport",
     "help": "Suport i Ajuda",
     "camera_permission_denied": "Es necessiten permisos per accedir a la galeria."
   },
@@ -84,38 +89,27 @@
   },
   "Session": {
     "title": "Llista d'alumnes",
-    "attendance_instruction": "Marca l'assistència dels alumnes. Prem sobre l'estat per canviar-lo.",
-    "observations_label": "Observacions Generals",
-    "observations_placeholder": "Escriu aquí qualsevol incidència o comentari sobre la sessió...",
+    "title_attendance": "Sessió - Asistència",
+    "title_work": "Sessió - Seguiment",
+    "attendance_header": "Registre de Sessió",
+    "attendance_instruction": "Marca l'assistència de cada alumne abans de començar el seguiment tècnic.",
+    "work_header": "Seguiment de Sessió",
+    "work_instruction": "Avalua el progrés de les competències durant el taller.",
+    "observations_label": "Observacions de la sessió",
+    "observations_placeholder": "Afegeix qualsevol incidència o comentari rellevant...",
     "evaluated": "Avaluat",
     "evaluate_competencies": "Avaluar Competències",
     "attendance_registered": "Assistència Registrada",
-    "finish_and_send": "Finalitzar i Enviar",
-    "error_loading_students": "No s'ha pogut carregar la llista d'alumnes.",
-    "attendance_sent_success": "Assistència enviada correctament als coordinadors.",
+    "finish_and_send": "Finalitzar i Enviar Llista",
+    "attendance_sent_success": "Llista d'assistència enviada correctament",
     "submit_attendance_error": "No s'ha pogut enviar l'assistència.",
+    "manage_session": "Gestionar Sessió",
+    "error_loading_students": "No s'ha pogut carregar la llista d'alumnes",
     "status_present": "Present",
     "status_absent": "Absent",
     "status_retard": "Retard"
   },
   "Dashboard": {
-    "welcome": "Hola, {{name}}",
-    "current_phase": "Fase Actual",
-    "pending_tasks": "Tasques Pendents",
-    "next_session": "Propera Sessió",
-    "evaluate_workshop": "Avaluar Taller",
-    "evaluated_workshop": "Taller Valorat",
-    "manage_session": "Gestionar Sessió",
-    "view_details": "Veure Detalls",
-    "no_upcoming_workshops": "No tens tallers propers",
-    "overview": "Resum del Dashboard",
-    "current_phase_label": "Fase Actual",
-    "total_workshops": "Total de Tallers",
-    "next_session_label": "Propera Sessió",
-    "active": "Actiu",
-    "loading_data": "Càrrega de dades",
-    "evaluate_finished_workshop": "Avaluar taller finalitzat",
-    "in_progress": "En Curs",
     "greeting_morning": "Bon dia, {{name}}",
     "greeting_afternoon": "Bona tarda, {{name}}",
     "no_upcoming_sessions": "Sense sessions properes",
@@ -125,7 +119,9 @@
     "none_new": "Cap de nou",
     "phase_status": "Estat de la fase",
     "pending_count_one": "{{count}} pendent",
-    "pending_count_other": "{{count}} pendents"
+    "pending_count_other": "{{count}} pendents",
+    "no_upcoming_workshops": "No tens tallers propers",
+    "next_session_label": "Propera Sessió"
   },
   "Evaluation": {
     "title": "Avaluació Competencial",
@@ -180,7 +176,9 @@
       "dg": "DG"
     },
     "no_events": "No hi ha esdeveniments",
-    "all_day": "Tot el dia"
+    "all_day": "Tot el dia",
+    "add_to_calendar": "Afegir al calendari",
+    "remove_event": "Eliminar esdeveniment"
   },
   "Coordination": {
     "teacher_space": "Espai del Docent",
@@ -190,20 +188,7 @@
     "secondary_referent": "Segon Referent",
     "no_referents_assigned": "No hi ha referents assignats a aquest taller encara.",
     "no_contacts_yet": "Encara no tens contactes de coordinació.",
-    "group_chat_instruction": "Aviat podràs xatejar directament amb l'equip de coordinació del centre."
-  },
-  "Session": {
-    "title_attendance": "Sessió - Asistència",
-    "title_work": "Sessió - Seguiment",
-    "attendance_header": "Registre de Sessió",
-    "attendance_instruction": "Marca l'assistència de cada alumne abans de començar el seguiment tècnic.",
-    "work_header": "Seguiment de Sessió",
-    "work_instruction": "Avalua el progrés de les competències durant el taller.",
-    "observations_label": "Observacions de la sessió",
-    "observations_placeholder": "Afegeix qualsevol incidència o comentari rellevant...",
-    "finish_and_send": "Finalitzar i Enviar Llista",
-    "attendance_sent_success": "Llista d'assistència enviada correctament",
-    "manage_session": "Gestionar Sessió",
-    "error_loading_students": "No s'ha pogut carregar la llista d'alumnes"
+    "group_chat_instruction": "Aviat podràs xatejar directament amb l'equip de coordinació del centre.",
+    "contact": "Contacte"
   }
 }
