@@ -82,6 +82,12 @@ COPY --from=builder-api --chown=node:node /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder-api --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder-api --chown=node:node /app/node_modules/@prisma ./node_modules/@prisma
 
+# Patch: Corregir package.json de @iter/shared para que apunte al JS compilado en lugar del TS
+# Esto evita que Node intente cargar archivos .ts en producción
+RUN sed -i 's/"main": ".\/index.ts"/"main": ".\/index.js"/g' ./node_modules/@iter/shared/package.json && \
+    sed -i 's/"import": ".\/index.ts"/"import": ".\/index.js"/g' ./node_modules/@iter/shared/package.json && \
+    sed -i 's/"require": ".\/index.ts"/"require": ".\/index.js"/g' ./node_modules/@iter/shared/package.json
+
 # Crear la carpeta d'uploads y asegurar permisos
 RUN mkdir -p /app/uploads/perfil /app/uploads/documents && chown -R node:node /app/uploads
 
