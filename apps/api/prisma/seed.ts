@@ -235,6 +235,8 @@ async function seedWorkshops(sectors: any) {
   }
 }
 
+
+
 async function seedPhases() {
   console.log('🗓️   Configurando fases del programa...');
   const now = new Date();
@@ -307,18 +309,11 @@ async function main() {
   await seedPhases();
 
   // Operative data for testing (CLEAN START)
-  console.log('🧪  Preparando entorno de descubrimiento (Alumnos y Solicitudes Pendientes)...');
+  console.log('🧪  Preparando datos de prueba (Alumnos)...');
   
-  const existingRequests = await prisma.request.count();
-  if (existingRequests > 0) {
-    console.log('⏭️  Database already has requests, skipping operative seeding to preserve your progress.');
-    return;
-  }
-
   const centers = await prisma.center.findMany();
-  const workshops = await prisma.workshop.findMany();
 
-  if (centers.length >= 2 && workshops.length >= 2) {
+  if (centers.length >= 2) {
     // 1. Create 20 students per center in the "pool"
     const firstNames = ['Marc', 'Júlia', 'Pau', 'Laia', 'Pol', 'Emma', 'Arnau', 'Clara', 'Biel', 'Ona', 'Oriol', 'Abril', 'Nil', 'Martina', 'Jan', 'Aina', 'Hugo', 'Lucía', 'Leo', 'Noa'];
     const lastNames = ['Pérez', 'Soler', 'García', 'Martínez', 'López', 'Sánchez', 'Rodríguez', 'Fernández', 'Vila', 'Serra'];
@@ -343,33 +338,6 @@ async function main() {
         });
       }
     }
-
-    // 2. Create 2 Pending Requests (Phase 1 Start)
-    console.log('   - Creando solicitudes PENDING para iniciar Fase 1...');
-    
-    // Request from Brossa
-    await prisma.request.create({
-      data: {
-        centerId: centers[0].centerId,
-        workshopId: workshops[0].workshopId,
-        status: 'PENDING',
-        studentsAprox: 15,
-        modality: workshops[0].modality,
-        comments: "Queremos iniciar a los alumnos en la robótica aplicada.",
-      }
-    });
-
-    // Request from Pau Claris
-    await prisma.request.create({
-      data: {
-        centerId: centers[1].centerId,
-        workshopId: workshops[1].workshopId,
-        status: 'PENDING',
-        studentsAprox: 12,
-        modality: workshops[1].modality,
-        comments: "Interés en la producción audiovisual creativa.",
-      }
-    });
   }
 
   console.log('✅  Seeding completado con éxito.');
