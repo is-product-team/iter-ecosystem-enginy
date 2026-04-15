@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
 import workshopService, { Workshop } from "@/services/workshopService";
+import DataTable, { Column } from "@/components/ui/DataTable";
 
 export default function WorkshopAdminPage() {
   const t = useTranslations('Admin.Workshops');
@@ -162,6 +163,67 @@ export default function WorkshopAdminPage() {
     });
   };
 
+  const columns: Column<Workshop>[] = [
+    {
+      header: t("table_info"),
+      render: (workshop) => (
+        <div className="flex items-center gap-5">
+          <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
+            <WorkshopIcon iconName={workshop.icon} className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[15px] font-medium text-text-primary leading-tight">{workshop.title}</div>
+            <div className="text-[12px] font-medium text-text-muted mt-1 uppercase tracking-tighter opacity-70">{tc("id_label", { id: workshop._id })}</div>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: t("table_classification"),
+      render: (workshop) => (
+        <div className="flex flex-col gap-1">
+          <span className="text-consorci-darkBlue font-medium text-[13px]">{workshop.sector}</span>
+          <span className="text-text-muted opacity-70 text-[13px]">{tc("modality_label", { modality: workshop.modality })}</span>
+        </div>
+      )
+    },
+    {
+      header: t("table_details"),
+      render: (workshop) => (
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
+            {tc("duration_label", { hours: workshop.technicalDetails?.durationHours ?? 0 })} • {tc("places_label", { count: workshop.technicalDetails?.maxPlaces ?? 0 })}
+          </div>
+          <div className="text-[12px] text-text-muted font-medium line-clamp-1 max-w-[240px] opacity-70">
+            {workshop.technicalDetails?.description}
+          </div>
+        </div>
+      )
+    },
+    {
+      header: t("table_actions"),
+      align: 'right',
+      render: (workshop) => (
+        <div className="flex justify-end items-center gap-4">
+          <button
+            onClick={() => handleEdit(workshop)}
+            className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
+          >
+            {tc("edit")}
+          </button>
+          <button
+            onClick={() => handleDelete(workshop._id)}
+            className="p-2 text-text-muted hover:text-red-600 transition-all"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      )
+    }
+  ];
+
   if (authLoading || !user || user.role.name !== ROLES.ADMIN) {
     return <Loading fullScreen message={tc("authenticating")} />;
   }
@@ -250,95 +312,24 @@ export default function WorkshopAdminPage() {
       </div>
 
       {/* Workshops Table */}
-      {loading ? (
-        <Loading message={t("loading_catalog")} />
-      ) : filteredWorkshops.length > 0 ? (
-        <>
-          <div className="bg-background-surface border border-border-subtle overflow-hidden">
-            <div className="premium-table-container">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-background-subtle border-b border-border-subtle">
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_info")}</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_classification")}</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_details")}</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{t("table_actions")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border-subtle">
-                  {paginatedWorkshops.map((workshop) => (
-                    <tr key={workshop._id} className="hover:bg-background-subtle transition-colors group">
-                      <td className="px-6 py-6" title={workshop.title}>
-                        <div className="flex items-center gap-5">
-                          <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
-                            <WorkshopIcon iconName={workshop.icon} className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="text-[15px] font-medium text-text-primary leading-tight">{workshop.title}</div>
-                            <div className="text-[12px] font-medium text-text-muted mt-1 uppercase tracking-tighter opacity-70">{tc("id_label", { id: workshop._id })}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6 text-[13px] font-medium text-text-primary">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-consorci-darkBlue">{workshop.sector}</span>
-                          <span className="text-text-muted opacity-70">{tc("modality_label", { modality: workshop.modality })}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
-                            {tc("duration_label", { hours: workshop.technicalDetails?.durationHours ?? 0 })} • {tc("places_label", { count: workshop.technicalDetails?.maxPlaces ?? 0 })}
-                          </div>
-                          <div className="text-[12px] text-text-muted font-medium line-clamp-1 max-w-[240px] opacity-70">
-                            {workshop.technicalDetails?.description}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6">
-                        <div className="flex justify-end items-center gap-4">
-                          <button
-                            onClick={() => handleEdit(workshop)}
-                            className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
-                          >
-                            {tc("edit")}
-                          </button>
-                          <button
-                            onClick={() => handleDelete(workshop._id)}
-                            className="p-2 text-text-muted hover:text-red-600 transition-all"
-                          >
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalItems={filteredWorkshops.length}
-            currentItemsCount={paginatedWorkshops.length}
-            itemName={tc("workshops").toLowerCase()}
-          />
-        </>
-      ) : (
-        <div className="text-center py-32 bg-background-surface border border-dashed border-border-subtle">
-          <div className="w-16 h-16 bg-background-subtle flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <p className="text-text-primary font-medium text-sm">{tc("no_results")}</p>
-          <p className="text-text-muted text-[11px] font-normal mt-1">{tc("try_other_terms")}</p>
+      {error ? (
+        <div className="bg-red-50 border-l-4 border-red-500 p-6 mb-10">
+          <p className="text-red-700 font-bold text-sm">{error}</p>
         </div>
+      ) : (
+        <DataTable
+          data={paginatedWorkshops}
+          columns={columns}
+          loading={loading}
+          emptyMessage={tc("no_results")}
+          pagination={{
+            currentPage: currentPage,
+            totalPages: totalPages,
+            onPageChange: setCurrentPage,
+            totalItems: filteredWorkshops.length,
+            itemName: tc("workshops").toLowerCase()
+          }}
+        />
       )}
 
       <CreateWorkshopModal

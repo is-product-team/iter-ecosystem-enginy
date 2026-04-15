@@ -12,6 +12,7 @@ import teacherService, { Teacher } from '@/services/teacherService';
 import Loading from '@/components/Loading';
 import WorkshopIcon from '@/components/WorkshopIcon';
 import Pagination from "@/components/Pagination";
+import DataTable, { Column } from '@/components/ui/DataTable';
 
 export default function RequestsPage() {
   const t = useTranslations('CenterRequestsPage');
@@ -189,6 +190,113 @@ export default function RequestsPage() {
     }
   };
 
+  const columns: Column<Workshop>[] = [
+    {
+      header: t('table_mod'),
+      align: 'center',
+      headerClassName: 'w-16',
+      render: (w) => (
+        <div className={`w-10 h-10 flex items-center justify-center font-bold text-[12px] shrink-0 border ${w.modality === 'A' ? 'bg-green-500/5 text-green-600 border-green-500/20' :
+          w.modality === 'B' ? 'bg-orange-500/5 text-orange-600 border-orange-500/20' :
+            'bg-purple-500/5 text-purple-600 border-purple-500/20'
+          }`}>
+          {w.modality}
+        </div>
+      )
+    },
+    {
+      header: t('table_workshop'),
+      render: (w) => (
+        <div className="flex items-start gap-4">
+          <WorkshopIcon iconName={w.icon} className="w-5 h-5 text-text-primary mt-0.5 shrink-0" />
+          <div>
+            <div className="font-semibold text-text-primary text-[15px] leading-tight mb-1">{w.title}</div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-text-muted">
+              <span className="uppercase text-text-secondary">{w.sector}</span>
+              <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
+              <span className="flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                {tCommon('duration_label', { hours: w.technicalDetails?.durationHours ?? 0 })}
+              </span>
+              <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
+              <span className="flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                {tCommon('places_label', { count: w.technicalDetails?.maxPlaces ?? 0 })}
+              </span>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: t('table_referents'),
+      headerClassName: 'hidden md:table-cell',
+      cellClassName: 'hidden md:table-cell',
+      render: (w) => {
+        const existingRequest = requests.find(r => r.workshopId === parseInt(w._id));
+        if (!existingRequest) return <span className="text-[11px] text-text-muted italic">---</span>;
+        return (
+          <div className="flex flex-col gap-0.5">
+            {existingRequest.teacher1Id && (
+              <div className="text-[12px] font-medium text-text-primary">
+                {teachers.find(t => t.teacherId === existingRequest.teacher1Id)?.name || tCommon('loading_error')}
+              </div>
+            )}
+            {existingRequest.teacher2Id && (
+              <div className="text-[12px] font-medium text-text-primary">
+                {teachers.find(t => t.teacherId === existingRequest.teacher2Id)?.name || tCommon('loading_error')}
+              </div>
+            )}
+          </div>
+        );
+      }
+    },
+    {
+      header: t('table_status'),
+      align: 'right',
+      headerClassName: 'w-32',
+      render: (w) => {
+        const existingRequest = requests.find(r => r.workshopId === parseInt(w._id));
+        const isSelected = selectedWorkshopId === w._id;
+        if (existingRequest) {
+          return (
+            <div className="flex flex-col items-end justify-center">
+              <span className={`text-[10px] font-bold border px-3 py-1.5 tracking-widest uppercase font-sans ${
+                existingRequest.status === REQUEST_STATUSES.APPROVED
+                  ? 'border-green-500/30 bg-green-500/5 text-green-500'
+                  : existingRequest.status === REQUEST_STATUSES.PENDING
+                    ? 'border-orange-500/30 bg-orange-500/5 text-orange-500'
+                    : 'border-red-500/30 bg-red-500/5 text-red-500'
+              }`}>
+                {existingRequest.status === REQUEST_STATUSES.PENDING ? t('status_pending') : 
+                 existingRequest.status === REQUEST_STATUSES.APPROVED ? t('status_approved') : 
+                 t('status_rejected')}
+              </span>
+            </div>
+          );
+        }
+        if (isSelected) {
+          return (
+            <div className="flex items-center justify-end gap-2 text-consorci-darkBlue font-bold text-[11px] uppercase tracking-tight font-sans">
+              <span>{t('selected_label')}</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+            </div>
+          );
+        }
+        return null;
+      }
+    }
+  ];
+
+  const handleRowClick = (workshop: Workshop) => {
+    const existingRequest = requests.find(r => r.workshopId === parseInt(workshop._id));
+    if (existingRequest && existingRequest.status === REQUEST_STATUSES.PENDING) {
+      handleEdit(existingRequest);
+    } else {
+      setSelectedWorkshopId(selectedWorkshopId === workshop._id ? null : workshop._id);
+    }
+  };
+
   if (authLoading || !user) {
     return <Loading fullScreen message={tCommon('status')} />;
   }
@@ -226,140 +334,23 @@ export default function RequestsPage() {
             </div>
           </div>
 
-          <div className="bg-background-surface border border-border-subtle overflow-hidden">
-            <div className="premium-table-container">
-              <table className="w-full text-left">
-              <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle uppercase tracking-wider">
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary w-16 text-center">{t('table_mod')}</th>
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary">{t('table_workshop')}</th>
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary hidden md:table-cell">{t('table_referents')}</th>
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary text-right">{t('table_status')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {loading ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-12">
-                      <Loading message={tCommon('loading')} />
-                    </td>
-                  </tr>
-                ) : filteredWorkshops.length > 0 ? (
-                  paginatedWorkshops.map((workshop) => {
-                    const existingRequest = requests.find(r => r.workshopId === parseInt(workshop._id));
-                    const isSelected = selectedWorkshopId === workshop._id;
-
-                    return (
-                      <React.Fragment key={workshop._id}>
-                        <tr
-                          onClick={() => {
-                            if (existingRequest && existingRequest.status === REQUEST_STATUSES.PENDING) {
-                              handleEdit(existingRequest);
-                            } else {
-                              setSelectedWorkshopId(isSelected ? null : workshop._id);
-                            }
-                          }}
-                          className={`group transition-colors border-l-2 cursor-pointer ${
-                            isSelected
-                              ? 'bg-background-subtle border-l-consorci-darkBlue'
-                              : 'hover:bg-background-subtle border-l-transparent hover:border-l-consorci-lightBlue'
-                          }`}
-                        >
-                          <td className="px-6 py-5">
-                            <div className="flex items-center gap-4">
-                              <div className={`w-10 h-10 flex items-center justify-center font-bold text-[12px] shrink-0 border ${workshop.modality === 'A' ? 'bg-green-500/5 text-green-600 border-green-500/20' :
-                                workshop.modality === 'B' ? 'bg-orange-500/5 text-orange-600 border-orange-500/20' :
-                                  'bg-purple-500/5 text-purple-600 border-purple-500/20'
-                                }`}>
-                                {workshop.modality}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="flex items-start gap-4">
-                                <WorkshopIcon iconName={workshop.icon} className="w-5 h-5 text-text-primary mt-0.5 shrink-0" />
-                                <div>
-                                    <div className="font-semibold text-text-primary text-[15px] leading-tight mb-1">{workshop.title}</div>
-                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-text-muted">
-                                        <span className="uppercase text-text-secondary">{workshop.sector}</span>
-                                        <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
-                                        <span className="flex items-center gap-1">
-                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                            {tCommon('duration_label', { hours: workshop.technicalDetails?.durationHours ?? 0 })}
-                                        </span>
-                                        <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
-                                        <span className="flex items-center gap-1">
-                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                            {tCommon('places_label', { count: workshop.technicalDetails?.maxPlaces ?? 0 })}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 hidden md:table-cell">
-                            {existingRequest ? (
-                              <div className="flex flex-col gap-0.5">
-                                {existingRequest.teacher1Id && (
-                                  <div className="text-[12px] font-medium text-text-primary">
-                                    {teachers.find(t => t.teacherId === existingRequest.teacher1Id)?.name || tCommon('loading_error')}
-                                  </div>
-                                )}
-                                {existingRequest.teacher2Id && (
-                                  <div className="text-[12px] font-medium text-text-primary">
-                                    {teachers.find(t => t.teacherId === existingRequest.teacher2Id)?.name || tCommon('loading_error')}
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-[11px] text-text-muted italic">---</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-5 text-right w-32">
-                            {existingRequest ? (
-                              <div className="flex flex-col items-end justify-center">
-                                <span className={`text-[10px] font-bold border px-3 py-1.5 tracking-widest uppercase font-sans ${
-                                  existingRequest.status === REQUEST_STATUSES.APPROVED
-                                    ? 'border-green-500/30 bg-green-500/5 text-green-500'
-                                    : existingRequest.status === REQUEST_STATUSES.PENDING
-                                      ? 'border-orange-500/30 bg-orange-500/5 text-orange-500'
-                                      : 'border-red-500/30 bg-red-500/5 text-red-500'
-                                }`}>
-                                  {existingRequest.status === REQUEST_STATUSES.PENDING ? t('status_pending') : 
-                                   existingRequest.status === REQUEST_STATUSES.APPROVED ? t('status_approved') : 
-                                   t('status_rejected')}
-                                </span>
-                              </div>
-                            ) : isSelected ? (
-                              <div className="flex items-center justify-end gap-2 text-consorci-darkBlue font-bold text-[11px] uppercase tracking-tight font-sans">
-                                <span>{t('selected_label')}</span>
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                              </div>
-                            ) : null}
-                          </td>
-                        </tr>
-
-
-                      </React.Fragment>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center">
-                      <p className="text-text-muted text-[13px] font-medium">{tCommon('no_results')}</p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalItems={filteredWorkshops.length}
-            currentItemsCount={paginatedWorkshops.length}
-            itemName={tCommon('workshops')}
+          <DataTable
+            data={paginatedWorkshops}
+            columns={columns}
+            loading={loading}
+            emptyMessage={tCommon('no_results')}
+            pagination={{
+              currentPage: currentPage,
+              totalPages: totalPages,
+              onPageChange: setCurrentPage,
+              totalItems: filteredWorkshops.length,
+              itemName: tCommon('workshops')
+            }}
+            onRowClick={handleRowClick}
+            rowClassName={(workshop) => {
+              const isSelected = selectedWorkshopId === workshop._id;
+              return `border-l-2 ${isSelected ? 'bg-background-subtle border-l-consorci-darkBlue' : 'border-l-transparent hover:border-l-consorci-lightBlue'}`;
+            }}
           />
         </div>
       </div>
@@ -367,7 +358,7 @@ export default function RequestsPage() {
 
       {/* Workshop Solicitation Modal - Flat Sharp Look with Backdrop Blur */}
       {(() => {
-        const workshopForModal = filteredWorkshops.find(w => w._id === selectedWorkshopId);
+        const workshopForModal = workshops.find(w => w._id === selectedWorkshopId);
         
         if (!workshopForModal) return null;
 
