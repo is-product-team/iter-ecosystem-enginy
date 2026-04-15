@@ -58,7 +58,7 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
             color: '#00426B',
             fontFamily: THEME.fonts.primary 
           }}>
-            {student.fullName?.charAt(0)}
+            {student?.fullName?.charAt(0) || '?'}
           </Text>
         </View>
         <View style={{ flex: 1 }}>
@@ -69,7 +69,7 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
             marginBottom: 2,
             fontFamily: THEME.fonts.primary,
           }}>
-            {student.fullName} {student.lastName}
+            {student?.fullName || 'Estudiant'} {student?.lastName || ''}
           </Text>
           <Text style={{ 
             fontSize: 12, 
@@ -78,7 +78,7 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
             textTransform: 'uppercase',
             letterSpacing: 0.5
           }}>
-            ID: {student.idalu}
+            ID: {student?.idalu || 'N/A'}
           </Text>
         </View>
       </View>

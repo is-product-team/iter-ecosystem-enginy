@@ -99,9 +99,9 @@ const MOCK_QUESTIONNAIRE_MODEL = {
   ]
 };
 
-const MOCK_STUDENTS: Student[] = [
-  { studentId: 101, idalu: 'ST001', fullName: 'Joan Vila', lastName: 'Vila' },
-  { studentId: 102, idalu: 'ST002', fullName: 'Marta Soler', lastName: 'Soler' }
+const MOCK_STUDENTS: any[] = [
+  { enrollmentId: 1, studentId: 101, student: { studentId: 101, idalu: 'ST001', fullName: 'Joan Vila', lastName: 'Vila' } },
+  { enrollmentId: 2, studentId: 102, student: { studentId: 102, idalu: 'ST002', fullName: 'Marta Soler', lastName: 'Soler' } }
 ];
 
 const MOCK_WORKSHOP: any = {
