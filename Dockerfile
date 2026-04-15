@@ -1,6 +1,5 @@
-# Stage 1: Base (Node 22 + Librerías sistema)
-FROM node:22-slim AS base
-RUN apt-get update && apt-get install -y openssl curl ca-certificates build-essential python3 && rm -rf /var/lib/apt/lists/*
+# Stage 1: Base (Node 22 con herramientas de construcción incluidas)
+FROM node:22 AS base
 RUN corepack enable
 ENV COREPACK_ENABLE=1
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -77,6 +76,9 @@ COPY --from=builder-api --chown=node:node /app/node_modules ./node_modules
 # Importante: apps/api/dist contiene tanto apps/api como shared debido a rootDir: ../../
 # Al copiarlo a ./dist, mantenemos la estructura que tsc generó para resolver imports relativos
 COPY --from=builder-api --chown=node:node /app/apps/api/dist ./dist
+# Fix: Copiar el paquete shared y sus JS compilados para que el runner los encuentre
+COPY --from=builder-api --chown=node:node /app/shared ./shared
+COPY --from=builder-api --chown=node:node /app/apps/api/dist/shared ./shared
 COPY --from=builder-api --chown=node:node /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder-api --chown=node:node /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder-api --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
