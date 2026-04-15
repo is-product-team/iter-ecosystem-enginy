@@ -313,7 +313,7 @@ export default function DocumentVerificationPage() {
               type="text"
               placeholder={tc('search')}
               value={searchTerm}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-background-subtle border border-border-subtle font-medium text-[13px] outline-none focus:border-consorci-darkBlue transition-all"
             />
             <svg className="w-4 h-4 absolute left-3.5 top-3.5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
