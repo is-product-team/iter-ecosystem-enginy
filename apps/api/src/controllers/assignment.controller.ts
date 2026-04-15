@@ -373,7 +373,12 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
   try {
     const request = await prisma.request.findUnique({
       where: { requestId: parseInt(requestId) },
-      include: { center: true, workshop: true }
+      include: { 
+        center: true, 
+        workshop: true,
+        teacher1: true,
+        teacher2: true
+      }
     });
 
     if (!request) {
@@ -406,8 +411,8 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
         startDate: startDate,
         teachers: {
           create: [
-            ...(request.prof1Id ? [{ userId: request.prof1Id, isPrincipal: true }] : []),
-            ...(request.prof2Id ? [{ userId: request.prof2Id, isPrincipal: false }] : [])
+            ...(request.teacher1?.userId ? [{ userId: request.teacher1.userId, isPrincipal: true }] : []),
+            ...(request.teacher2?.userId ? [{ userId: request.teacher2.userId, isPrincipal: false }] : [])
           ]
         },
         // Initialize default checklist for Phase 2
@@ -422,9 +427,6 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
       }
     });
     
-    // Auto-generate sessions immediately (provisional)
-    await SessionService.syncSessionsForAssignment(newAssignment.assignmentId);
-
     res.status(201).json(newAssignment);
   } catch (error) {
     console.error("Error creating assignment:", error);

@@ -296,14 +296,27 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
 async function logStatusChange(requestId: number, oldState: string, newState: string, userId: number = 0) {
   if (oldState === newState) return;
   try {
+    // Ensure userId is valid or fallback to something else if needed
+    // If userId = 0 or no user found, we might skip or use a generic system user if required by DB
+    // For now, we wrap in try-catch to ensure main logic continues
+    
+    // Check if user exists before logging if userId > 0
+    let finalUserId = userId;
+    if (userId > 0) {
+      const userExists = await prisma.user.findFirst({ where: { userId } });
+      if (!userExists) finalUserId = 1; 
+    } else {
+      finalUserId = 1; // Fallback to Admin id 1
+    }
+
     await prisma.auditLog.create({
       data: {
-        userId: userId, // 0 for system if not provided
+        userId: finalUserId,
         action: `Status change for request ${requestId} from ${oldState} to ${newState}`,
         details: { requestId, oldState, newState }
       }
     });
-  } catch (e) {
-    console.error("Error logging status change:", e);
+  } catch (e: any) {
+    console.warn("⚠️ [AUDIT] Skip log creation - constraint or DB error:", e.message);
   }
 }
