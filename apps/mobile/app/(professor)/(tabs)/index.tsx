@@ -271,25 +271,27 @@ export default function DashboardScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.colors.primary} />
         }
       >
-        {/* ── Contextual Header ── */}
-        <View className="px-5 pt-10 pb-6 flex-row justify-between items-center">
+        {/* ── Apple-style Header ── */}
+        <View className="px-8 pt-16 pb-10 flex-row justify-between items-start">
           <View className="flex-1 mr-4">
-            <Text className="text-[32px] font-bold text-text-primary dark:text-white tracking-tighter leading-tight">
+            <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
               {greeting}
             </Text>
-            {centerName && (
-              <Text className="text-[13px] font-bold text-primary uppercase tracking-widest mt-1">
-                {centerName}
-              </Text>
-            )}
-            <Text className="text-[15px] font-medium text-text-muted mt-0.5">
+            <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
               {subtitle}
             </Text>
+            {centerName && (
+              <View className="mt-4 bg-gray-100 dark:bg-gray-800 self-start px-3 py-1 rounded-full">
+                <Text className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                  {centerName}
+                </Text>
+              </View>
+            )}
           </View>
           <TouchableOpacity
             onPress={() => router.push('/profile')}
             activeOpacity={0.8}
-            className="w-12 h-12 rounded-full bg-primary items-center justify-center overflow-hidden"
+            className="w-12 h-12 rounded-full bg-primary items-center justify-center overflow-hidden mt-2"
           >
             {avatar ? (
               <Image source={{ uri: avatar }} className="w-full h-full" />
