@@ -13,7 +13,7 @@ import centerService, { Center } from "../../../services/centerService";
 import Loading from "@/components/Loading";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import Pagination from "@/components/Pagination";
+import DataTable, { Column } from "@/components/ui/DataTable";
 
 export default function CentersScreen() {
   const t = useTranslations('CentersPage');
@@ -125,6 +125,71 @@ export default function CentersScreen() {
     });
   };
 
+  const columns: Column<Center>[] = [
+    {
+      header: t('table_center'),
+      render: (center) => (
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-sm font-medium text-text-primary tracking-tight">{center.name}</div>
+            <div className="text-[10px] font-medium text-text-muted mt-0.5">{t('center_code')}: {center.centerCode}</div>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: t('table_address'),
+      render: (center) => (
+        <span className="text-[11px] font-medium text-text-primary">
+          {center.address || t('no_address')}
+        </span>
+      )
+    },
+    {
+      header: t('table_email'),
+      render: (center) => (
+        <span className="text-[11px] font-medium text-text-primary">
+          {center.contactEmail || "N/A"}
+        </span>
+      )
+    },
+    {
+      header: t('table_phone'),
+      render: (center) => (
+        <span className="text-[11px] font-medium text-text-primary">
+          {center.contactPhone || "N/A"}
+        </span>
+      )
+    },
+    {
+      header: tCommon('actions'),
+      align: 'right',
+      render: (center) => (
+        <div className="flex justify-end items-center gap-2">
+          <button
+            onClick={() => handleEdit(center)}
+            className="px-4 py-2 text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors"
+          >
+            {tCommon('edit')}
+          </button>
+          <button
+            onClick={() => handleDelete(center.centerId)}
+            className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      )
+    }
+  ];
+
   if (authLoading || !user || user.role.name !== ROLES.ADMIN) {
     return <Loading fullScreen message={tCommon('authenticating')} />;
   }
@@ -168,7 +233,7 @@ export default function CentersScreen() {
               className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
             />
             <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
         </div>
@@ -202,92 +267,19 @@ export default function CentersScreen() {
         </div>
       )}
 
-      {/* Centers Table */}
-      {loading ? (
-        <Loading message={t('loading')} />
-      ) : filteredCenters.length > 0 ? (
-        <div className="bg-background-surface border border-border-subtle overflow-hidden">
-          <div className="premium-table-container">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_center')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_address')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_email')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_phone')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{tCommon('actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {paginatedCenters.map((center) => (
-                  <tr key={center.centerId} className="hover:bg-background-subtle transition-colors group">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors">
-                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                          </svg>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-text-primary tracking-tight">{center.name}</div>
-                          <div className="text-[10px] font-medium text-text-muted mt-0.5">{t('center_code')}: {center.centerCode}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5 text-[11px] font-medium text-text-primary">
-                      {center.address || t('no_address')}
-                    </td>
-                    <td className="px-6 py-5 text-[11px] font-medium text-text-primary">
-                      {center.contactEmail || "N/A"}
-                    </td>
-                    <td className="px-6 py-5 text-[11px] font-medium text-text-primary">
-                      {center.contactPhone || "N/A"}
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex justify-end items-center gap-2">
-                        <button
-                          onClick={() => handleEdit(center)}
-                          className="px-4 py-2 text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors"
-                        >
-                          {tCommon('edit')}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(center.centerId)}
-                          className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
-                        >
-                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Paginació */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalItems={filteredCenters.length}
-            currentItemsCount={paginatedCenters.length}
-            itemName={tCommon('centers').toLowerCase()}
-          />
-        </div>
-      ) : (
-        <div className="text-center py-32 bg-background-surface border border-dashed border-border-subtle">
-          <div className="w-16 h-16 bg-background-subtle flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <p className="text-text-primary font-medium text-sm">{t('empty')}</p>
-          <p className="text-text-muted text-[12px] font-medium mt-2">{t('empty_desc')}</p>
-        </div>
-      )}
+      <DataTable
+        data={paginatedCenters}
+        columns={columns}
+        loading={loading}
+        emptyMessage={t('empty')}
+        pagination={{
+          currentPage,
+          totalPages,
+          onPageChange: setCurrentPage,
+          totalItems: filteredCenters.length,
+          itemName: tCommon('centers').toLowerCase()
+        }}
+      />
 
       <CreateCenterModal
         visible={isModalVisible}

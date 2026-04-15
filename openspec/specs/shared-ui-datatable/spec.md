@@ -14,6 +14,10 @@ The system SHALL provide a reusable `DataTable` component in the shared UI libra
 - **WHEN** a developer provides an array of data and a column configuration to the `DataTable`
 - **THEN** the component MUST render a responsive, styled table following the "Premium" design pattern defined in `globals.css`.
 
+#### Scenario: Rendering interactive cell content
+- **WHEN** a column configuration includes a `render` function that returns interactive elements (e.g., buttons, inputs)
+- **THEN** the `DataTable` MUST correctly mount these elements and maintain their internal state during re-renders.
+
 ### Requirement: Integrated Pagination and Filtering
 The `DataTable` component SHALL encapsulate logic for client-side or server-side pagination and filtering to reduce boilerplate in page components.
 

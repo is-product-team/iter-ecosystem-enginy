@@ -12,7 +12,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
-import Pagination from '@/components/Pagination';
+import DataTable, { Column } from '@/components/ui/DataTable';
 
 export default function StudentsCRUD() {
   const t = useTranslations('Center.Students');
@@ -138,6 +138,52 @@ export default function StudentsCRUD() {
     });
   };
 
+  const columns: Column<Student>[] = [
+    {
+      header: tc('table_info'),
+      render: (a) => (
+        <div className="flex items-center gap-4">
+          <Avatar
+            url={a.photoUrl}
+            name={`${a.fullName} ${a.lastName}`}
+            id={a.studentId}
+            type="student"
+            size="md"
+          />
+          <div className="text-sm font-medium text-text-primary tracking-tight">
+            {a.fullName} {a.lastName}
+          </div>
+        </div>
+      )
+    },
+    {
+      header: t('table_idalu'),
+      render: (a) => (
+        <span className="text-[12px] font-medium text-text-muted font-mono">{a.idalu}</span>
+      )
+    },
+    {
+      header: t('table_course'),
+      render: (a) => (
+        <span className="px-2 py-0.5 bg-background-subtle text-text-primary text-[11px] font-medium border border-border-subtle">
+          {a.grade}
+        </span>
+      )
+    },
+    {
+      header: tc('actions'),
+      align: 'right',
+      render: (a) => (
+        <div className="flex justify-end items-center gap-4">
+          <button onClick={() => handleEdit(a)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
+          <button onClick={() => handleDelete(a.studentId)} className="text-text-muted hover:text-red-500 transition-all">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+        </div>
+      )
+    }
+  ];
+
   const headerActions = (
     <button
       onClick={() => { setEditingStudent(null); setFormData({ fullName: '', lastName: '', idalu: '', grade: '' }); setIsModalOpen(true); }}
@@ -196,76 +242,19 @@ export default function StudentsCRUD() {
         </div>
       </div>
 
-      {loading ? (
-        <Loading />
-      ) : (
-        <div className="bg-background-surface border border-border-subtle overflow-hidden">
-          <div className="premium-table-container">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{tc('table_info')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_idalu')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_course')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{tc('actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {paginatedStudents.map(a => (
-                  <tr key={a.studentId} className="hover:bg-gray-50 transition-colors group">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <Avatar
-                          url={a.photoUrl}
-                          name={`${a.fullName} ${a.lastName}`}
-                          id={a.studentId}
-                          type="student"
-                          size="md"
-                        />
-                        <div>
-                          <div className="text-sm font-medium text-text-primary tracking-tight">{a.fullName} {a.lastName}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="text-[12px] font-medium text-text-muted font-mono">{a.idalu}</span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="px-2 py-0.5 bg-background-subtle text-text-primary text-[11px] font-medium border border-border-subtle">
-                        {a.grade}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex justify-end items-center gap-4">
-                        <button onClick={() => handleEdit(a)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
-                        <button onClick={() => handleDelete(a.studentId)} className="text-text-muted hover:text-red-500 transition-all">
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {filteredStudents.length === 0 && !loading && (
-            <div className="p-20 text-center">
-              <p className="text-text-primary font-medium text-sm">{tc('no_results')}</p>
-              <p className="text-text-muted text-[12px] font-medium mt-2">{tc('try_other_terms')}</p>
-            </div>
-          )}
-
-          {/* Paginació */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalItems={filteredStudents.length}
-            currentItemsCount={paginatedStudents.length}
-            itemName={tc('students').toLowerCase()}
-          />
-        </div>
-      )}
+      <DataTable
+        data={paginatedStudents}
+        columns={columns}
+        loading={loading}
+        emptyMessage={tc('no_results')}
+        pagination={{
+          currentPage,
+          totalPages,
+          onPageChange: setCurrentPage,
+          totalItems: filteredStudents.length,
+          itemName: tc('students').toLowerCase()
+        }}
+      />
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">

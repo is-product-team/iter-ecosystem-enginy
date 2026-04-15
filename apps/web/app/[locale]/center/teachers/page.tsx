@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
 import getApi from '@/services/api';
-import Pagination from "@/components/Pagination";
+import DataTable, { Column } from '@/components/ui/DataTable';
 
 export default function TeachersCRUD() {
   const t = useTranslations('Center.Teachers');
@@ -130,6 +130,46 @@ export default function TeachersCRUD() {
       }
     });
   };
+
+  const columns: Column<Teacher>[] = [
+    {
+      header: t('table_name'),
+      render: (p) => (
+        <div className="flex items-center gap-4">
+          <Avatar
+            url={p.user?.photoUrl}
+            name={p.name}
+            id={p.user?.userId || p.teacherId}
+            type="user"
+            size="md"
+            email={p.user?.email}
+          />
+          <div className="text-sm font-medium text-text-primary tracking-tight">
+            {p.name}
+          </div>
+        </div>
+      )
+    },
+    {
+      header: t('table_email'),
+      render: (p) => (
+        <span className="text-sm font-medium text-text-muted">{p.contact}</span>
+      )
+    },
+    {
+      header: tc('actions'),
+      align: 'right',
+      render: (p) => (
+        <div className="flex justify-end items-center gap-4">
+          <button onClick={() => handleEdit(p)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
+          <button onClick={() => handleDelete(p.teacherId)} className="text-text-muted hover:text-red-500 transition-all">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+        </div>
+      )
+    }
+  ];
+
   const headerActions = (
     <button
       onClick={() => { setEditingTeacher(null); setFormData({ name: '', contact: '', password: '' }); setIsModalOpen(true); }}
@@ -174,71 +214,19 @@ export default function TeachersCRUD() {
         </div>
       </div>
 
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
-          <div className="bg-background-surface border border-border-subtle overflow-hidden">
-            <div className="premium-table-container">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-background-subtle border-b border-border-subtle">
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_name')}</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_email')}</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{tc('actions')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border-subtle">
-                  {paginatedTeachers.map(p => (
-                    <tr key={p.teacherId} className="hover:bg-gray-50 transition-colors group">
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-4">
-                          <Avatar
-                            url={p.user?.photoUrl}
-                            name={p.name}
-                            id={p.user?.userId || p.teacherId}
-                            type="user"
-                            size="md"
-                            email={p.user?.email}
-                          />
-                          <div>
-                            <div className="text-sm font-medium text-text-primary tracking-tight">{p.name}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <span className="text-sm font-medium text-text-muted">{p.contact}</span>
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="flex justify-end items-center gap-4">
-                          <button onClick={() => handleEdit(p)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
-                          <button onClick={() => handleDelete(p.teacherId)} className="text-text-muted hover:text-red-500 transition-all">
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-            {filteredTeachers.length === 0 && (
-              <div className="p-20 text-center">
-                <p className="text-text-primary font-medium text-sm">{tc('no_results')}</p>
-                <p className="text-text-muted text-[12px] font-medium mt-2">{tc('try_other_terms')}</p>
-              </div>
-            )}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalItems={filteredTeachers.length}
-            currentItemsCount={paginatedTeachers.length}
-            itemName={tc('teachers').toLowerCase()}
-          />
-        </>
-      )}
+      <DataTable
+        data={paginatedTeachers}
+        columns={columns}
+        loading={loading}
+        emptyMessage={tc('no_results')}
+        pagination={{
+          currentPage,
+          totalPages,
+          onPageChange: setCurrentPage,
+          totalItems: filteredTeachers.length,
+          itemName: tc('teachers').toLowerCase()
+        }}
+      />
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">

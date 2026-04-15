@@ -24,29 +24,29 @@ export default function Phase2Table({
   return (
     <div className="bg-background-surface border border-border-subtle overflow-hidden">
       <div className="premium-table-container">
-        <table className="w-full text-left">
+        <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-background-subtle border-b border-border-subtle">
-              <th className="px-8 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_info')}</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('docs.pedagogical_agreement')}</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('docs.mobility_authorization')}</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('docs.image_rights')}</th>
-              <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest text-right">{tCommon('actions')}</th>
+            <tr className="bg-background-subtle/50 border-b border-border-subtle">
+              <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_info')}</th>
+              <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('docs.pedagogical_agreement')}</th>
+              <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('docs.mobility_authorization')}</th>
+              <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('docs.image_rights')}</th>
+              <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest text-right">{tCommon('actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">
             {enrollments.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-8 py-12 text-center">
-                  <p className="text-[13px] font-medium text-text-muted italic opacity-60">
+                <td colSpan={5} className="px-8 py-20 text-center">
+                  <p className="text-text-muted text-xs font-black uppercase tracking-widest">
                     {t('no_students')}
                   </p>
                 </td>
               </tr>
             ) : (
               enrollments.map((ins) => (
-                <tr key={ins.enrollmentId} className="hover:bg-background-subtle/30 transition-colors">
-                  <td className="px-8 py-5">
+                <tr key={ins.enrollmentId} className="hover:bg-background-subtle/30 transition-colors group">
+                  <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <Avatar
                         url={ins.student.photoUrl}
@@ -65,7 +65,7 @@ export default function Phase2Table({
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-8 py-6">
                     <DocumentUpload
                       assignmentId={assignmentId}
                       enrollmentId={ins.enrollmentId}
@@ -77,7 +77,7 @@ export default function Phase2Table({
                       variant="table"
                     />
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-8 py-6">
                     <DocumentUpload
                       assignmentId={assignmentId}
                       enrollmentId={ins.enrollmentId}
@@ -89,7 +89,7 @@ export default function Phase2Table({
                       variant="table"
                     />
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-8 py-6">
                     <DocumentUpload
                       assignmentId={assignmentId}
                       enrollmentId={ins.enrollmentId}
@@ -101,7 +101,7 @@ export default function Phase2Table({
                       variant="table"
                     />
                   </td>
-                  <td className="px-6 py-5 text-right">
+                  <td className="px-8 py-6 text-right">
                     <button
                       onClick={() => onRemoveStudent(ins.student.studentId)}
                       className="p-2 text-text-muted hover:text-red-500 hover:bg-red-50 transition-all rounded"

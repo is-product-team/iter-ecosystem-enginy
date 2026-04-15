@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService, { Assignment } from '@/services/assignmentService';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
-import Pagination from "@/components/Pagination";
 import { useTranslations } from 'next-intl';
-import { ROLES } from '@iter/shared';
+import DataTable, { Column } from '@/components/ui/DataTable';
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
@@ -37,7 +36,7 @@ export default function DocumentVerificationPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // all, pending, problem, validated
-  const itemsPerPage = 15; // Increased density
+  const itemsPerPage = 15;
 
   const router = useRouter();
   const params = useParams();
@@ -49,8 +48,7 @@ export default function DocumentVerificationPage() {
     { id: 'image', field: 'isImageRightsValidated', urlField: 'imageRightsUrl', label: 'R', nameKey: 'doc_names.rights' }
   ] as const;
 
-  // Flat list transformation
-  const flatEnrollments = assignments.flatMap(assig =>
+  const flatEnrollments = useMemo(() => assignments.flatMap(assig =>
     (assig.enrollments || []).map(ins => ({
       ...ins,
       workshopTitle: assig.workshop?.title,
@@ -60,10 +58,9 @@ export default function DocumentVerificationPage() {
       endDate: assig.endDate,
       workshop: assig.workshop
     }))
-  );
+  ), [assignments]);
 
-  // Filtered list
-  const filteredEnrollments = flatEnrollments.filter(row => {
+  const filteredEnrollments = useMemo(() => flatEnrollments.filter(row => {
     const matchesSearch = row.student?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       row.centerName?.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -76,7 +73,14 @@ export default function DocumentVerificationPage() {
       return matchesSearch && DOCUMENT_CONFIG.every(doc => row[doc.field]);
     }
     return matchesSearch;
-  });
+  }), [flatEnrollments, searchTerm, statusFilter]);
+
+  const paginatedEnrollments = useMemo(() => filteredEnrollments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  ), [filteredEnrollments, currentPage]);
+
+  const totalPages = Math.ceil(filteredEnrollments.length / itemsPerPage);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
@@ -142,7 +146,7 @@ export default function DocumentVerificationPage() {
     try {
       await assignmentService.validateDocument(idEnrollment, field, valid);
       toast.success(valid ? t('success_validate') : t('success_unvalidate'));
-      loadData(); // Refresh list to see updated status
+      loadData();
     } catch (err) {
       console.error(err);
       toast.error(t('error_validate'));
@@ -158,10 +162,8 @@ export default function DocumentVerificationPage() {
       const isRowFullySelected = rowDocs.length > 0 && rowDocs.every(rd => prev.some(p => p.enrollmentId === rd.enrollmentId && p.field === rd.field));
 
       if (isRowFullySelected) {
-        // Unselect only those from this row
         return prev.filter(p => p.enrollmentId !== row.enrollmentId);
       } else {
-        // Select all pending from this row, avoid duplicates
         const otherDocs = prev.filter(p => p.enrollmentId !== row.enrollmentId);
         return [...otherDocs, ...rowDocs];
       }
@@ -186,7 +188,6 @@ export default function DocumentVerificationPage() {
 
     setLoading(true);
     try {
-      // Execute in small batches to avoid timeout
       const batchSize = 5;
       for (let i = 0; i < selectedDocs.length; i += batchSize) {
         const batch = selectedDocs.slice(i, i + batchSize);
@@ -202,15 +203,103 @@ export default function DocumentVerificationPage() {
     }
   };
 
-  const totalPages = Math.ceil(filteredEnrollments.length / itemsPerPage);
-  const paginatedEnrollments = filteredEnrollments.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const isAllPendingOnPageSelected = useMemo(() => {
+    const allPendingOnPage = paginatedEnrollments.flatMap(row => 
+      DOCUMENT_CONFIG
+        .filter(doc => row[doc.urlField] && !row[doc.field])
+        .map(doc => ({ enrollmentId: row.enrollmentId, field: doc.field }))
+    );
+    return allPendingOnPage.length > 0 && allPendingOnPage.every(rd => 
+      selectedDocs.some(sd => sd.enrollmentId === rd.enrollmentId && sd.field === rd.field)
+    );
+  }, [paginatedEnrollments, selectedDocs]);
+
+  const columns: Column<any>[] = [
+    {
+      header: '',
+      align: 'center',
+      headerClassName: 'w-[60px]',
+      render: (row) => {
+        const rowPendingDocs = DOCUMENT_CONFIG.filter(doc => row[doc.urlField] && !row[doc.field]);
+        if (rowPendingDocs.length === 0) return null;
+        
+        const isRowFullySelected = rowPendingDocs.every(rd => 
+          selectedDocs.some(sd => sd.enrollmentId === row.enrollmentId && sd.field === rd.field)
+        );
+
+        return (
+          <div className="flex items-center justify-center">
+            <input
+              type="checkbox"
+              checked={isRowFullySelected}
+              onChange={() => toggleRowSelection(row)}
+              className="w-4 h-4 border-border-subtle accent-consorci-darkBlue cursor-pointer"
+            />
+          </div>
+        );
+      }
+    },
+    {
+      header: t('table_student'),
+      render: (row) => (
+        <div onClick={() => setSelectedRow(row)} className="cursor-pointer">
+          <div className="font-bold text-text-primary text-[14px]">{row.student?.fullName}</div>
+          <div className="text-[11px] text-text-muted mt-0.5">ID: {row.student?.idalu}</div>
+        </div>
+      )
+    },
+    {
+      header: t('table_center_workshop'),
+      render: (row) => (
+        <div onClick={() => setSelectedRow(row)} className="cursor-pointer">
+          <div className="font-medium text-text-primary text-[13px] truncate">{row.centerName}</div>
+          <div className="text-[12px] font-medium text-consorci-darkBlue mt-0.5">{row.workshopTitle}</div>
+        </div>
+      )
+    },
+    {
+      header: t('table_docs'),
+      render: (row) => (
+        <div className="flex items-center gap-3">
+          {DOCUMENT_CONFIG.map((docConfig) => {
+            const url = row[docConfig.urlField];
+            const valid = row[docConfig.field];
+            return (
+              <div
+                key={docConfig.id}
+                title={url ? (valid ? 'Validat' : 'Pendent') : 'No pujat'}
+                className={`w-8 h-8 flex items-center justify-center text-[11px] font-bold border ${url
+                    ? valid
+                      ? 'bg-green-50 border-green-200 text-green-700'
+                      : 'bg-amber-50 border-amber-200 text-amber-700 animate-pulse'
+                    : 'bg-background-subtle border-border-subtle text-text-muted opacity-40'
+                  }`}
+              >
+                {docConfig.label}
+              </div>
+            );
+          })}
+        </div>
+      )
+    },
+    {
+      header: tc('actions'),
+      align: 'right',
+      render: (row) => (
+        <button
+          onClick={() => setSelectedRow(row)}
+          className="inline-flex items-center justify-center px-4 py-2 border border-border-subtle text-[11px] font-bold text-text-muted hover:text-consorci-darkBlue hover:border-consorci-darkBlue transition-all"
+        >
+          {tc('view')}
+        </button>
+      )
+    }
+  ];
 
   if (authLoading || !user) {
     return <Loading fullScreen message={tc('authenticating')} />;
   }
+
   return (
     <DashboardLayout
       title={t('title')}
@@ -224,7 +313,7 @@ export default function DocumentVerificationPage() {
               type="text"
               placeholder={tc('search')}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-background-subtle border border-border-subtle font-medium text-[13px] outline-none focus:border-consorci-darkBlue transition-all"
             />
             <svg className="w-4 h-4 absolute left-3.5 top-3.5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -254,125 +343,38 @@ export default function DocumentVerificationPage() {
           )}
         </div>
 
-        {/* List of Verifications */}
-        <div className="bg-background-surface border border-border-subtle overflow-hidden">
-          <div className="premium-table-container">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">                  <th className="px-6 py-4 w-[60px]">
-                    <div className="flex items-center justify-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedDocs.length > 0 && selectedDocs.length === paginatedEnrollments.flatMap(r => 
-                          DOCUMENT_CONFIG.filter(doc => r[doc.urlField] && !r[doc.field])
-                        ).length}
-                        onChange={toggleAllSelection}
-                        className="w-4 h-4 border-border-subtle accent-consorci-darkBlue cursor-pointer"
-                      />
-                    </div>
-                  </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_student')}</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_center_workshop')}</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_docs')}</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-muted uppercase tracking-widest text-right">{tc('actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {loading && paginatedEnrollments.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-20 text-center">
-                      <Loading message={tc('loading')} />
-                    </td>
-                  </tr>
-                ) : paginatedEnrollments.length > 0 ? (
-                  paginatedEnrollments.map((row) => {
-                    const hasPending = DOCUMENT_CONFIG.some(doc => row[doc.urlField] && !row[doc.field]);
-
-                    return (
-                      <tr
-                        key={row.enrollmentId}
-                        className={`group hover:bg-background-subtle/30 transition-colors ${selectedRow?.enrollmentId === row.enrollmentId ? 'bg-consorci-darkBlue/5' : ''}`}
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-center">
-                            <input
-                              type="checkbox"
-                              checked={DOCUMENT_CONFIG.some(doc => row[doc.urlField] && !row[doc.field] && selectedDocs.some(sd => sd.enrollmentId === row.enrollmentId && sd.field === doc.field))}
-                              onChange={() => toggleRowSelection(row)}
-                              className="w-4 h-4 border-border-subtle accent-consorci-darkBlue cursor-pointer"
-                            />
-                          </div>
-                        </td>
-                        <td className="px-6 py-5 cursor-pointer" onClick={() => setSelectedRow(row)}>
-                          <div className="font-bold text-text-primary text-[14px]">{row.student?.fullName}</div>
-                          <div className="text-[11px] text-text-muted mt-0.5">ID: {row.student?.idalu}</div>
-                        </td>
-                        <td className="px-6 py-5 cursor-pointer" onClick={() => setSelectedRow(row)}>
-                          <div className="font-medium text-text-primary text-[13px] truncate">{row.centerName}</div>
-                          <div className="text-[12px] font-medium text-consorci-darkBlue mt-0.5">{row.workshopTitle}</div>
-                        </td>
-                        <td className="px-6 py-5">
-                          <div className="flex items-center gap-3">
-                            {DOCUMENT_CONFIG.map((docConfig) => {
-                              const url = row[docConfig.urlField];
-                              const valid = row[docConfig.field];
-                              return (
-                                <div
-                                  key={docConfig.id}
-                                  title={url ? (valid ? 'Validat' : 'Pendent') : 'No pujat'}
-                                  className={`w-8 h-8 flex items-center justify-center text-[11px] font-bold border ${url
-                                      ? valid
-                                        ? 'bg-green-50 border-green-200 text-green-700'
-                                        : 'bg-amber-50 border-amber-200 text-amber-700 animate-pulse'
-                                      : 'bg-background-subtle border-border-subtle text-text-muted opacity-40'
-                                    }`}
-                                >
-                                  {docConfig.label}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </td>
-                        <td className="px-6 py-5 text-right">
-                          <button
-                            onClick={() => setSelectedRow(row)}
-                            className="inline-flex items-center justify-center px-4 py-2 border border-border-subtle text-[11px] font-bold text-text-muted hover:text-consorci-darkBlue hover:border-consorci-darkBlue transition-all"
-                          >
-                            {tc('view')}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-24 text-center">
-                      <div className="text-text-muted text-[13px] font-medium italic opacity-40">{tc('no_results')}</div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        <div className="flex justify-start px-2">
+          <label className="flex items-center gap-2 text-[11px] font-bold text-text-muted uppercase cursor-pointer hover:text-consorci-darkBlue transition-colors">
+            <input
+              type="checkbox"
+              checked={isAllPendingOnPageSelected}
+              onChange={toggleAllSelection}
+              className="w-4 h-4 border-border-subtle accent-consorci-darkBlue cursor-pointer"
+            />
+            {t('select_all_pending_page') || 'Seleccionar tots los pendents de la pàgina'}
+          </label>
         </div>
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          totalItems={filteredEnrollments.length}
-          currentItemsCount={paginatedEnrollments.length}
-          itemName={tc('students')}
+        <DataTable
+          data={paginatedEnrollments}
+          columns={columns}
+          loading={loading && assignments.length === 0}
+          emptyMessage={tc('no_results')}
+          pagination={{
+            currentPage,
+            totalPages,
+            onPageChange: setCurrentPage,
+            totalItems: filteredEnrollments.length,
+            itemName: tc('students').toLowerCase()
+          }}
+          rowClassName={(row) => selectedRow?.enrollmentId === row.enrollmentId ? 'bg-consorci-darkBlue/5' : ''}
         />
       </div>
 
       {/* Modern Side Drawer for Details */}
       {selectedRow && (
         <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setSelectedRow(null)} />
-
-          {/* Drawer Content */}
           <div className="relative w-full max-w-2xl bg-background-surface border-l border-border-subtle flex flex-col animate-in slide-in-from-right duration-300">
             <div className="p-8 border-b border-border-subtle bg-background-subtle flex justify-between items-center">
               <div>
@@ -457,7 +459,7 @@ export default function DocumentVerificationPage() {
       {/* Notification Modal (Matches Dashboard Style) */}
       {showNotificationModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6">
-          <div className="bg-background-surface w-full max-w-xl border border-border-subtle">
+          <div className="bg-background-surface w-full max-xl border border-border-subtle">
             <div className="p-8 border-b border-border-subtle bg-background-subtle flex justify-between items-center">
               <h3 className="text-lg font-bold text-text-primary tracking-tight flex items-center gap-3">
                 <svg className="w-5 h-5 text-consorci-darkBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
