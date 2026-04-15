@@ -10,9 +10,12 @@ import StudentSessionCard from '../../../components/session/StudentSessionCard';
 
 export default function SessionScreen() {
   const { t } = useTranslation();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, sessionNum: paramNum, sessionId: paramId } = useLocalSearchParams<{ id: string, sessionNum?: string, sessionId?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  const num = paramNum ? parseInt(paramNum) : 1;
+  const sessionId = paramId ? parseInt(paramId) : null;
 
   const [loading, setLoading] = React.useState(true);
   const [submitting, setSubmitting] = React.useState(false);
@@ -39,7 +42,7 @@ export default function SessionScreen() {
 
       // 3. Check if attendance already exists (to pre-fill)
       try {
-        const existingRes = await getAttendance(id as string);
+        const existingRes = await api.get(`assignments/${id}/sessions/${num}`);
         if (existingRes.data && existingRes.data.length > 0) {
             existingRes.data.forEach((record: any) => {
                 initialAttendance[record.studentId] = record.status;
@@ -50,13 +53,12 @@ export default function SessionScreen() {
             setIsSubmitted(true);
         }
       } catch (_err) {
-        // No existing attendance
+        // No existing attendance for this specific session
       }
 
       setAttendance(initialAttendance);
-      if (isSubmitted || Object.keys(initialAttendance).some(k => initialAttendance[k] !== 'PRESENT')) {
-          // If we have data, we might want to start in WORK mode, but for now let's respect isSubmitted
-          if (isSubmitted) setSessionMode('WORK');
+      if (isSubmitted) {
+          setSessionMode('WORK');
       }
 
     } catch (error) {
@@ -65,7 +67,7 @@ export default function SessionScreen() {
     } finally {
       setLoading(false);
     }
-  }, [id, isSubmitted, t]);
+  }, [id, num, isSubmitted, t]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -81,14 +83,13 @@ export default function SessionScreen() {
   const submitAttendance = async () => {
     setSubmitting(true);
     try {
-        const payload = Object.keys(attendance).map(studentId => ({
-            assignmentId: parseInt(id as string),
-            studentId: parseInt(studentId),
-            status: attendance[studentId],
+        const payload = enrollments.map(e => ({
+            enrollmentId: e.enrollmentId,
+            status: attendance[e.studentId] || 'PRESENT',
             observations: observations
         }));
 
-        await api.post('attendance/batch', { attendance: payload, assignmentId: id }); 
+        await api.post(`assignments/${id}/sessions/${num}`, payload); 
         
         setIsSubmitted(true);
         setSessionMode('WORK');
@@ -159,16 +160,44 @@ export default function SessionScreen() {
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 24, paddingBottom: 120 }}>
          
          <View style={{ marginBottom: 40, marginTop: 12, paddingHorizontal: 8 }}>
-            <Text style={{ 
-              color: THEME.colors.text.primary, 
-              fontSize: 34, 
-              fontWeight: '900', 
-              marginBottom: 12,
-              fontFamily: THEME.fonts.primary,
-              letterSpacing: -1
-            }}>
-                {sessionMode === 'ATTENDANCE' ? t('Session.attendance_header') : t('Session.work_header')}
-            </Text>
+            <View className="flex-row justify-between items-center mb-1">
+               <View className="flex-row items-center gap-2">
+                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: THEME.colors.success }} />
+                 <Text className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">En línia</Text>
+               </View>
+               {isSubmitted && (
+                 <View className="bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 flex-row items-center gap-1">
+                   <Ionicons name="cloud-done" size={12} color={THEME.colors.success} />
+                   <Text className="text-[10px] font-bold text-emerald-700 uppercase">Sincronitzat</Text>
+                 </View>
+               )}
+            </View>
+            <View className="flex-row justify-between items-end">
+              <View className="flex-1">
+                <Text style={{ 
+                  color: THEME.colors.text.primary, 
+                  fontSize: 34, 
+                  fontWeight: '900', 
+                  marginBottom: 12,
+                  fontFamily: THEME.fonts.primary,
+                  letterSpacing: -1
+                }}>
+                    {sessionMode === 'ATTENDANCE' ? t('Session.attendance_header') : t('Session.work_header')}
+                </Text>
+              </View>
+              {sessionMode === 'ATTENDANCE' && !isSubmitted && (
+                <Pressable 
+                  onPress={() => {
+                    const allPresent: any = {};
+                    enrollments.forEach(e => allPresent[e.studentId] = 'PRESENT');
+                    setAttendance(allPresent);
+                  }}
+                  className="bg-indigo-50 px-5 py-2.5 rounded-2xl mb-3 border border-indigo-100 active:bg-indigo-100"
+                >
+                  <Text className="text-indigo-700 font-black text-[10px] uppercase tracking-widest">{t('Session.mark_all_present') || 'Tots presents'}</Text>
+                </Pressable>
+              )}
+            </View>
             <Text style={{ 
               color: THEME.colors.text.muted, 
               fontSize: 15, 
@@ -186,7 +215,10 @@ export default function SessionScreen() {
          {enrollments.map((item) => (
              <StudentSessionCard
                 key={item.enrollmentId}
-                student={item.student}
+                student={{
+                  ...item.student,
+                  imageRightsValidated: item.enrollment?.imageRightsValidated
+                }}
                 status={attendance[item.studentId]}
                 onStatusChange={(status) => updateStatus(String(item.studentId), status)}
                 onEvaluate={() => router.push(`/(professor)/evaluation/${item.enrollmentId}?assignmentId=${id}`)}

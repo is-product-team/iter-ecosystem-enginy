@@ -227,11 +227,18 @@ export const getStudents = async (req: Request, res: Response) => {
       }
     });
 
-    // Flatten structure to return just students with relevant info + evaluated status
-    const students = enrollments.map((i: any) => ({
-      ...i.student,
-      evaluated: i.evaluations.length > 0 // true if exists, false otherwise
-    }));
+    // Flatten structure to return students with enrollment info
+    const students = enrollments.map((i: any) => {
+      const docsStatus = (i.docsStatus as any) || {};
+      return {
+        ...i.student,
+        enrollmentId: i.enrollmentId,
+        evaluated: i.evaluations.length > 0,
+        enrollment: {
+          imageRightsValidated: !!docsStatus.image_rightsValidated
+        }
+      };
+    });
     res.json(students);
   } catch (_error) {
     res.status(500).json({ error: 'Error obtaining students' });
@@ -386,12 +393,17 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
       return res.status(400).json({ error: 'An assignment already exists for this request.' });
     }
 
+    // Get default startDate from Execution Phase if possible
+    const { phase } = await isPhaseActive(PHASES.EXECUTION);
+    const startDate = phase?.startDate || new Date();
+
     const newAssignment = await prisma.assignment.create({
       data: {
         requestId: request.requestId,
         centerId: request.centerId,
         workshopId: request.workshopId,
         status: 'PUBLISHED',
+        startDate: startDate,
         teachers: {
           create: [
             ...(request.prof1Id ? [{ userId: request.prof1Id, isPrincipal: true }] : []),
@@ -409,6 +421,9 @@ export const createAssignmentFromRequest = async (req: Request, res: Response) =
         }
       }
     });
+    
+    // Auto-generate sessions immediately (provisional)
+    await SessionService.syncSessionsForAssignment(newAssignment.assignmentId);
 
     res.status(201).json(newAssignment);
   } catch (error) {
@@ -768,6 +783,13 @@ export const validateEnrollmentDocument = async (req: Request, res: Response) =>
         }
       }
     });
+
+    // AUTO-ACTIVATION TRIGGER
+    // If the document is being validated (true), check if the whole assignment is now complete
+    if (valid) {
+      await checkAndActivateAssignment(enrollment.assignmentId);
+    }
+
     res.json(updated);
   } catch (error) {
     console.error("Error validating document:", error);
@@ -797,6 +819,82 @@ async function logStatusChange(assignmentId: number, oldState: string, newState:
     });
   } catch (e) {
     console.error("Error logging status change:", e);
+  }
+}
+
+/**
+ * HELPER: Checks if an assignment has all its documentation validated and activates it.
+ */
+async function checkAndActivateAssignment(assignmentId: number) {
+  try {
+    const assignment = await prisma.assignment.findUnique({
+      where: { assignmentId },
+      include: { 
+        enrollments: true,
+        workshop: true
+      }
+    });
+
+    if (!assignment || assignment.status === 'IN_PROGRESS' || assignment.status === 'COMPLETED') {
+      return; // Already active or done
+    }
+
+    const { enrollments } = assignment;
+    if (enrollments.length === 0) return;
+
+    // Check if ALL documents for ALL enrollments are validated
+    const allValidated = enrollments.every(e => {
+      const status = (e.docsStatus as any) || {};
+      return status.isPedagogicalAgreementValidated === true &&
+             status.isMobilityAuthorizationValidated === true &&
+             status.isImageRightsValidated === true;
+    });
+
+    if (allValidated) {
+      console.log(`🚀 Automated Activation: Activating Assignment ${assignmentId}...`);
+      
+      await prisma.$transaction(async (tx) => {
+        // 1. Mark enrollments as confirmed in JSON metadata
+        for (const enrollment of enrollments) {
+          const docsStatus = (enrollment.docsStatus as any) || {};
+          await tx.enrollment.update({
+            where: { enrollmentId: enrollment.enrollmentId },
+            data: {
+              docsStatus: {
+                ...docsStatus,
+                cebRegistrationConfirmed: true
+              }
+            }
+          });
+        }
+
+        // 2. Ensure sessions are synchronized one last time
+        await SessionService.syncSessionsForAssignment(assignmentId);
+
+        // 3. Update status to IN_PROGRESS
+        await tx.assignment.update({
+          where: { assignmentId },
+          data: { status: 'IN_PROGRESS' }
+        });
+      });
+
+      // 4. Log the change
+      await logStatusChange(assignmentId, assignment.status, 'IN_PROGRESS');
+
+      // 5. Send notification to center
+      await createNotificationInternal({
+        centerId: assignment.centerId,
+        title: 'registration_confirmed_title',
+        message: JSON.stringify({
+          key: 'registration_confirmed_msg',
+          params: { title: assignment.workshop?.title || 'Taller' }
+        }),
+        type: 'PHASE',
+        importance: 'INFO'
+      });
+    }
+  } catch (error) {
+    console.error(`❌ Error in checkAndActivateAssignment (${assignmentId}):`, error);
   }
 }
 
@@ -999,13 +1097,12 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
     }
 
     // 2. Ensure attendance records are initialized
-    await SessionService.ensureAttendanceRecords(assignmentId, num, targetSession.sessionDate);
+    await SessionService.ensureAttendanceRecords(assignmentId, targetSession.sessionId, num, targetSession.sessionDate);
 
     // 3. Get combined attendance list
     const rawAttendance = await prisma.attendance.findMany({
       where: {
-        enrollment: { assignmentId },
-        sessionNumber: num
+        sessionId: targetSession.sessionId
       },
       include: {
         enrollment: {
@@ -1016,21 +1113,25 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
       }
     });
 
-    const attendance = rawAttendance.map((r) => ({
-      attendanceId: r.attendanceId,
-      enrollmentId: r.enrollmentId,
-      sessionNumber: r.sessionNumber,
-      sessionDate: r.sessionDate.toISOString(),
-      status: r.status,
-      observations: r.observations,
-      enrollment: {
-        student: {
-          fullName: r.enrollment.student.fullName,
-          lastName: r.enrollment.student.lastName,
-          idalu: r.enrollment.student.idalu
+    const attendance = rawAttendance.map((r) => {
+      const docsStatus = (r.enrollment.docsStatus as any) || {};
+      return {
+        attendanceId: r.attendanceId,
+        enrollmentId: r.enrollmentId,
+        sessionNumber: r.sessionNumber,
+        sessionDate: r.sessionDate.toISOString(),
+        status: r.status,
+        observations: r.observations,
+        enrollment: {
+          student: {
+            fullName: r.enrollment.student.fullName,
+            lastName: r.enrollment.student.lastName,
+            idalu: r.enrollment.student.idalu
+          },
+          imageRightsValidated: !!docsStatus.image_rightsValidated
         }
-      }
-    }));
+      };
+    });
 
     res.json(attendance);
   } catch (error) {
@@ -1102,12 +1203,17 @@ export const registerAttendance = async (req: Request, res: Response) => {
     });
 
     const sessionDate = session ? session.sessionDate : new Date();
+    const sessionId = session ? session.sessionId : null;
+
+    if (!sessionId) {
+      return res.status(404).json({ error: 'Session not found for the given number.' });
+    }
 
     // 2. Perform updates in a transaction
     await prisma.$transaction(async (tx) => {
       for (const item of validatedData) {
         const existing = await tx.attendance.findFirst({
-          where: { enrollmentId: item.enrollmentId, sessionNumber: num }
+          where: { enrollmentId: item.enrollmentId, sessionId: sessionId }
         });
 
         if (existing) {
@@ -1122,6 +1228,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
           await tx.attendance.create({
             data: {
               enrollmentId: item.enrollmentId,
+              sessionId: sessionId,
               sessionNumber: num,
               sessionDate: sessionDate,
               status: item.status,
@@ -1258,5 +1365,49 @@ export const closeAssignment = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Error in closeAssignment:", error);
     res.status(400).json({ error: error.message });
+  }
+};
+export const bulkAssignTeacherToSessions = async (req: Request, res: Response) => {
+  const { idAssignment: assignmentId } = req.params;
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'Missing userId' });
+  }
+
+  try {
+    const aid = parseInt(assignmentId as string);
+    const uid = parseInt(userId as string);
+
+    // 1. Get all sessions for this assignment
+    const sessions = await prisma.session.findMany({
+      where: { assignmentId: aid }
+    });
+
+    if (sessions.length === 0) {
+      return res.status(404).json({ error: 'No sessions found for this assignment' });
+    }
+
+    // 2. For each session, upsert the teacher relation
+    const results = await Promise.all(sessions.map(s => 
+      prisma.sessionTeacher.upsert({
+        where: {
+          sessionId_userId: {
+            sessionId: s.sessionId,
+            userId: uid
+          }
+        },
+        update: {}, // No change if already exists
+        create: {
+          sessionId: s.sessionId,
+          userId: uid
+        }
+      })
+    ));
+
+    res.json({ success: true, count: results.length });
+  } catch (error) {
+    console.error("Error in bulkAssignTeacherToSessions:", error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };

@@ -126,7 +126,13 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
                           if (event.metadata.isEvaluation) {
                               router.push(`/(professor)/questionnaire/${event.metadata.assignmentId}`);
                           } else {
-                              router.push(`/(professor)/session/${event.metadata.assignmentId}`);
+                              router.push({
+                                pathname: `/(professor)/session/${event.metadata.assignmentId}`,
+                                params: { 
+                                  sessionNum: event.metadata.sessionNum,
+                                  sessionId: event.metadata.sessionId 
+                                }
+                              } as any);
                           }
                         }}
                         className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg shadow-slate-200 ${

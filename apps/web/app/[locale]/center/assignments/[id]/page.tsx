@@ -215,21 +215,10 @@ export default function AssignmentDetailsPage() {
             </p>
           </div>
           {allDocumentsValidated && (
-            <button
-              onClick={async () => {
-                if (!confirm(t('finalize_section.confirm_dialog'))) return;
-                try {
-                  await assignmentService.confirmRegistration(parseInt(id));
-                  toast.success(t('finalize_section.success'));
-                  window.location.reload();
-                } catch (_e) {
-                  toast.error(tCommon('save_error'));
-                }
-              }}
-              className="px-8 py-4 bg-green-600 text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
-            >
-              {t('finalize_section.confirm_btn')}
-            </button>
+            <div className="flex items-center gap-3 text-green-600 font-medium text-[13px] animate-pulse">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              {locale === 'ca' ? 'Activació automàtica en curs...' : 'Activación automática en curso...'}
+            </div>
           )}
         </div>
       )}

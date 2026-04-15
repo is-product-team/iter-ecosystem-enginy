@@ -47,6 +47,7 @@ router.get('/:idAssignment/attendance', authenticateToken, assignmentController.
 // Phase 3: Dynamic Session Teaching Staff
 router.post('/sessions/:idSession/staff', authenticateToken, assignmentController.addSessionTeacher);
 router.delete('/sessions/:idSession/staff/:idUser', authenticateToken, assignmentController.removeSessionTeacher);
+router.post('/:idAssignment/sessions/bulk-assign', authenticateToken, assignmentController.bulkAssignTeacherToSessions);
 
 // Phase 4: Closing
 router.post('/:idAssignment/close', authenticateToken, assignmentController.closeAssignment);

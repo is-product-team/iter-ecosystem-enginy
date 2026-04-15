@@ -3,6 +3,7 @@ import prisma from '../lib/prisma.js';
 import { isPhaseActive } from '../lib/phaseUtils.js';
 import { PHASES, REQUEST_STATUSES } from '@iter/shared';
 import { SessionService } from './session.service.js';
+import { createNotificationInternal } from '../controllers/notification.controller.js';
 
 interface PendingCenter {
     centerId: number;
@@ -177,6 +178,19 @@ export class AutoAssignmentService {
                     status: REQUEST_STATUSES.APPROVED as RequestStatus,
                     studentsAprox: center.assignedCount
                 }
+            });
+
+            // Trigger notification
+            const workshop = await prisma.workshop.findUnique({ where: { workshopId } });
+            await createNotificationInternal({
+                centerId: center.centerId,
+                title: 'workshop_assigned_title',
+                message: JSON.stringify({
+                    key: 'workshop_assigned_msg',
+                    params: { title: workshop?.title || 'Taller' }
+                }),
+                type: 'REQUEST',
+                importance: 'INFO'
             });
         }
 

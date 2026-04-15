@@ -48,7 +48,16 @@ export const getRequests = async (req: Request, res: Response) => {
           center: true,
           workshop: true,
           teacher1: true,
-          teacher2: true
+          teacher2: true,
+          assignment: {
+            include: {
+              teachers: {
+                include: {
+                  user: true
+                }
+              }
+            }
+          }
         },
         orderBy: {
           createdAt: 'desc'

@@ -170,11 +170,6 @@ export default function AssignmentsPage() {
                     <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_planning')}</th>
                     <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
                     <th className="px-10 py-6 text-[12px] font-medium text-text-primary text-right">{t('table_actions')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_workshop')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_center')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_planning')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary text-right">{t('table_actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-subtle">
@@ -182,13 +177,11 @@ export default function AssignmentsPage() {
                     <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
                       <td className="px-10 py-8">
                         <div className="flex flex-col">
-                          <span className="text-[11px] font-medium text-consorci-darkBlue mb-1">{t('workshop_id')}</span>
-                          <span className="text-[11px] font-medium text-consorci-darkBlue mb-1">{t('workshop_id')}</span>
+                          <span className="text-[11px] font-medium text-consorci-darkBlue mb-1 tracking-widest uppercase opacity-50">{t('workshop_id')}</span>
                           <span className="text-[15px] font-medium text-text-primary tracking-tight leading-tight">{a.workshop?.title}</span>
                         </div>
                       </td>
                       <td className="px-10 py-8">
-                        <span className="text-[13px] font-medium text-text-primary">{a.center?.name || t('not_assigned')}</span>
                         <span className="text-[13px] font-medium text-text-primary">{a.center?.name || t('not_assigned')}</span>
                       </td>
                       <td className="px-10 py-8">
