@@ -74,10 +74,11 @@ RUN chown -R node:node /app
 
 # Copiamos la estructura completa necesaria para que los symlinks de node_modules funcionen
 COPY --from=builder-api --chown=node:node /app/node_modules ./node_modules
-COPY --from=builder-api --chown=node:node /app/shared ./shared
+# Importante: apps/api/dist contiene tanto apps/api como shared debido a rootDir: ../../
+# Al copiarlo a ./dist, mantenemos la estructura que tsc generó para resolver imports relativos
+COPY --from=builder-api --chown=node:node /app/apps/api/dist ./dist
 COPY --from=builder-api --chown=node:node /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder-api --chown=node:node /app/apps/api/prisma ./apps/api/prisma
-COPY --from=builder-api --chown=node:node /app/apps/api/dist ./apps/api/dist
 COPY --from=builder-api --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder-api --chown=node:node /app/node_modules/@prisma ./node_modules/@prisma
 
@@ -86,5 +87,5 @@ RUN mkdir -p /app/uploads/perfil /app/uploads/documents && chown -R node:node /a
 
 USER node
 EXPOSE 3000
-# Apuntamos a la ruta exacta donde tsc genera el index con rootDir: ../../
-CMD ["node", "apps/api/dist/apps/api/src/index.js"]
+# Apuntamos a la ruta exacta dentro de ./dist que tsc generó
+CMD ["node", "dist/apps/api/src/index.js"]
