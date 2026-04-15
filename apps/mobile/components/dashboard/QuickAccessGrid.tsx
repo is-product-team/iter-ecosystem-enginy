@@ -22,7 +22,7 @@ function GridCard({ item }: { item: QuickAccessItem }) {
     <TouchableOpacity
       onPress={item.onPress}
       activeOpacity={0.75}
-      className="flex-1 bg-background-surface rounded-[24px] p-4 min-h-[110px] justify-between shadow-sm"
+      className="flex-1 bg-background-surface rounded-[24px] p-4 h-[110px] justify-between shadow-sm"
     >
       {/* Icon + badge */}
       <View className="flex-row items-start justify-between">

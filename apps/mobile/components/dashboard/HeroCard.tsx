@@ -58,22 +58,24 @@ export function HeroCard({ workshop, onPress }: HeroCardProps) {
       onPress={onPress}
       activeOpacity={0.8}
       style={{
-        backgroundColor: '#4197CB', // Azul secundario del tema, más suave e integrado
+        backgroundColor: '#FFFFFF', // Blanco puro
         borderRadius: 32,
         padding: 28,
         marginHorizontal: 15, 
         marginBottom: 32,
+        borderWidth: 1,
+        borderColor: '#EFEFEF', // Borde muy sutil
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-        elevation: 5,
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 3,
       }}
     >
       {/* Label Indicator */}
       <View className="flex-row items-center mb-6">
-        <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10 }}>
-          <Text style={{ color: 'white', fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>
+        <View style={{ backgroundColor: '#F2F2F7', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10 }}>
+          <Text style={{ color: '#8E8E93', fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>
             {isToday ? t('Common.today') : t('Dashboard.next_session_label')}
           </Text>
         </View>
@@ -81,7 +83,7 @@ export function HeroCard({ workshop, onPress }: HeroCardProps) {
 
       {/* Workshop Title */}
       <Text 
-        className="text-white text-[28px] font-light leading-tight mb-6" 
+        className="text-black dark:text-white text-[28px] font-light leading-tight mb-6" 
         style={{ letterSpacing: -0.8 }}
         numberOfLines={2}
       >
@@ -89,17 +91,17 @@ export function HeroCard({ workshop, onPress }: HeroCardProps) {
       </Text>
 
       {/* Meta Info */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 20, borderTopWidth: 1, borderTopColor: '#F2F2F7' }}>
         <View className="flex-row items-center flex-1">
-          <Ionicons name="business" size={14} color="white" opacity={0.7} />
-          <Text className="text-white text-[13px] font-medium ml-2 opacity-90" numberOfLines={1}>
+          <Ionicons name="business" size={14} color="#8E8E93" />
+          <Text className="text-gray-500 text-[13px] font-medium ml-2" numberOfLines={1}>
             {workshop.center}
           </Text>
         </View>
         
         <View className="flex-row items-center">
-          <Ionicons name="time" size={14} color="white" />
-          <Text style={{ color: 'white', fontSize: 13, fontWeight: '700', marginLeft: 6 }}>
+          <Ionicons name="time" size={14} color="#4197CB" />
+          <Text style={{ color: '#4197CB', fontSize: 13, fontWeight: '700', marginLeft: 6 }}>
             {timeLabel || dateLabel}
           </Text>
         </View>

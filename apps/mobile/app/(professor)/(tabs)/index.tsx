@@ -232,8 +232,8 @@ export default function DashboardScreen() {
     {
       id: 'phase',
       icon: 'rocket' as const,
-      iconColor: THEME.colors.primary,
-      iconBg: `${THEME.colors.primary}15`,
+      iconColor: '#5856D6',
+      iconBg: '#5856D615',
       label: t('Dashboard.phase_status'),
       value: activePhaseName || 'N/A',
       onPress: () => {},
@@ -243,15 +243,24 @@ export default function DashboardScreen() {
       icon: 'people' as const,
       iconColor: '#34C759',
       iconBg: '#34C75915',
-      label: t('Coordination.collaboration'),
-      value: t('Coordination.contact'),
+      label: t('Coordination.title'),
+      value: t('Coordination.collaboration'),
       onPress: () => router.push('/(professor)/coordination'),
+    },
+    {
+      id: 'support',
+      icon: 'chatbubble-ellipses' as const,
+      iconColor: '#FF9500',
+      iconBg: '#FF950015',
+      label: t('Support.title'),
+      value: t('Support.chat_admin'),
+      onPress: () => router.push('/(professor)/support'),
     },
     ...(isEvalPhase && pendingAssignments.length > 0 ? [{
       id: 'evaluations',
       icon: 'star' as const,
-      iconColor: '#FF9500',
-      iconBg: '#FF950015',
+      iconColor: '#F26178',
+      iconBg: '#F2617815',
       label: t('Evaluation.title'),
       value: t('Dashboard.pending_count', { count: pendingAssignments.length }),
       onPress: () => router.push(`/(professor)/questionnaire/${pendingAssignments[0].assignmentId}`),
@@ -280,13 +289,6 @@ export default function DashboardScreen() {
             <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
               {subtitle}
             </Text>
-            {centerName && (
-              <View className="mt-4 bg-gray-100 dark:bg-gray-800 self-start px-3 py-1 rounded-full">
-                <Text className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                  {centerName}
-                </Text>
-              </View>
-            )}
           </View>
           <TouchableOpacity
             onPress={() => router.push('/profile')}

@@ -24,6 +24,7 @@ export default function ProfessorStackLayout() {
       <Stack.Screen name="session/[id]" options={{ title: t('Routes.session') }} />
       <Stack.Screen name="evaluation/[id]" options={{ title: t('Routes.evaluation') }} />
       <Stack.Screen name="questionnaire/[id]" options={{ title: t('Routes.questionnaire') }} />
+      <Stack.Screen name="support" options={{ title: t('Support.title') }} />
     </Stack>
   );
 }
