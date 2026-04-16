@@ -244,6 +244,16 @@ h6 {
 
 .premium-table-container table {
   min-width: 800px;
+  border-spacing: 0;
+}
+
+/* Redesign Grid Styles */
+.table-grid-cell {
+  @apply border-r border-border-subtle last:border-r-0;
+}
+
+.text-table-link {
+  @apply text-consorci-lightBlue hover:underline cursor-pointer transition-colors;
 }
 
 @media (max-width: 640px) {

@@ -11,6 +11,7 @@ export interface Column<T> {
   headerClassName?: string;
   cellClassName?: string;
   align?: 'left' | 'center' | 'right';
+  icon?: React.ReactNode;
 }
 
 interface DataTableProps<T> {
@@ -27,15 +28,22 @@ interface DataTableProps<T> {
   };
   rowClassName?: string | ((item: T) => string);
   onRowClick?: (item: T) => void;
+  variant?: 'default' | 'simple' | 'grid';
+  showIndex?: boolean;
 }
 
-const TableSkeleton = ({ columns, rows = 5 }: { columns: Column<any>[], rows?: number }) => {
+const TableSkeleton = ({ columns, rows = 5, showIndex = false }: { columns: Column<any>[], rows?: number, showIndex?: boolean }) => {
   return (
     <>
       {[...Array(rows)].map((_, rowIndex) => (
-        <tr key={rowIndex} className="border-b border-border-subtle last:border-0 animate-pulse">
+        <tr key={rowIndex} className="border-b border-border-subtle animate-pulse">
+          {showIndex && (
+            <td className="px-4 py-3 border-r border-border-subtle w-12">
+               <div className="h-4 bg-background-subtle rounded-sm w-4 mx-auto opacity-60"></div>
+            </td>
+          )}
           {columns.map((column, colIndex) => (
-            <td key={colIndex} className="px-8 py-6">
+            <td key={colIndex} className={`px-4 py-3 border-r border-border-subtle last:border-r-0`}>
               <div className={`h-4 bg-background-subtle rounded-sm w-full opacity-60`}></div>
             </td>
           ))}
@@ -52,7 +60,9 @@ export default function DataTable<T>({
   emptyMessage = 'No results found',
   pagination,
   rowClassName = '',
-  onRowClick
+  onRowClick,
+  variant = 'default',
+  showIndex = false
 }: DataTableProps<T>) {
   const alignClasses = {
     left: 'text-left',
@@ -61,30 +71,38 @@ export default function DataTable<T>({
   };
 
   return (
-    <div className="bg-background-surface border border-border-subtle border-t-2 border-t-consorci-darkBlue overflow-hidden transition-all duration-300">
+    <div className={`bg-background-surface border border-border-subtle ${variant === 'simple' ? '' : 'border-t-2 border-t-consorci-darkBlue'} overflow-hidden transition-all duration-300`}>
       <div className="premium-table-container">
         <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-background-subtle/50 border-b border-border-subtle">
+          <thead className="sticky top-0 z-10 bg-background-subtle border-b border-border-subtle">
+            <tr>
+              {showIndex && (
+                <th className="px-4 py-2.5 text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] border-r border-border-subtle w-12 text-center bg-background-subtle">
+                  #
+                </th>
+              )}
               {columns.map((column, index) => (
                 <th
                   key={index}
-                  className={`px-8 py-5 text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] ${
-                    alignClasses[column.align || 'left']
+                  className={`px-4 py-2.5 text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] border-r border-border-subtle last:border-r-0 bg-background-subtle ${
+                    alignClasses[column.align || 'center']
                   } ${column.headerClassName || ''}`}
                 >
-                  {column.header}
+                  <div className={`flex items-center gap-2 ${(!column.align || column.align === 'center') ? 'justify-center' : column.align === 'right' ? 'justify-end' : ''}`}>
+                    {column.icon && <span className="opacity-70">{column.icon}</span>}
+                    {column.header}
+                  </div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">
             {loading ? (
-              <TableSkeleton columns={columns} />
+              <TableSkeleton columns={columns} showIndex={showIndex} />
             ) : data.length === 0 ? (
               <tr>
                 <td
-                  colSpan={columns.length}
+                  colSpan={columns.length + (showIndex ? 1 : 0)}
                   className="px-8 py-32 text-center"
                 >
                   <div className="flex flex-col items-center justify-center opacity-40">
@@ -104,15 +122,20 @@ export default function DataTable<T>({
                   <tr
                     key={rowIndex}
                     onClick={() => onRowClick?.(item)}
-                    className={`border-l-2 border-l-transparent hover:border-l-consorci-darkBlue hover:bg-background-subtle/30 even:bg-background-subtle/10 transition-all duration-300 group ${
+                    className={`border-l-2 border-l-transparent hover:border-l-consorci-darkBlue hover:bg-background-subtle/30 even:bg-background-subtle/5 transition-all duration-300 group ${
                       onRowClick ? 'cursor-pointer' : ''
                     } ${customRowClass}`}
                   >
+                    {showIndex && (
+                      <td className="px-4 py-3 text-[12px] font-medium text-text-muted border-r border-border-subtle text-center">
+                        {rowIndex + 1}
+                      </td>
+                    )}
                     {columns.map((column, colIndex) => (
                       <td
                         key={colIndex}
-                        className={`px-8 py-6 text-[13px] font-medium text-text-primary ${
-                          alignClasses[column.align || 'left']
+                        className={`px-4 py-3 text-[13px] font-medium text-text-primary border-r border-border-subtle last:border-r-0 ${
+                          alignClasses[column.align || 'center']
                         } ${column.cellClassName || ''}`}
                       >
                         {column.render

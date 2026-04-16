@@ -9,6 +9,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import FilterPanel from '@/components/ui/FilterPanel';
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
@@ -315,8 +316,8 @@ export default function DocumentVerificationPage() {
     >
       <div className="space-y-6">
         {/* Filter Bar */}
-        <div className="flex flex-col md:flex-row gap-6 bg-background-surface border border-border-subtle p-6">
-          <div className="flex-1 relative">
+        <FilterPanel gridCols={selectedDocs.length > 0 ? 3 : 2}>
+          <div className="relative">
             <input
               type="text"
               placeholder={tc('search')}
@@ -331,7 +332,7 @@ export default function DocumentVerificationPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-6 py-3 bg-background-subtle border border-border-subtle font-medium text-[13px] outline-none min-w-[220px] cursor-pointer"
+            className="w-full px-6 py-3 bg-background-subtle border border-border-subtle font-medium text-[13px] outline-none cursor-pointer"
           >
             <option value="all">{t('all_statuses') || 'Tots els estats'}</option>
             <option value="pending">{t('pending_validation') || 'Pendents de Validar'}</option>
@@ -341,7 +342,7 @@ export default function DocumentVerificationPage() {
             <button
               onClick={handleBulkApprove}
               disabled={loading}
-              className="px-8 py-3 bg-green-600 text-white font-bold text-[13px] hover:bg-black transition-all flex items-center gap-2"
+              className="w-full px-8 py-3 bg-green-600 text-white font-bold text-[13px] hover:bg-black transition-all flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -349,7 +350,7 @@ export default function DocumentVerificationPage() {
               {t('btn_bulk_approve') || 'Validació Massiva'} ({selectedDocs.length})
             </button>
           )}
-        </div>
+        </FilterPanel>
 
         <div className="flex justify-start px-2">
           <label className="flex items-center gap-2 text-[11px] font-bold text-text-muted uppercase cursor-pointer hover:text-consorci-darkBlue transition-colors">

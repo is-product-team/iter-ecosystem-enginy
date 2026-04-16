@@ -13,6 +13,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
 import workshopService, { Workshop } from "@/services/workshopService";
 import DataTable, { Column } from "@/components/ui/DataTable";
+import FilterPanel from "@/components/ui/FilterPanel";
 
 export default function WorkshopAdminPage() {
   const t = useTranslations('Admin.Workshops');
@@ -249,8 +250,14 @@ export default function WorkshopAdminPage() {
       subtitle={t("management_subtitle")}
       actions={headerActions}
     >
-      {/* Filters Panel */}
-      <div className="mb-10 flex flex-col lg:flex-row gap-8 bg-background-surface border border-border-subtle p-10">
+      <FilterPanel
+        onClear={() => {
+          setSearchQuery("");
+          setSelectedSector(tc("all_sectors"));
+          setSelectedModality(tc("all_modalities"));
+        }}
+        clearLabel={tc("clear_filters")}
+      >
         {/* Text Search */}
         <div className="flex-1">
           <label className="block text-[13px] font-medium text-text-primary mb-3">{tc("search_by_title")}</label>
@@ -269,7 +276,7 @@ export default function WorkshopAdminPage() {
         </div>
 
         {/* Sector Filter */}
-        <div className="lg:w-64">
+        <div className="w-full">
           <label className="block text-[13px] font-medium text-text-primary mb-3">{tc("filter_by_sector")}</label>
           <select
             value={selectedSector}
@@ -283,7 +290,7 @@ export default function WorkshopAdminPage() {
         </div>
 
         {/* Modality Filter */}
-        <div className="lg:w-64">
+        <div className="w-full">
           <label className="block text-[11px] font-medium text-text-primary mb-3">{tc("filter_by_modality")}</label>
           <select
             value={selectedModality}
@@ -295,21 +302,7 @@ export default function WorkshopAdminPage() {
             ))}
           </select>
         </div>
-
-        {/* Action: Clear */}
-        <div className="flex items-end">
-          <button
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedSector(tc("all_sectors"));
-              setSelectedModality(tc("all_modalities"));
-            }}
-            className="w-full lg:w-auto px-6 py-3 text-[13px] font-medium text-text-muted hover:text-red-500 hover:bg-red-500/5 transition-all h-[49px]"
-          >
-            {tc("clear_filters")}
-          </button>
-        </div>
-      </div>
+      </FilterPanel>
 
       {/* Workshops Table */}
       {error ? (

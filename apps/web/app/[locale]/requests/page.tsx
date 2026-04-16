@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from '@/components/Pagination';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import FilterPanel from '@/components/ui/FilterPanel';
 
 export default function AdminRequestsPage() {
   const t = useTranslations('Admin.Requests');
@@ -208,14 +209,25 @@ export default function AdminRequestsPage() {
       header: t('table_teachers'),
       render: (r) => (
         <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
-            <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">1</span>
-            {r.teacher1?.name || (r.teacher1Id ? `${tc('teachers')} ${r.teacher1Id}` : '-')}
-          </div>
-          <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
-            <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">2</span>
-            {r.teacher2?.name || (r.teacher2Id ? `${tc('teachers')} ${r.teacher2Id}` : '-')}
-          </div>
+          {(r.assignment as any)?.teachers && (r.assignment as any).teachers.length > 0 ? (
+            (r.assignment as any).teachers.map((t: any, idx: number) => (
+              <div key={idx} className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
+                <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">{idx + 1}</span>
+                {t.fullName}
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
+                <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">1</span>
+                {r.teacher1?.name || (r.teacher1Id ? `${tc('teachers')} ${r.teacher1Id}` : '-')}
+              </div>
+              <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
+                <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">2</span>
+                {r.teacher2?.name || (r.teacher2Id ? `${tc('teachers')} ${r.teacher2Id}` : '-')}
+              </div>
+            </>
+          )}
         </div>
       )
     },
@@ -228,14 +240,30 @@ export default function AdminRequestsPage() {
     },
     {
       header: t('table_status'),
+      align: 'center',
       render: (r) => (
-        <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200/50 text-orange-600 bg-orange-500/10' :
-          r.status === REQUEST_STATUSES.APPROVED ? 'border-green-200/50 text-green-600 bg-green-500/10' :
-            'border-red-200/50 text-red-600 bg-red-500/10'
+        <div className="flex items-center justify-center gap-2">
+          {r.status === REQUEST_STATUSES.APPROVED ? (
+            <svg className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ) : r.status === REQUEST_STATUSES.REJECTED ? (
+            <svg className="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ) : (
+            <svg className="h-4 w-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+          <span className={`text-[11px] font-bold ${
+            r.status === REQUEST_STATUSES.APPROVED ? 'text-green-600' :
+            r.status === REQUEST_STATUSES.REJECTED ? 'text-red-600' :
+            'text-orange-600'
           }`}>
-          <span className={`w-1.5 h-1.5 ${r.status === REQUEST_STATUSES.PENDING ? 'bg-orange-500' : r.status === REQUEST_STATUSES.APPROVED ? 'bg-green-500' : 'bg-red-500'}`}></span>
-          {r.status === REQUEST_STATUSES.PENDING ? tc('pending') : r.status === REQUEST_STATUSES.APPROVED ? t('assigned') : t('rejected')}
-        </span>
+            {r.status === REQUEST_STATUSES.PENDING ? tc('pending') : r.status === REQUEST_STATUSES.APPROVED ? t('assigned') : t('rejected')}
+          </span>
+        </div>
       )
     },
     {
@@ -328,88 +356,89 @@ export default function AdminRequestsPage() {
     return <Loading fullScreen message={tc('authenticating')} />;
   }
 
+  const headerActions = (
+    <button
+      onClick={handleRunTetris}
+      className="bg-consorci-darkBlue text-white px-8 py-3.5 text-[13px] font-semibold transition-all hover:bg-black hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 h-[49px]"
+    >
+      <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.5 2L14 9L21 11.5L14 14L11.5 21L9 14L2 11.5L9 9L11.5 2Z" />
+      </svg>
+      {t('run_tetris_btn')}
+    </button>
+  );
+
   return (
     <DashboardLayout
       title={t('title')}
       subtitle={t('subtitle')}
+      actions={headerActions}
     >
-      {/* Filter Section */}
-      <div className="space-y-6 mb-12">
-        <div className="bg-background-surface border border-border-subtle p-8 flex flex-col xl:flex-row gap-8 items-end">
-          <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Search */}
-            <div className="space-y-2.5">
-              <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('search_by_title')}</label>
-              <div className="relative group">
-                <input
-                  type="text"
-                  placeholder={tc('search_placeholder')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
-                />
-                <svg className="absolute left-4 top-4 h-4 w-4 text-text-muted group-focus-within:text-consorci-lightBlue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Center Filter */}
-            <div className="space-y-2.5">
-              <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('educational_center')}</label>
-              <div className="relative">
-                <select
-                  value={selectedCenterId}
-                  onChange={(e) => setSelectedCenterId(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary appearance-none transition-all"
-                >
-                  <option value="">{tc('all_centers')}</option>
-                  {centers.map(c => (
-                    <option key={c.centerId} value={c.centerId}>{c.name}</option>
-                  ))}
-                </select>
-                <svg className="absolute right-4 top-4 h-4 w-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Modality Filter */}
-            <div className="space-y-2.5">
-              <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('filter_by_modality')}</label>
-              <div className="relative">
-                <select
-                  value={selectedModality}
-                  onChange={(e) => setSelectedModality(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary appearance-none transition-all"
-                >
-                  <option value="">{tc('all_modalities')}</option>
-                  <option value="A">{tc('modality_label', { modality: 'A' })}</option>
-                  <option value="B">{tc('modality_label', { modality: 'B' })}</option>
-                  <option value="C">{tc('modality_label', { modality: 'C' })}</option>
-                </select>
-                <svg className="absolute right-4 top-4 h-4 w-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="hidden xl:block w-px h-12 bg-border-subtle mx-2"></div>
-
-          <div className="flex w-full xl:w-auto mt-4 xl:mt-0">
-            <button
-              onClick={handleRunTetris}
-              className="flex-1 xl:w-auto bg-consorci-darkBlue text-white px-8 py-3.5 text-[13px] font-semibold transition-all hover:bg-black hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3"
-            >
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M11.5 2L14 9L21 11.5L14 14L11.5 21L9 14L2 11.5L9 9L11.5 2Z" />
-              </svg>
-              {t('run_tetris_btn')}
-            </button>
+      <FilterPanel
+        onClear={() => {
+          setSearchQuery('');
+          setSelectedCenterId('');
+          setSelectedModality('');
+        }}
+        clearLabel={tc('clear_filters')}
+      >
+        {/* Search */}
+        <div className="space-y-2.5">
+          <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('search_by_title')}</label>
+          <div className="relative group">
+            <input
+              type="text"
+              placeholder={tc('search_placeholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
+            />
+            <svg className="absolute left-4 top-4 h-4 w-4 text-text-muted group-focus-within:text-consorci-lightBlue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </div>
         </div>
-      </div>
+
+        {/* Center Filter */}
+        <div className="space-y-2.5">
+          <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('educational_center')}</label>
+          <div className="relative">
+            <select
+              value={selectedCenterId}
+              onChange={(e) => setSelectedCenterId(e.target.value)}
+              className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary appearance-none transition-all"
+            >
+              <option value="">{tc('all_centers')}</option>
+              {centers.map(c => (
+                <option key={c.centerId} value={c.centerId}>{c.name}</option>
+              ))}
+            </select>
+            <svg className="absolute right-4 top-4 h-4 w-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Modality Filter */}
+        <div className="space-y-2.5">
+          <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('filter_by_modality')}</label>
+          <div className="relative">
+            <select
+              value={selectedModality}
+              onChange={(e) => setSelectedModality(e.target.value)}
+              className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary appearance-none transition-all"
+            >
+              <option value="">{tc('all_modalities')}</option>
+              <option value="A">{tc('modality_label', { modality: 'A' })}</option>
+              <option value="B">{tc('modality_label', { modality: 'B' })}</option>
+              <option value="C">{tc('modality_label', { modality: 'C' })}</option>
+            </select>
+            <svg className="absolute right-4 top-4 h-4 w-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </FilterPanel>
 
       {loading ? (
         <Loading message={tc('loading')} />
@@ -445,98 +474,12 @@ export default function AdminRequestsPage() {
                   </div>
                 </div>
 
-                <div className="bg-background-surface border border-border-subtle overflow-hidden mb-8">
-                  <div className="premium-table-container">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="bg-background-subtle/50 border-b border-border-subtle">
-                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_center_date')}</th>
-                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_teachers')}</th>
-                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest text-center">{t('table_students')}</th>
-                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_status')}</th>
-                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest text-right">{tc('actions')}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border-subtle">
-                        {currentRequests.map(r => (
-                          <tr key={r.requestId} className="hover:bg-background-subtle/30 transition-colors group">
-                            <td className="px-8 py-6">
-                              <div className="text-sm font-bold text-text-primary group-hover:text-consorci-darkBlue transition-colors">{r.center?.name}</div>
-                              <div className="text-[11px] font-semibold text-text-muted mt-1 px-2 py-0.5 bg-background-subtle inline-block">{new Date(r.createdAt).toLocaleDateString()}</div>
-                            </td>
-                            <td className="px-8 py-6">
-                              <div className="space-y-1.5">
-                                {r.assignment?.teachers && r.assignment.teachers.length > 0 ? (
-                                  r.assignment.teachers.map((t, idx) => (
-                                    <div key={idx} className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
-                                      <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">{idx + 1}</span>
-                                      {t.fullName}
-                                    </div>
-                                  ))
-                                ) : (
-                                  <>
-                                    <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
-                                      <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">1</span>
-                                      {r.teacher1?.name || (r.teacher1Id ? `${tc('teachers')} ${r.teacher1Id}` : '-')}
-                                    </div>
-                                    <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
-                                      <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">2</span>
-                                      {r.teacher2?.name || (r.teacher2Id ? `${tc('teachers')} ${r.teacher2Id}` : '-')}
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-8 py-6 text-center">
-                              <span className="inline-flex items-center justify-center min-w-[36px] h-9 bg-background-subtle px-3 text-sm font-bold text-text-primary border border-border-subtle">{r.studentsAprox}</span>
-                            </td>
-                            <td className="px-8 py-6">
-                              <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200/50 text-orange-600 bg-orange-500/10' :
-                                r.status === REQUEST_STATUSES.APPROVED ? 'border-green-200/50 text-green-600 bg-green-500/10' :
-                                  'border-red-200/50 text-red-600 bg-red-500/10'
-                                }`}>
-                                {r.status === REQUEST_STATUSES.PENDING ? tc('pending') : r.status === REQUEST_STATUSES.APPROVED ? t('assigned') : t('rejected')}
-                              </span>
-                            </td>
-                            <td className="px-8 py-6 text-right">
-                              {r.status === REQUEST_STATUSES.REJECTED ? (
-                                <span className="text-[11px] font-bold text-text-muted/60 uppercase tracking-wider">{t('rejected')}</span>
-                              ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
-                                <span className="text-[11px] font-bold text-consorci-lightBlue uppercase tracking-wider">{t('assigned')}</span>
-                              ) : (
-                                <div className="flex justify-end gap-2">
-                                  <button
-                                    onClick={() => handleEditClick(r)}
-                                    className="p-2 text-text-muted hover:text-consorci-darkBlue hover:bg-consorci-darkBlue/5 transition-all"
-                                    title={tc('edit')}
-                                  >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                    </svg>
-                                  </button>
-                                  {r.status === REQUEST_STATUSES.PENDING && (
-                                    <button
-                                      onClick={() => handleApprove(r.requestId)}
-                                      className="px-4 py-2 bg-consorci-darkBlue text-white text-[11px] font-bold transition-all hover:bg-black active:scale-95"
-                                    >
-                                      {t('approve_btn')}
-                                    </button>
-                                  )}
-                                  <button
-                                    onClick={() => handleReject(r.requestId)}
-                                    className="px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-500 text-[11px] font-bold transition-all hover:bg-red-500 hover:text-white"
-                                  >
-                                    {t('reject_btn')}
-                                  </button>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                <DataTable
+                  variant="simple"
+                  data={currentRequests}
+                  columns={columns}
+                  emptyMessage={t('no_requests')}
+                />
               </section>
             );
           })}
