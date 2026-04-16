@@ -30,10 +30,13 @@ export default function AdminReportsPage() {
         return <Loading fullScreen message={t('loading_data') || "Loading reports..."} />;
     }
 
-    const { generalAvg, impactDistribution } = (metrics as { 
+    const { generalAvg, impactDistribution, workshopsCount, totalEnrollments, topWorkshops } = (metrics as { 
         generalAvg: { experienceRating: number, teacherRating: number }, 
-        impactDistribution: { vocationalImpact: string, _count: { _all: number } }[] 
-    }) || { generalAvg: { experienceRating: 0, teacherRating: 0 }, impactDistribution: [] };
+        impactDistribution: { vocationalImpact: string, _count: { _all: number } }[],
+        workshopsCount?: number,
+        totalEnrollments?: number,
+        topWorkshops?: { name: string, score: number }[]
+    }) || { generalAvg: { experienceRating: 0, teacherRating: 0 }, impactDistribution: [], workshopsCount: 0, totalEnrollments: 0, topWorkshops: [] };
 
     return (
         <DashboardLayout
@@ -58,15 +61,15 @@ export default function AdminReportsPage() {
                             <div className="h-full bg-consorci-darkBlue dark:bg-consorci-lightBlue" style={{ width: `${(generalAvg?.teacherRating || 0) * 10}%` }}></div>
                         </div>
                     </div>
-                    {/* Mocks for additional metrics */}
+                    
                     <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
                         <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">{t('workshops_completed')}</span>
-                        <span className="text-4xl font-medium text-text-primary">84%</span>
-                        <p className="text-[12px] font-medium text-green-600 mt-4 opacity-80">{t('vs_last_year')}</p>
+                        <span className="text-4xl font-medium text-text-primary">{workshopsCount || 0}</span>
+                        <p className="text-[12px] font-medium text-text-muted mt-4 opacity-80">{t('total_active') || 'Total active'}</p>
                     </div>
                     <div className="bg-background-surface p-10 border border-border-subtle flex flex-col items-center justify-center text-center">
                         <span className="text-[13px] font-medium text-text-muted mb-4 uppercase tracking-wider">{t('student_part')}</span>
-                        <span className="text-4xl font-medium text-text-primary">1240</span>
+                        <span className="text-4xl font-medium text-text-primary">{totalEnrollments || 0}</span>
                         <p className="text-[12px] font-medium text-consorci-darkBlue mt-4 opacity-80">{t('total_enrollments')}</p>
                     </div>
                 </div>
@@ -75,51 +78,54 @@ export default function AdminReportsPage() {
                     {/* Vocational Impact */}
                     <div className="lg:col-span-2 bg-background-surface p-12 border border-border-subtle">
                         <h3 className="text-[17px] font-medium text-text-primary mb-12 tracking-tight">{t('vocational_dist')}</h3>
-                        <div className="space-y-10">
-                            {impactDistribution.map((item: { vocationalImpact: string, _count: { _all: number } }) => {
-                                const total = impactDistribution.reduce((acc: number, curr: { _count: { _all: number } }) => acc + curr._count._all, 0);
-                                const percent = (item._count._all / total) * 100;
-                                const labels: Record<string, string> = {
-                                    'SI': t('impact_labels.si'),
-                                    'NO': t('impact_labels.no'),
-                                    'CONSIDERANT': t('impact_labels.considerant')
-                                };
-                                return (
-                                    <div key={item.vocationalImpact} className="space-y-4">
-                                        <div className="flex justify-between items-center text-[13px] font-medium">
-                                            <span className="text-text-primary">{labels[item.vocationalImpact] || item.vocationalImpact}</span>
-                                            <span className="text-consorci-darkBlue">{percent.toFixed(0)}% ({item._count._all})</span>
+                        {impactDistribution.length === 0 ? (
+                            <div className="py-20 text-center text-text-muted italic">{tc('no_data') || 'No data available'}</div>
+                        ) : (
+                            <div className="space-y-10">
+                                {impactDistribution.map((item: { vocationalImpact: string, _count: { _all: number } }) => {
+                                    const total = impactDistribution.reduce((acc: number, curr: { _count: { _all: number } }) => acc + curr._count._all, 0);
+                                    const percent = (item._count._all / total) * 100;
+                                    const labels: Record<string, string> = {
+                                        'SI': t('impact_labels.si'),
+                                        'NO': t('impact_labels.no'),
+                                        'CONSIDERANT': t('impact_labels.considerant')
+                                    };
+                                    return (
+                                        <div key={item.vocationalImpact} className="space-y-4">
+                                            <div className="flex justify-between items-center text-[13px] font-medium">
+                                                <span className="text-text-primary">{labels[item.vocationalImpact] || item.vocationalImpact}</span>
+                                                <span className="text-consorci-darkBlue">{percent.toFixed(0)}% ({item._count._all})</span>
+                                            </div>
+                                            <div className="w-full h-1.5 bg-background-subtle overflow-hidden">
+                                                <div
+                                                    className={`h-full transition-all duration-1000 ${
+                                                        item.vocationalImpact === 'SI' ? 'bg-green-500' :
+                                                        item.vocationalImpact === 'CONSIDERANT' ? 'bg-consorci-darkBlue' : 'bg-text-muted opacity-20'
+                                                    }`}
+                                                    style={{ width: `${percent}%` }}
+                                                ></div>
+                                            </div>
                                         </div>
-                                        <div className="w-full h-1.5 bg-background-subtle overflow-hidden">
-                                            <div
-                                                className={`h-full transition-all duration-1000 ${
-                                                    item.vocationalImpact === 'SI' ? 'bg-green-500' :
-                                                    item.vocationalImpact === 'CONSIDERANT' ? 'bg-consorci-darkBlue' : 'bg-text-muted opacity-20'
-                                                }`}
-                                                style={{ width: `${percent}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
 
                     {/* Top Workshops */}
                     <div className="bg-background-subtle p-12 border border-border-subtle flex flex-col">
                         <h3 className="text-[17px] font-medium text-text-primary mb-12 tracking-tight">{t('top_rated')}</h3>
                         <div className="space-y-8 flex-1">
-                            {[
-                                { name: '3D Printing', score: 4.8 },
-                                { name: 'LEGO Robotics', score: 4.7 },
-                                { name: 'Web Design', score: 4.5 },
-                                { name: 'Electronics', score: 4.3 }
-                            ].map((t, i) => (
-                                <div key={i} className="flex justify-between items-center border-b border-border-subtle pb-5">
-                                    <span className="text-[13px] font-medium text-text-primary">{t.name}</span>
-                                    <span className="text-consorci-darkBlue font-medium text-[13px]">{t.score}</span>
-                                </div>
-                            ))}
+                            {topWorkshops && topWorkshops.length > 0 ? (
+                                topWorkshops.map((ws, i) => (
+                                    <div key={i} className="flex justify-between items-center border-b border-border-subtle pb-5">
+                                        <span className="text-[13px] font-medium text-text-primary">{ws.name}</span>
+                                        <span className="text-consorci-darkBlue font-medium text-[13px]">{ws.score.toFixed(1)}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="py-10 text-center text-text-muted italic text-[13px]">{tc('no_data') || 'No data'}</div>
+                            )}
                         </div>
                         <button className="mt-12 w-full py-4 bg-consorci-darkBlue text-white font-medium text-[13px] hover:bg-black transition-all active:scale-[0.98]">{t('download_pdf')}</button>
                     </div>

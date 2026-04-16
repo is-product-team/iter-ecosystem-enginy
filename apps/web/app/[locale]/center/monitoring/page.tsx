@@ -56,7 +56,7 @@ export default function MonitoringPage() {
     
     let sessionsToday = 0;
     let pendingAttendance = 0;
-    let incidents = 0; // Mocked for now as we don't have a service yet
+    let incidents: number | string = 'TBD'; // Service not yet implemented in backend
 
     active.forEach(a => {
       a.sessions?.forEach(s => {
