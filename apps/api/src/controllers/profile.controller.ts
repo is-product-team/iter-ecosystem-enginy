@@ -30,6 +30,12 @@ export const updateSettings = async (req: Request, res: Response) => {
   try {
     const { emailNotificationsEnabled, emailNotificationsFilter } = req.body;
     
+    // Check if user exists first to provide a better error if the token is stale
+    const userExists = await prisma.user.findUnique({ where: { userId: req.user!.userId } });
+    if (!userExists) {
+      return res.status(404).json({ error: 'User not found. Please log out and log in again.' });
+    }
+
     const updated = await prisma.user.update({
       where: { userId: req.user!.userId },
       data: { 

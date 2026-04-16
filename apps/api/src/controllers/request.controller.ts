@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { RequestStatus, Modality } from '@prisma/client';
 import { ROLES, REQUEST_STATUSES, PHASES } from '@iter/shared';
 import { isPhaseActive } from '../lib/phaseUtils.js';
-import { createNotificationInternal } from './notification.controller.js';
+import { NotificationService } from '../services/notification.service.js';
 import { RequestService } from '../services/request.service.js';
 
 // GET: View requests (Filters by center if COORDINATOR) with pagination
@@ -268,7 +268,7 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
     const statusLabel = updated.status === 'APPROVED' ? 'Aprobada' : 'Rechazada';
     const statusLow = updated.status === 'APPROVED' ? 'aprobada' : 'rechazada';
 
-    await createNotificationInternal({
+    await NotificationService.notify({
       centerId: updated.centerId,
       title: 'request_status_title',
       message: JSON.stringify({

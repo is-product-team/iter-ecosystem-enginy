@@ -1,9 +1,6 @@
-import { RequestStatus, AssignmentStatus } from '@prisma/client';
-import prisma from '../lib/prisma.js';
-import { isPhaseActive } from '../lib/phaseUtils.js';
 import { PHASES, REQUEST_STATUSES } from '@iter/shared';
 import { SessionService } from './session.service.js';
-import { createNotificationInternal } from '../controllers/notification.controller.js';
+import { NotificationService } from './notification.service.js';
 
 interface PendingCenter {
     centerId: number;
@@ -182,7 +179,7 @@ export class AutoAssignmentService {
 
             // Trigger notification
             const workshop = await prisma.workshop.findUnique({ where: { workshopId } });
-            await createNotificationInternal({
+            await NotificationService.notify({
                 centerId: center.centerId,
                 title: 'workshop_assigned_title',
                 message: JSON.stringify({

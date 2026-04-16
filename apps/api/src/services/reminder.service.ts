@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma.js';
-import { createNotificationInternal } from '../controllers/notification.controller.js';
+import { NotificationService } from './notification.service.js';
 import { addHours } from 'date-fns';
 
 /**
@@ -112,7 +112,7 @@ export class ReminderService {
             });
 
             if (!existing) {
-              await createNotificationInternal({
+              await NotificationService.notify({
                 userId: user.userId,
                 title: 'session_reminder_title',
                 message: JSON.stringify({
@@ -156,7 +156,7 @@ export class ReminderService {
           });
 
           if (!existing) {
-            await createNotificationInternal({
+            await NotificationService.notify({
               title: 'milestone_reminder_title',
               message: JSON.stringify({
                 key: 'milestone_reminder_msg',

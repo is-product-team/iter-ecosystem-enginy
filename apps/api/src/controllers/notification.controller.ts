@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { sendNotificationEmail } from '../services/mail.service.js';
+import { NotificationService } from '../services/notification.service.js';
 import { generateICS, ICSEvent } from '../utils/ics.js';
 
 // GET: View notifications (Filtered by center or user)
@@ -77,59 +77,9 @@ export const createNotificationInternal = async (data: {
   message: string;
   type: 'REQUEST' | 'PHASE' | 'SYSTEM';
   importance?: 'INFO' | 'WARNING' | 'URGENT';
+  isBroadcast?: boolean;
 }) => {
-  try {
-    const notification = await prisma.notification.create({
-      data: {
-        userId: data.userId,
-        centerId: data.centerId,
-        title: data.title,
-        message: data.message,
-        type: data.type,
-        importance: data.importance || 'INFO'
-      }
-    });
-
-    // Handle Email Notification
-    if (data.userId) {
-      const user = await prisma.user.findUnique({
-        where: { userId: data.userId },
-        select: { email: true, fullName: true, emailNotificationsEnabled: true }
-      });
-
-      if (user && user.emailNotificationsEnabled) {
-        // We only send emails for important types or if requested
-        const importantTypes = ['REQUEST', 'PHASE'];
-        if (importantTypes.includes(data.type) || data.importance === 'URGENT') {
-          await sendNotificationEmail(user.email, user.fullName, {
-            title: data.title,
-            message: data.message
-          });
-        }
-      }
-    } else if (data.centerId) {
-      // If notification is for a center, send to all coordinators of that center
-      const coordinators = (await prisma.user.findMany({
-        where: { 
-          centerId: data.centerId, 
-          emailNotificationsEnabled: true,
-          role: { roleName: 'COORDINATOR' }
-        },
-        select: { email: true, fullName: true }
-      })) || [];
-
-      for (const coord of coordinators) {
-        await sendNotificationEmail(coord.email, coord.fullName, {
-          title: data.title,
-          message: data.message
-        });
-      }
-    }
-
-    return notification;
-  } catch (error) {
-    console.error("Error creating internal notification:", error);
-  }
+  return await NotificationService.notify(data);
 };
 
 // GET: Sync notifications as ICS

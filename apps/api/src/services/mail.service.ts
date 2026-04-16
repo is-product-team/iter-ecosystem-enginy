@@ -48,7 +48,7 @@ export const sendMail = async (options: MailOptions) => {
  */
 export const sendNotificationEmail = async (userEmail: string, userName: string, notification: { title: string, message: string }) => {
   const subject = `[Iter] Aviso: ${notification.title}`;
-  
+
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
       <h2 style="color: #004A99;">Hola ${userName},</h2>
