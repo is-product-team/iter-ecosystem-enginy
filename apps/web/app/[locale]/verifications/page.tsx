@@ -34,10 +34,8 @@ export default function DocumentVerificationPage() {
     greeting: getGreetingKey()
   });
   const [sendingNotif, setSendingNotif] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // all, pending, problem, validated
-  const itemsPerPage = 15;
 
   const router = useRouter();
   const params = useParams();
@@ -76,12 +74,6 @@ export default function DocumentVerificationPage() {
     return matchesSearch;
   }), [flatEnrollments, searchTerm, statusFilter]);
 
-  const paginatedEnrollments = useMemo(() => filteredEnrollments.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  ), [filteredEnrollments, currentPage]);
-
-  const totalPages = Math.ceil(filteredEnrollments.length / itemsPerPage);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== 'ADMIN')) {
@@ -183,7 +175,7 @@ export default function DocumentVerificationPage() {
     if (selectedDocs.length > 0) {
       setSelectedDocs([]);
     } else {
-      const allPending = paginatedEnrollments.flatMap(row =>
+      const allPending = filteredEnrollments.flatMap(row =>
         DOCUMENT_CONFIG
           .filter(doc => row[doc.urlField] && !row[doc.field])
           .map(doc => ({ enrollmentId: row.enrollmentId, field: doc.field }))
@@ -213,7 +205,7 @@ export default function DocumentVerificationPage() {
   };
 
   const isAllPendingOnPageSelected = useMemo(() => {
-    const allPendingOnPage = paginatedEnrollments.flatMap(row =>
+    const allPendingOnPage = filteredEnrollments.flatMap(row =>
       DOCUMENT_CONFIG
         .filter(doc => row[doc.urlField] && !row[doc.field])
         .map(doc => ({ enrollmentId: row.enrollmentId, field: doc.field }))
@@ -221,7 +213,7 @@ export default function DocumentVerificationPage() {
     return allPendingOnPage.length > 0 && allPendingOnPage.every(rd =>
       selectedDocs.some(sd => sd.enrollmentId === rd.enrollmentId && sd.field === rd.field)
     );
-  }, [paginatedEnrollments, selectedDocs]);
+  }, [filteredEnrollments, selectedDocs]);
 
   const columns: Column<any>[] = [
     {
@@ -378,17 +370,10 @@ export default function DocumentVerificationPage() {
         </div>
 
         <DataTable
-          data={paginatedEnrollments}
+          data={filteredEnrollments}
           columns={columns}
           loading={loading && assignments.length === 0}
           emptyMessage={tc('no_results')}
-          pagination={{
-            currentPage,
-            totalPages,
-            onPageChange: setCurrentPage,
-            totalItems: filteredEnrollments.length,
-            itemName: tc('students').toLowerCase()
-          }}
           rowClassName={(row) => selectedRow?.enrollmentId === row.enrollmentId ? 'bg-consorci-darkBlue/5' : ''}
         />
       </div>

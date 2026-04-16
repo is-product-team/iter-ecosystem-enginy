@@ -26,8 +26,6 @@ export default function StudentsCRUD() {
   const [formData, setFormData] = useState({ fullName: '', lastName: '', idalu: '', grade: '' });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(t("all_courses"));
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -78,14 +76,8 @@ export default function StudentsCRUD() {
   });
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCourse]);
-
-  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-  const paginatedStudents = filteredStudents.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    if (user) loadStudents();
+  }, [user]);
 
   const uniqueCourses = Array.from(new Set(students.map(a => a.grade))).filter(Boolean).sort();
 
@@ -260,17 +252,10 @@ export default function StudentsCRUD() {
       </div>
 
       <DataTable
-        data={paginatedStudents}
+        data={filteredStudents}
         columns={columns}
         loading={loading}
         emptyMessage={tc('no_results')}
-        pagination={{
-          currentPage,
-          totalPages,
-          onPageChange: setCurrentPage,
-          totalItems: filteredStudents.length,
-          itemName: tc('students').toLowerCase()
-        }}
       />
 
       {isModalOpen && (

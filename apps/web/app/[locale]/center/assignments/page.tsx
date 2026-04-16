@@ -97,19 +97,6 @@ export default function AssignmentsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter]);
-
-  const totalPages = Math.ceil(filteredAssignments.length / itemsPerPage);
-  const paginatedAssignments = filteredAssignments.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
   const columns: Column<Assignment>[] = [
     {
       header: "ID",
@@ -206,17 +193,11 @@ export default function AssignmentsPage() {
         </FilterPanel>
 
         <DataTable
-          data={paginatedAssignments}
+          data={filteredAssignments}
           columns={columns}
           loading={loading}
           emptyMessage={t('no_assignments')}
-          pagination={{
-            currentPage: currentPage,
-            totalPages: totalPages,
-            onPageChange: setCurrentPage,
-            totalItems: filteredAssignments.length,
-            itemName: tCommon('assignments').toLowerCase()
-          }}
+          tableId="center_assignments"
         />
 
         {/* Incidents Section (Only available in Phase 3) */}

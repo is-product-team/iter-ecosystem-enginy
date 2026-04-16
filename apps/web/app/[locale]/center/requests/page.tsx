@@ -35,9 +35,6 @@ export default function RequestsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
   const router = useRouter();
   const params = useParams();
   const locale = params?.locale || 'ca';
@@ -82,16 +79,6 @@ export default function RequestsPage() {
     }
     return result;
   }, [workshops, searchQuery]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
-  const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
-  const paginatedWorkshops = filteredWorkshops.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   const selectedWorkshop = workshops.find(w => w._id === selectedWorkshopId);
 
@@ -346,17 +333,10 @@ export default function RequestsPage() {
           </div>
 
           <DataTable
-            data={paginatedWorkshops}
+            data={filteredWorkshops}
             columns={columns}
             loading={loading}
             emptyMessage={tCommon('no_results')}
-            pagination={{
-              currentPage: currentPage,
-              totalPages: totalPages,
-              onPageChange: setCurrentPage,
-              totalItems: filteredWorkshops.length,
-              itemName: tCommon('workshops')
-            }}
             onRowClick={handleRowClick}
             rowClassName={(workshop) => {
               const isSelected = selectedWorkshopId === workshop._id;

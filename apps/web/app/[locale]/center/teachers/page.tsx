@@ -27,8 +27,6 @@ export default function TeachersCRUD() {
   const [formData, setFormData] = useState({ name: '', contact: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -72,16 +70,6 @@ export default function TeachersCRUD() {
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.contact.toLowerCase().includes(searchQuery.toLowerCase());
   });
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
-  const totalPages = Math.ceil(filteredTeachers.length / itemsPerPage);
-  const paginatedTeachers = filteredTeachers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,17 +213,11 @@ export default function TeachersCRUD() {
       </div>
 
       <DataTable
-        data={paginatedTeachers}
+        tableId="center_teachers"
+        data={filteredTeachers}
         columns={columns}
         loading={loading}
         emptyMessage={tc('no_results')}
-        pagination={{
-          currentPage,
-          totalPages,
-          onPageChange: setCurrentPage,
-          totalItems: filteredTeachers.length,
-          itemName: tc('teachers').toLowerCase()
-        }}
       />
 
       {isModalOpen && (

@@ -37,8 +37,6 @@ export default function CentersScreen() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -83,12 +81,6 @@ export default function CentersScreen() {
       return matchesSearch;
     });
   }, [centers, searchQuery]);
-
-  const totalPages = Math.ceil(filteredCenters.length / itemsPerPage);
-  const paginatedCenters = filteredCenters.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   const handleCenterSaved = (saved: Center) => {
     setCenters((prev) => {
@@ -236,7 +228,6 @@ export default function CentersScreen() {
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                setCurrentPage(1);
               }}
               className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
             />
@@ -277,17 +268,10 @@ export default function CentersScreen() {
 
       <DataTable
         tableId="centers_admin"
-        data={paginatedCenters}
+        data={filteredCenters}
         columns={columns}
         loading={loading}
         emptyMessage={t('empty')}
-        pagination={{
-          currentPage,
-          totalPages,
-          onPageChange: setCurrentPage,
-          totalItems: filteredCenters.length,
-          itemName: tCommon('centers').toLowerCase()
-        }}
       />
 
       <CreateCenterModal

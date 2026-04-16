@@ -240,8 +240,9 @@ h6 {
   border-radius: 10px;
 }
 
-.premium-table-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+.premium-table-container {
+  @apply relative overflow-auto border-t border-l border-border-subtle bg-white;
+  max-height: calc(100vh - 280px); /* Height adjustment for sticky header context */
 }
 
 .premium-table-container table {

@@ -72,7 +72,7 @@ export default function DataTable<T>({
   rowClassName = '',
   onRowClick,
   variant = 'default',
-  showIndex = false
+  showIndex = true
 }: DataTableProps<T>) {
   const [columnWidths, setColumnWidths] = React.useState<Record<string, number>>({});
   const [resizing, setResizing] = React.useState<string | null>(null);
@@ -207,13 +207,11 @@ export default function DataTable<T>({
                           } ${column.cellClassName || ''}`}
                           style={width ? { width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px` } : {}}
                         >
-                          <div className="truncate">
-                            {column.render
-                              ? column.render(item)
-                              : column.accessor
-                              ? (item[column.accessor] as React.ReactNode)
-                              : null}
-                          </div>
+                          {column.render
+                            ? column.render(item)
+                            : column.accessor
+                            ? (item[column.accessor] as React.ReactNode)
+                            : null}
                         </td>
                       );
                     })}

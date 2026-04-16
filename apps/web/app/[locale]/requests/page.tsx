@@ -37,10 +37,6 @@ export default function AdminRequestsPage() {
   const [selectedCenterId, setSelectedCenterId] = useState<string>('');
   const [selectedModality, setSelectedModality] = useState<string>('');
 
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -349,16 +345,6 @@ export default function AdminRequestsPage() {
     });
   }, [workshops, searchQuery, selectedModality, workshopRequests]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCenterId, selectedModality]);
-
-  const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
-  const paginatedWorkshops = filteredWorkshops.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
   if (authLoading || !user) {
     return <Loading fullScreen message={tc('authenticating')} />;
   }
@@ -455,7 +441,7 @@ export default function AdminRequestsPage() {
         </div>
       ) : filteredWorkshops.length > 0 ? (
         <div className="space-y-12">
-          {paginatedWorkshops.map(workshop => {
+          {filteredWorkshops.map(workshop => {
             const workshopId = parseInt(workshop._id);
             const currentRequests = workshopRequests[workshopId] || [];
             return (

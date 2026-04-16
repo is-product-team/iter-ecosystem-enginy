@@ -33,21 +33,16 @@ export default function WorkshopAdminPage() {
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
-    setCurrentPage(1);
   };
 
   const handleSectorChange = (val: string) => {
     setSelectedSector(val);
-    setCurrentPage(1);
   };
 
   const handleModalityChange = (val: string) => {
     setSelectedModality(val);
-    setCurrentPage(1);
   };
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -121,12 +116,6 @@ export default function WorkshopAdminPage() {
       return matchesSearch && matchesSector && matchesModality;
     });
   }, [workshops, searchQuery, selectedSector, selectedModality, tc]);
-
-  const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
-  const paginatedWorkshops = filteredWorkshops.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   const handleWorkshopSaved = (savedWorkshop: Workshop) => {
     setWorkshops((prev) => {
@@ -326,17 +315,10 @@ export default function WorkshopAdminPage() {
         </div>
       ) : (
         <DataTable
-          data={paginatedWorkshops}
+          data={filteredWorkshops}
           columns={columns}
           loading={loading}
           emptyMessage={tc("no_results")}
-          pagination={{
-            currentPage: currentPage,
-            totalPages: totalPages,
-            onPageChange: setCurrentPage,
-            totalItems: filteredWorkshops.length,
-            itemName: tc("workshops").toLowerCase()
-          }}
         />
       )}
 
