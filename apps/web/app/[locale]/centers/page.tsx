@@ -129,7 +129,7 @@ export default function CentersScreen() {
   const columns: Column<Center>[] = [
     {
       header: "ID",
-      render: (center) => <span className="font-mono text-[10px] opacity-50">{center.centerId}</span>,
+      render: (center) => <span className="table-id">{center.centerId}</span>,
       width: 60,
       align: 'center'
     },
@@ -140,28 +140,28 @@ export default function CentersScreen() {
       align: 'center'
     },
     {
-      header: t('table_center'),
-      render: (center) => <span className="font-semibold text-text-primary">{center.name}</span>,
+      header: "Nom",
+      render: (center) => <span className="table-primary">{center.name}</span>,
       width: 250
     },
     {
       header: "Codi",
-      render: (center) => <span className="font-mono text-[11px] font-bold text-text-muted">{center.centerCode}</span>,
+      render: (center) => <span className="table-id font-bold">{center.centerCode}</span>,
       width: 120,
       align: 'center'
     },
     {
-      header: t('table_address'),
+      header: "Adreça",
       render: (center) => (
-        <span className="text-[11px] font-medium text-text-primary">
+        <span className="table-detail font-medium">
           {center.address || t('no_address')}
         </span>
       )
     },
     {
-      header: t('table_email'),
+      header: "Email",
       render: (center) => (
-        <span className="text-[11px] font-medium text-text-primary">
+        <span className="table-detail font-medium">
           {center.contactEmail || "N/A"}
         </span>
       )
@@ -180,13 +180,13 @@ export default function CentersScreen() {
       render: (center) => (
         <div className="flex justify-end items-center gap-2">
           <button
-            onClick={() => handleEdit(center)}
+            onClick={(e) => { e.stopPropagation(); handleEdit(center); }}
             className="px-4 py-2 text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors"
           >
             {tCommon('edit')}
           </button>
           <button
-            onClick={() => handleDelete(center.centerId)}
+            onClick={(e) => { e.stopPropagation(); handleDelete(center.centerId); }}
             className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

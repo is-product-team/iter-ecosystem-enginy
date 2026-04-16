@@ -112,46 +112,56 @@ export default function AssignmentsPage() {
 
   const columns: Column<Assignment>[] = [
     {
-      header: t('table_workshop'),
+      header: "ID",
+      render: (a) => <span className="table-id">{a.assignmentId}</span>,
+      width: 60,
+      align: 'center'
+    },
+    {
+      header: "Taller",
       render: (a) => (
-        <div className="flex flex-col">
-          <span className="text-[11px] font-medium text-consorci-darkBlue mb-1 tracking-widest uppercase opacity-50">{t('workshop_id')}</span>
-          <span className="text-[15px] font-medium text-text-primary tracking-tight leading-tight">{a.workshop?.title}</span>
+        <span className="table-primary">{a.workshop?.title}</span>
+      ),
+      width: 250
+    },
+    {
+      header: "Centre",
+      render: (a) => (
+        <span className="table-primary">{a.center?.name || t('not_assigned')}</span>
+      ),
+      width: 200
+    },
+    {
+      header: "Planificació",
+      render: (a) => (
+        <div className="table-detail">
+          {a.startDate ? new Date(a.startDate).toLocaleDateString() : '—'}
         </div>
-      )
+      ),
+      width: 120,
+      align: 'center'
     },
     {
-      header: t('table_center'),
+      header: "Estat",
       render: (a) => (
-        <span className="text-[13px] font-medium text-text-primary">{a.center?.name || t('not_assigned')}</span>
-      )
-    },
-    {
-      header: t('table_planning'),
-      render: (a) => (
-        <div className="text-[13px] text-text-muted">
-          {a.startDate ? t('start_date', { date: new Date(a.startDate).toLocaleDateString() }) : '—'}
-        </div>
-      )
-    },
-    {
-      header: t('table_status'),
-      render: (a) => (
-        <span className={`text-[11px] font-medium px-3 py-1 border ${a.status === 'VALIDATED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
-          a.status === 'DATA_ENTRY' ? 'border-orange-500/20 bg-orange-500/5 text-orange-600' :
-            'border-border-subtle bg-background-subtle text-text-muted'
-          }`}>
+        <span className={
+          a.status === 'VALIDATED' ? 'table-tag-green' :
+          a.status === 'DATA_ENTRY' ? 'table-tag-orange' :
+          'table-tag-muted'
+        }>
           {tCommon(`statuses.${a.status}`)}
         </span>
-      )
+      ),
+      width: 120,
+      align: 'center'
     },
     {
       header: t('table_actions'),
       align: 'right',
       render: (a) => (
         <button
-          onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
-          className="bg-consorci-darkBlue text-white py-2 px-6 text-[12px] font-medium transition-all hover:bg-black active:scale-[0.98]"
+          onClick={(e) => { e.stopPropagation(); router.push(`/center/assignments/${a.assignmentId}`); }}
+          className="bg-consorci-darkBlue text-white py-2 px-6 text-[12px] font-medium transition-all hover:bg-black active:scale-[0.98] whitespace-nowrap"
         >
           {t('manage_btn')}
         </button>

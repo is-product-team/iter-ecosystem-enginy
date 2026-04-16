@@ -22,6 +22,14 @@
   --consorci-pink-red: #f26178;
   --consorci-beige: #e0c5ac;
   --consorci-yellow: #f9c311;
+
+  /* Global Pastel Palette (Text Only) */
+  --pastel-green: #10b981;
+  --pastel-orange: #f59e0b;
+  --pastel-blue: #3b82f6;
+  --pastel-red: #ef4444;
+  --pastel-purple: #8b5cf6;
+  --pastel-muted: #6b7280;
 }
 
 .dark {
@@ -277,3 +285,27 @@ h6 {
     min-width: 1200px;
   }
 }
+
+/* Atomic Table Typography Styles */
+.table-id {
+  @apply font-mono text-[10px] text-text-muted opacity-60;
+}
+
+.table-primary {
+  @apply font-semibold text-[14px] text-text-primary tracking-tight;
+}
+
+.table-detail {
+  @apply text-[12px] font-medium text-text-muted;
+}
+
+.table-tag {
+  @apply text-[10px] font-bold uppercase tracking-wider;
+}
+
+.table-tag-green { @apply table-tag text-[var(--pastel-green)]; }
+.table-tag-orange { @apply table-tag text-[var(--pastel-orange)]; }
+.table-tag-blue { @apply table-tag text-[var(--pastel-blue)]; }
+.table-tag-red { @apply table-tag text-[var(--pastel-red)]; }
+.table-tag-purple { @apply table-tag text-[var(--pastel-purple)]; }
+.table-tag-muted { @apply table-tag text-[var(--pastel-muted)]; }

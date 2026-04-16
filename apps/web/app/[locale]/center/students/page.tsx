@@ -140,43 +140,60 @@ export default function StudentsCRUD() {
 
   const columns: Column<Student>[] = [
     {
-      header: tc('table_info'),
-      render: (a) => (
-        <div className="flex items-center gap-4">
-          <Avatar
-            url={a.photoUrl}
-            name={`${a.fullName} ${a.lastName}`}
-            id={a.studentId}
-            type="student"
-            size="md"
-          />
-          <div className="text-sm font-medium text-text-primary tracking-tight">
-            {a.fullName} {a.lastName}
-          </div>
-        </div>
-      )
+      header: "ID",
+      render: (a) => <span className="table-id">{a.studentId}</span>,
+      width: 60,
+      align: 'center'
     },
     {
-      header: t('table_idalu'),
+      header: "",
       render: (a) => (
-        <span className="text-[12px] font-medium text-text-muted font-mono">{a.idalu}</span>
-      )
+        <Avatar
+          url={a.photoUrl}
+          name={`${a.fullName} ${a.lastName}`}
+          id={a.studentId}
+          type="student"
+          size="sm"
+        />
+      ),
+      width: 50,
+      align: 'center'
     },
     {
-      header: t('table_course'),
+      header: "Nom",
+      render: (a) => <span className="table-primary">{a.fullName}</span>,
+      width: 150
+    },
+    {
+      header: "Cognoms",
+      render: (a) => <span className="table-primary">{a.lastName}</span>,
+      width: 180
+    },
+    {
+      header: "IDALU",
       render: (a) => (
-        <span className="px-2 py-0.5 bg-background-subtle text-text-primary text-[11px] font-medium border border-border-subtle">
+        <span className="table-id font-bold">{a.idalu}</span>
+      ),
+      width: 120,
+      align: 'center'
+    },
+    {
+      header: "Curs",
+      render: (a) => (
+        <span className="table-tag-blue">
           {a.grade}
         </span>
-      )
+      ),
+      width: 120,
+      align: 'center'
     },
     {
       header: tc('actions'),
       align: 'right',
       render: (a) => (
         <div className="flex justify-end items-center gap-4">
-          <button onClick={() => handleEdit(a)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
-          <button onClick={() => handleDelete(a.studentId)} className="text-text-muted hover:text-red-500 transition-all">
+          <button onClick={(e) => { e.stopPropagation(); handleEdit(a); }} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
+          <button onClick={(e) => { e.stopPropagation(); handleDelete(a.studentId); }} className="text-text-muted hover:text-red-500 transition-all">
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
           </button>
         </div>
@@ -203,7 +220,7 @@ export default function StudentsCRUD() {
       {/* Filters Panel */}
       <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
         <div className="flex-1">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_placeholder')}</label>
+          <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">Cercar</label>
           <div className="relative">
             <input
               type="text"
@@ -219,11 +236,11 @@ export default function StudentsCRUD() {
         </div>
 
         <div className="lg:w-64">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('filter_course')}</label>
+          <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">Curs</label>
           <select
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
-            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary appearance-none"
+            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary appearance-none transition-all"
           >
             <option value={t("all_courses")}>{t("all_courses")}</option>
             {uniqueCourses.map(c => (

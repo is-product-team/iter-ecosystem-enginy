@@ -249,27 +249,38 @@ export default function DocumentVerificationPage() {
       }
     },
     {
-      header: t('table_student'),
-      render: (row) => (
-        <div onClick={() => setSelectedRow(row)} className="cursor-pointer">
-          <div className="font-bold text-text-primary text-[14px]">{row.student?.fullName}</div>
-          <div className="text-[11px] text-text-muted mt-0.5">ID: {row.student?.idalu}</div>
-        </div>
-      )
+      header: "ID",
+      render: (row) => <span className="table-id">{row.student?.idalu}</span>,
+      width: 80,
+      align: 'center'
     },
     {
-      header: t('table_center_workshop'),
+      header: "Alumne",
       render: (row) => (
         <div onClick={() => setSelectedRow(row)} className="cursor-pointer">
-          <div className="font-medium text-text-primary text-[13px] truncate">{row.centerName}</div>
-          <div className="text-[12px] font-medium text-consorci-darkBlue mt-0.5">{row.workshopTitle}</div>
+          <div className="table-primary">{row.student?.fullName}</div>
         </div>
-      )
+      ),
+      width: 200
     },
     {
-      header: t('table_docs'),
+      header: "Centre",
       render: (row) => (
-        <div className="flex items-center gap-3">
+        <span onClick={() => setSelectedRow(row)} className="cursor-pointer table-detail font-medium whitespace-nowrap">{row.centerName}</span>
+      ),
+      width: 250
+    },
+    {
+      header: "Taller",
+      render: (row) => (
+        <span onClick={() => setSelectedRow(row)} className="cursor-pointer table-tag-blue font-bold mt-0.5 whitespace-nowrap">{row.workshopTitle}</span>
+      ),
+      width: 300
+    },
+    {
+      header: "Documents",
+      render: (row) => (
+        <div className="flex items-center gap-4">
           {DOCUMENT_CONFIG.map((docConfig) => {
             const url = row[docConfig.urlField];
             const valid = row[docConfig.field];
@@ -277,11 +288,11 @@ export default function DocumentVerificationPage() {
               <div
                 key={docConfig.id}
                 title={url ? (valid ? 'Validat' : 'Pendent') : 'No pujat'}
-                className={`w-8 h-8 flex items-center justify-center text-[11px] font-bold border ${url
+                className={`text-[10px] font-bold ${url
                   ? valid
-                    ? 'bg-green-50 border-green-200 text-green-700'
-                    : 'bg-amber-50 border-amber-200 text-amber-700 animate-pulse'
-                  : 'bg-background-subtle border-border-subtle text-text-muted opacity-40'
+                    ? 'text-[var(--pastel-green)]'
+                    : 'text-[var(--pastel-orange)]'
+                  : 'text-text-muted opacity-20'
                   }`}
               >
                 {docConfig.label}
@@ -289,7 +300,9 @@ export default function DocumentVerificationPage() {
             );
           })}
         </div>
-      )
+      ),
+      width: 150,
+      align: 'center'
     },
     {
       header: tc('actions'),

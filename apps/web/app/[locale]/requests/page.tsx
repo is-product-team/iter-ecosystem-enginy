@@ -199,7 +199,7 @@ export default function AdminRequestsPage() {
   const columns: Column<Request>[] = [
     {
       header: "ID",
-      render: (r) => <span className="font-mono text-[10px] opacity-50">{r.requestId}</span>,
+      render: (r) => <span className="table-id">{r.requestId}</span>,
       width: 60,
       align: 'center'
     },
@@ -211,48 +211,42 @@ export default function AdminRequestsPage() {
     },
     {
       header: "Centre",
-      render: (r) => <span className="font-semibold text-text-primary underline decoration-border-subtle underline-offset-4">{r.center?.name}</span>,
+      render: (r) => <span className="table-primary">{r.center?.name}</span>,
+      width: 200
+    },
+    {
+      header: "Taller",
+      render: (r) => <span className="table-detail font-semibold">{r.workshop?.title}</span>,
       width: 250
     },
     {
       header: "Data",
-      render: (r) => <span className="text-[11px] font-medium text-text-muted">{new Date(r.createdAt).toLocaleDateString()}</span>,
-      width: 120,
+      render: (r) => <span className="table-detail">{new Date(r.createdAt).toLocaleDateString()}</span>,
+      width: 100,
       align: 'center'
     },
     {
-      header: t('table_teachers'),
-      render: (r) => (
-        <div className="space-y-1.5">
-          {(r.assignment as any)?.teachers && (r.assignment as any).teachers.length > 0 ? (
-            (r.assignment as any).teachers.map((t: any, idx: number) => (
-              <div key={idx} className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
-                <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">{idx + 1}</span>
-                {t.fullName}
-              </div>
-            ))
-          ) : (
-            <>
-              <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
-                <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">1</span>
-                {r.teacher1?.name || (r.teacher1Id ? `${tc('teachers')} ${r.teacher1Id}` : '-')}
-              </div>
-              <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
-                <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">2</span>
-                {r.teacher2?.name || (r.teacher2Id ? `${tc('teachers')} ${r.teacher2Id}` : '-')}
-              </div>
-            </>
-          )}
-        </div>
-      )
+      header: "Alumnes",
+      render: (r) => <span className="table-detail font-bold">{r.studentsAprox}</span>,
+      width: 80,
+      align: 'center'
     },
     {
-      header: "Alumnes",
-      align: 'center',
-      render: (r) => (
-        <span className="text-sm font-bold text-text-primary px-3">{r.studentsAprox}</span>
-      ),
-      width: 100
+      header: "Estat",
+      render: (r) => {
+        const s = r.status.toUpperCase();
+        return (
+          <span className={
+            s === 'APPROVED' ? 'table-tag-green' :
+            s === 'PENDING' ? 'table-tag-orange' :
+            'table-tag-red'
+          }>
+            {t(`statuses.${r.status.toLowerCase()}`)}
+          </span>
+        );
+      },
+      width: 120,
+      align: 'center'
     },
     {
       header: t('table_status'),
@@ -287,46 +281,37 @@ export default function AdminRequestsPage() {
       align: 'center',
       render: (r) => (
         <div className="flex justify-center gap-2">
-          {r.status === REQUEST_STATUSES.REJECTED ? (
-            <span className="text-[11px] font-bold text-text-muted/60 uppercase tracking-wider">{t('rejected')}</span>
-          ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
-            <span className="text-[11px] font-bold text-consorci-lightBlue uppercase tracking-wider">{t('assigned')}</span>
-          ) : (
-            <>
-              <button
-                onClick={() => handleEditClick(r)}
-                className="btn-raw"
-                title={tc('edit')}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </button>
-              {r.status === REQUEST_STATUSES.PENDING && (
-                <button
-                  onClick={() => handleApprove(r.requestId)}
-                  className="btn-raw text-green-600 hover:text-green-700"
-                  title={t('approve_btn')}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                </button>
-              )}
-              <button
-                onClick={() => handleReject(r.requestId)}
-                className="btn-raw-destructive"
-                title={t('reject_btn')}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </>
+          {r.status === REQUEST_STATUSES.PENDING && (
+            <button
+              onClick={(e) => { e.stopPropagation(); handleApprove(r.requestId); }}
+              className="bg-consorci-darkBlue text-white px-4 py-2 text-[11px] font-bold uppercase tracking-wider transition-all hover:bg-black active:scale-95"
+            >
+              Asignar plazas
+            </button>
           )}
+          <button
+            onClick={(e) => { e.stopPropagation(); handleEditClick(r); }}
+            className="btn-raw"
+            title={tc('edit')}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleReject(r.requestId); }}
+            className="btn-raw-destructive"
+            title={t('reject_btn')}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-      )
+      ),
+      width: 250
     }
+
   ];
 
   // Filtered Requests based on Center Selection

@@ -192,99 +192,110 @@ export default function RequestsPage() {
 
   const columns: Column<Workshop>[] = [
     {
-      header: t('table_mod'),
-      align: 'center',
-      headerClassName: 'w-16',
+      header: "ID",
+      render: (w) => <span className="table-id">{w._id}</span>,
+      width: 60,
+      align: 'center'
+    },
+    {
+      header: "Taller",
       render: (w) => (
-        <div className={`w-10 h-10 flex items-center justify-center font-bold text-[12px] shrink-0 border ${w.modality === 'A' ? 'bg-green-500/5 text-green-600 border-green-500/20' :
-          w.modality === 'B' ? 'bg-orange-500/5 text-orange-600 border-orange-500/20' :
-            'bg-purple-500/5 text-purple-600 border-purple-500/20'
-          }`}>
+        <div className="flex items-center gap-3">
+          <WorkshopIcon iconName={w.icon} className="w-4 h-4 text-text-primary shrink-0" />
+          <span className="table-primary">{w.title}</span>
+        </div>
+      ),
+      width: 250
+    },
+    {
+      header: "Mod",
+      render: (w) => (
+        <span className={
+          w.modality === 'A' ? 'table-tag-green' :
+          w.modality === 'B' ? 'table-tag-orange' :
+          'table-tag-purple'
+        }>
           {w.modality}
-        </div>
-      )
+        </span>
+      ),
+      width: 50,
+      align: 'center'
     },
     {
-      header: t('table_workshop'),
-      render: (w) => (
-        <div className="flex items-start gap-4">
-          <WorkshopIcon iconName={w.icon} className="w-5 h-5 text-text-primary mt-0.5 shrink-0" />
-          <div>
-            <div className="font-semibold text-text-primary text-[15px] leading-tight mb-1">{w.title}</div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-text-muted">
-              <span className="uppercase text-text-secondary">{w.sector}</span>
-              <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
-              <span className="flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                {tCommon('duration_label', { hours: w.technicalDetails?.durationHours ?? 0 })}
-              </span>
-              <span className="w-1 h-1 rounded-full bg-border-subtle"></span>
-              <span className="flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                {tCommon('places_label', { count: w.technicalDetails?.maxPlaces ?? 0 })}
-              </span>
-            </div>
-          </div>
-        </div>
-      )
+      header: "Sector",
+      render: (w) => <span className="table-tag-muted">{w.sector}</span>,
+      width: 150
     },
     {
-      header: t('table_referents'),
+      header: "Hores",
+      headerClassName: 'hidden lg:table-cell',
+      cellClassName: 'hidden lg:table-cell',
+      render: (w) => <span className="table-detail">{w.technicalDetails?.durationHours}h</span>,
+      width: 80,
+      align: 'center'
+    },
+    {
+      header: "Places",
+      headerClassName: 'hidden lg:table-cell',
+      cellClassName: 'hidden lg:table-cell',
+      render: (w) => <span className="table-detail">{w.technicalDetails?.maxPlaces}</span>,
+      width: 80,
+      align: 'center'
+    },
+    {
+      header: "Referents",
       headerClassName: 'hidden md:table-cell',
       cellClassName: 'hidden md:table-cell',
       render: (w) => {
         const existingRequest = requests.find(r => r.workshopId === parseInt(w._id));
-        if (!existingRequest) return <span className="text-[11px] text-text-muted italic">---</span>;
+        if (!existingRequest) return <span className="table-id opacity-30">---</span>;
         return (
           <div className="flex flex-col gap-0.5">
             {existingRequest.teacher1Id && (
-              <div className="text-[12px] font-medium text-text-primary">
-                {teachers.find(t => t.teacherId === existingRequest.teacher1Id)?.name || tCommon('loading_error')}
-              </div>
+              <span className="table-detail font-semibold whitespace-nowrap">
+                {teachers.find(t => t.teacherId === existingRequest.teacher1Id)?.name}
+              </span>
             )}
             {existingRequest.teacher2Id && (
-              <div className="text-[12px] font-medium text-text-primary">
-                {teachers.find(t => t.teacherId === existingRequest.teacher2Id)?.name || tCommon('loading_error')}
-              </div>
+              <span className="table-detail font-semibold whitespace-nowrap">
+                {teachers.find(t => t.teacherId === existingRequest.teacher2Id)?.name}
+              </span>
             )}
           </div>
         );
-      }
+      },
+      width: 180
     },
     {
-      header: t('table_status'),
+      header: "Estat",
       align: 'right',
-      headerClassName: 'w-32',
       render: (w) => {
         const existingRequest = requests.find(r => r.workshopId === parseInt(w._id));
         const isSelected = selectedWorkshopId === w._id;
         if (existingRequest) {
           return (
-            <div className="flex flex-col items-end justify-center">
-              <span className={`text-[10px] font-bold border px-3 py-1.5 tracking-widest uppercase font-sans ${
-                existingRequest.status === REQUEST_STATUSES.APPROVED
-                  ? 'border-green-500/30 bg-green-500/5 text-green-500'
-                  : existingRequest.status === REQUEST_STATUSES.PENDING
-                    ? 'border-orange-500/30 bg-orange-500/5 text-orange-500'
-                    : 'border-red-500/30 bg-red-500/5 text-red-500'
-              }`}>
-                {existingRequest.status === REQUEST_STATUSES.PENDING ? t('status_pending') : 
-                 existingRequest.status === REQUEST_STATUSES.APPROVED ? t('status_approved') : 
-                 t('status_rejected')}
-              </span>
-            </div>
+            <span className={`text-[11px] font-bold tracking-widest uppercase ${
+              existingRequest.status === REQUEST_STATUSES.APPROVED ? 'text-green-600' :
+              existingRequest.status === REQUEST_STATUSES.PENDING ? 'text-orange-600' :
+              'text-red-600'
+            }`}>
+              {existingRequest.status === REQUEST_STATUSES.PENDING ? t('status_pending') : 
+               existingRequest.status === REQUEST_STATUSES.APPROVED ? t('status_approved') : 
+               t('status_rejected')}
+            </span>
           );
         }
         if (isSelected) {
           return (
-            <div className="flex items-center justify-end gap-2 text-consorci-darkBlue font-bold text-[11px] uppercase tracking-tight font-sans">
+            <div className="flex items-center justify-end gap-2 text-consorci-darkBlue font-bold text-[11px] uppercase tracking-tight">
               <span>{t('selected_label')}</span>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
             </div>
           );
         }
         return null;
-      }
+      },
+      width: 120
     }
   ];
 

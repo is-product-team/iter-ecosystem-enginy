@@ -167,26 +167,28 @@ export default function WorkshopAdminPage() {
   const columns: Column<Workshop>[] = [
     {
       header: "ID",
-      render: (workshop) => <span className="font-mono text-[10px] opacity-50">{workshop._id}</span>,
+      render: (workshop) => <span className="table-id">{workshop._id}</span>,
       width: 60,
       align: 'center'
     },
     {
-      header: t("table_info"),
-      render: (workshop) => <span className="font-semibold text-text-primary">{workshop.title}</span>,
+      header: "Taller",
+      render: (workshop) => <span className="table-primary">{workshop.title}</span>,
       width: 250
     },
     {
       header: "Sector",
-      render: (workshop) => <span className="text-consorci-darkBlue font-medium">{workshop.sector}</span>,
-      width: 180
+      render: (workshop) => <span className="table-tag-muted">{workshop.sector}</span>,
+      width: 150
     },
     {
       header: "Modalitat",
       render: (workshop) => (
-        <span className={`text-[10px] uppercase tracking-wider font-bold ${
-          workshop.modality === 'A' ? 'text-green-600' : workshop.modality === 'B' ? 'text-orange-600' : 'text-consorci-darkBlue'
-        }`}>
+        <span className={
+          workshop.modality === 'A' ? 'table-tag-green' :
+          workshop.modality === 'B' ? 'table-tag-orange' :
+          'table-tag-blue'
+        }>
           {workshop.modality}
         </span>
       ),
@@ -195,24 +197,24 @@ export default function WorkshopAdminPage() {
     },
     {
       header: "Hores",
-      render: (workshop) => <span className="font-medium">{workshop.technicalDetails?.durationHours ?? 0}h</span>,
+      render: (workshop) => <span className="table-detail">{workshop.technicalDetails?.durationHours ?? 0}h</span>,
       width: 80,
       align: 'center'
     },
     {
       header: "Places",
-      render: (workshop) => <span className="font-medium">{workshop.technicalDetails?.maxPlaces ?? 0}</span>,
+      render: (workshop) => <span className="table-detail">{workshop.technicalDetails?.maxPlaces ?? 0}</span>,
       width: 80,
       align: 'center'
     },
     {
       header: "Descripció",
       render: (workshop) => (
-        <span className="text-text-muted opacity-80 italic line-clamp-1 max-w-[400px]">
+        <span className="table-detail italic">
           {workshop.technicalDetails?.description || "-"}
         </span>
       ),
-      width: 400
+      width: 500
     },
     {
       header: t("table_actions"),
@@ -220,14 +222,14 @@ export default function WorkshopAdminPage() {
       render: (workshop) => (
         <div className="flex justify-end items-center gap-4">
           <button
-            onClick={() => handleEdit(workshop)}
+            onClick={(e) => { e.stopPropagation(); handleEdit(workshop); }}
             className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
           >
             {tc("edit")}
           </button>
           <button
-            onClick={() => handleDelete(workshop._id)}
-            className="p-2 text-text-muted hover:text-red-600 transition-all"
+            onClick={(e) => { e.stopPropagation(); handleDelete(workshop._id); }}
+            className="text-text-muted hover:text-red-600 transition-colors"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
