@@ -15,53 +15,52 @@ export default function NotificationsTabScreen() {
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const formatContent = (content: string, paramsContext: any = {}) => {
+  const formatContent = (content: string, paramsContext: any = {}): string => {
     if (!content) return '';
-    
+
     // Default params to avoid FORMATTING_ERROR in i18next if params are missing
-    const defaultParams = { 
-      name: '', 
-      title: '', 
-      status: '', 
-      status_low: '', 
-      doc: '', 
-      comment: '', 
+    const defaultParams: Record<string, any> = {
+      name: '',
+      title: '',
+      status: '',
+      status_low: '',
+      doc: '',
+      comment: '',
       time: '',
-      ...paramsContext 
+      ...paramsContext
     };
-    
+
     try {
       if (content.startsWith('{')) {
         const parsed = JSON.parse(content);
         if (parsed.key) {
           const params = { ...defaultParams, ...parsed.params };
-          
+
           // Recursive translation for params (like the web version)
           for (const key in params) {
             const val = params[key];
             if (typeof val === 'string' && val.length > 0 && !val.includes(' ')) {
-              const transVal = t(`Notifications.${val}`);
+              const transVal = t(`Notifications.${val}`) as string;
               if (transVal !== `Notifications.${val}`) {
                 params[key] = transVal;
               }
             }
           }
-          
-          return t(`Notifications.${parsed.key}`, params);
+
+          return t(`Notifications.${parsed.key}`, params) as string;
         }
       }
-      
-      const translated = t(`Notifications.${content}`, defaultParams);
+
+      const translated = t(`Notifications.${content}`, defaultParams) as string;
       if (translated !== `Notifications.${content}`) {
         return translated;
       }
     } catch (e) {
       // Not JSON or other error
     }
-    
+
     return content;
   };
-
   const getParamsFromNotification = (notif: Notification) => {
     try {
       // Try to extract params from message if it's JSON

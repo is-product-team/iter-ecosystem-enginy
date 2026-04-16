@@ -394,6 +394,7 @@
     "Monitoring": {
       "title": "Monitorización Operativa",
       "subtitle": "Estado de la ejecución de talleres y asistencia en tu centro.",
+      "description": "Controla la asistencia, los hitos y el estado de todos tus talleres activos.",
       "KPI": {
         "sessions_today": "Sesiones Hoy",
         "pending_attendance": "Hojas Pendientes",
@@ -403,8 +404,14 @@
       "Assignments": {
         "title": "Estado de los Talleres",
         "progress": "Progreso",
+        "sessions": "sesiones",
         "health": "Salud de la Asistencia",
-        "view_details": "Gestionar Sesiones",
+        "health_label": "Salud de la Asistencia",
+        "present": "Presente",
+        "late": "Retraso",
+        "absent": "Falta",
+        "staff_needed": "Profesorado pendiente",
+        "view_details": "Asignar Profesores",
         "no_staff": "⚠️ Sin profesor asignado",
         "attendance_ok": "Asistencia al día",
         "attendance_warning": "Faltan hojas por rellenar"

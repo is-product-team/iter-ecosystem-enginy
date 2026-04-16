@@ -111,8 +111,8 @@ const MOCK_STUDENTS: any[] = [
 const MOCK_WORKSHOP: any = {
   assignmentId: 999,
   workshop: {
-    title: "Taller de Robótica",
-    icon: "robot"
+    title: "Cine",
+    icon: "videocam"
   },
   center: {
     name: "IES Brossa"
@@ -182,82 +182,11 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   async (response) => {
-    // --- GENERIC MOCKS FOR TEACHERS IN DEV ---
-    try {
-      if (isDevelopment) {
-        const userData = Platform.OS === 'web' ? localStorage.getItem('user') : await SecureStore.getItemAsync('user');
-        const user = userData ? JSON.parse(userData) : null;
-        
-        if (user && isKnownTeacher(user.email)) {
-          const url = response.config.url;
-          if (url?.includes('questionnaires/models')) {
-            return { ...response, data: [{ modelId: 1, name: "Valoració del Taller", target: "PROFESSOR" }] };
-          }
-          if (url?.includes('questionnaires/model/1')) {
-            return { ...response, data: MOCK_QUESTIONNAIRE_MODEL };
-          }
-          if (url?.includes('questionnaires/track')) {
-            return { ...response, data: { token: 'mock-token-dev' } };
-          }
-        }
-      }
-    } catch (e) {}
-    
     return response;
   },
   async (error) => {
-    const isTimeout = error.code === 'ECONNABORTED' || error.message.includes('timeout') || error.message.includes('Network Error');
-    const isLikelyDown = isTimeout || error.response?.status >= 500 || error.response?.status === 404;
-
-    if (isDevelopment && isLikelyDown) {
-      try {
-        const config = error.config;
-        // NO AUTH MOCK: Favor real backend login.
-
-        // --- DATA FALLBACKS ---
-        const matches = (pattern: string) => config.url?.includes(pattern);
-
-          // 1. If requesting models List
-          if (matches('questionnaires/models')) {
-            console.log("🛡️ [API MOCK] Serving models for:", url);
-            return Promise.resolve({ data: [{ modelId: 1, name: "Valoració del Taller", target: "PROFESSOR" }], status: 200 });
-          }
-          
-          // 2. If requesting specific model
-          if (matches('questionnaires/model/1')) {
-            console.log("🛡️ [API MOCK] Serving model model/1");
-            return Promise.resolve({ data: MOCK_QUESTIONNAIRE_MODEL, status: 200 });
-          }
-          
-          // 3. Notifications, Calendar, Phases & Assignments
-          if (matches('notifications')) {
-            console.log("🛡️ [API MOCK] Serving notifications");
-            return Promise.resolve({ data: [{ notificationId: 1, title: 'Benvinguda', message: 'Hola Laura, ja pots provar el nou flux!', isRead: false, createdAt: new Date().toISOString(), type: 'INFO', importance: 'MEDIUM' }], status: 200 });
-          }
-          if (matches('calendar')) {
-            console.log("🛡️ [API MOCK] Serving empty calendar");
-            return Promise.resolve({ data: [], status: 200 });
-          }
-          if (matches('phases')) {
-            console.log("🛡️ [API MOCK] Serving execution phase");
-            return Promise.resolve({ data: [{ name: 'Execution', isActive: true }], status: 200 });
-          }
-          if (matches('assignments')) {
-             console.log("🛡️ [API MOCK] Serving assignments for:", url);
-             if (url.includes('students')) {
-                // If real API returned empty (happens in some dev states), fallback to mocks
-                return Promise.resolve({ data: MOCK_STUDENTS, status: 200 });
-             }
-             return Promise.resolve({ data: [MOCK_WORKSHOP], status: 200 });
-          }
-        }
-      }
-    } catch (e) {
-      console.warn("⚠️ [API MOCK] Fallback logic error:", e);
-    }
-    
     if (error.response?.status === 401) {
-      // Skip logout for Laura if it's potentially a transient error
+      // Handle unauthorized access if needed
     }
     
     return Promise.reject(error);

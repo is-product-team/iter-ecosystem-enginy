@@ -394,6 +394,7 @@
     "Monitoring": {
       "title": "Operational Monitoring (Phase 3)",
       "subtitle": "Status of workshop execution and attendance at your center.",
+      "description": "Control attendance, milestones, and the status of all your active workshops.",
       "KPI": {
         "sessions_today": "Sessions Today",
         "pending_attendance": "Pending Sheets",
@@ -403,8 +404,14 @@
       "Assignments": {
         "title": "Workshop Status",
         "progress": "Progress",
+        "sessions": "sessions",
         "health": "Attendance Health",
-        "view_details": "Manage Sessions",
+        "health_label": "Attendance Health",
+        "present": "Present",
+        "late": "Late",
+        "absent": "Absent",
+        "staff_needed": "Staff needed",
+        "view_details": "Assign Teachers",
         "no_staff": "⚠️ No teacher assigned",
         "attendance_ok": "Attendance up to date",
         "attendance_warning": "Attendance sheets missing"

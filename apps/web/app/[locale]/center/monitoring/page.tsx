@@ -59,17 +59,21 @@ export default function MonitoringPage() {
     let incidents = 0; // Mocked for now as we don't have a service yet
 
     active.forEach(a => {
-      a.sessions?.forEach(s => {
+      const sessions = a.sessions || [];
+      sessions.forEach(s => {
         if (s.sessionDate.startsWith(today)) {
           sessionsToday++;
         }
       });
       
-      // Potential pending attendance: sessions in the past without attendance full
-      const pastSessions = a.sessions?.filter(s => new Date(s.sessionDate) < new Date()) || [];
+      // Real pending attendance calculation: 
+      // Sessions in the past that don't have attendance records yet
+      const pastSessions = sessions.filter(s => new Date(s.sessionDate) < new Date());
       pastSessions.forEach(s => {
-        // If it was more than 1 hour ago and no attendance records...
-        // This is a simplification
+        const hasAttendance = s.attendance && s.attendance.length > 0;
+        if (!hasAttendance) {
+          pendingAttendance++;
+        }
       });
     });
 

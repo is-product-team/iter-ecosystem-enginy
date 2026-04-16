@@ -394,6 +394,7 @@
     "Monitoring": {
       "title": "Monitorització Operativa",
       "subtitle": "Estat de l'execució de tallers i assistència en el teu centre.",
+      "description": "Controla l'asistència, les fites i l'estat de tots els teus tallers actius.",
       "KPI": {
         "sessions_today": "Sessions Avui",
         "pending_attendance": "Fulls Pendents",
@@ -403,8 +404,14 @@
       "Assignments": {
         "title": "Estat dels Tallers",
         "progress": "Progrés",
+        "sessions": "sessions",
         "health": "Salut de l'Asistència",
-        "view_details": "Gestionar Sessions",
+        "health_label": "Salut de l'Assistència",
+        "present": "Present",
+        "late": "Retard",
+        "absent": "Falta",
+        "staff_needed": "Professorat pendent",
+        "view_details": "Assignar Professors",
         "no_staff": "⚠️ Sense professor assignat",
         "attendance_ok": "Asistència al dia",
         "attendance_warning": "Falten fulls per omplir"

@@ -16,7 +16,7 @@ const AttendanceSegmentedControl: React.FC<AttendanceSegmentedControlProps> = ({
   const options = [
     { label: 'Present', value: 'PRESENT' },
     { label: 'Absent', value: 'ABSENT' },
-    { label: 'Tard', value: 'LATE' }
+    { label: 'Retard', value: 'LATE' }
   ];
 
   return (

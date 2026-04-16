@@ -113,7 +113,6 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
                 <Ionicons name="ribbon-outline" size={20} color="#007AFF" />
             </Pressable>
         )}
-      </View>
 
       <AttendanceSegmentedControl 
         currentStatus={status || 'PRESENT'} 
