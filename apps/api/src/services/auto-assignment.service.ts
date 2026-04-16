@@ -1,4 +1,7 @@
+import { RequestStatus, AssignmentStatus } from '@prisma/client';
 import { PHASES, REQUEST_STATUSES } from '@iter/shared';
+import prisma from '../lib/prisma.js';
+import { isPhaseActive } from '../lib/phaseUtils.js';
 import { SessionService } from './session.service.js';
 import { NotificationService } from './notification.service.js';
 
