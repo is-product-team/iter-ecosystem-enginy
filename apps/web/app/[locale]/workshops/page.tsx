@@ -166,40 +166,53 @@ export default function WorkshopAdminPage() {
 
   const columns: Column<Workshop>[] = [
     {
+      header: "ID",
+      render: (workshop) => <span className="font-mono text-[10px] opacity-50">{workshop._id}</span>,
+      width: 60,
+      align: 'center'
+    },
+    {
       header: t("table_info"),
-      render: (workshop) => (
-        <div className="flex items-center gap-5">
-          <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
-            <WorkshopIcon iconName={workshop.icon} className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-[15px] font-medium text-text-primary leading-tight">{workshop.title}</div>
-            <div className="text-[12px] font-medium text-text-muted mt-1 uppercase tracking-tighter opacity-70">{tc("id_label", { id: workshop._id })}</div>
-          </div>
-        </div>
-      )
+      render: (workshop) => <span className="font-semibold text-text-primary">{workshop.title}</span>,
+      width: 250
     },
     {
-      header: t("table_classification"),
-      render: (workshop) => (
-        <div className="flex flex-col gap-1">
-          <span className="text-consorci-darkBlue font-medium text-[13px]">{workshop.sector}</span>
-          <span className="text-text-muted opacity-70 text-[13px]">{tc("modality_label", { modality: workshop.modality })}</span>
-        </div>
-      )
+      header: "Sector",
+      render: (workshop) => <span className="text-consorci-darkBlue font-medium">{workshop.sector}</span>,
+      width: 180
     },
     {
-      header: t("table_details"),
+      header: "Modalitat",
       render: (workshop) => (
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
-            {tc("duration_label", { hours: workshop.technicalDetails?.durationHours ?? 0 })} • {tc("places_label", { count: workshop.technicalDetails?.maxPlaces ?? 0 })}
-          </div>
-          <div className="text-[12px] text-text-muted font-medium line-clamp-1 max-w-[240px] opacity-70">
-            {workshop.technicalDetails?.description}
-          </div>
-        </div>
-      )
+        <span className={`text-[10px] uppercase tracking-wider font-bold ${
+          workshop.modality === 'A' ? 'text-green-600' : workshop.modality === 'B' ? 'text-orange-600' : 'text-consorci-darkBlue'
+        }`}>
+          {workshop.modality}
+        </span>
+      ),
+      width: 100,
+      align: 'center'
+    },
+    {
+      header: "Hores",
+      render: (workshop) => <span className="font-medium">{workshop.technicalDetails?.durationHours ?? 0}h</span>,
+      width: 80,
+      align: 'center'
+    },
+    {
+      header: "Places",
+      render: (workshop) => <span className="font-medium">{workshop.technicalDetails?.maxPlaces ?? 0}</span>,
+      width: 80,
+      align: 'center'
+    },
+    {
+      header: "Descripció",
+      render: (workshop) => (
+        <span className="text-text-muted opacity-80 italic line-clamp-1 max-w-[400px]">
+          {workshop.technicalDetails?.description || "-"}
+        </span>
+      ),
+      width: 400
     },
     {
       header: t("table_actions"),
@@ -277,7 +290,7 @@ export default function WorkshopAdminPage() {
 
         {/* Sector Filter */}
         <div className="w-full">
-          <label className="block text-[13px] font-medium text-text-primary mb-3">{tc("filter_by_sector")}</label>
+          <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">Sector</label>
           <select
             value={selectedSector}
             onChange={(e) => handleSectorChange(e.target.value)}
@@ -291,7 +304,7 @@ export default function WorkshopAdminPage() {
 
         {/* Modality Filter */}
         <div className="w-full">
-          <label className="block text-[11px] font-medium text-text-primary mb-3">{tc("filter_by_modality")}</label>
+          <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">Modalitat</label>
           <select
             value={selectedModality}
             onChange={(e) => handleModalityChange(e.target.value)}

@@ -12,9 +12,11 @@ export interface Column<T> {
   cellClassName?: string;
   align?: 'left' | 'center' | 'right';
   icon?: React.ReactNode;
+  width?: number; // Initial width in px
 }
 
 interface DataTableProps<T> {
+  tableId?: string; // Unique ID for localStorage persistence
   data: T[];
   columns: Column<T>[];
   loading?: boolean;
@@ -32,21 +34,28 @@ interface DataTableProps<T> {
   showIndex?: boolean;
 }
 
-const TableSkeleton = ({ columns, rows = 5, showIndex = false }: { columns: Column<any>[], rows?: number, showIndex?: boolean }) => {
+const TableSkeleton = ({ columns, rows = 5, showIndex = false, columnWidths = {} }: { columns: Column<any>[], rows?: number, showIndex?: boolean, columnWidths?: Record<string, number> }) => {
   return (
     <>
       {[...Array(rows)].map((_, rowIndex) => (
         <tr key={rowIndex} className="border-b border-border-subtle animate-pulse">
           {showIndex && (
-            <td className="px-4 py-3 border-r border-border-subtle w-12">
-               <div className="h-4 bg-background-subtle rounded-sm w-4 mx-auto opacity-60"></div>
+            <td className="table-database-td w-10 text-center sticky left-0 z-20 bg-background-surface">
+               <div className="h-3 bg-background-subtle rounded-sm w-4 mx-auto opacity-60"></div>
             </td>
           )}
-          {columns.map((column, colIndex) => (
-            <td key={colIndex} className={`px-4 py-3 border-r border-border-subtle last:border-r-0`}>
-              <div className={`h-4 bg-background-subtle rounded-sm w-full opacity-60`}></div>
-            </td>
-          ))}
+          {columns.map((column, colIndex) => {
+            const width = columnWidths[column.header] || column.width;
+            return (
+              <td 
+                key={colIndex} 
+                className="table-database-td"
+                style={width ? { width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px` } : {}}
+              >
+                <div className={`h-3 bg-background-subtle rounded-sm w-full opacity-60`}></div>
+              </td>
+            );
+          })}
         </tr>
       ))}
     </>
@@ -54,6 +63,7 @@ const TableSkeleton = ({ columns, rows = 5, showIndex = false }: { columns: Colu
 };
 
 export default function DataTable<T>({
+  tableId,
   data,
   columns,
   loading,
@@ -64,6 +74,53 @@ export default function DataTable<T>({
   variant = 'default',
   showIndex = false
 }: DataTableProps<T>) {
+  const [columnWidths, setColumnWidths] = React.useState<Record<string, number>>({});
+  const [resizing, setResizing] = React.useState<string | null>(null);
+
+  // Initialize widths from localStorage
+  React.useEffect(() => {
+    if (tableId) {
+      const saved = localStorage.getItem(`dt_widths_${tableId}`);
+      if (saved) {
+        try {
+          setColumnWidths(JSON.parse(saved));
+        } catch (e) {
+          console.error('Error loading table widths', e);
+        }
+      }
+    }
+  }, [tableId]);
+
+  const startResize = (e: React.MouseEvent, header: string) => {
+    e.preventDefault();
+    setResizing(header);
+    
+    const startX = e.pageX;
+    const startWidth = columnWidths[header] || columns.find(c => c.header === header)?.width || 150;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const newWidth = Math.max(50, startWidth + (moveEvent.pageX - startX));
+      setColumnWidths(prev => ({ ...prev, [header]: newWidth }));
+    };
+
+    const onMouseUp = () => {
+      setResizing(null);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      
+      // Save to localStorage
+      if (tableId) {
+        setColumnWidths(current => {
+          localStorage.setItem(`dt_widths_${tableId}`, JSON.stringify(current));
+          return current;
+        });
+      }
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
   const alignClasses = {
     left: 'text-left',
     center: 'text-center',
@@ -71,34 +128,43 @@ export default function DataTable<T>({
   };
 
   return (
-    <div className={`bg-background-surface border border-border-subtle ${variant === 'simple' ? '' : 'border-t-2 border-t-consorci-darkBlue'} overflow-hidden transition-all duration-300`}>
+    <div className={`bg-background-surface border border-border-subtle transition-all duration-300 table-database`}>
       <div className="premium-table-container">
-        <table className="w-full text-left border-collapse">
-          <thead className="sticky top-0 z-10 bg-background-subtle border-b border-border-subtle">
+        <table className="w-full text-left border-collapse border-spacing-0">
+          <thead className="sticky top-0 z-30 bg-background-surface">
             <tr>
               {showIndex && (
-                <th className="px-4 py-2.5 text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] border-r border-border-subtle w-12 text-center bg-background-subtle">
+                <th className="table-database-th w-10 text-center sticky left-0 z-40 bg-background-surface shadow-[1px_0_0_0_#e5e7eb]">
                   #
                 </th>
               )}
-              {columns.map((column, index) => (
-                <th
-                  key={index}
-                  className={`px-4 py-2.5 text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] border-r border-border-subtle last:border-r-0 bg-background-subtle ${
-                    alignClasses[column.align || 'center']
-                  } ${column.headerClassName || ''}`}
-                >
-                  <div className={`flex items-center gap-2 ${(!column.align || column.align === 'center') ? 'justify-center' : column.align === 'right' ? 'justify-end' : ''}`}>
-                    {column.icon && <span className="opacity-70">{column.icon}</span>}
-                    {column.header}
-                  </div>
-                </th>
-              ))}
+              {columns.map((column, index) => {
+                const width = columnWidths[column.header] || column.width;
+                return (
+                  <th
+                    key={index}
+                    className={`table-database-th relative group/th ${
+                      alignClasses[column.align || 'center']
+                    } ${column.headerClassName || ''}`}
+                    style={width ? { width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px` } : {}}
+                  >
+                    <div className={`flex items-center gap-2 ${(!column.align || column.align === 'center') ? 'justify-center' : column.align === 'right' ? 'justify-end' : ''}`}>
+                      {column.icon && <span className="opacity-70">{column.icon}</span>}
+                      {column.header}
+                    </div>
+                    {/* Resize Handle */}
+                    <div 
+                      onMouseDown={(e) => startResize(e, column.header)}
+                      className={`absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-consorci-lightBlue transition-colors z-10 ${resizing === column.header ? 'bg-consorci-lightBlue' : 'bg-transparent'}`}
+                    />
+                  </th>
+                );
+              })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-border-subtle">
+          <tbody className="bg-background-surface">
             {loading ? (
-              <TableSkeleton columns={columns} showIndex={showIndex} />
+              <TableSkeleton columns={columns} showIndex={showIndex} columnWidths={columnWidths} />
             ) : data.length === 0 ? (
               <tr>
                 <td
@@ -122,29 +188,35 @@ export default function DataTable<T>({
                   <tr
                     key={rowIndex}
                     onClick={() => onRowClick?.(item)}
-                    className={`border-l-2 border-l-transparent hover:border-l-consorci-darkBlue hover:bg-background-subtle/30 even:bg-background-subtle/5 transition-all duration-300 group ${
+                    className={`table-database-row group ${
                       onRowClick ? 'cursor-pointer' : ''
                     } ${customRowClass}`}
                   >
                     {showIndex && (
-                      <td className="px-4 py-3 text-[12px] font-medium text-text-muted border-r border-border-subtle text-center">
+                      <td className="table-database-td text-center text-text-muted font-medium sticky left-0 z-20 bg-background-surface shadow-[1px_0_0_0_#e5e7eb]">
                         {rowIndex + 1}
                       </td>
                     )}
-                    {columns.map((column, colIndex) => (
-                      <td
-                        key={colIndex}
-                        className={`px-4 py-3 text-[13px] font-medium text-text-primary border-r border-border-subtle last:border-r-0 ${
-                          alignClasses[column.align || 'center']
-                        } ${column.cellClassName || ''}`}
-                      >
-                        {column.render
-                          ? column.render(item)
-                          : column.accessor
-                          ? (item[column.accessor] as React.ReactNode)
-                          : null}
-                      </td>
-                    ))}
+                    {columns.map((column, colIndex) => {
+                      const width = columnWidths[column.header] || column.width;
+                      return (
+                        <td
+                          key={colIndex}
+                          className={`table-database-td ${
+                            alignClasses[column.align || 'center']
+                          } ${column.cellClassName || ''}`}
+                          style={width ? { width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px` } : {}}
+                        >
+                          <div className="truncate">
+                            {column.render
+                              ? column.render(item)
+                              : column.accessor
+                              ? (item[column.accessor] as React.ReactNode)
+                              : null}
+                          </div>
+                        </td>
+                      );
+                    })}
                   </tr>
                 );
               })
@@ -160,6 +232,7 @@ export default function DataTable<T>({
           totalItems={pagination.totalItems}
           currentItemsCount={data.length}
           itemName={pagination.itemName}
+          variant="database"
         />
       )}
     </div>

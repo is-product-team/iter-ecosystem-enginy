@@ -14,6 +14,7 @@ import Loading from "@/components/Loading";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import DataTable, { Column } from "@/components/ui/DataTable";
+import Avatar from "@/components/Avatar";
 
 export default function CentersScreen() {
   const t = useTranslations('CentersPage');
@@ -127,20 +128,27 @@ export default function CentersScreen() {
 
   const columns: Column<Center>[] = [
     {
+      header: "ID",
+      render: (center) => <span className="font-mono text-[10px] opacity-50">{center.centerId}</span>,
+      width: 60,
+      align: 'center'
+    },
+    {
+      header: "",
+      render: (center) => <Avatar name={center.name} size="sm" type="center" />,
+      width: 50,
+      align: 'center'
+    },
+    {
       header: t('table_center'),
-      render: (center) => (
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </div>
-          <div>
-            <div className="text-sm font-medium text-text-primary tracking-tight">{center.name}</div>
-            <div className="text-[10px] font-medium text-text-muted mt-0.5">{t('center_code')}: {center.centerCode}</div>
-          </div>
-        </div>
-      )
+      render: (center) => <span className="font-semibold text-text-primary">{center.name}</span>,
+      width: 250
+    },
+    {
+      header: "Codi",
+      render: (center) => <span className="font-mono text-[11px] font-bold text-text-muted">{center.centerCode}</span>,
+      width: 120,
+      align: 'center'
     },
     {
       header: t('table_address'),
@@ -268,6 +276,7 @@ export default function CentersScreen() {
       )}
 
       <DataTable
+        tableId="centers_admin"
         data={paginatedCenters}
         columns={columns}
         loading={loading}

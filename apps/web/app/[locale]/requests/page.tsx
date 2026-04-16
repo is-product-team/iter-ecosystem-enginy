@@ -17,6 +17,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from '@/components/Pagination';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import FilterPanel from '@/components/ui/FilterPanel';
+import Avatar from '@/components/Avatar';
 
 export default function AdminRequestsPage() {
   const t = useTranslations('Admin.Requests');
@@ -197,13 +198,27 @@ export default function AdminRequestsPage() {
   // Column definition for the requests table
   const columns: Column<Request>[] = [
     {
-      header: t('table_center_date'),
-      render: (r) => (
-        <>
-          <div className="text-sm font-bold text-text-primary group-hover:text-consorci-darkBlue transition-colors">{r.center?.name}</div>
-          <div className="text-[11px] font-semibold text-text-muted mt-1 px-2 py-0.5 bg-background-subtle inline-block">{new Date(r.createdAt).toLocaleDateString()}</div>
-        </>
-      )
+      header: "ID",
+      render: (r) => <span className="font-mono text-[10px] opacity-50">{r.requestId}</span>,
+      width: 60,
+      align: 'center'
+    },
+    {
+      header: "",
+      render: (r) => <Avatar name={r.center?.name || "Center"} size="sm" type="center" />,
+      width: 50,
+      align: 'center'
+    },
+    {
+      header: "Centre",
+      render: (r) => <span className="font-semibold text-text-primary underline decoration-border-subtle underline-offset-4">{r.center?.name}</span>,
+      width: 250
+    },
+    {
+      header: "Data",
+      render: (r) => <span className="text-[11px] font-medium text-text-muted">{new Date(r.createdAt).toLocaleDateString()}</span>,
+      width: 120,
+      align: 'center'
     },
     {
       header: t('table_teachers'),
@@ -232,11 +247,12 @@ export default function AdminRequestsPage() {
       )
     },
     {
-      header: t('table_students'),
+      header: "Alumnes",
       align: 'center',
       render: (r) => (
-        <span className="inline-flex items-center justify-center min-w-[36px] h-9 bg-background-subtle px-3 text-sm font-bold text-text-primary border border-border-subtle">{r.studentsAprox}</span>
-      )
+        <span className="text-sm font-bold text-text-primary px-3">{r.studentsAprox}</span>
+      ),
+      width: 100
     },
     {
       header: t('table_status'),
@@ -279,7 +295,7 @@ export default function AdminRequestsPage() {
             <>
               <button
                 onClick={() => handleEditClick(r)}
-                className="p-2 text-text-muted hover:text-consorci-darkBlue hover:bg-consorci-darkBlue/5 transition-all"
+                className="btn-raw"
                 title={tc('edit')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -289,7 +305,7 @@ export default function AdminRequestsPage() {
               {r.status === REQUEST_STATUSES.PENDING && (
                 <button
                   onClick={() => handleApprove(r.requestId)}
-                  className="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all rounded-sm shadow-sm"
+                  className="btn-raw text-green-600 hover:text-green-700"
                   title={t('approve_btn')}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -299,7 +315,7 @@ export default function AdminRequestsPage() {
               )}
               <button
                 onClick={() => handleReject(r.requestId)}
-                className="p-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all rounded-sm shadow-sm"
+                className="btn-raw-destructive"
                 title={t('reject_btn')}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -427,7 +443,7 @@ export default function AdminRequestsPage() {
 
         {/* Modality Filter */}
         <div className="space-y-2.5">
-          <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('filter_by_modality')}</label>
+          <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">Modalitat</label>
           <div className="relative">
             <select
               value={selectedModality}
@@ -471,9 +487,9 @@ export default function AdminRequestsPage() {
                       <div className="flex items-center gap-3 mt-1.5 font-medium">
                         <span className="text-[12px] text-text-muted">{workshop.sector}</span>
                         <span className="w-1 h-1 bg-text-muted/30 rounded-full"></span>
-                        <span className={`text-[10px] uppercase tracking-wider px-2.5 py-1 border ${workshop.modality === 'A' ? 'border-green-500/30 text-green-600' :
-                          workshop.modality === 'B' ? 'border-orange-500/30 text-orange-600' :
-                            'border-consorci-darkBlue/30 text-consorci-darkBlue'
+                        <span className={`text-[10px] uppercase tracking-wider font-bold ${workshop.modality === 'A' ? 'text-green-600' :
+                          workshop.modality === 'B' ? 'text-orange-600' :
+                            'text-consorci-darkBlue'
                           }`}>{tc('modality_label', { modality: workshop.modality })}</span>
                       </div>
                     </div>
@@ -481,6 +497,7 @@ export default function AdminRequestsPage() {
                 </div>
 
                 <DataTable
+                  tableId={`requests_workshop_${workshopId}`}
                   variant="simple"
                   data={currentRequests}
                   columns={columns}

@@ -214,19 +214,13 @@ h6 {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  background: linear-gradient(to right, var(--bg-surface) 30%, rgba(255, 255, 255, 0)),
-              linear-gradient(to right, rgba(255, 255, 255, 0), var(--bg-surface) 70%) 0 100%,
-              radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0)),
-              radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0)) 0 100%;
-  background-repeat: no-repeat;
   background-color: var(--bg-surface);
-  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
-  background-attachment: local, local, scroll, scroll;
 }
 
 /* Custom Thin Scrollbar (Notion-like) */
 .premium-table-container::-webkit-scrollbar {
   height: 6px;
+  width: 6px;
 }
 
 .premium-table-container::-webkit-scrollbar-track {
@@ -234,22 +228,44 @@ h6 {
 }
 
 .premium-table-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
 .premium-table-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .premium-table-container table {
-  min-width: 800px;
+  min-width: 100%;
   border-spacing: 0;
+  border-collapse: separate; /* Required for sticky borders */
 }
 
-/* Redesign Grid Styles */
-.table-grid-cell {
-  @apply border-r border-border-subtle last:border-r-0;
+/* NocoDB Style: Raw Grid */
+.table-database {
+  @apply text-[12px] text-text-primary;
+}
+
+.table-database-th {
+  @apply py-1.5 px-2 font-bold text-text-muted uppercase tracking-[0.05em] border-r border-b border-border-subtle bg-transparent transition-colors;
+}
+
+.table-database-td {
+  @apply py-1.5 px-2 border-r border-b border-border-subtle bg-transparent transition-colors;
+}
+
+/* Hover effect: No background, only color change */
+.table-database-row:hover .table-database-td {
+  @apply text-consorci-darkBlue;
+}
+
+.btn-raw {
+  @apply p-1.5 text-text-muted hover:text-consorci-darkBlue bg-transparent transition-all active:scale-95;
+}
+
+.btn-raw-destructive {
+  @apply p-1.5 text-text-muted hover:text-red-600 bg-transparent transition-all active:scale-95;
 }
 
 .text-table-link {
@@ -258,6 +274,6 @@ h6 {
 
 @media (max-width: 640px) {
   .premium-table-container table {
-    min-width: 1000px;
+    min-width: 1200px;
   }
 }
