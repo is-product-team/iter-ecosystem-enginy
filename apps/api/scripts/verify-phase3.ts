@@ -51,10 +51,18 @@ async function main() {
         if (assignment) {
             const aId = assignment.assignmentId;
             console.log(`Found Assignment ID: ${aId} starting ${assignment.startDate}`);
+            
+            // Fetch real sessions first to get IDs
+            const sessions = await prisma.session.findMany({
+                where: { assignmentId: aId },
+                orderBy: { sessionDate: 'asc' },
+                take: 3
+            });
+
             const sessionsStatus = await Promise.all(
-                [1, 2, 3].map(async i => ({
-                    num: i,
-                    status: await SessionService.getSessionStatus(aId, i)
+                sessions.map(async (s, i) => ({
+                    num: i + 1,
+                    status: await SessionService.getSessionStatus(s.sessionId)
                 }))
             );
             console.log('Session Statuses:', sessionsStatus);
@@ -78,10 +86,12 @@ async function main() {
                 }
             }
 
-            console.log('Testing ensureAttendanceRecords...');
-            await SessionService.ensureAttendanceRecords(aId, 1, new Date());
-            const statusAfter = await SessionService.getSessionStatus(aId, 1);
-            console.log(`Session 1 Status After Init: ${statusAfter}`);
+            if (sessions.length > 0) {
+                console.log('Testing ensureAttendanceRecords...');
+                await SessionService.ensureAttendanceRecords(aId, sessions[0].sessionId, 1, sessions[0].sessionDate);
+                const statusAfter = await SessionService.getSessionStatus(sessions[0].sessionId);
+                console.log(`Session 1 Status After Init: ${statusAfter}`);
+            }
 
             if (createdDummy) {
                 // Cleanup

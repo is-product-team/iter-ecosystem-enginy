@@ -65,8 +65,16 @@ export default function CalendarTabScreen() {
           isLoading={isRangeFetching}
           onMonthChange={fetchRangeData}
           onEventClick={(event) => {
-            if (event.type === 'assignment' && event.metadata?.assignmentId) {
-               router.push(`/assignment/${event.metadata.assignmentId}`);
+            if (event.type === 'session' && event.metadata?.assignmentId) {
+               router.push({
+                 pathname: `/(professor)/session/${event.metadata.assignmentId}`,
+                 params: { 
+                   sessionNum: event.metadata.sessionNum,
+                   sessionId: event.metadata.sessionId 
+                 }
+               } as any);
+            } else if (event.type === 'assignment' && event.metadata?.assignmentId) {
+               router.push(`/(professor)/session/${event.metadata.assignmentId}`);
             }
           }}
         />

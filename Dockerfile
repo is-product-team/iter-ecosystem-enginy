@@ -1,6 +1,5 @@
-# Stage 1: Base (Node 22 + Librerías sistema)
-FROM node:22-slim AS base
-RUN apt-get update && apt-get install -y openssl curl ca-certificates build-essential python3 && rm -rf /var/lib/apt/lists/*
+# Stage 1: Base (Node 22 con herramientas de construcción incluidas)
+FROM node:22 AS base
 RUN corepack enable
 ENV COREPACK_ENABLE=1
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -74,17 +73,27 @@ RUN chown -R node:node /app
 
 # Copiamos la estructura completa necesaria para que los symlinks de node_modules funcionen
 COPY --from=builder-api --chown=node:node /app/node_modules ./node_modules
+# Importante: apps/api/dist contiene tanto apps/api como shared debido a rootDir: ../../
+# Al copiarlo a ./dist, mantenemos la estructura que tsc generó para resolver imports relativos
+COPY --from=builder-api --chown=node:node /app/apps/api/dist ./dist
+# Fix: Copiar el paquete shared y sus JS compilados para que el runner los encuentre
 COPY --from=builder-api --chown=node:node /app/shared ./shared
+COPY --from=builder-api --chown=node:node /app/apps/api/dist/shared ./shared
 COPY --from=builder-api --chown=node:node /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder-api --chown=node:node /app/apps/api/prisma ./apps/api/prisma
-COPY --from=builder-api --chown=node:node /app/apps/api/dist ./apps/api/dist
 COPY --from=builder-api --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder-api --chown=node:node /app/node_modules/@prisma ./node_modules/@prisma
+
+# Patch: Corregir package.json de @iter/shared para que apunte al JS compilado en lugar del TS
+# Esto evita que Node intente cargar archivos .ts en producción
+RUN sed -i 's/"main": ".\/index.ts"/"main": ".\/index.js"/g' ./node_modules/@iter/shared/package.json && \
+    sed -i 's/"import": ".\/index.ts"/"import": ".\/index.js"/g' ./node_modules/@iter/shared/package.json && \
+    sed -i 's/"require": ".\/index.ts"/"require": ".\/index.js"/g' ./node_modules/@iter/shared/package.json
 
 # Crear la carpeta d'uploads y asegurar permisos
 RUN mkdir -p /app/uploads/perfil /app/uploads/documents && chown -R node:node /app/uploads
 
 USER node
 EXPOSE 3000
-# Apuntamos a la ruta exacta donde tsc genera el index con rootDir: ../../
-CMD ["node", "apps/api/dist/apps/api/src/index.js"]
+# Apuntamos a la ruta exacta dentro de ./dist que tsc generó
+CMD ["node", "dist/apps/api/src/index.js"]

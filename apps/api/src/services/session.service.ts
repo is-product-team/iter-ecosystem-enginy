@@ -58,10 +58,10 @@ export class SessionService {
     }
 
     /**
-     * Ensures attendance records exist for a given assignment and session number.
+     * Ensures attendance records exist for a given session.
      * If not, creates them for all currently enrolled students with a 'PRESENT' status.
      */
-    static async ensureAttendanceRecords(assignmentId: number, sessionNum: number, date: Date) {
+    static async ensureAttendanceRecords(assignmentId: number, sessionId: number, sessionNum: number, date: Date) {
         // 1. Get all enrollments for this assignment
         const enrollments = await prisma.enrollment.findMany({
             where: { assignmentId },
@@ -73,8 +73,7 @@ export class SessionService {
         // 2. Check which students already have attendance for this session
         const existingAttendance = await prisma.attendance.findMany({
             where: {
-                enrollment: { assignmentId },
-                sessionNumber: sessionNum
+                sessionId: sessionId
             },
             select: { enrollmentId: true }
         });
@@ -86,9 +85,10 @@ export class SessionService {
             .filter((e) => !existingIds.has(e.enrollmentId))
             .map((e) => ({
                 enrollmentId: e.enrollmentId,
+                sessionId: sessionId,
                 sessionNumber: sessionNum,
                 sessionDate: date,
-                status: 'PRESENT' as any // Prisma enum needs cast or correct string
+                status: 'PRESENT' as any
             }));
 
         if (toCreate.length > 0) {
@@ -102,11 +102,10 @@ export class SessionService {
     /**
      * Retrieves the status of a session: 'Pending', 'Recorded', or 'Future'.
      */
-    static async getSessionStatus(assignmentId: number, sessionNum: number): Promise<string> {
+    static async getSessionStatus(sessionId: number): Promise<string> {
         const count = await prisma.attendance.count({
             where: {
-                enrollment: { assignmentId },
-                sessionNumber: sessionNum
+                sessionId: sessionId
             }
         });
         return count > 0 ? 'Recorded' : 'Pending';

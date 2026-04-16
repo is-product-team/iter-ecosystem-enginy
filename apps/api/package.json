@@ -9,6 +9,7 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "db:clean": "tsx prisma/clean.ts",
     "studio": "prisma studio",
     "lint": "eslint \"src/**/*.ts\"",
     "type-check": "tsc --noEmit",

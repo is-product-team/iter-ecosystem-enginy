@@ -22,6 +22,9 @@ export interface Request {
   };
   teacher1?: { name: string };
   teacher2?: { name: string };
+  assignment?: {
+    teachers: { fullName: string }[];
+  };
 }
 
 interface BackendRequest {
@@ -46,6 +49,11 @@ interface BackendRequest {
   };
   teacher1?: { name: string };
   teacher2?: { name: string };
+  assignment?: {
+    teachers: {
+      user: { fullName: string };
+    }[];
+  };
 }
 
 const requestService = {
@@ -78,6 +86,9 @@ const requestService = {
         } : undefined,
         teacher1: r.teacher1 ? { name: r.teacher1.name } : undefined,
         teacher2: r.teacher2 ? { name: r.teacher2.name } : undefined,
+        assignment: r.assignment ? {
+          teachers: r.assignment.teachers.map(t => ({ fullName: t.user.fullName }))
+        } : undefined,
       }));
     } catch (error) {
       console.error("Error in requestService.getAll:", error);

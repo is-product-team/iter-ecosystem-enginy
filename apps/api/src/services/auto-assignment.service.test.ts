@@ -65,7 +65,7 @@ describe('AutoAssignmentService', () => {
       const result = await service.generateAssignments();
 
       // Fair Share: 10 / 2 = 5 each. 
-      expect(result.processed).toBe(2);
+      expect(result.assignmentsCreated).toBe(2);
       expect(prismaMock.assignment.create).toHaveBeenCalledTimes(2);
     });
 

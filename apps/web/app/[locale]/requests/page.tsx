@@ -96,11 +96,18 @@ export default function AdminRequestsPage() {
       message: t('approve_confirm'),
       onConfirm: async () => {
         try {
+          // Optimistic update: status and a mock assignment to trigger UI change
+          setRequests(prev => prev.map(r => r.requestId === requestId ? {
+            ...r,
+            status: REQUEST_STATUSES.APPROVED,
+            assignments: [{ id: 0 }] // Mock to trigger "Assigned" label
+          } : r));
+
           await requestService.updateStatus(requestId, REQUEST_STATUSES.APPROVED);
           await assignmentService.createFromRequest(requestId);
-          await fetchData();
-          toast.success(t('success_approve'));
+          await fetchData(); // Final sync with real data
         } catch (err) {
+          await fetchData();
           toast.error(t('error_approve'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -116,10 +123,13 @@ export default function AdminRequestsPage() {
       isDestructive: true,
       onConfirm: async () => {
         try {
+          // Optimistic update
+          setRequests(prev => prev.map(r => r.requestId === requestId ? { ...r, status: REQUEST_STATUSES.REJECTED } : r));
+
           await requestService.updateStatus(requestId, REQUEST_STATUSES.REJECTED);
           await fetchData();
-          toast.success(t('success_reject'));
         } catch (err) {
+          await fetchData();
           toast.error(t('error_reject'));
         }
         setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -426,20 +436,107 @@ export default function AdminRequestsPage() {
                       <div className="flex items-center gap-3 mt-1.5 font-medium">
                         <span className="text-[12px] text-text-muted">{workshop.sector}</span>
                         <span className="w-1 h-1 bg-text-muted/30 rounded-full"></span>
-                        <span className={`text-[10px] uppercase tracking-wider px-2.5 py-1 border ${workshop.modality === 'A' ? 'border-green-200/50 bg-green-500/10 text-green-600' :
-                          workshop.modality === 'B' ? 'border-orange-200/50 bg-orange-500/10 text-orange-600' :
-                            'border-blue-200/50 bg-blue-500/10 text-blue-600'
+                        <span className={`text-[10px] uppercase tracking-wider px-2.5 py-1 border ${workshop.modality === 'A' ? 'border-green-500/30 text-green-600' :
+                          workshop.modality === 'B' ? 'border-orange-500/30 text-orange-600' :
+                            'border-consorci-darkBlue/30 text-consorci-darkBlue'
                           }`}>{tc('modality_label', { modality: workshop.modality })}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <DataTable
-                  data={currentRequests}
-                  columns={columns}
-                  emptyMessage={t('no_requests')}
-                />
+                <div className="bg-background-surface border border-border-subtle overflow-hidden mb-8">
+                  <div className="premium-table-container">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-background-subtle/50 border-b border-border-subtle">
+                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_center_date')}</th>
+                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_teachers')}</th>
+                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest text-center">{t('table_students')}</th>
+                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('table_status')}</th>
+                          <th className="px-8 py-5 text-[11px] font-bold text-text-muted uppercase tracking-widest text-right">{tc('actions')}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border-subtle">
+                        {currentRequests.map(r => (
+                          <tr key={r.requestId} className="hover:bg-background-subtle/30 transition-colors group">
+                            <td className="px-8 py-6">
+                              <div className="text-sm font-bold text-text-primary group-hover:text-consorci-darkBlue transition-colors">{r.center?.name}</div>
+                              <div className="text-[11px] font-semibold text-text-muted mt-1 px-2 py-0.5 bg-background-subtle inline-block">{new Date(r.createdAt).toLocaleDateString()}</div>
+                            </td>
+                            <td className="px-8 py-6">
+                              <div className="space-y-1.5">
+                                {r.assignment?.teachers && r.assignment.teachers.length > 0 ? (
+                                  r.assignment.teachers.map((t, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
+                                      <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">{idx + 1}</span>
+                                      {t.fullName}
+                                    </div>
+                                  ))
+                                ) : (
+                                  <>
+                                    <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
+                                      <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">1</span>
+                                      {r.teacher1?.name || (r.teacher1Id ? `${tc('teachers')} ${r.teacher1Id}` : '-')}
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[12px] font-medium text-text-secondary">
+                                      <span className="w-4 h-4 bg-consorci-darkBlue/10 flex items-center justify-center text-[8px] font-bold text-consorci-darkBlue">2</span>
+                                      {r.teacher2?.name || (r.teacher2Id ? `${tc('teachers')} ${r.teacher2Id}` : '-')}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-8 py-6 text-center">
+                              <span className="inline-flex items-center justify-center min-w-[36px] h-9 bg-background-subtle px-3 text-sm font-bold text-text-primary border border-border-subtle">{r.studentsAprox}</span>
+                            </td>
+                            <td className="px-8 py-6">
+                              <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 border ${r.status === REQUEST_STATUSES.PENDING ? 'border-orange-200/50 text-orange-600 bg-orange-500/10' :
+                                r.status === REQUEST_STATUSES.APPROVED ? 'border-green-200/50 text-green-600 bg-green-500/10' :
+                                  'border-red-200/50 text-red-600 bg-red-500/10'
+                                }`}>
+                                {r.status === REQUEST_STATUSES.PENDING ? tc('pending') : r.status === REQUEST_STATUSES.APPROVED ? t('assigned') : t('rejected')}
+                              </span>
+                            </td>
+                            <td className="px-8 py-6 text-right">
+                              {r.status === REQUEST_STATUSES.REJECTED ? (
+                                <span className="text-[11px] font-bold text-text-muted/60 uppercase tracking-wider">{t('rejected')}</span>
+                              ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
+                                <span className="text-[11px] font-bold text-consorci-lightBlue uppercase tracking-wider">{t('assigned')}</span>
+                              ) : (
+                                <div className="flex justify-end gap-2">
+                                  <button
+                                    onClick={() => handleEditClick(r)}
+                                    className="p-2 text-text-muted hover:text-consorci-darkBlue hover:bg-consorci-darkBlue/5 transition-all"
+                                    title={tc('edit')}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                  </button>
+                                  {r.status === REQUEST_STATUSES.PENDING && (
+                                    <button
+                                      onClick={() => handleApprove(r.requestId)}
+                                      className="px-4 py-2 bg-consorci-darkBlue text-white text-[11px] font-bold transition-all hover:bg-black active:scale-95"
+                                    >
+                                      {t('approve_btn')}
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={() => handleReject(r.requestId)}
+                                    className="px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-500 text-[11px] font-bold transition-all hover:bg-red-500 hover:text-white"
+                                  >
+                                    {t('reject_btn')}
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </section>
             );
           })}

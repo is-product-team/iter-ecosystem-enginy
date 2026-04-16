@@ -18,6 +18,10 @@
       "cache": false,
       "env": ["DATABASE_URL"]
     },
+    "db:clean": {
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
     "studio": {
       "cache": false,
       "persistent": true

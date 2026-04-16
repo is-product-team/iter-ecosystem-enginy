@@ -145,7 +145,7 @@ export default function RequestsPage() {
 
 
 
-    if (!teacher1Id || !teacher2Id) {
+    if (!teacher1Id) {
       setError(t('referents_required'));
       setSubmitting(false);
       return;
@@ -457,7 +457,6 @@ export default function RequestsPage() {
                             value={teacher2Id}
                             onChange={(e) => setTeacher2Id(e.target.value)}
                             className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none appearance-none"
-                            required
                           >
                             <option value="">{t('referent2_placeholder')}</option>
                             {teachers.map(t => (

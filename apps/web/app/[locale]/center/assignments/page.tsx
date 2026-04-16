@@ -206,19 +206,77 @@ export default function AssignmentsPage() {
           </div>
         </div>
 
-        <DataTable
-          data={paginatedAssignments}
-          columns={columns}
-          loading={loading}
-          emptyMessage={t('no_assignments')}
-          pagination={{
-            currentPage,
-            totalPages,
-            onPageChange: setCurrentPage,
-            totalItems: filteredAssignments.length,
-            itemName: tCommon('assignments').toLowerCase()
-          }}
-        />
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="bg-background-surface border border-border-subtle overflow-hidden">
+            <div className="premium-table-container">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-background-subtle border-b border-border-subtle">
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_workshop')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_center')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_planning')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
+                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary text-right">{t('table_actions')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-subtle">
+                  {paginatedAssignments.map(a => (
+                    <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
+                      <td className="px-10 py-8">
+                        <div className="flex flex-col">
+                          <span className="text-[11px] font-medium text-consorci-darkBlue mb-1 tracking-widest uppercase opacity-50">{t('workshop_id')}</span>
+                          <span className="text-[15px] font-medium text-text-primary tracking-tight leading-tight">{a.workshop?.title}</span>
+                        </div>
+                      </td>
+                      <td className="px-10 py-8">
+                        <span className="text-[13px] font-medium text-text-primary">{a.center?.name || t('not_assigned')}</span>
+                      </td>
+                      <td className="px-10 py-8">
+                        <div className="text-[13px] text-text-muted">
+                          {a.startDate ? t('start_date', { date: new Date(a.startDate).toLocaleDateString() }) : '—'}
+                        </div>
+                      </td>
+                      <td className="px-10 py-8">
+                        <span className={`text-[11px] font-medium px-3 py-1 border ${a.status === 'VALIDATED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
+                          a.status === 'DATA_ENTRY' ? 'border-orange-500/20 bg-orange-500/5 text-orange-600' :
+                            'border-border-subtle bg-background-subtle text-text-muted'
+                          }`}>
+                          {tCommon(`statuses.${a.status}`)}
+                        </span>
+                      </td>
+                      <td className="px-10 py-8 text-right">
+                        <button
+                          onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
+                          className="bg-consorci-darkBlue text-white py-2 px-6 text-[12px] font-medium transition-all hover:bg-black active:scale-[0.98]"
+                        >
+                          {t('manage_btn')}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {filteredAssignments.length === 0 && (
+              <div className="p-20 text-center">
+                <p className="text-text-primary font-medium text-sm">{t('no_assignments')}</p>
+                <p className="text-text-muted text-[12px] font-medium mt-2">{t('adjust_filters')}</p>
+              </div>
+            )}
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={filteredAssignments.length}
+              currentItemsCount={paginatedAssignments.length}
+              itemName={tCommon('assignments')}
+            />
+          </div>
+        )}
 
         {/* Incidents Section (Only available in Phase 3) */}
         {isPhaseActive(PHASES.EXECUTION) && (

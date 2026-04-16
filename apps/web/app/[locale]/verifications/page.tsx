@@ -144,12 +144,20 @@ export default function DocumentVerificationPage() {
 
   const handleValidateDocument = async (idEnrollment: number, field: string, valid: boolean) => {
     try {
+      // Optimistic update for immediate UI response
+      if (selectedRow) {
+        setSelectedRow({
+          ...selectedRow,
+          [field]: valid
+        });
+      }
+
       await assignmentService.validateDocument(idEnrollment, field, valid);
-      toast.success(valid ? t('success_validate') : t('success_unvalidate'));
-      loadData();
+      loadData(); // Sync with server
     } catch (err) {
       console.error(err);
       toast.error(t('error_validate'));
+      loadData(); // Rollback on error
     }
   };
 
@@ -174,7 +182,7 @@ export default function DocumentVerificationPage() {
     if (selectedDocs.length > 0) {
       setSelectedDocs([]);
     } else {
-      const allPending = paginatedEnrollments.flatMap(row => 
+      const allPending = paginatedEnrollments.flatMap(row =>
         DOCUMENT_CONFIG
           .filter(doc => row[doc.urlField] && !row[doc.field])
           .map(doc => ({ enrollmentId: row.enrollmentId, field: doc.field }))
@@ -204,12 +212,12 @@ export default function DocumentVerificationPage() {
   };
 
   const isAllPendingOnPageSelected = useMemo(() => {
-    const allPendingOnPage = paginatedEnrollments.flatMap(row => 
+    const allPendingOnPage = paginatedEnrollments.flatMap(row =>
       DOCUMENT_CONFIG
         .filter(doc => row[doc.urlField] && !row[doc.field])
         .map(doc => ({ enrollmentId: row.enrollmentId, field: doc.field }))
     );
-    return allPendingOnPage.length > 0 && allPendingOnPage.every(rd => 
+    return allPendingOnPage.length > 0 && allPendingOnPage.every(rd =>
       selectedDocs.some(sd => sd.enrollmentId === rd.enrollmentId && sd.field === rd.field)
     );
   }, [paginatedEnrollments, selectedDocs]);
@@ -222,8 +230,8 @@ export default function DocumentVerificationPage() {
       render: (row) => {
         const rowPendingDocs = DOCUMENT_CONFIG.filter(doc => row[doc.urlField] && !row[doc.field]);
         if (rowPendingDocs.length === 0) return null;
-        
-        const isRowFullySelected = rowPendingDocs.every(rd => 
+
+        const isRowFullySelected = rowPendingDocs.every(rd =>
           selectedDocs.some(sd => sd.enrollmentId === row.enrollmentId && sd.field === rd.field)
         );
 
@@ -269,10 +277,10 @@ export default function DocumentVerificationPage() {
                 key={docConfig.id}
                 title={url ? (valid ? 'Validat' : 'Pendent') : 'No pujat'}
                 className={`w-8 h-8 flex items-center justify-center text-[11px] font-bold border ${url
-                    ? valid
-                      ? 'bg-green-50 border-green-200 text-green-700'
-                      : 'bg-amber-50 border-amber-200 text-amber-700 animate-pulse'
-                    : 'bg-background-subtle border-border-subtle text-text-muted opacity-40'
+                  ? valid
+                    ? 'bg-green-50 border-green-200 text-green-700'
+                    : 'bg-amber-50 border-amber-200 text-amber-700 animate-pulse'
+                  : 'bg-background-subtle border-border-subtle text-text-muted opacity-40'
                   }`}
               >
                 {docConfig.label}
@@ -394,7 +402,6 @@ export default function DocumentVerificationPage() {
                   <div key={doc.id} className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full ${url ? (valid ? 'bg-green-500' : 'bg-amber-500') : 'bg-border-subtle'}`} />
                         <h4 className="text-[13px] font-bold uppercase tracking-widest text-text-primary">{t(doc.nameKey)}</h4>
                       </div>
                       <div className="flex gap-3">
@@ -403,8 +410,8 @@ export default function DocumentVerificationPage() {
                             <button
                               onClick={() => handleValidateDocument(selectedRow.enrollmentId, doc.field, !valid)}
                               className={`px-6 py-2 text-[11px] font-bold transition-all ${valid
-                                  ? 'bg-red-50 text-red-600 border border-red-500/20 hover:bg-black hover:text-white'
-                                  : 'bg-green-600 text-white hover:bg-black'
+                                ? 'bg-red-50 text-red-600 border border-red-500/20 hover:bg-black hover:text-white'
+                                : 'bg-green-600 text-white hover:bg-black'
                                 }`}
                             >
                               {valid ? t('btn_unvalidate') : t('btn_validate')}

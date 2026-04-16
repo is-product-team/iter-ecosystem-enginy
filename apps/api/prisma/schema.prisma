@@ -107,6 +107,9 @@ model Teacher {
   userId    Int    @unique @map("id_user")
   user      User   @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
+  requests1 Request[] @relation("RequestTeacher1")
+  requests2 Request[] @relation("RequestTeacher2")
+
   @@map("professors")
 }
 
@@ -129,6 +132,8 @@ model Request {
   // Requested teachers (optional)
   prof1Id Int? @map("prof1_id")
   prof2Id Int? @map("prof2_id")
+  teacher1 Teacher? @relation("RequestTeacher1", fields: [prof1Id], references: [teacherId])
+  teacher2 Teacher? @relation("RequestTeacher2", fields: [prof2Id], references: [teacherId])
 
   assignment Assignment?
 
@@ -200,6 +205,7 @@ model Session {
   endTime      String?          @map("hora_fi")
   staff        SessionTeacher[]
   issues       Issue[]
+  attendance   Attendance[]
 
   @@map("sessions")
 }
@@ -271,6 +277,8 @@ model Attendance {
   attendanceId  Int              @id @default(autoincrement()) @map("id_attendance")
   enrollmentId  Int              @map("id_enrollment")
   enrollment    Enrollment       @relation(fields: [enrollmentId], references: [enrollmentId], onDelete: Cascade)
+  sessionId     Int?             @map("id_session")
+  session       Session?         @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
   sessionNumber Int              @map("numero_sessio")
   sessionDate   DateTime         @map("data_sessio") @db.Date
   status        AttendanceStatus @default(PRESENT) @map("estat")

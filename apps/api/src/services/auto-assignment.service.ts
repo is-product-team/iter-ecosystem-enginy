@@ -3,6 +3,7 @@ import prisma from '../lib/prisma.js';
 import { isPhaseActive } from '../lib/phaseUtils.js';
 import { PHASES, REQUEST_STATUSES } from '@iter/shared';
 import { SessionService } from './session.service.js';
+import { createNotificationInternal } from '../controllers/notification.controller.js';
 
 interface PendingCenter {
     centerId: number;
@@ -79,7 +80,6 @@ export class AutoAssignmentService {
 
             workshopRequests.forEach((r) => {
                 const demand = r.studentsAprox || 0;
-                if (demand === 0) return;
 
                 if (!centerMap.has(r.centerId)) {
                     centerMap.set(r.centerId, {
@@ -100,30 +100,49 @@ export class AutoAssignmentService {
             });
 
             const centers = Array.from(centerMap.values());
-            const totalWorkshopDemand = centers.reduce((sum, c) => sum + (c.demand || 0), 0);
 
-            // Fair Distribution Logic
-            if (totalWorkshopDemand <= remainingCapacity) {
-                centers.forEach((c) => c.assignedCount = c.demand || 0);
-            } else {
-                // Distribute limited capacity fairly
+            // NEW Logic: Maximize workshop capacity usage (filling the workshop)
+            // Divide the total remaining capacity among all centers that have at least one request.
+            if (centers.length > 0) {
                 let leftoverSpots = remainingCapacity;
                 const numCenters = centers.length;
                 
                 // Sort centers by priority (FIFO)
                 centers.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-                // Greedy distribution with a minimum "fair share" if possible
-                let i = 0;
-                while (leftoverSpots > 0) {
-                    const center = centers[i % numCenters];
-                    if (center.assignedCount < (center.demand || 0)) {
-                        center.assignedCount++;
-                        leftoverSpots--;
+                // Weighted Priority Algorithm (FIFO):
+                // Earlier centers get a higher share. Weight formula: 1.0 + (N - 1 - index) * 0.5
+                // For 2 centers, this results in a 60/40 ratio (e.g., 12/8 for 20 spots).
+                const weights = centers.map((_, i) => 1.0 + (numCenters - 1 - i) * 0.5);
+                const totalWeight = weights.reduce((acc, w) => acc + w, 0);
+
+                let allocatedTotal = 0;
+                centers.forEach((center, index) => {
+                    const share = weights[index] / totalWeight;
+                    const distributedShare = Math.floor(share * remainingCapacity);
+                    // CAP BY DEMAND: Never give more than requested
+                    center.assignedCount = Math.min(center.demand || 0, distributedShare);
+                    allocatedTotal += center.assignedCount;
+                });
+
+                // Distribute rounding remainder one by one starting from the first center (FIFO)
+                // BUT only if they haven't reached their demand yet
+                let remainder = remainingCapacity - allocatedTotal;
+                if (remainder > 0) {
+                    let assignedAny = true;
+                    while (remainder > 0 && assignedAny) {
+                        assignedAny = false;
+                        for (const center of centers) {
+                            if (remainder > 0 && center.assignedCount < (center.demand || 0)) {
+                                center.assignedCount++;
+                                remainder--;
+                                assignedAny = true;
+                            }
+                        }
                     }
-                    i++;
-                    if (i >= numCenters * 50 && leftoverSpots > 0) break; // Increased safety break for large distributions
                 }
+                
+                console.log(`⚖️ AutoAssignment: Distributed ${remainingCapacity} spots among ${numCenters} centers.`);
             }
 
             // 4. Create Assignments with Rational Splitting
@@ -147,7 +166,7 @@ export class AutoAssignmentService {
             }
         }
 
-        return { processed: results.length };
+        return { assignmentsCreated: results.length };
     }
 
     private async persistAssignment(center: PendingCenter, workshopId: number, groupNum: number = 1) {
@@ -155,7 +174,23 @@ export class AutoAssignmentService {
         if (groupNum === 1) {
             await prisma.request.update({
                 where: { requestId: center.requestId },
-                data: { status: REQUEST_STATUSES.APPROVED as RequestStatus }
+                data: { 
+                    status: REQUEST_STATUSES.APPROVED as RequestStatus,
+                    studentsAprox: center.assignedCount
+                }
+            });
+
+            // Trigger notification
+            const workshop = await prisma.workshop.findUnique({ where: { workshopId } });
+            await createNotificationInternal({
+                centerId: center.centerId,
+                title: 'workshop_assigned_title',
+                message: JSON.stringify({
+                    key: 'workshop_assigned_msg',
+                    params: { title: workshop?.title || 'Taller' }
+                }),
+                type: 'REQUEST',
+                importance: 'INFO'
             });
         }
 

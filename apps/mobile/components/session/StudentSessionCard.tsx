@@ -62,15 +62,34 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
           </Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ 
-            fontSize: 18, 
-            fontWeight: '800', 
-            color: '#000000', 
-            marginBottom: 2,
-            fontFamily: THEME.fonts.primary,
-          }}>
-            {student.fullName} {student.lastName}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '800', 
+              color: '#000000', 
+              marginBottom: 2,
+              fontFamily: THEME.fonts.primary,
+            }}>
+              {student.fullName} {student.lastName}
+            </Text>
+            {student.imageRightsValidated === false && (
+                <View style={{ 
+                    backgroundColor: '#FEE2E2', 
+                    paddingHorizontal: 6, 
+                    paddingVertical: 2, 
+                    borderRadius: 6, 
+                    flexDirection: 'row', 
+                    alignItems: 'center',
+                    gap: 3,
+                    borderWidth: 0.5,
+                    borderColor: '#FECACA'
+                }}>
+                    <Ionicons name="camera-outline" size={10} color="#B91C1C" />
+                    <Ionicons name="close" size={8} color="#B91C1C" style={{ marginLeft: -4 }} />
+                    <Text style={{ fontSize: 8, fontWeight: '900', color: '#B91C1C', textTransform: 'uppercase' }}>NO FOTOS</Text>
+                </View>
+            )}
+          </View>
           <Text style={{ 
             fontSize: 12, 
             fontWeight: 'bold', 

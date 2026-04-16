@@ -1,9 +1,31 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
-// Cargar el .env desde la raíz (dos niveles arriba de src/config)
-dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
+/**
+ * Prioritize system environment variables.
+ * Only load .env if critical variables are missing or if we are in development.
+ */
+const criticalVars = ['DATABASE_URL', 'JWT_SECRET'];
+const missingCritical = criticalVars.some(v => !process.env[v]);
+
+if (missingCritical || process.env.NODE_ENV === 'development') {
+  // Try several locations for .env to be robust across different deployment structures
+  const possiblePaths = [
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(process.cwd(), '../../.env'),
+    path.resolve(__dirname, '../../../../.env'),
+    path.resolve(__dirname, '../../../../../.env'),
+  ];
+
+  for (const envPath of possiblePaths) {
+    if (fs.existsSync(envPath)) {
+      dotenv.config({ path: envPath });
+      break;
+    }
+  }
+}
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -16,22 +38,41 @@ const envSchema = z.object({
   POSTGRES_USER: z.string().optional(),
   POSTGRES_PASSWORD: z.string().optional(),
   POSTGRES_DB: z.string().optional(),
+  // AI Config
+  OLLAMA_HOST: z.string().url().default('http://ollama:11434'),
+  AI_MODEL_VISION: z.string().default('moondream'),
 });
 
 function validateEnv() {
   const parsed = envSchema.safeParse(process.env);
 
   if (!parsed.success) {
+    // In production, we might want to be more descriptive but not always exit 
+    // if the system can still function or if the error is non-critical.
+    // However, DATABASE_URL and JWT_SECRET are critical.
+    
+    const errors = parsed.error.flatten().fieldErrors;
+    const isCriticalError = errors.DATABASE_URL || errors.JWT_SECRET;
+
     if (process.env.NODE_ENV === 'test') {
-      console.warn('⚠️ Environment validation failed during test execution. Some tests might skip or fail.');
-      return process.env as any; // Return raw env during tests to avoid crash
+      console.warn('⚠️ Environment validation failed during test execution.');
+      return process.env as any;
     }
-    console.error('❌ Error de validación en las variables de entorno:');
-    console.error(JSON.stringify(parsed.error.flatten().fieldErrors, null, 2));
-    process.exit(1);
+
+    if (isCriticalError) {
+      console.error('❌ CRITICAL Error de validación en las variables de entorno:');
+      console.error(JSON.stringify(errors, null, 2));
+      // Only exit on critical errors in production
+      if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+      }
+    } else {
+      console.warn('⚠️ Advertencia: Algunas variables de entorno no críticas fallaron la validación:');
+      console.warn(JSON.stringify(errors, null, 2));
+    }
   }
 
-  return parsed.data;
+  return parsed.data || process.env as any;
 }
 
 export const env = validateEnv();
