@@ -18,19 +18,23 @@ async function fetchEventsForUser(user: { userId: number, role: string, centerId
     }
   }
 
-  // Date filters
-  const dateFilter = start && end ? {
+  // Date filters - Capturing full days for the range
+  const startDateObj = start ? new Date(start as string) : null;
+  const endDateObj = end ? new Date(end as string) : null;
+  if (endDateObj) {
+    endDateObj.setHours(23, 59, 59, 999);
+  }
+
+  const dateFilter = startDateObj && endDateObj ? {
     date: {
-      gte: new Date(start as string),
-      lte: new Date(end as string),
+      gte: startDateObj,
+      lte: endDateObj,
     }
   } : {};
 
-  const assignmentDateFilter = start && end ? {
-    OR: [
-      { startDate: { gte: new Date(start as string), lte: new Date(end as string) } },
-      { endDate: { gte: new Date(start as string), lte: new Date(end as string) } },
-    ]
+  const assignmentDateFilter = startDateObj && endDateObj ? {
+    startDate: { lte: endDateObj },
+    endDate: { gte: startDateObj }
   } : {};
 
   // Parallel queries
@@ -52,6 +56,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centerId
           where: { ...assignmentDateFilter, centerId: user.centerId! },
           include: {
             workshop: true,
+            center: true,
             sessions: {
               orderBy: { sessionDate: 'asc' },
               include: {
@@ -160,7 +165,7 @@ export const getCalendarEvents = async (req: Request, res: Response) => {
     const user = req.user!;
     const { start, end } = req.query;
     const events = await fetchEventsForUser(
-      { userId: user.userId, role: user.role, centerId: user.centerId },
+      { userId: user.userId, role: user.role, centerId: user.centerId ? Number(user.centerId) : null },
       start as string,
       end as string
     );
@@ -188,7 +193,7 @@ export const getCalendarICS = async (req: Request, res: Response) => {
     const events = await fetchEventsForUser({
       userId: user.userId,
       role: user.role.roleName,
-      centerId: user.centerId
+      centerId: user.centerId ? Number(user.centerId) : null
     });
 
     // Map to ICS format

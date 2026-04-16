@@ -925,6 +925,9 @@ export const updateComplianceDocuments = async (req: Request, res: Response) => 
       }
     });
 
+    // Trigger activation check and notification
+    await checkAndActivateAssignment(enrollment.assignmentId);
+
     res.json(updated);
   } catch (error) {
     console.error("Error updating compliance documents:", error);
@@ -1047,6 +1050,10 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
     });
 
     console.log(`[Upload] Success! URL: ${url}`);
+
+    // Trigger activation check and notification
+    await checkAndActivateAssignment(enrollment.assignmentId);
+
     res.json(updated);
   } catch (error: any) {
     console.error("Error uploading document:", error);
