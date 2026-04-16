@@ -4,6 +4,7 @@ import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES, CHECKLIST_STEPS, PH
 import { NotificationService } from '../services/notification.service.js';
 import { isPhaseActive } from '../lib/phaseUtils.js';
 import { VisionService } from '../services/vision.service.js';
+import { createNotificationInternal } from './notification.controller.js';
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';
 import fs from 'fs';
 import path from 'path';
