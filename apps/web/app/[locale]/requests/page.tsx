@@ -268,9 +268,9 @@ export default function AdminRequestsPage() {
     },
     {
       header: tc('actions'),
-      align: 'right',
+      align: 'center',
       render: (r) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-center gap-2">
           {r.status === REQUEST_STATUSES.REJECTED ? (
             <span className="text-[11px] font-bold text-text-muted/60 uppercase tracking-wider">{t('rejected')}</span>
           ) : (r as Request & { assignments?: unknown[] }).assignments && (r as Request & { assignments?: unknown[] }).assignments!.length > 0 ? (
@@ -289,16 +289,22 @@ export default function AdminRequestsPage() {
               {r.status === REQUEST_STATUSES.PENDING && (
                 <button
                   onClick={() => handleApprove(r.requestId)}
-                  className="px-4 py-2 bg-consorci-darkBlue text-white text-[11px] font-bold transition-all hover:bg-black active:scale-95"
+                  className="p-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all rounded-sm shadow-sm"
+                  title={t('approve_btn')}
                 >
-                  {t('approve_btn')}
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
                 </button>
               )}
               <button
                 onClick={() => handleReject(r.requestId)}
-                className="px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-500 text-[11px] font-bold transition-all hover:bg-red-500 hover:text-white"
+                className="p-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all rounded-sm shadow-sm"
+                title={t('reject_btn')}
               >
-                {t('reject_btn')}
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </>
           )}
