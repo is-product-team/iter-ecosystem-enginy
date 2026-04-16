@@ -21,10 +21,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 200M
+
 
   # Adminer (Visualizador DB)
   adminer:
@@ -53,10 +50,7 @@ services:
       - db
     networks:
       - iter-network
-    deploy:
-      resources:
-        limits:
-          memory: 500M
+
 
   # Backend API (Dev)
   api:
@@ -76,8 +70,7 @@ services:
       - .env
     environment:
       - PORT=${API_PORT_INTERNAL}
-      - AI_MODEL_VISION=moondream
-      - OLLAMA_HOST=http://ollama:11434
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
     depends_on:
       setup:
         condition: service_completed_successfully
@@ -90,10 +83,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 800M
+
 
   # Frontend Web (Dev)
   web:
@@ -125,43 +115,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 2G
 
-  # IA Local (Especializada en documentos)
-  ollama:
-    image: ollama/ollama:latest
-    container_name: iter_ollama
-    restart: always
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    networks:
-      - iter-network
-    deploy:
-      resources:
-        limits:
-          memory: 2G
 
-  # Setup service to pull models automatically
-  ollama-setup:
-    image: ollama/ollama:latest
-    container_name: ollama_setup
-    networks:
-      - iter-network
-    depends_on:
-      - ollama
-    environment:
-      - OLLAMA_HOST=ollama:11434
-    entrypoint: /bin/sh
-    command: -c "sleep 15 && ollama pull gemma:2b && ollama pull moondream"
-    deploy:
-      resources:
-        limits:
-          memory: 500M
+
+
+
 
 networks:
   iter-network:
@@ -170,4 +128,4 @@ networks:
 volumes:
   postgres_data:
   node_modules_cache:
-  ollama_data:
+
