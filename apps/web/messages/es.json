@@ -621,7 +621,12 @@
     "language": "Idioma",
     "coming_soon": "Funcionalidad disponible próximamente",
     "sync_success": "Token de sincronización generado correctamente",
-    "sync_error": "Error al generar el token de sincronización"
+    "sync_error": "Error al generar el token de sincronización",
+    "notifications_label": "Configuración de Notificaciones",
+    "email_notifications_title": "Notificaciones por correo",
+    "email_notifications_desc": "Recibirás un correo por cada aviso importante o cambio de fase.",
+    "notifications_updated": "Preferencias actualizadas",
+    "notifications_error": "Error al guardar las preferencias"
   },
   "Navigation": {
     "home": "Inicio",
@@ -1059,6 +1064,10 @@
     "apple_btn": "Añadir a Apple / Outlook",
     "copy_btn": "Copiar enlace iCal",
     "copy_success": "Enlace copiado al portapapeles",
+    "calendar_copy_success": "Enlace del calendario copiado",
+    "notifications_copy_success": "Enlace de avisos copiado",
+    "tab_calendar": "Calendario",
+    "tab_notifications": "Avisos",
     "token_regenerated": "Token de sincronización regenerado",
     "token_error": "Error al generar el token",
     "obtaining_data": "Obteniendo datos de sincronización...",

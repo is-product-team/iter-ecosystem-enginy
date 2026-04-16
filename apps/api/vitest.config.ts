@@ -12,6 +12,7 @@ export default defineConfig({
       DATABASE_URL: 'postgresql://test:test@localhost:5432/test_db',
       JWT_SECRET: 'test_secret_key_minimum_length_10',
       NODE_ENV: 'test',
+      GOOGLE_AI_API_KEY: process.env.GOOGLE_AI_API_KEY || '',
     },
   },
 });

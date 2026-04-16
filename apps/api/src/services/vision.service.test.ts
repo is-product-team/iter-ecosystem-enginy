@@ -1,15 +1,35 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { VisionService } from './vision.service.js';
 
+// Mock the Google Generative AI SDK
+vi.mock('@google/generative-ai', () => {
+  const generateContentMock = vi.fn();
+  const getGenerativeModelMock = vi.fn(() => ({
+    generateContent: generateContentMock
+  }));
+
+  return {
+    GoogleGenerativeAI: vi.fn().mockImplementation(() => ({
+      getGenerativeModel: getGenerativeModelMock
+    }))
+  };
+});
+
+// Import the mocked classes to set up their behaviors in tests
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
 describe('VisionService', () => {
   let service: VisionService;
+  let mockGenerateContent: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.GOOGLE_AI_API_KEY = 'test-key';
     service = new VisionService();
     
-    // Mock global fetch for Ollama calls
-    global.fetch = vi.fn();
+    // Extract the mock function to control it
+    const genAI = new (GoogleGenerativeAI as any)();
+    mockGenerateContent = genAI.getGenerativeModel().generateContent;
   });
 
   it('should validate a correct signed PDF', async () => {
@@ -17,21 +37,20 @@ describe('VisionService', () => {
       originalname: 'acord_pedagogic_firmado.pdf',
       size: 5000, 
       buffer: Buffer.from('dummy-pdf-content'),
+      mimetype: 'application/pdf'
     } as any;
 
-    const mockResponse = {
-      response: '{"hasSignature": true, "confidence": 0.9, "reason": "Signature found"}'
-    };
-
-    (global.fetch as any).mockResolvedValue({
-      ok: true,
-      json: async () => mockResponse
+    mockGenerateContent.mockResolvedValue({
+      response: {
+        text: () => '{"hasSignature": true, "confidence": 0.9, "reason": "Signature found"}'
+      }
     });
 
     const result = await service.validateDocument(mockFile);
     
     expect(result.valid).toBe(true);
     expect(result.metadata.hasSignature).toBe(true);
+    expect(mockGenerateContent).toHaveBeenCalled();
   });
 
   it('should fail if not a PDF or supported image', async () => {
@@ -51,15 +70,13 @@ describe('VisionService', () => {
       originalname: 'acord_unsigned.pdf',
       size: 5000,
       buffer: Buffer.from('dummy-pdf-content'),
+      mimetype: 'application/pdf'
     } as any;
 
-    const mockResponse = {
-      response: '{"hasSignature": false, "confidence": 0.2, "reason": "Firma manuscrita no detectada en la región esperada."}'
-    };
-
-    (global.fetch as any).mockResolvedValue({
-      ok: true,
-      json: async () => mockResponse
+    mockGenerateContent.mockResolvedValue({
+      response: {
+        text: () => '{"hasSignature": false, "confidence": 0.2, "reason": "Firma manuscrita no detectada en la región esperada."}'
+      }
     });
 
     const result = await service.validateDocument(mockFile);

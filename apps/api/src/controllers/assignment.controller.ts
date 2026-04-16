@@ -1003,8 +1003,8 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
 
     const url = `/uploads/documents/${fileName}`;
 
-    // --- AI VALIDATION (OLLAMA) ---
-    console.log(`[Upload] Starting AI validation with Ollama for ${documentType}...`);
+    // --- AI VALIDATION (GEMINI) ---
+    console.log(`[Upload] Starting AI validation with Gemini Cloud for ${documentType}...`);
     const visionService = new VisionService();
     let aiResult;
     try {

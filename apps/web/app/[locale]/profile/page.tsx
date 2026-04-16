@@ -23,6 +23,8 @@ export default function ProfilePage() {
   const [loadingToken, setLoadingToken] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [emailNotifications, setEmailNotifications] = useState((user as any)?.emailNotificationsEnabled ?? true);
+  const [updatingNotifications, setUpdatingNotifications] = useState(false);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -61,6 +63,23 @@ export default function ProfilePage() {
       toast.error(t('sync_error'));
     } finally {
       setLoadingToken(false);
+    }
+  };
+
+  const toggleEmailNotifications = async () => {
+    const newValue = !emailNotifications;
+    setUpdatingNotifications(true);
+    try {
+      await api().patch('/profile/settings', {
+        emailNotificationsEnabled: newValue
+      });
+      setEmailNotifications(newValue);
+      toast.success(t('notifications_updated'));
+    } catch (error) {
+      console.error('Error updating notifications:', error);
+      toast.error(t('notifications_error'));
+    } finally {
+      setUpdatingNotifications(false);
     }
   };
 
@@ -191,6 +210,30 @@ export default function ProfilePage() {
                 <div>
                   <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">{t('language')}</label>
                   <LanguageSelector />
+                </div>
+
+                {/* Notification Settings */}
+                <div className="pt-6 border-t border-border-subtle">
+                  <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">{t('notifications_label')}</label>
+                  <div className="flex items-center justify-between p-4 bg-background-subtle border border-border-subtle group hover:border-text-primary transition-all">
+                    <div>
+                      <p className="text-[14px] font-medium text-text-primary">{t('email_notifications_title')}</p>
+                      <p className="text-[12px] text-text-muted">{t('email_notifications_desc')}</p>
+                    </div>
+                    <button
+                      onClick={toggleEmailNotifications}
+                      disabled={updatingNotifications}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                        emailNotifications ? 'bg-consorci-darkBlue' : 'bg-border-subtle'
+                      } ${updatingNotifications ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          emailNotifications ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

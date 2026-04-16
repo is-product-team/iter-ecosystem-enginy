@@ -39,8 +39,7 @@ const envSchema = z.object({
   POSTGRES_PASSWORD: z.string().optional(),
   POSTGRES_DB: z.string().optional(),
   // AI Config
-  OLLAMA_HOST: z.string().url().default('http://ollama:11434'),
-  AI_MODEL_VISION: z.string().default('moondream'),
+  GOOGLE_AI_API_KEY: z.string().optional(),
 });
 
 function validateEnv() {

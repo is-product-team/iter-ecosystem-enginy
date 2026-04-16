@@ -6,5 +6,6 @@ const router = Router();
 
 router.get('/sync-token', authenticateToken, profileController.getSyncToken);
 router.post('/sync-token', authenticateToken, profileController.generateSyncToken);
+router.patch('/settings', authenticateToken, profileController.updateSettings);
 
 export default router;

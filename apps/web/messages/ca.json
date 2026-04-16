@@ -621,7 +621,12 @@
     "language": "Idioma",
     "coming_soon": "Funcionalitat disponible pròximament",
     "sync_success": "Token de sincronización generat correctament",
-    "sync_error": "Error en generar el token de sincronización"
+    "sync_error": "Error en generar el token de sincronización",
+    "notifications_label": "Configuració de Notificacions",
+    "email_notifications_title": "Notificacions per correu",
+    "email_notifications_desc": "Rebràs un correu per cada avís important o canvi de fase.",
+    "notifications_updated": "Preferències actualitzades",
+    "notifications_error": "Error en desar les preferències"
   },
   "Navigation": {
     "home": "Inici",
@@ -1059,6 +1064,10 @@
     "apple_btn": "Afegir a Apple / Outlook",
     "copy_btn": "Copiar enllaç iCal",
     "copy_success": "Enllaç copiat al porta-retalls",
+    "calendar_copy_success": "Enllaç del calendari copiat",
+    "notifications_copy_success": "Enllaç d'avisos copiat",
+    "tab_calendar": "Calendari",
+    "tab_notifications": "Avisos",
     "token_regenerated": "Token de sincronització regenerat",
     "token_error": "Error en generar el token",
     "obtaining_data": "Obtenint dades de sincronització...",

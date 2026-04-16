@@ -1,3 +1,4 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export interface CompetenceUpdate {
     competenceName: string;
@@ -17,16 +18,26 @@ export interface NLPAnalysisResult {
 }
 
 export class NLPService {
-    private ollamaHost: string;
-    private model: string;
+    private genAI: GoogleGenerativeAI;
+    private model: any;
 
     constructor() {
-        this.ollamaHost = process.env.OLLAMA_HOST || 'http://ollama:11434';
-        this.model = process.env.AI_MODEL_NLP || 'gemma:2b';
+        const apiKey = process.env.GOOGLE_AI_API_KEY;
+        if (!apiKey) {
+            console.warn('⚠️ GOOGLE_AI_API_KEY missing in environment. NLP AI will be disabled or fail.');
+        }
+        this.genAI = new GoogleGenerativeAI(apiKey || 'dummy');
+        // Gemini 1.5 Flash is perfect for text analysis
+        this.model = this.genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            generationConfig: {
+                responseMimeType: "application/json",
+            }
+        });
     }
 
     /**
-     * Analyzes the teacher's input text to extract structured data.
+     * Analyzes the teacher's input text to extract structured data using Gemini 1.5 Flash.
      */
     public async processText(text: string): Promise<NLPAnalysisResult> {
         // Fallback for empty text
@@ -38,32 +49,18 @@ export class NLPService {
             const prompt = `
             Tarea: Extraer el estado de asistencia del estudiante y la evaluación de competencias a partir del feedback del profesor.
             Contexto: El proyecto Iter utiliza 3 documentos: Acuerdo Pedagógico, Registro Nominal y Evaluación de Competencias.
-            Salida: Solo JSON.
+            Entrada teacher feedback: "${text}"
             
+            Salida: Responde estrictamente en formato JSON.
             Esquema:
             {
               "attendanceStatus": "PRESENT" | "LATE" | "ABSENT" | "JUSTIFIED_ABSENCE" | null,
               "competenceUpdate": { "competenceName": "Transversal", "score": 1-5, "reason": "Breve resumen" } | null
-            }
+            }`;
 
-            Input: "${text}"
-            Response:`;
-
-            const response = await fetch(`${this.ollamaHost}/api/generate`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: this.model,
-                    prompt: prompt,
-                    stream: false,
-                    format: 'json'
-                })
-            });
-
-            if (!response.ok) throw new Error('Ollama connection failed');
-
-            const data = await response.json() as any;
-            const aiResult = JSON.parse(data.response);
+            const result = await this.model.generateContent(prompt);
+            const response = await result.response;
+            const aiResult = JSON.parse(response.text());
 
             return {
                 attendanceStatus: aiResult.attendanceStatus || undefined,
@@ -72,7 +69,7 @@ export class NLPService {
             };
 
         } catch (error) {
-            console.error('❌ NLPService Local AI Error:', error);
+            console.error('❌ NLPService Gemini Cloud Error:', error);
             // Graceful fallback to empty structured data if AI fails
             return {
                 cleanedObservation: text

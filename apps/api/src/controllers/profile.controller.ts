@@ -25,3 +25,26 @@ export const generateSyncToken = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error generating sync token' });
   }
 };
+
+export const updateSettings = async (req: Request, res: Response) => {
+  try {
+    const { emailNotificationsEnabled, emailNotificationsFilter } = req.body;
+    
+    const updated = await prisma.user.update({
+      where: { userId: req.user!.userId },
+      data: { 
+        emailNotificationsEnabled,
+        emailNotificationsFilter
+      }
+    });
+
+    res.json({ 
+      success: true, 
+      emailNotificationsEnabled: updated.emailNotificationsEnabled,
+      emailNotificationsFilter: updated.emailNotificationsFilter
+    });
+  } catch (_error) {
+    console.error('[Profile] Error updating settings:', _error);
+    res.status(500).json({ error: 'Error updating profile settings' });
+  }
+};
