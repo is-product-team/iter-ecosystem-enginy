@@ -46,7 +46,7 @@ services:
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
-    command: sh -c "npm install && npx turbo db:generate --filter=@iter/api && npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss"
+    command: sh -c "npm install && npx prisma generate --schema=apps/api/prisma/schema.prisma && npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss"
     env_file:
       - .env
     depends_on:
@@ -65,7 +65,7 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: npx turbo dev --filter=@iter/api
+    command: npm run dev --workspace=@iter/api
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
@@ -102,7 +102,7 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: npx turbo run dev --filter=@iter/web --parallel
+    command: npm run dev --workspace=@iter/web
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
@@ -135,6 +135,8 @@ services:
     image: ollama/ollama:latest
     container_name: iter_ollama
     restart: always
+    ports:
+      - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
     networks:
@@ -143,6 +145,23 @@ services:
       resources:
         limits:
           memory: 2G
+
+  # Setup service to pull models automatically
+  ollama-setup:
+    image: ollama/ollama:latest
+    container_name: ollama_setup
+    networks:
+      - iter-network
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=ollama:11434
+    entrypoint: /bin/sh
+    command: -c "sleep 15 && ollama pull gemma:2b && ollama pull moondream"
+    deploy:
+      resources:
+        limits:
+          memory: 500M
 
 networks:
   iter-network:

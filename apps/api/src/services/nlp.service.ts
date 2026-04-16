@@ -22,7 +22,7 @@ export class NLPService {
 
     constructor() {
         this.ollamaHost = process.env.OLLAMA_HOST || 'http://ollama:11434';
-        this.model = process.env.AI_MODEL_NLP || 'llama3';
+        this.model = process.env.AI_MODEL_NLP || 'gemma:2b';
     }
 
     /**
