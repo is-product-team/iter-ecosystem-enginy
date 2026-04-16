@@ -52,7 +52,14 @@ export default function LoginScreen() {
       }
       router.replace('/(professor)' as any);
     } catch (error: any) {
-      const message = error.response?.data?.error || t('Auth.login.error_generic');
+      let message = error.response?.data?.error || t('Auth.login.error_generic');
+      
+      // Technical diagnostic for development
+      if (__DEV__ && (error.message.includes('Network Error') || error.code === 'ECONNABORTED')) {
+        const targetUrl = error.config?.baseURL || 'unknown';
+        message = `${t('Auth.login.error_generic')}\n\n[Diagnostic]\nTarget: ${targetUrl}\nError: ${error.message}`;
+      }
+      
       Alert.alert(t('Auth.login.error_title'), message);
     } finally {
       setLoading(false);

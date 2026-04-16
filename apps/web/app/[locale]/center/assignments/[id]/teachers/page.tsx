@@ -73,7 +73,7 @@ export default function DesignateTeachersPage({ params }: { params: Promise<{ id
   }, [id, router]);
 
   const handleSave = async () => {
-    if (!teacher1Id || !teacher2Id) {
+    if (!teacher1Id) {
       toast.error(t('designate_two_teachers'));
       return;
     }
@@ -89,7 +89,7 @@ export default function DesignateTeachersPage({ params }: { params: Promise<{ id
 
       await api.patch(`/assignments/checklist/designate-teachers/${id}`, {
         teacher1Id: parseInt(teacher1Id),
-        teacher2Id: parseInt(teacher2Id)
+        teacher2Id: teacher2Id ? parseInt(teacher2Id) : null
       });
 
       toast.success(t('teachers_designated_correctly'));

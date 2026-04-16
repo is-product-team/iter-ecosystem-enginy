@@ -2,6 +2,10 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { router } from 'expo-router';
+import * as ExpoConstants from 'expo-constants';
+
+// For backward compatibility or different export styles
+const Constants = ExpoConstants.default || ExpoConstants;
 import type { 
   Role, 
   Phase, 
@@ -118,14 +122,23 @@ const MOCK_WORKSHOP: any = {
 };
 
 const getBaseURL = () => {
-  // Variable de entorno directa (o fallback dinámico usando la IP local definida en .env)
-  const FALLBACK_IP = process.env.EXPO_PUBLIC_LOCAL_IP || '127.0.0.1';
-  let url = process.env.EXPO_PUBLIC_API_URL || `http://${FALLBACK_IP}:3000`;
-  
-  if (url.endsWith('/')) {
-    url = url.slice(0, -1);
+  // 1. Prioritize direct environment variable (Staging/Prod)
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
   }
-  return url;
+
+  // 2. Local development: Use the Host IP from Metro Bundler (192.168.x.x)
+  // This is essential for physical devices to find the workstation
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    const ip = hostUri.split(':')[0];
+    console.log(`📡 [API] Local Host IP detected: ${ip}`);
+    return `http://${ip}:3000`;
+  }
+  
+  // 3. Last fallback (Simulators)
+  const FALLBACK_IP = process.env.EXPO_PUBLIC_LOCAL_IP || '127.0.0.1';
+  return `http://${FALLBACK_IP}:3000`;
 };
 
 const api = axios.create({
@@ -136,6 +149,11 @@ const api = axios.create({
     'ngrok-skip-browser-warning': 'true',
   },
 });
+
+// Helper for Mock Users
+const isDevelopment = __DEV__;
+const isKnownTeacher = (email: string) => 
+  email.endsWith('@brossa.cat') || email.endsWith('@pauclaris.cat') || email.includes('laura.martinez');
 
 api.interceptors.request.use(
   async (config) => {
@@ -164,25 +182,23 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   async (response) => {
-    // --- MOCK INTERCEPTOR FOR LAURA'S QUESTIONNAIRES ---
+    // --- GENERIC MOCKS FOR TEACHERS IN DEV ---
     try {
-      const userData = Platform.OS === 'web' ? localStorage.getItem('user') : await SecureStore.getItemAsync('user');
-      if (userData && JSON.parse(userData).email === 'laura.martinez@brossa.cat') {
-        const url = response.config.url;
-        if (url?.includes('questionnaires/models')) {
-          return { ...response, data: [{ modelId: 1, name: "Valoració del Taller", target: "PROFESSOR" }] };
-        }
-        if (url?.includes('questionnaires/model/1')) {
-          return { 
-            ...response, 
-            data: MOCK_QUESTIONNAIRE_MODEL 
-          };
-        }
-        if (url?.includes('questionnaires/track')) {
-          return { ...response, data: { token: 'mock-token-laura' } };
-        }
-        if (url?.includes('questionnaires/respond')) {
-          return { ...response, data: { success: true } };
+      if (isDevelopment) {
+        const userData = Platform.OS === 'web' ? localStorage.getItem('user') : await SecureStore.getItemAsync('user');
+        const user = userData ? JSON.parse(userData) : null;
+        
+        if (user && isKnownTeacher(user.email)) {
+          const url = response.config.url;
+          if (url?.includes('questionnaires/models')) {
+            return { ...response, data: [{ modelId: 1, name: "Valoració del Taller", target: "PROFESSOR" }] };
+          }
+          if (url?.includes('questionnaires/model/1')) {
+            return { ...response, data: MOCK_QUESTIONNAIRE_MODEL };
+          }
+          if (url?.includes('questionnaires/track')) {
+            return { ...response, data: { token: 'mock-token-dev' } };
+          }
         }
       }
     } catch (e) {}
@@ -190,28 +206,16 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const isTimeout = error.code === 'ECONNABORTED' || error.message.includes('timeout');
-    if (isTimeout) {
-      console.warn('🕒 [API] Request timeout - checks server IP connectivity');
-    }
-    
-    // --- MOCK FALLBACKS FOR LAURA & TIMEOUTS ---
-    try {
-      // Use config.url or concat baseURL + url if both are missing
-      const config = error.config;
-      if (!config && !isTimeout) {
-        console.warn("⚠️ [API] No config found on error and not a timeout. Reverting to default error.");
-      } else {
-        const url = config?.url || '';
-        const fullUrl = config ? `${config.baseURL}${config.url}` : '';
-        
-        console.log(`🔍 [API INTERCEPTOR DEBUG] URL: "${url}", FullURL: "${fullUrl}"`);
-        
-        // If server is down/timeout, serve these specific mocks to keep app functional
-        if (isTimeout || error.response?.status >= 500 || error.response?.status === 404) {
-          
-          // Match both relative and absolute paths
-          const matches = (pattern: string) => url.includes(pattern) || fullUrl.includes(pattern);
+    const isTimeout = error.code === 'ECONNABORTED' || error.message.includes('timeout') || error.message.includes('Network Error');
+    const isLikelyDown = isTimeout || error.response?.status >= 500 || error.response?.status === 404;
+
+    if (isDevelopment && isLikelyDown) {
+      try {
+        const config = error.config;
+        // NO AUTH MOCK: Favor real backend login.
+
+        // --- DATA FALLBACKS ---
+        const matches = (pattern: string) => config.url?.includes(pattern);
 
           // 1. If requesting models List
           if (matches('questionnaires/models')) {
@@ -255,6 +259,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Skip logout for Laura if it's potentially a transient error
     }
+    
     return Promise.reject(error);
   }
 );

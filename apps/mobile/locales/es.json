@@ -10,6 +10,10 @@
     "call": "Llamar",
     "coming_soon": "Próximamente",
     "no_description": "Sin descripción disponible",
+    "description": "Descripción",
+    "location": "Ubicación",
+    "pending": "Pendiente",
+    "workshop": "Taller",
     "practical_workshop": "Taller Práctico",
     "session": "Sesión",
     "time": "Horario",
@@ -85,38 +89,27 @@
   },
   "Session": {
     "title": "Lista de alumnos",
-    "attendance_instruction": "Marca la asistencia de los alumnos. Pulsa sobre el estado para cambiarlo.",
-    "observations_label": "Observaciones Generales",
-    "observations_placeholder": "Escribe aquí cualquier incidencia o comentario sobre la sesión...",
+    "title_attendance": "Sesión - Asistencia",
+    "title_work": "Sesión - Seguimiento",
+    "attendance_header": "Registro de Sesión",
+    "attendance_instruction": "Marca la asistencia de cada alumno antes de empezar el seguimiento técnico.",
+    "work_header": "Seguimiento de Sesión",
+    "work_instruction": "Evalúa el progreso de las competencias durante el taller.",
+    "observations_label": "Observaciones de la sesión",
+    "observations_placeholder": "Añade cualquier incidencia o comentario relevante...",
     "evaluated": "Evaluado",
     "evaluate_competencies": "Evaluar Competencias",
     "attendance_registered": "Asistencia Registrada",
-    "finish_and_send": "Finalizar y Enviar",
-    "error_loading_students": "No se ha podido cargar la lista de alumnos.",
-    "attendance_sent_success": "Asistencia enviada correctamente a los coordinadores.",
+    "finish_and_send": "Finalizar y Enviar Lista",
+    "attendance_sent_success": "Lista de asistencia enviada correctamente",
     "submit_attendance_error": "No se ha podido enviar la asistencia.",
+    "manage_session": "Gestionar Sesión",
+    "error_loading_students": "No se ha podido cargar la lista de alumnos",
     "status_present": "Presente",
     "status_absent": "Ausente",
     "status_retard": "Retraso"
   },
   "Dashboard": {
-    "welcome": "Hola, {{name}}",
-    "current_phase": "Fase Actual",
-    "pending_tasks": "Tareas Pendientes",
-    "next_session": "Próxima Sesión",
-    "evaluate_workshop": "Evaluar Taller",
-    "evaluated_workshop": "Taller Valorado",
-    "manage_session": "Gestionar Sesión",
-    "view_details": "Ver Detalles",
-    "no_upcoming_workshops": "No tienes talleres próximos",
-    "overview": "Resumen del Dashboard",
-    "current_phase_label": "Fase Actual",
-    "total_workshops": "Total de Talleres",
-    "next_session_label": "Próxima Sesión",
-    "active": "Activo",
-    "loading_data": "Cargando datos",
-    "evaluate_finished_workshop": "Evaluar taller finalizado",
-    "in_progress": "En Curso",
     "greeting_morning": "Buen día, {{name}}",
     "greeting_afternoon": "Buenas tardes, {{name}}",
     "no_upcoming_sessions": "Sin sesiones próximas",
@@ -126,12 +119,14 @@
     "none_new": "Ninguno nuevo",
     "phase_status": "Estado de la fase",
     "pending_count_one": "{{count}} pendiente",
-    "pending_count_other": "{{count}} pendientes"
+    "pending_count_other": "{{count}} pendientes",
+    "no_upcoming_workshops": "No tienes talleres próximos",
+    "next_session_label": "Próxima Sesión"
   },
   "Evaluation": {
     "title": "Evaluación Competencial",
     "technical_competencies": "Competencias Técnicas",
-    "transversal_competencies": "Competencias Transversales",
+    "transversal_competencies": "Competencias Transversals",
     "observations_label": "Observaciones",
     "observations_placeholder": "Añade comentarios cualitativos sobre la evolución del alumno...",
     "save_button": "Guardar Evaluación",
@@ -201,7 +196,9 @@
       "dg": "DO"
     },
     "no_events": "No hay eventos",
-    "all_day": "Todo el día"
+    "all_day": "Todo el día",
+    "add_to_calendar": "Añadir al calendario",
+    "remove_event": "Eliminar evento"
   },
   "Coordination": {
     "teacher_space": "Espacio del Docente",
@@ -214,7 +211,8 @@
     "no_contacts_yet": "Todavía no tienes contactos de coordinación.",
     "group_chat_instruction": "Pronto podrás chatear directamente con el equipo de coordinación del centro."
   },
-  "Support": {
+    "contact": "Contacto",
+    "Support": {
     "title": "Soporte",
     "chat_admin": "Chat con Administración",
     "direct_contact": "Contacto directo"
@@ -224,6 +222,7 @@
     "materials": "Materiales y Guías",
     "view_all": "Ver todo"
   },
+
   "Session": {
     "title_attendance": "Sesión - Asistencia",
     "title_work": "Sesión - Seguimiento",

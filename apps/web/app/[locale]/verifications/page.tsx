@@ -140,12 +140,20 @@ export default function DocumentVerificationPage() {
 
   const handleValidateDocument = async (idEnrollment: number, field: string, valid: boolean) => {
     try {
+      // Optimistic update for immediate UI response
+      if (selectedRow) {
+        setSelectedRow({
+          ...selectedRow,
+          [field]: valid
+        });
+      }
+      
       await assignmentService.validateDocument(idEnrollment, field, valid);
-      toast.success(valid ? t('success_validate') : t('success_unvalidate'));
-      loadData(); // Refresh list to see updated status
+      loadData(); // Sync with server
     } catch (err) {
       console.error(err);
       toast.error(t('error_validate'));
+      loadData(); // Rollback on error
     }
   };
 
@@ -393,7 +401,6 @@ export default function DocumentVerificationPage() {
                   <div key={doc.id} className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full ${url ? (valid ? 'bg-green-500' : 'bg-amber-500') : 'bg-border-subtle'}`} />
                         <h4 className="text-[13px] font-bold uppercase tracking-widest text-text-primary">{t(doc.nameKey)}</h4>
                       </div>
                       <div className="flex gap-3">

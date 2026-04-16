@@ -46,7 +46,18 @@ export const getRequests = async (req: Request, res: Response) => {
         take,
         include: {
           center: true,
-          workshop: true
+          workshop: true,
+          teacher1: true,
+          teacher2: true,
+          assignment: {
+            include: {
+              teachers: {
+                include: {
+                  user: true
+                }
+              }
+            }
+          }
         },
         orderBy: {
           createdAt: 'desc'
@@ -82,8 +93,8 @@ export const createRequest = async (req: Request, res: Response) => {
   } = req.body;
   const { centerId } = req.user!;
 
-  if (!workshopId || !centerId || !prof1Id || !prof2Id) {
-    return res.status(400).json({ error: 'Missing mandatory fields (workshopId, centerId, prof1Id, prof2Id)' });
+  if (!workshopId || !centerId || !prof1Id) {
+    return res.status(400).json({ error: 'Missing mandatory fields (workshopId, centerId, prof1Id)' });
   }
 
   // --- PHASE VERIFICATION ---
@@ -101,7 +112,7 @@ export const createRequest = async (req: Request, res: Response) => {
   }
 
   // --- TEACHER VALIDATION ---
-  const teacherCheck = await RequestService.verifyTeachersExist(parseInt(prof1Id), parseInt(prof2Id));
+  const teacherCheck = await RequestService.verifyTeachersExist(parseInt(prof1Id), prof2Id ? parseInt(prof2Id) : undefined);
   if (!teacherCheck.valid) {
     return res.status(400).json({ error: teacherCheck.error });
   }
@@ -135,7 +146,7 @@ export const createRequest = async (req: Request, res: Response) => {
         status: REQUEST_STATUSES.PENDING as RequestStatus,
         modality: modality as Modality,
         prof1Id: parseInt(prof1Id),
-        prof2Id: parseInt(prof2Id),
+        prof2Id: prof2Id ? parseInt(prof2Id) : null,
       },
       include: {
         workshop: true
@@ -217,8 +228,8 @@ export const updateRequest = async (req: Request, res: Response) => {
       data: {
         studentsAprox: studentsAprox ? parseInt(studentsAprox) : undefined,
         comments,
-        prof1Id: parseInt(prof1Id),
-        prof2Id: parseInt(prof2Id),
+        prof1Id: prof1Id ? parseInt(prof1Id) : undefined,
+        prof2Id: prof2Id ? parseInt(prof2Id) : null,
         modality: modality as Modality,
       },
       include: {
@@ -285,14 +296,27 @@ export const updateRequestStatus = async (req: Request, res: Response) => {
 async function logStatusChange(requestId: number, oldState: string, newState: string, userId: number = 0) {
   if (oldState === newState) return;
   try {
+    // Ensure userId is valid or fallback to something else if needed
+    // If userId = 0 or no user found, we might skip or use a generic system user if required by DB
+    // For now, we wrap in try-catch to ensure main logic continues
+    
+    // Check if user exists before logging if userId > 0
+    let finalUserId = userId;
+    if (userId > 0) {
+      const userExists = await prisma.user.findFirst({ where: { userId } });
+      if (!userExists) finalUserId = 1; 
+    } else {
+      finalUserId = 1; // Fallback to Admin id 1
+    }
+
     await prisma.auditLog.create({
       data: {
-        userId: userId, // 0 for system if not provided
+        userId: finalUserId,
         action: `Status change for request ${requestId} from ${oldState} to ${newState}`,
         details: { requestId, oldState, newState }
       }
     });
-  } catch (e) {
-    console.error("Error logging status change:", e);
+  } catch (e: any) {
+    console.warn("⚠️ [AUDIT] Skip log creation - constraint or DB error:", e.message);
   }
 }

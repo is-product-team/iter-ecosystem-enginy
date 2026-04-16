@@ -104,11 +104,32 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
       subtitle={t('page_subtitle')}
     >
       <div className="mb-8 p-6 bg-white border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
+        <div className="flex flex-col gap-2">
           <h3 className="text-lg font-black text-[#00426B] uppercase">{t('referent_team')}</h3>
-          <div className="flex gap-4 mt-2">
-            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher1?.user?.fullName || tCommon('pending')}</span>
-            <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher2?.user?.fullName || tCommon('pending')}</span>
+          <div className="flex gap-4 items-center">
+            <div className="flex gap-2">
+              <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher1?.user?.fullName || tCommon('pending')}</span>
+              <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher2?.user?.fullName || tCommon('pending')}</span>
+            </div>
+            {assignment.teacher1?.userId && (
+              <button
+                onClick={async () => {
+                  try {
+                    const api = getApi();
+                    await api.post(`/assignments/${id}/sessions/bulk-assign`, { userId: assignment.teacher1.userId });
+                    const res = await api.get(`/assignments/${id}`);
+                    setAssignment(res.data);
+                    toast.success(t('bulk_assign_success') || 'Equip sincronitzat correctament');
+                  } catch (error) {
+                    toast.error(t('bulk_assign_error') || 'Error al sincronitzar');
+                  }
+                }}
+                className="text-[10px] font-black uppercase text-white bg-[#4197CB] hover:bg-black px-4 py-1.5 transition-all flex items-center gap-2"
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                {t('sync_team_btn') || 'Sincronitzar'}
+              </button>
+            )}
           </div>
         </div>
         <button
@@ -150,7 +171,10 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                   </div>
                 ))}
                 {(!session.staff || session.staff.length === 0) && (
-                  <span className="text-[10px] text-gray-300 italic font-medium">{t('use_referent_team')}</span>
+                  <div className="flex items-center gap-2 bg-orange-50 border border-orange-100 px-3 py-1 animate-pulse">
+                    <svg className="w-3 h-3 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <span className="text-[10px] text-orange-600 font-bold uppercase tracking-tight">{t('use_referent_team')}</span>
+                  </div>
                 )}
               </div>
             </div>

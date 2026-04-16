@@ -45,7 +45,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centerId
     user.role === ROLES.ADMIN
       ? prisma.assignment.findMany({
         where: assignmentDateFilter,
-        include: { workshop: true, center: true, sessions: { include: { staff: { include: { user: true } } } } }
+        include: { workshop: true, center: true, sessions: { orderBy: { sessionDate: 'asc' }, include: { staff: { include: { user: true } } } } }
       })
       : user.role === ROLES.COORDINATOR
         ? prisma.assignment.findMany({
@@ -53,6 +53,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centerId
           include: {
             workshop: true,
             sessions: {
+              orderBy: { sessionDate: 'asc' },
               include: {
                 staff: {
                   include: {
@@ -76,6 +77,7 @@ async function fetchEventsForUser(user: { userId: number, role: string, centerId
               workshop: true,
               center: true,
               sessions: {
+                orderBy: { sessionDate: 'asc' },
                 include: {
                   staff: {
                     include: {
