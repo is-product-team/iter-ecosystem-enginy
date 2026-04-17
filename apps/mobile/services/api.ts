@@ -86,59 +86,11 @@ export interface Notification {
   importance: string;
 }
 
-// --- MOCKS FOR LAURA (PROFESSIONAL FALLBACKS) ---
-const MOCK_QUESTIONNAIRE_MODEL = {
-  modelId: 1,
-  name: "Valoració del Taller",
-  description: "Valoració pedagògica per al professorat",
-  sections: [
-    {
-      sectionId: 1,
-      name: "Aspectes Generals",
-      questions: [
-        { questionId: 1, text: "Com valores el contingut del taller?", type: "RATING" },
-        { questionId: 2, text: "El material era adequat?", type: "YES_NO" }
-      ]
-    }
-  ]
-};
-
-const MOCK_STUDENTS: Student[] = [
-  { studentId: 101, idalu: 'ST001', fullName: 'Joan Vila', lastName: 'Vila' },
-  { studentId: 102, idalu: 'ST002', fullName: 'Marta Soler', lastName: 'Soler' }
-];
-
-const MOCK_WORKSHOP: any = {
-  assignmentId: 999,
-  workshop: {
-    title: "Taller de Robótica",
-    icon: "robot"
-  },
-  center: {
-    name: "IES Brossa"
-  },
-  status: "PUBLISHED",
-  group: 1
-};
-
+/**
+ * Resolves the API base URL from Expo configuration
+ */
 const getBaseURL = () => {
-  // 1. Prioritize direct environment variable (Staging/Prod)
-  if (process.env.EXPO_PUBLIC_API_URL) {
-    return process.env.EXPO_PUBLIC_API_URL;
-  }
-
-  // 2. Local development: Use the Host IP from Metro Bundler (192.168.x.x)
-  // This is essential for physical devices to find the workstation
-  const hostUri = Constants.expoConfig?.hostUri;
-  if (hostUri) {
-    const ip = hostUri.split(':')[0];
-    console.log(`📡 [API] Local Host IP detected: ${ip}`);
-    return `http://${ip}:3000`;
-  }
-  
-  // 3. Last fallback (Simulators)
-  const FALLBACK_IP = process.env.EXPO_PUBLIC_LOCAL_IP || '127.0.0.1';
-  return `http://${FALLBACK_IP}:3000`;
+  return Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
 };
 
 const api = axios.create({
@@ -149,11 +101,6 @@ const api = axios.create({
     'ngrok-skip-browser-warning': 'true',
   },
 });
-
-// Helper for Mock Users
-const isDevelopment = __DEV__;
-const isKnownTeacher = (email: string) => 
-  email.endsWith('@brossa.cat') || email.endsWith('@pauclaris.cat') || email.includes('laura.martinez');
 
 api.interceptors.request.use(
   async (config) => {
@@ -181,48 +128,8 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  async (response) => {
-    // --- GENERIC MOCKS FOR TEACHERS IN DEV ---
-    try {
-      if (isDevelopment) {
-        const userData = Platform.OS === 'web' ? localStorage.getItem('user') : await SecureStore.getItemAsync('user');
-        const user = userData ? JSON.parse(userData) : null;
-        
-        if (user && isKnownTeacher(user.email)) {
-          const url = response.config.url;
-          if (url?.includes('questionnaires/models')) {
-            return { ...response, data: [{ modelId: 1, name: "Valoració del Taller", target: "PROFESSOR" }] };
-          }
-          if (url?.includes('questionnaires/model/1')) {
-            return { ...response, data: MOCK_QUESTIONNAIRE_MODEL };
-          }
-          if (url?.includes('questionnaires/track')) {
-            return { ...response, data: { token: 'mock-token-dev' } };
-          }
-        }
-      }
-    } catch (e) {}
-    
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    const isTimeout = error.code === 'ECONNABORTED' || error.message.includes('timeout') || error.message.includes('Network Error');
-    const isLikelyDown = isTimeout || error.response?.status >= 500 || error.response?.status === 404;
-
-    if (isDevelopment && isLikelyDown) {
-      try {
-        const config = error.config;
-        // NO AUTH MOCK: Favor real backend login.
-
-        // --- DATA FALLBACKS ---
-        const matches = (pattern: string) => config.url?.includes(pattern);
-
-        // NO DATA MOCKS: Favor real backend data.
-      } catch (e) {
-        console.warn("⚠️ [API MOCK] Fallback logic error:", e);
-      }
-    }
-    
     return Promise.reject(error);
   }
 );

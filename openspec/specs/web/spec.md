@@ -35,3 +35,10 @@ All pages and sub-pages under the Coordinator role view (`/center/**`) MUST be f
 #### Scenario: Coordinator requests a workshop
 - **WHEN** a coordinator interacts with the workshop request form (`/center/requests`)
 - **THEN** all informational text, labels, and feedback messages MUST be fully internationalized.
+
+### Requirement: Standardized Data Presentation
+The web application SHALL use the unified `DataTable` component for all tabular data presentation to ensure consistency across Admin and Coordinator views.
+
+#### Scenario: Admin views workshop requests
+- **WHEN** the user navigates to a list-based page (e.g., `/requests`)
+- **THEN** the system MUST employ the `DataTable` component for rendering the list of entities.

@@ -12,7 +12,9 @@ import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import Pagination from "@/components/Pagination";
+import DataTable, { Column } from '@/components/ui/DataTable';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
+import { ListChecks } from 'lucide-react';
 
 export default function AssignmentsPage() {
   const t = useTranslations('AssignmentsPage');
@@ -25,6 +27,7 @@ export default function AssignmentsPage() {
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [groupBy, setGroupBy] = useState<string | null>(null);
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -146,18 +149,84 @@ export default function AssignmentsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const columns: Column<Assignment>[] = [
+    {
+      header: "Taller",
+      render: (a) => (
+        <span className="table-primary">{a.workshop?.title}</span>
+      ),
+      width: 250
+    },
+    {
+      header: "Centre",
+      render: (a) => (
+        <span className="table-primary">{a.center?.name || t('not_assigned')}</span>
+      ),
+      width: 200
+    },
+    {
+      header: "Planificació",
+      render: (a) => (
+        <div className="table-detail">
+          {a.startDate ? new Date(a.startDate).toLocaleDateString() : '—'}
+        </div>
+      ),
+      width: 120,
+      align: 'center'
+    },
+    {
+      header: "Estat",
+      render: (a) => (
+        <span className={
+          a.status === 'COMPLETED' ? 'table-tag-green' :
+            a.status === 'IN_PROGRESS' ? 'table-tag-orange' :
+              'table-tag-muted'
+        }>
+          {tCommon(`statuses.${a.status}`)}
+        </span>
+      ),
+      width: 120,
+      align: 'center'
+    },
+    {
+      header: t('table_actions'),
+      align: 'right',
+      render: (a) => (
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={(e) => { e.stopPropagation(); router.push(`/center/assignments/${a.assignmentId}`); }}
+            className="bg-background-subtle text-text-primary py-2 px-6 border border-border-subtle text-[12px] font-medium transition-all hover:bg-gray-100 active:scale-[0.98]"
+          >
+            {t('manage_btn')}
+          </button>
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter]);
+          {/* Phase 4: Closure Actions */}
+          {isPhaseActive(PHASES.CLOSURE) && a.status === 'IN_PROGRESS' && (
+            <button
+              onClick={(e) => { e.stopPropagation(); handleCloseAssignment(a.assignmentId); }}
+              disabled={processingId === a.assignmentId}
+              className="bg-black text-white py-2 px-6 text-[12px] font-black uppercase tracking-widest transition-all hover:bg-consorci-darkBlue active:scale-[0.98] flex items-center gap-2"
+            >
+              {processingId === a.assignmentId && <Loading size="mini" white />}
+              {t('close_group_btn')}
+            </button>
+          )}
 
-  const totalPages = Math.ceil(filteredAssignments.length / itemsPerPage);
-  const paginatedAssignments = filteredAssignments.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+          {/* Phase 4: Download Actions */}
+          {a.status === 'COMPLETED' && (
+            <button
+              onClick={(e) => { e.stopPropagation(); handleBulkDownload(a.assignmentId); }}
+              disabled={processingId === a.assignmentId}
+              className="bg-[#00426B] text-white py-2 px-6 text-[12px] font-black uppercase tracking-widest transition-all hover:bg-[#0775AB] active:scale-[0.98] flex items-center gap-2"
+            >
+              {processingId === a.assignmentId && <Loading size="mini" white />}
+              {t('download_bulk_btn')}
+            </button>
+          )}
+        </div>
+      )
+    }
+  ];
 
   if (!user) return null;
 
@@ -167,144 +236,46 @@ export default function AssignmentsPage() {
       subtitle={t('subtitle')}
     >
       <div className="w-full">
-        {/* Filters Panel */}
-        <div className="bg-background-surface border border-border-subtle p-10 mb-10">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-8">
-            <div className="flex-1 w-full space-y-6">
-              <h3 className="text-[14px] font-medium text-text-primary">
-                {t('search_filters')}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="relative group">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={t('search_placeholder')}
-                    className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all outline-none"
-                  />
-                  <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-4 h-5 w-5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all outline-none appearance-none"
-                >
-                  <option value="All">{tCommon('all_statuses')}</option>
-                  <option value="IN_PROGRESS">{t('in_progress')}</option>
-                  <option value="COMPLETED">{t('completed')}</option>
-                </select>
-              </div>
-            </div>
-            <button
-              onClick={() => { setSearchQuery(""); setStatusFilter("All"); }}
-              className="px-8 py-3.5 text-[13px] font-medium text-text-muted hover:text-text-primary transition-all"
-            >
-              {tCommon('clear_filters')}
-            </button>
-          </div>
-        </div>
-
-        {loading ? (
-          <Loading />
-        ) : (
-          <div className="bg-background-surface border border-border-subtle overflow-hidden">
-            <div className="premium-table-container">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-background-subtle border-b border-border-subtle">
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_workshop')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_center')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_planning')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary">{t('table_status')}</th>
-                    <th className="px-10 py-6 text-[12px] font-medium text-text-primary text-right">{t('table_actions')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border-subtle">
-                  {paginatedAssignments.map(a => (
-                    <tr key={a.assignmentId} className="bg-white hover:bg-gray-50 transition-colors border-b-2 border-gray-50">
-                      <td className="px-10 py-8">
-                        <div className="flex flex-col">
-                          <span className="text-[11px] font-medium text-consorci-darkBlue mb-1 tracking-widest uppercase opacity-50">{t('workshop_id')}</span>
-                          <span className="text-[15px] font-medium text-text-primary tracking-tight leading-tight">{a.workshop?.title}</span>
-                        </div>
-                      </td>
-                      <td className="px-10 py-8">
-                        <span className="text-[13px] font-medium text-text-primary">{a.center?.name || t('not_assigned')}</span>
-                      </td>
-                      <td className="px-10 py-8">
-                        <div className="text-[13px] text-text-muted">
-                          {a.startDate ? t('start_date', { date: new Date(a.startDate).toLocaleDateString() }) : '—'}
-                        </div>
-                      </td>
-                      <td className="px-10 py-8">
-                        <span className={`text-[11px] font-medium px-3 py-1 border ${a.status === 'COMPLETED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
-                          a.status === 'IN_PROGRESS' ? 'border-blue-500/20 bg-blue-500/5 text-blue-600' :
-                            'border-border-subtle bg-background-subtle text-text-muted'
-                          }`}>
-                          {tCommon(`statuses.${a.status}`)}
-                        </span>
-                      </td>
-                      <td className="px-10 py-8 text-right">
-                        <div className="flex justify-end gap-3">
-                            {/* Manage Button */}
-                            <button
-                            onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
-                            className="bg-background-subtle text-text-primary py-2 px-6 border border-border-subtle text-[12px] font-medium transition-all hover:bg-gray-100 active:scale-[0.98]"
-                            >
-                            {t('manage_btn')}
-                            </button>
-
-                            {/* Phase 4: Closure Actions */}
-                            {isPhaseActive(PHASES.CLOSURE) && a.status === 'IN_PROGRESS' && (
-                                <button
-                                onClick={() => handleCloseAssignment(a.assignmentId)}
-                                disabled={processingId === a.assignmentId}
-                                className="bg-black text-white py-2 px-6 text-[12px] font-black uppercase tracking-widest transition-all hover:bg-consorci-darkBlue active:scale-[0.98] flex items-center gap-2"
-                                >
-                                {processingId === a.assignmentId && <Loading size="mini" white />}
-                                {t('close_group_btn')}
-                                </button>
-                            )}
-
-                            {/* Phase 4: Download Actions */}
-                            {a.status === 'COMPLETED' && (
-                                <button
-                                onClick={() => handleBulkDownload(a.assignmentId)}
-                                disabled={processingId === a.assignmentId}
-                                className="bg-[#00426B] text-white py-2 px-6 text-[12px] font-black uppercase tracking-widest transition-all hover:bg-[#0775AB] active:scale-[0.98] flex items-center gap-2"
-                                >
-                                {processingId === a.assignmentId && <Loading size="mini" white />}
-                                {t('download_bulk_btn')}
-                                </button>
-                            )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {filteredAssignments.length === 0 && (
-              <div className="p-20 text-center">
-                <p className="text-text-primary font-medium text-sm">{t('no_assignments')}</p>
-                <p className="text-text-muted text-[12px] font-medium mt-2">{t('adjust_filters')}</p>
-              </div>
-            )}
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              totalItems={filteredAssignments.length}
-              currentItemsCount={paginatedAssignments.length}
-              itemName={tCommon('assignments')}
+        <DataTableToolbar
+          search={{
+            value: searchQuery,
+            onChange: setSearchQuery,
+            placeholder: t('search_placeholder')
+          }}
+          onClear={() => { setSearchQuery(""); setStatusFilter("All"); }}
+          filters={
+            <FilterSelect
+              label={tCommon('status')}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { label: tCommon('all_statuses'), value: "All" },
+                { label: t('in_progress'), value: "IN_PROGRESS" },
+                { label: t('completed'), value: "COMPLETED" },
+              ]}
+              icon={ListChecks}
             />
-          </div>
-        )}
+          }
+          groups={{
+            value: groupBy || '',
+            onChange: setGroupBy,
+            options: [
+              { label: tCommon('status'), value: 'status' }
+            ]
+          }}
+        />
+
+        <DataTable
+          data={filteredAssignments}
+          columns={columns}
+          loading={loading}
+          emptyMessage={tCommon('no_results')}
+          getRowId={a => a.assignmentId}
+          tableId="center_assignments"
+          hideTopBorder
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
+        />
 
         {/* Incidents Section (Only available in Phase 3) */}
         {isPhaseActive(PHASES.EXECUTION) && (
@@ -327,7 +298,7 @@ export default function AssignmentsPage() {
                   if (!input.value) return;
                   const api = getApi();
                   await api.post('/assignments/incidents', {
-                    centerId: user.centerId,
+                    centerId: (user as any).centerId,
                     description: input.value
                   });
                   input.value = '';

@@ -316,26 +316,42 @@ async function main() {
   const centers = await prisma.center.findMany();
 
   if (centers.length >= 2) {
-    // 1. Create 20 students per center in the "pool"
-    const firstNames = ['Marc', 'Júlia', 'Pau', 'Laia', 'Pol', 'Emma', 'Arnau', 'Clara', 'Biel', 'Ona', 'Oriol', 'Abril', 'Nil', 'Martina', 'Jan', 'Aina', 'Hugo', 'Lucía', 'Leo', 'Noa'];
-    const lastNames = ['Pérez', 'Soler', 'García', 'Martínez', 'López', 'Sánchez', 'Rodríguez', 'Fernández', 'Vila', 'Serra'];
+    // 1. Create 50 students per center in the "pool"
+    const firstNames = ['Marc', 'Júlia', 'Pau', 'Laia', 'Pol', 'Emma', 'Arnau', 'Clara', 'Biel', 'Ona', 'Oriol', 'Abril', 'Nil', 'Martina', 'Jan', 'Aina', 'Hugo', 'Lucía', 'Leo', 'Noa', 'Xavi', 'Carla', 'Enric', 'Sara', 'Roc', 'Marta'];
+    const lastNames = ['Pérez', 'Soler', 'García', 'Martínez', 'López', 'Sánchez', 'Rodríguez', 'Fernández', 'Vila', 'Serra', 'Mas', 'Pascual', 'Casals', 'Dalmau', 'Font'];
+    const grades = ['1r ESO', '2n ESO', '3r ESO', '4t ESO', '1r Batx', '2n Batx', '1r CFGM', '2n CFGM'];
+    const genders = ['Masc', 'Fem', 'Altres'];
 
     for (const [index, center] of centers.entries()) {
-      console.log(`   - Generando pool de alumnos para ${center.name}...`);
-      for (let i = 0; i < 20; i++) {
+      console.log(`   - Generando pool de 50 alumnos para ${center.name}...`);
+      for (let i = 0; i < 50; i++) {
         const fName = firstNames[i % firstNames.length];
         const lName = lastNames[Math.floor(i / 2) % lastNames.length];
-        const studentId = `${1000 + (index * 20) + i}`;
+        const studentId = `${1000 + (index * 50) + i}`;
+        const dni = `${Math.floor(10000000 + Math.random() * 90000000)}${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`;
+        const phone = `6${Math.floor(10000000 + Math.random() * 90000000)}`;
+        const birthDate = new Date(2005 + Math.floor(Math.random() * 8), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28));
         
         await prisma.student.upsert({
           where: { idalu: studentId },
-          update: {},
+          update: {
+            grade: grades[i % grades.length],
+            dni: dni,
+            phone: phone,
+            birthDate: birthDate,
+            gender: genders[i % genders.length],
+          },
           create: {
             idalu: studentId,
             fullName: fName,
             lastName: lName,
-            email: `${fName.toLowerCase()}${i}@${center.centerCode}.edu`,
+            email: `${fName.toLowerCase()}${index}${i}@${center.centerCode}.edu`,
             originCenterId: center.centerId,
+            grade: grades[i % grades.length],
+            dni: dni,
+            phone: phone,
+            birthDate: birthDate,
+            gender: genders[i % genders.length],
           }
         });
       }
