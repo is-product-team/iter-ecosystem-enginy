@@ -13,6 +13,7 @@ import Loading from '@/components/Loading';
 import WorkshopIcon from '@/components/WorkshopIcon';
 import Pagination from "@/components/Pagination";
 import DataTable, { Column } from '@/components/ui/DataTable';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 
 export default function RequestsPage() {
   const t = useTranslations('CenterRequestsPage');
@@ -308,29 +309,15 @@ export default function RequestsPage() {
       <div className="space-y-6 animate-in fade-in duration-500">
         {/* Catalog Section */}
         <div className="space-y-6">
-          {/* Filter Bar */}
-          <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row gap-6 items-center">
-            <div className="relative flex-1 group w-full">
-              <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder={t('search_placeholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:outline-none focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all"
-              />
-            </div>
-            <div className="text-[12px] font-medium text-text-muted whitespace-nowrap">
-              {t('num_workshops', { count: filteredWorkshops.length })}
-            </div>
-          </div>
+          <DataTableToolbar
+            search={{
+              value: searchQuery,
+              onChange: setSearchQuery,
+              placeholder: t('search_placeholder')
+            }}
+            resultsCount={filteredWorkshops.length}
+            itemName="tallers"
+          />
 
           <DataTable
             data={filteredWorkshops}
@@ -338,6 +325,7 @@ export default function RequestsPage() {
             loading={loading}
             emptyMessage={tCommon('no_results')}
             onRowClick={handleRowClick}
+            hideTopBorder
             rowClassName={(workshop) => {
               const isSelected = selectedWorkshopId === workshop._id;
               return `border-l-2 ${isSelected ? 'bg-background-subtle border-l-consorci-darkBlue' : 'border-l-transparent hover:border-l-consorci-lightBlue'}`;

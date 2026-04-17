@@ -10,6 +10,7 @@ import getApi from '@/services/api';
 import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
 
 interface AttendanceRecord {
   attendanceId: number;
@@ -35,6 +36,7 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [sessionDate, setSessionDate] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -170,12 +172,19 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
 
   if (authLoading || loading) return <Loading fullScreen message={t('loading')} />;
 
+  const filteredAttendance = attendance.filter(record => {
+    const query = searchQuery.toLowerCase();
+    return record.enrollment.student.fullName.toLowerCase().includes(query) ||
+           record.enrollment.student.lastName.toLowerCase().includes(query) ||
+           record.enrollment.student.idalu.toLowerCase().includes(query);
+  });
+
   return (
     <DashboardLayout
       title={t('title', { num })}
       subtitle={sessionDate ? new Date(sessionDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase() : `Assignment ${id}`}
     >
-      <div className="mb-10 flex justify-between items-center bg-background-surface p-8 border border-border-subtle">
+      <div className="mb-0 flex justify-between items-center bg-background-surface p-8 border border-border-subtle border-b-0">
         <button
           onClick={() => router.back()}
           className="text-[11px] font-bold text-text-muted hover:text-consorci-darkBlue uppercase tracking-widest flex items-center gap-2 transition-colors"
@@ -194,10 +203,20 @@ export default function AttendancePage({ params }: { params: Promise<{ id: strin
         </button>
       </div>
 
+      <DataTableToolbar
+        search={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: t('search_placeholder') || 'Search student...'
+        }}
+        onClear={() => setSearchQuery("")}
+      />
+
       <DataTable
-        data={attendance}
+        data={filteredAttendance}
         columns={columns}
         emptyMessage={t('no_students')}
+        hideTopBorder
       />
     </DashboardLayout>
   );

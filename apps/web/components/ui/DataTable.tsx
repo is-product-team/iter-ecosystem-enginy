@@ -32,6 +32,7 @@ interface DataTableProps<T> {
   onRowClick?: (item: T) => void;
   variant?: 'default' | 'simple' | 'grid';
   showIndex?: boolean;
+  hideTopBorder?: boolean;
 }
 
 const TableSkeleton = ({ columns, rows = 5, showIndex = false, columnWidths = {} }: { columns: Column<any>[], rows?: number, showIndex?: boolean, columnWidths?: Record<string, number> }) => {
@@ -72,7 +73,8 @@ export default function DataTable<T>({
   rowClassName = '',
   onRowClick,
   variant = 'default',
-  showIndex = true
+  showIndex = true,
+  hideTopBorder = false
 }: DataTableProps<T>) {
   const [columnWidths, setColumnWidths] = React.useState<Record<string, number>>({});
   const [resizing, setResizing] = React.useState<string | null>(null);
@@ -128,8 +130,8 @@ export default function DataTable<T>({
   };
 
   return (
-    <div className={`bg-background-surface border border-border-subtle transition-all duration-300 table-database`}>
-      <div className="premium-table-container">
+    <div className={`bg-background-surface border border-border-subtle transition-all duration-300 table-database ${hideTopBorder ? 'border-t-0' : ''}`}>
+      <div className={`premium-table-container ${hideTopBorder ? 'border-t-0' : ''}`}>
         <table className="w-full text-left border-collapse border-spacing-0">
           <thead className="sticky top-0 z-30 bg-background-surface">
             <tr>

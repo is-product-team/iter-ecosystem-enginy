@@ -13,7 +13,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
 import workshopService, { Workshop } from "@/services/workshopService";
 import DataTable, { Column } from "@/components/ui/DataTable";
-import FilterPanel from "@/components/ui/FilterPanel";
+import DataTableToolbar, { FilterSelect } from "@/components/ui/DataTableToolbar";
 
 export default function WorkshopAdminPage() {
   const t = useTranslations('Admin.Workshops');
@@ -254,59 +254,34 @@ export default function WorkshopAdminPage() {
       subtitle={t("management_subtitle")}
       actions={headerActions}
     >
-      <FilterPanel
+      <DataTableToolbar
+        search={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: tc('search_placeholder')
+        }}
         onClear={() => {
           setSearchQuery("");
           setSelectedSector(tc("all_sectors"));
           setSelectedModality(tc("all_modalities"));
         }}
-        clearLabel={tc("clear_filters")}
-      >
-        {/* Text Search */}
-        <div className="flex-1">
-          <label className="block text-[13px] font-medium text-text-primary mb-3">{tc("search_by_title")}</label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={tc("search_placeholder")}
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
+        filters={
+          <>
+            <FilterSelect
+              label={tc("sector")}
+              value={selectedSector}
+              onChange={setSelectedSector}
+              options={uniqueSectors.map(s => ({ label: s, value: s }))}
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Sector Filter */}
-        <div className="w-full">
-          <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">Sector</label>
-          <select
-            value={selectedSector}
-            onChange={(e) => handleSectorChange(e.target.value)}
-            className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
-          >
-            {uniqueSectors.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Modality Filter */}
-        <div className="w-full">
-          <label className="block text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">Modalitat</label>
-          <select
-            value={selectedModality}
-            onChange={(e) => handleModalityChange(e.target.value)}
-            className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
-          >
-            {uniqueModalities.map(m => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-        </div>
-      </FilterPanel>
+            <FilterSelect
+              label="Modalitat"
+              value={selectedModality}
+              onChange={setSelectedModality}
+              options={uniqueModalities.map(m => ({ label: m, value: m }))}
+            />
+          </>
+        }
+      />
 
       {/* Workshops Table */}
       {error ? (
@@ -319,6 +294,7 @@ export default function WorkshopAdminPage() {
           columns={columns}
           loading={loading}
           emptyMessage={tc("no_results")}
+          hideTopBorder
         />
       )}
 

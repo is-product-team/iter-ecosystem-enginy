@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from '@/components/Pagination';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import FilterPanel from '@/components/ui/FilterPanel';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 import Avatar from '@/components/Avatar';
 
 export default function AdminRequestsPage() {
@@ -367,71 +367,38 @@ export default function AdminRequestsPage() {
       subtitle={t('subtitle')}
       actions={headerActions}
     >
-      <FilterPanel
+      <DataTableToolbar
+        search={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: tc('search_placeholder')
+        }}
         onClear={() => {
           setSearchQuery('');
           setSelectedCenterId('');
           setSelectedModality('');
         }}
-        clearLabel={tc('clear_filters')}
-      >
-        {/* Search */}
-        <div className="space-y-2.5">
-          <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('search_by_title')}</label>
-          <div className="relative group">
-            <input
-              type="text"
-              placeholder={tc('search_placeholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
-            />
-            <svg className="absolute left-4 top-4 h-4 w-4 text-text-muted group-focus-within:text-consorci-lightBlue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Center Filter */}
-        <div className="space-y-2.5">
-          <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">{tc('educational_center')}</label>
-          <div className="relative">
-            <select
+        filters={
+          <>
+            <FilterSelect
+              label={tc('educational_center')}
               value={selectedCenterId}
-              onChange={(e) => setSelectedCenterId(e.target.value)}
-              className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary appearance-none transition-all"
-            >
-              <option value="">{tc('all_centers')}</option>
-              {centers.map(c => (
-                <option key={c.centerId} value={c.centerId}>{c.name}</option>
-              ))}
-            </select>
-            <svg className="absolute right-4 top-4 h-4 w-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Modality Filter */}
-        <div className="space-y-2.5">
-          <label className="text-[11px] font-bold text-text-muted px-1 uppercase tracking-wider">Modalitat</label>
-          <div className="relative">
-            <select
+              onChange={setSelectedCenterId}
+              options={centers.map(c => ({ label: c.name, value: c.centerId.toString() }))}
+            />
+            <FilterSelect
+              label="Modalitat"
               value={selectedModality}
-              onChange={(e) => setSelectedModality(e.target.value)}
-              className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-lightBlue outline-none text-sm font-medium text-text-primary appearance-none transition-all"
-            >
-              <option value="">{tc('all_modalities')}</option>
-              <option value="A">{tc('modality_label', { modality: 'A' })}</option>
-              <option value="B">{tc('modality_label', { modality: 'B' })}</option>
-              <option value="C">{tc('modality_label', { modality: 'C' })}</option>
-            </select>
-            <svg className="absolute right-4 top-4 h-4 w-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </div>
-      </FilterPanel>
+              onChange={setSelectedModality}
+              options={[
+                { label: tc('modality_label', { modality: 'A' }), value: 'A' },
+                { label: tc('modality_label', { modality: 'B' }), value: 'B' },
+                { label: tc('modality_label', { modality: 'C' }), value: 'C' },
+              ]}
+            />
+          </>
+        }
+      />
 
       {loading ? (
         <Loading message={tc('loading')} />
@@ -473,6 +440,7 @@ export default function AdminRequestsPage() {
                   data={currentRequests}
                   columns={columns}
                   emptyMessage={t('no_requests')}
+                  hideTopBorder
                 />
               </section>
             );

@@ -9,7 +9,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import FilterPanel from '@/components/ui/FilterPanel';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
@@ -320,42 +320,43 @@ export default function DocumentVerificationPage() {
       subtitle={t('subtitle')}
     >
       <div className="space-y-6">
-        {/* Filter Bar */}
-        <FilterPanel gridCols={selectedDocs.length > 0 ? 3 : 2}>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={tc('search')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-background-subtle border border-border-subtle font-medium text-[13px] outline-none focus:border-consorci-darkBlue transition-all"
+        <DataTableToolbar
+          search={{
+            value: searchTerm,
+            onChange: setSearchTerm,
+            placeholder: tc('search')
+          }}
+          onClear={() => {
+            setSearchTerm('');
+            setStatusFilter('all');
+          }}
+          filters={
+            <FilterSelect
+              label={t('all_statuses') || 'Tots els estats'}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { label: t('all_statuses') || 'Tots els estats', value: 'all' },
+                { label: t('pending_validation') || 'Pendents de Validar', value: 'pending' },
+                { label: t('fully_validated') || 'Tots Validats', value: 'validated' },
+              ]}
             />
-            <svg className="w-4 h-4 absolute left-3.5 top-3.5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-6 py-3 bg-background-subtle border border-border-subtle font-medium text-[13px] outline-none cursor-pointer"
-          >
-            <option value="all">{t('all_statuses') || 'Tots els estats'}</option>
-            <option value="pending">{t('pending_validation') || 'Pendents de Validar'}</option>
-            <option value="validated">{t('fully_validated') || 'Tots Validats'}</option>
-          </select>
-          {selectedDocs.length > 0 && (
-            <button
-              onClick={handleBulkApprove}
-              disabled={loading}
-              className="w-full px-8 py-3 bg-green-600 text-white font-bold text-[13px] hover:bg-black transition-all flex items-center justify-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              {t('btn_bulk_approve') || 'Validació Massiva'} ({selectedDocs.length})
-            </button>
-          )}
-        </FilterPanel>
+          }
+          actions={
+            selectedDocs.length > 0 && (
+              <button
+                onClick={handleBulkApprove}
+                disabled={loading}
+                className="px-8 h-full bg-green-600 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {t('btn_bulk_approve') || 'Validació Massiva'} ({selectedDocs.length})
+              </button>
+            )
+          }
+        />
 
         <div className="flex justify-start px-2">
           <label className="flex items-center gap-2 text-[11px] font-bold text-text-muted uppercase cursor-pointer hover:text-consorci-darkBlue transition-colors">
@@ -375,6 +376,7 @@ export default function DocumentVerificationPage() {
           loading={loading && assignments.length === 0}
           emptyMessage={tc('no_results')}
           rowClassName={(row) => selectedRow?.enrollmentId === row.enrollmentId ? 'bg-consorci-darkBlue/5' : ''}
+          hideTopBorder
         />
       </div>
 

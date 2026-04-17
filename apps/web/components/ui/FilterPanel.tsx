@@ -10,6 +10,9 @@ interface FilterPanelProps {
   variant?: 'default' | 'inline';
 }
 
+/**
+ * @deprecated Use DataTableToolbar and FilterSelect for a more integrated, sharp-edged UI.
+ */
 export default function FilterPanel({
   children,
   onClear,

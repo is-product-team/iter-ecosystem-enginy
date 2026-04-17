@@ -13,7 +13,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import FilterPanel from '@/components/ui/FilterPanel';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 
 export default function AssignmentsPage() {
   const t = useTranslations('AssignmentsPage');
@@ -164,33 +164,26 @@ export default function AssignmentsPage() {
       subtitle={t('subtitle')}
     >
       <div className="w-full">
-        <FilterPanel
+        <DataTableToolbar
+          search={{
+            value: searchQuery,
+            onChange: setSearchQuery,
+            placeholder: t('search_placeholder')
+          }}
           onClear={() => { setSearchQuery(""); setStatusFilter("All"); }}
-          clearLabel={tCommon('clear_filters')}
-          gridCols={2}
-        >
-          <div className="relative group">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('search_placeholder')}
-              className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all outline-none"
+          filters={
+            <FilterSelect
+              label={tCommon('status')}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { label: tCommon('all_statuses'), value: "All" },
+                { label: t('in_progress'), value: "IN_PROGRESS" },
+                { label: t('completed'), value: "COMPLETED" },
+              ]}
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-4 h-5 w-5 text-text-muted group-focus-within:text-consorci-darkBlue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue text-sm font-medium text-text-primary transition-all outline-none appearance-none cursor-pointer"
-          >
-            <option value="All">{tCommon('all_statuses')}</option>
-            <option value="IN_PROGRESS">{t('in_progress')}</option>
-            <option value="COMPLETED">{t('completed')}</option>
-          </select>
-        </FilterPanel>
+          }
+        />
 
         <DataTable
           data={filteredAssignments}
@@ -198,6 +191,7 @@ export default function AssignmentsPage() {
           loading={loading}
           emptyMessage={t('no_assignments')}
           tableId="center_assignments"
+          hideTopBorder
         />
 
         {/* Incidents Section (Only available in Phase 3) */}

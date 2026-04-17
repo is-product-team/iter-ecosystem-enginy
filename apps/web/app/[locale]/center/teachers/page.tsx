@@ -13,6 +13,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
 import getApi from '@/services/api';
 import DataTable, { Column } from '@/components/ui/DataTable';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 
 export default function TeachersCRUD() {
   const t = useTranslations('Center.Teachers');
@@ -184,33 +185,14 @@ export default function TeachersCRUD() {
       subtitle={t('description')}
       actions={headerActions}
     >
-      {/* Filters Panel */}
-      <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
-        <div className="flex-1">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_placeholder')}</label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={tc('search_placeholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
-            />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-
-        <div className="flex items-end">
-          <button
-            onClick={() => setSearchQuery("")}
-            className="w-full lg:w-auto px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-all border border-transparent h-[46px]"
-          >
-            {tc('clear_filters')}
-          </button>
-        </div>
-      </div>
+      <DataTableToolbar
+        search={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: tc('search_placeholder')
+        }}
+        onClear={() => setSearchQuery("")}
+      />
 
       <DataTable
         tableId="center_teachers"
@@ -218,6 +200,7 @@ export default function TeachersCRUD() {
         columns={columns}
         loading={loading}
         emptyMessage={tc('no_results')}
+        hideTopBorder
       />
 
       {isModalOpen && (
