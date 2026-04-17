@@ -148,6 +148,8 @@ export default function DataTable<T>({
   };
 
   const alignClasses = {
+    left: 'text-left',
+    center: 'text-center',
     right: 'text-right'
   };
 
@@ -174,8 +176,8 @@ export default function DataTable<T>({
     if (!column) return data;
 
     return [...data].sort((a, b) => {
-      let aVal: any = column.accessor ? a[column.accessor] : null;
-      let bVal: any = column.accessor ? b[column.accessor] : null;
+      const aVal: any = column.accessor ? a[column.accessor] : null;
+      const bVal: any = column.accessor ? b[column.accessor] : null;
 
       // Handle nulls
       if (aVal === null || aVal === undefined) return 1;

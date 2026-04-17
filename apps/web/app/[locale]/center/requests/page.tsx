@@ -277,7 +277,7 @@ export default function RequestsPage() {
                   onClick={(e) => { e.stopPropagation(); handleEdit(existingRequest); }}
                   className="px-4 py-1.5 bg-background-subtle hover:bg-consorci-darkBlue hover:text-white text-consorci-darkBlue font-bold text-[10px] uppercase tracking-wider border border-border-subtle transition-all active:scale-95"
                 >
-                  {tc('edit')}
+                  {tCommon('edit')}
                 </button>
               )}
             </div>

@@ -86,6 +86,13 @@ export interface Notification {
   importance: string;
 }
 
+/**
+ * Resolves the API base URL from Expo configuration
+ */
+const getBaseURL = () => {
+  return Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
+};
+
 const api = axios.create({
   baseURL: getBaseURL().endsWith('/') ? getBaseURL() : `${getBaseURL()}/`,
   timeout: 5000,

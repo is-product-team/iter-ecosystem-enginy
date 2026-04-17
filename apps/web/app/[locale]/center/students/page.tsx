@@ -497,7 +497,7 @@ export default function StudentsCRUD() {
                 </div>
 
                 <div className="border-t border-border-subtle pt-8">
-                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-6">Contacte d'Emergència</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-6">Contacte d&apos;Emergència</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
                       <label className="block text-[12px] font-medium text-text-primary px-1">Nom de Contacte</label>

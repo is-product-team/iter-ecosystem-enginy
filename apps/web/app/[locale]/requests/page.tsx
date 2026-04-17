@@ -37,6 +37,8 @@ export default function AdminRequestsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCenterId, setSelectedCenterId] = useState<string>('');
   const [selectedModality, setSelectedModality] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -346,6 +348,18 @@ export default function AdminRequestsPage() {
     });
   }, [workshops, searchQuery, selectedModality, workshopRequests]);
 
+  const paginatedWorkshops = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredWorkshops.slice(start, end);
+  }, [filteredWorkshops, currentPage]);
+
+  const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCenterId, selectedModality]);
+
   if (authLoading || !user) {
     return <Loading fullScreen message={tc('authenticating')} />;
   }
@@ -411,7 +425,7 @@ export default function AdminRequestsPage() {
         </div>
       ) : filteredWorkshops.length > 0 ? (
         <div className="space-y-12">
-          {filteredWorkshops.map(workshop => {
+          {paginatedWorkshops.map(workshop => {
             const workshopId = parseInt(workshop._id);
             const currentRequests = workshopRequests[workshopId] || [];
             return (
