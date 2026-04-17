@@ -14,6 +14,7 @@ interface Certificate {
     studentId: number;
     assignmentId: number;
     issuedAt: string;
+    surveyCompleted: boolean;
     assignment: {
         workshop: {
             title: string;
@@ -28,6 +29,7 @@ export default function StudentDashboardPage() {
     const [user, setUser] = useState<User | null>(null);
     const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [loading, setLoading] = useState(true);
+    const [downloading, setDownloading] = useState<number | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -53,6 +55,35 @@ export default function StudentDashboardPage() {
 
         fetchCertificates();
     }, [router, tCommon]);
+
+    const handleDownload = async (assignmentId: number) => {
+        setDownloading(assignmentId);
+        try {
+            const api = getApi();
+            const response = await api.get(`/certificates/download/${assignmentId}`, {
+                responseType: 'blob'
+            });
+            
+            // Create download link
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `certificat_taller_${assignmentId}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            toast.success(tCommon('success_download'));
+        } catch (err: any) {
+            console.error("Download error:", err);
+            if (err.response?.data?.error === 'SURVEY_REQUIRED') {
+                toast.error(t('survey_required_msg'));
+            } else {
+                toast.error(t('download_error'));
+            }
+        } finally {
+            setDownloading(null);
+        }
+    };
 
     if (loading || !user) {
         return <Loading fullScreen message={t('loading')} />;
@@ -85,14 +116,31 @@ export default function StudentDashboardPage() {
                                          <h4 className="font-black text-[#00426B] leading-tight mb-2 uppercase">{cert.assignment?.workshop?.title}</h4>
                                          <p className="text-xs text-gray-500 mb-6">{t('duration')}: {cert.assignment?.workshop?.durationHours}h</p>
                                      </div>
-                                     <div>
-                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-3">{t('issued')}: {new Date(cert.issuedAt).toLocaleDateString()}</p>
-                                         <button 
-                                            onClick={() => toast.info(t('pdf_not_implemented'))}
-                                            className="w-full py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors"
-                                         >
-                                             {t('download_pdf')}
-                                         </button>
+                                     <div className="space-y-3">
+                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('issued')}: {new Date(cert.issuedAt).toLocaleDateString()}</p>
+                                         
+                                         {cert.surveyCompleted ? (
+                                             <button 
+                                                disabled={downloading === cert.assignmentId}
+                                                onClick={() => handleDownload(cert.assignmentId)}
+                                                className="w-full py-3 bg-[#00426B] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#0775AB] transition-colors flex items-center justify-center gap-2"
+                                             >
+                                                 {downloading === cert.assignmentId && <Loading size="mini" white />}
+                                                 {t('download_pdf')}
+                                             </button>
+                                         ) : (
+                                             <div className="space-y-2">
+                                                 <div className="bg-amber-50 border border-amber-100 p-3 text-[10px] text-amber-700 font-medium leading-relaxed">
+                                                     {t('survey_pending_notice')}
+                                                 </div>
+                                                 <button 
+                                                    onClick={() => router.push('/survey')}
+                                                    className="w-full py-3 bg-white border-2 border-[#00426B] text-[#00426B] text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors"
+                                                 >
+                                                     {t('take_survey_button')}
+                                                 </button>
+                                             </div>
+                                         )}
                                      </div>
                                  </div>
                              ))}

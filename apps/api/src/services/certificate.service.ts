@@ -90,6 +90,24 @@ export class CertificateService {
   }
 
   /**
+   * Helper for download controller
+   */
+  async generatePDF(student: any, assignmentId: number) {
+    const assignment = await prisma.assignment.findUnique({
+      where: { assignmentId },
+      include: { workshop: true }
+    });
+    if (!assignment) throw new Error('Assignment not found');
+
+    return this.generateCertificate(
+      `${student.fullName} ${student.lastName}`,
+      assignment.workshop.title,
+      assignment.workshop.durationHours,
+      new Date()
+    );
+  }
+
+  /**
    * Issues database records for students who meet the attendance criteria.
    * Typically called when an assignment is closed.
    */
@@ -108,15 +126,26 @@ export class CertificateService {
 
     if (!assignment) throw new Error('Assignment not found');
 
-    const totalSessions = assignment.sessions.length || 10;
-    let certificatesIssued = 0;
+    const totalSessions = assignment.sessions.length;
+    
+    // Task 2.3: If no sessions, we can't calculate 80% correctly.
+    // In this domain, a workshop MUST have sessions to be valid for certification.
+    if (totalSessions === 0) {
+        return {
+            issued: 0,
+            totalStudents: assignment.enrollments.length,
+            error: 'Cannot issue certificates: No sessions found for this assignment.'
+        };
+    }
+
+    let issued = 0;
 
     for (const enrollment of assignment.enrollments) {
         const attendedCount = enrollment.attendance.filter((a: any) =>
             a.status === 'PRESENT' || a.status === 'LATE'
         ).length;
 
-        const percentage = totalSessions > 0 ? (attendedCount / totalSessions) * 100 : 0;
+        const percentage = (attendedCount / totalSessions) * 100;
 
         // Requirement: 80% attendance
         if (percentage >= 80) {
@@ -134,12 +163,12 @@ export class CertificateService {
                     issuedAt: new Date()
                 }
             });
-            certificatesIssued++;
+            issued++;
         }
     }
 
     return {
-        certificatesIssued,
+        issued,
         totalStudents: assignment.enrollments.length
     };
   }

@@ -164,6 +164,14 @@ export default function CenterDashboard() {
               active: isPhaseActive(PHASES.EXECUTION),
               phase: tc('phase_with_number', { number: 3 })
             },
+            {
+              title: t('Closure.title'),
+              text: t('Closure.description'),
+              icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+              path: `/${locale}/center/assignments`, // Reuse assignments for closure monitoring
+              active: isPhaseActive(PHASES.CLOSURE),
+              phase: tc('phase_with_number', { number: 4 })
+            },
           ].map((item, idx) => (
             <div
               key={idx}

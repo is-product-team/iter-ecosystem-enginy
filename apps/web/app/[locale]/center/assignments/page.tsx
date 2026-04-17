@@ -22,6 +22,7 @@ export default function AssignmentsPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
@@ -43,6 +44,26 @@ export default function AssignmentsPage() {
   const params = useParams();
   const locale = params?.locale || 'ca';
 
+  const fetchData = async () => {
+    const currentUser = getUser();
+    if (!currentUser) return;
+
+    if (currentUser.centerId) {
+      try {
+        const [resAssig, resPhases] = await Promise.all([
+          assignmentService.getByCenter(currentUser.centerId),
+          phaseService.getAll()
+        ]);
+        setAssignments(resAssig);
+        setPhases(resPhases);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
     const init = async () => {
@@ -55,26 +76,7 @@ export default function AssignmentsPage() {
       }
 
       setUser(currentUser);
-
-      // Fetch assignments
-      if (currentUser.centerId) {
-        try {
-          const [resAssig, resPhases] = await Promise.all([
-            assignmentService.getByCenter(currentUser.centerId),
-            phaseService.getAll()
-          ]);
-          if (isMounted) {
-            setAssignments(resAssig);
-            setPhases(resPhases);
-          }
-        } catch (err) {
-          console.error(err);
-        } finally {
-          if (isMounted) setLoading(false);
-        }
-      } else {
-        if (isMounted) setLoading(false);
-      }
+      await fetchData();
     };
 
     init();
@@ -84,6 +86,54 @@ export default function AssignmentsPage() {
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find(f => f.name === phaseName);
     return phase ? phase.isActive : false;
+  };
+
+  const handleCloseAssignment = async (id: number) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: t('close_confirm_title'),
+      message: t('close_confirm_msg'),
+      isDestructive: true,
+      onConfirm: async () => {
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        setProcessingId(id);
+        try {
+          const api = getApi();
+          await api.post(`/assignments/${id}/close`);
+          toast.success(t('close_success'));
+          await fetchData();
+        } catch (err: any) {
+          console.error(err);
+          toast.error(err.response?.data?.error || t('close_error'));
+        } finally {
+          setProcessingId(null);
+        }
+      }
+    });
+  };
+
+  const handleBulkDownload = async (id: number) => {
+    setProcessingId(id);
+    try {
+      const api = getApi();
+      const response = await api.get(`/certificates/download-bulk/${id}`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `certificats_taller_${id}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success(tCommon('success_download'));
+    } catch (err) {
+      console.error(err);
+      toast.error(t('download_error'));
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   const filteredAssignments = assignments.filter(a => {
@@ -190,20 +240,47 @@ export default function AssignmentsPage() {
                         </div>
                       </td>
                       <td className="px-10 py-8">
-                        <span className={`text-[11px] font-medium px-3 py-1 border ${a.status === 'VALIDATED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
-                          a.status === 'DATA_ENTRY' ? 'border-orange-500/20 bg-orange-500/5 text-orange-600' :
+                        <span className={`text-[11px] font-medium px-3 py-1 border ${a.status === 'COMPLETED' ? 'border-green-500/20 bg-green-500/5 text-green-600' :
+                          a.status === 'IN_PROGRESS' ? 'border-blue-500/20 bg-blue-500/5 text-blue-600' :
                             'border-border-subtle bg-background-subtle text-text-muted'
                           }`}>
                           {tCommon(`statuses.${a.status}`)}
                         </span>
                       </td>
                       <td className="px-10 py-8 text-right">
-                        <button
-                          onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
-                          className="bg-consorci-darkBlue text-white py-2 px-6 text-[12px] font-medium transition-all hover:bg-black active:scale-[0.98]"
-                        >
-                          {t('manage_btn')}
-                        </button>
+                        <div className="flex justify-end gap-3">
+                            {/* Manage Button */}
+                            <button
+                            onClick={() => router.push(`/center/assignments/${a.assignmentId}`)}
+                            className="bg-background-subtle text-text-primary py-2 px-6 border border-border-subtle text-[12px] font-medium transition-all hover:bg-gray-100 active:scale-[0.98]"
+                            >
+                            {t('manage_btn')}
+                            </button>
+
+                            {/* Phase 4: Closure Actions */}
+                            {isPhaseActive(PHASES.CLOSURE) && a.status === 'IN_PROGRESS' && (
+                                <button
+                                onClick={() => handleCloseAssignment(a.assignmentId)}
+                                disabled={processingId === a.assignmentId}
+                                className="bg-black text-white py-2 px-6 text-[12px] font-black uppercase tracking-widest transition-all hover:bg-consorci-darkBlue active:scale-[0.98] flex items-center gap-2"
+                                >
+                                {processingId === a.assignmentId && <Loading size="mini" white />}
+                                {t('close_group_btn')}
+                                </button>
+                            )}
+
+                            {/* Phase 4: Download Actions */}
+                            {a.status === 'COMPLETED' && (
+                                <button
+                                onClick={() => handleBulkDownload(a.assignmentId)}
+                                disabled={processingId === a.assignmentId}
+                                className="bg-[#00426B] text-white py-2 px-6 text-[12px] font-black uppercase tracking-widest transition-all hover:bg-[#0775AB] active:scale-[0.98] flex items-center gap-2"
+                                >
+                                {processingId === a.assignmentId && <Loading size="mini" white />}
+                                {t('download_bulk_btn')}
+                                </button>
+                            )}
+                        </div>
                       </td>
                     </tr>
                   ))}

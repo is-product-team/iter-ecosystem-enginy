@@ -387,6 +387,10 @@
       "update_btn": "Actualitzar Sol·licitud",
       "send_btn": "Enviar Sol·licitud"
     },
+    "Closure": {
+        "title": "Cierre y Certificación",
+        "description": "Finalització de tallers i emissió de certificats."
+    },
     "Evaluations": {
       "title": "Seguiment i Avaluació",
       "subtitle": "Revisió de l'impacte i resultats dels tallers."
@@ -724,7 +728,11 @@
       "loading": "Carregant panell...",
       "duration": "Durada",
       "issued": "Emès",
-      "pdf_not_implemented": "La generació de PDF no està implementada en aquesta demo."
+      "pdf_not_implemented": "La generació de PDF no està implementada en aquesta demo.",
+      "survey_required_msg": "Debes completar la encuesta de satisfacción antes de descargar el certificado.",
+      "survey_pending_notice": "Tens una enquesta de satisfacció pendent per aquest taller. La teva opinió és necessària per emetre el certificat.",
+      "take_survey_button": "Realitzar Enquesta",
+      "download_error": "Error en descarregar el certificat."
     }
   },
   "Forms": {
@@ -747,7 +755,7 @@
     "select_sector": "Selecciona un sector...",
     "required_fields": "Els camps marcats amb * són obligatoris.",
     "workshop_config_subtitle": "Configuració del Taller i Horari Setmanal",
-    "general_info": "Informació General",
+    "general_info": "Information General",
     "technical_details": "Detalls Tècnics",
     "title_placeholder": "Introdueix el nom del taller...",
     "description_placeholder": "Breu explicació del contingut...",
@@ -883,7 +891,14 @@
     "incident_success": "Incidència informada. El CEB la revisarà aviat.",
     "search_assignments_title": "Cercar assignacions",
     "input_search_placeholder": "Cercar per taller o centre...",
-    "action_btn": "Acció"
+    "action_btn": "Acció",
+    "close_confirm_title": "Confirmar Tancament de Grup",
+    "close_confirm_msg": "Estàs segur que vols tancar aquest grup? Aquesta acció bloquejarà les dades i generarà els certificats per als alumnes aptes.",
+    "close_success": "Grup tancat i certificats emesos correctament.",
+    "close_error": "Error en tancar el grup. Verifica les avaluacions pendents.",
+    "download_error": "Error en descarregar els certificats.",
+    "close_group_btn": "Tancar Grup",
+    "download_bulk_btn": "Descarregar Certificats (ZIP)"
   },
   "StudentsPage": {
     "title": "Gestió d'Alumnat",
@@ -1272,6 +1287,8 @@
     "workshop_assigned_msg": "La teva sol·licitud per al taller \"{title}\" ha estat aprovada i assignada.",
     "assignments_published_title": "Assignacions Publicades",
     "assignments_published_msg": "Ja pots consultar les assignacions i començar a introduir les dades dels alumnes.",
+    "workshop_completed_title": "Taller Finalitzat i Certificats Llestos",
+    "workshop_completed_msg": "El taller \"{title}\" s'ha tancat oficialment. Ja pots descarregar el teu certificat des del panell d'usuari.",
     "CALENDAR_CHECK_HEARTBEAT": "Sincronització de Calendari (Sistema)",
     "Background calendar check executed": "Verificació de calendari en segon pla executada",
     "New Phase: Application": "Nova Fase: Sol·licitud i Pre-inscripció",
