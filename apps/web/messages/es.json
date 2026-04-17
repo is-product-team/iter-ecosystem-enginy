@@ -1027,9 +1027,6 @@
       "success": "¡Taller cerrado y certificados generados correctamente!",
       "error": "Error al cerrar el taller."
     },
-    "Monitoring": {
-      "no_assignments": "No hay talleres activos en ejecución por ahora."
-    },
     "ia_matcher_btn": "IA Matcher",
     "ia_matcher_close_btn": "Cerrar IA Matcher",
     "bulk_upload": {

@@ -392,7 +392,7 @@
       "subtitle": "Review of the impact and results of the workshops."
     },
     "Monitoring": {
-      "title": "Operational Monitoring (Phase 3)",
+      "title": "Operational Monitoring",
       "subtitle": "Status of workshop execution and attendance at your center.",
       "description": "Monitoring of workshop execution, attendance and incidents in real time.",
       "no_assignments": "There are no active workshops at this time.",
@@ -991,7 +991,7 @@
   },
   "AssignmentWorkshopsPage": {
     "title_prefix": "WORKSHOP MANAGEMENT: ",
-    "modality_prefix": "MODALITY ",
+    "modality_prefix": "MODALIDAD ",
     "referent_label": "Referent Teaching Team",
     "center_label": "Educational Center",
     "students_title": "Participating Students",
@@ -1009,22 +1009,22 @@
       "PUBLISHED": "PUBLISHED",
       "DATA_ENTRY": "PENDING MANAGEMENT",
       "DATA_SUBMITTED": "DATA SUBMITTED",
-      "VALIDATED": "CONFIRMED",
+      "VALIDATED": "CONFIRMADO",
       "READY_TO_START": "READY TO START",
-      "VACANT": "VACANT",
+      "VACANT": "VACANTE",
       "IN_PROGRESS": "IN EXECUTION",
       "COMPLETED": "COMPLETED",
-      "CANCELLED": "CANCELLED",
+      "CANCELLED": "CANCELADO",
       "provisional": "Provisional",
       "published": "Published",
       "data_entry": "Pending management",
       "data_submitted": "Data submitted",
-      "validated": "Confirmed",
+      "validated": "Confirmado",
       "ready_to_start": "Ready to start",
-      "vacant": "Vacant",
+      "vacant": "Vacante",
       "in_progress": "In execution",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelado"
     },
     "docs": {
       "pedagogical_agreement": "Pedagogical Agreement",
@@ -1048,9 +1048,6 @@
       "pending_evals_error": "Cannot close assignment. There are {count} pending evaluations.",
       "success": "Workshop closed and certificates generated successfully!",
       "error": "Error closing the workshop."
-    },
-    "Monitoring": {
-      "no_assignments": "No active workshops in execution for now."
     },
     "ia_matcher_btn": "IA Matcher",
     "ia_matcher_close_btn": "Close IA Matcher",
@@ -1207,8 +1204,8 @@
     "table_course": "Course",
     "clear": "Clear",
     "upload_success": "{label} uploaded successfully.",
-    "error_upload": "Error uploading the document.",
-    "only_pdf_allowed": "Only PDF files are allowed.",
+    "error_upload": "Error al pujar el document.",
+    "only_pdf_allowed": "Només es permeten fitxers PDF.",
     "ai_mismatch": "AI detects a different type: {type}.",
     "ai_no_signatures": "AI has not detected the required signatures.",
     "ai_error": "Error processing AI. You can force the upload.",
@@ -1240,12 +1237,12 @@
       "PUBLISHED": "Published",
       "DATA_ENTRY": "Pending Management",
       "DATA_SUBMITTED": "Data Submitted",
-      "VALIDATED": "Confirmed",
+      "VALIDATED": "Confirmado",
       "READY_TO_START": "Ready to Start",
-      "VACANT": "Vacant",
+      "VACANT": "Vacante",
       "IN_PROGRESS": "In Execution",
       "COMPLETED": "Completed",
-      "CANCELLED": "Cancelled"
+      "CANCELLED": "Cancelado"
     }
   },
   "Notifications": {
@@ -1306,23 +1303,22 @@
     }
   },
   "DesignateTeachersPage": {
-    "page_title": "Designate Teachers: {title}",
-    "page_subtitle": "Designate the two referring teachers who will be responsible for monitoring.",
-    "selection_of_referents": "Selection of Referents",
-    "main_teacher": "Main Teacher",
-    "select": "Select...",
-    "second_teacher": "Second Teacher",
-    "saving": "Saving...",
-    "confirm_designation": "Confirm Designation",
-    "mandatory_requirement": "Mandatory Requirement",
-    "mandatory_description": "It is necessary to designate two teachers to ensure that there is always a referent available for students and for communications with the CEB.",
-    "teacher_designation_not_active": "The teacher designation period is not active.",
-    "assignment_not_found": "Assignment not found.",
-    "designate_two_teachers": "You must designate two referring teachers.",
-    "teachers_must_be_different": "The two teachers must be different people.",
-    "teachers_designated_correctly": "Teachers designated correctly.",
-    "error_saving_designation": "Error saving designation.",
-    "loading_designation": "Loading designation..."
+    "page_subtitle": "Designa al equipo docente responsable que se encargará del seguimiento y la asistencia.",
+    "selection_of_referents": "Equipo Docente (Practicantes)",
+    "main_teacher": "Docente Principal",
+    "select": "Seleccionar...",
+    "second_teacher": "Segundo Docente (Opcional)",
+    "saving": "Guardando...",
+    "confirm_designation": "Confirmar Equipo Docente",
+    "mandatory_requirement": "Equipo Responsable",
+    "mandatory_description": "Se recomienda designar a dos docentes para garantizar la continuidad del taller, aunque solo uno es estrictamente obligatorio.",
+    "teacher_designation_not_active": "El periodo de designación de docentes no está activo.",
+    "assignment_not_found": "Asignación no encontrada.",
+    "designate_two_teachers": "Debes designar al menos a un docente responsable.",
+    "teachers_must_be_different": "Si designas a dos docentes, deben ser personas diferentes.",
+    "teachers_designated_correctly": "Docentes designados correctamente.",
+    "error_saving_designation": "Error al guardar la designación.",
+    "loading_designation": "Cargando designación..."
   },
   "AssignmentEvaluationsPage": {
     "page_title": "Competence Evaluation: {title}",
