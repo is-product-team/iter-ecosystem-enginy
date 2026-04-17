@@ -30,6 +30,7 @@ export default function WorkshopAdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSector, setSelectedSector] = useState(tc("all_sectors"));
   const [selectedModality, setSelectedModality] = useState(tc("all_modalities"));
+  const [groupBy, setGroupBy] = useState<string | null>(null);
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
@@ -155,12 +156,6 @@ export default function WorkshopAdminPage() {
 
   const columns: Column<Workshop>[] = [
     {
-      header: "ID",
-      render: (workshop) => <span className="table-id">{workshop._id}</span>,
-      width: 60,
-      align: 'center'
-    },
-    {
       header: "Taller",
       render: (workshop) => <span className="table-primary">{workshop.title}</span>,
       width: 250
@@ -281,6 +276,14 @@ export default function WorkshopAdminPage() {
             />
           </>
         }
+        groups={{
+          value: groupBy || '',
+          onChange: setGroupBy,
+          options: [
+            { label: 'Sector', value: 'sector' },
+            { label: 'Modalitat', value: 'modality' }
+          ]
+        }}
       />
 
       {/* Workshops Table */}
@@ -294,7 +297,10 @@ export default function WorkshopAdminPage() {
           columns={columns}
           loading={loading}
           emptyMessage={tc("no_results")}
+          getRowId={p => p._id}
           hideTopBorder
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
         />
       )}
 

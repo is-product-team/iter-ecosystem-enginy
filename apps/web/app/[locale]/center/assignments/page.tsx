@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
+import { ListChecks } from 'lucide-react';
 
 export default function AssignmentsPage() {
   const t = useTranslations('AssignmentsPage');
@@ -25,6 +26,7 @@ export default function AssignmentsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [groupBy, setGroupBy] = useState<string | null>(null);
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -98,12 +100,6 @@ export default function AssignmentsPage() {
   });
 
   const columns: Column<Assignment>[] = [
-    {
-      header: "ID",
-      render: (a) => <span className="table-id">{a.assignmentId}</span>,
-      width: 60,
-      align: 'center'
-    },
     {
       header: "Taller",
       render: (a) => (
@@ -181,17 +177,28 @@ export default function AssignmentsPage() {
                 { label: t('in_progress'), value: "IN_PROGRESS" },
                 { label: t('completed'), value: "COMPLETED" },
               ]}
+              icon={ListChecks}
             />
           }
+          groups={{
+            value: groupBy || '',
+            onChange: setGroupBy,
+            options: [
+              { label: tCommon('status'), value: 'status' }
+            ]
+          }}
         />
 
         <DataTable
           data={filteredAssignments}
           columns={columns}
           loading={loading}
-          emptyMessage={t('no_assignments')}
+          emptyMessage={tCommon('no_results')}
+          getRowId={a => a.assignmentId}
           tableId="center_assignments"
           hideTopBorder
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
         />
 
         {/* Incidents Section (Only available in Phase 3) */}

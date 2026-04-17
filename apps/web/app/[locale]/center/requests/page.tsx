@@ -16,7 +16,7 @@ import DataTable, { Column } from '@/components/ui/DataTable';
 import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 
 export default function RequestsPage() {
-  const t = useTranslations('CenterRequestsPage');
+  const t = useTranslations('Center.Requests');
   const tCommon = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
@@ -180,7 +180,7 @@ export default function RequestsPage() {
 
   const columns: Column<Workshop>[] = [
     {
-      header: "ID",
+      header: "#",
       render: (w) => <span className="table-id">{w._id}</span>,
       width: 60,
       align: 'center'
@@ -189,7 +189,6 @@ export default function RequestsPage() {
       header: "Taller",
       render: (w) => (
         <div className="flex items-center gap-3">
-          <WorkshopIcon iconName={w.icon} className="w-4 h-4 text-text-primary shrink-0" />
           <span className="table-primary">{w.title}</span>
         </div>
       ),
@@ -255,46 +254,52 @@ export default function RequestsPage() {
       width: 180
     },
     {
-      header: "Estat",
+      header: tCommon('actions'),
       align: 'right',
       render: (w) => {
         const existingRequest = requests.find(r => r.workshopId === parseInt(w._id));
-        const isSelected = selectedWorkshopId === w._id;
+        
         if (existingRequest) {
+          const isPending = existingRequest.status === REQUEST_STATUSES.PENDING;
           return (
-            <span className={`text-[11px] font-bold tracking-widest uppercase ${
-              existingRequest.status === REQUEST_STATUSES.APPROVED ? 'text-green-600' :
-              existingRequest.status === REQUEST_STATUSES.PENDING ? 'text-orange-600' :
-              'text-red-600'
-            }`}>
-              {existingRequest.status === REQUEST_STATUSES.PENDING ? t('status_pending') : 
-               existingRequest.status === REQUEST_STATUSES.APPROVED ? t('status_approved') : 
-               t('status_rejected')}
-            </span>
-          );
-        }
-        if (isSelected) {
-          return (
-            <div className="flex items-center justify-end gap-2 text-consorci-darkBlue font-bold text-[11px] uppercase tracking-tight">
-              <span>{t('selected_label')}</span>
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+            <div className="flex items-center justify-end gap-4">
+              <span className={`text-[10px] font-bold tracking-widest uppercase ${
+                existingRequest.status === REQUEST_STATUSES.APPROVED ? 'text-green-600' :
+                isPending ? 'text-orange-600' :
+                'text-red-600'
+              }`}>
+                {isPending ? t('status_pending') : 
+                 existingRequest.status === REQUEST_STATUSES.APPROVED ? t('status_approved') : 
+                 t('status_rejected')}
+              </span>
+              {isPending && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleEdit(existingRequest); }}
+                  className="px-4 py-1.5 bg-background-subtle hover:bg-consorci-darkBlue hover:text-white text-consorci-darkBlue font-bold text-[10px] uppercase tracking-wider border border-border-subtle transition-all active:scale-95"
+                >
+                  {tc('edit')}
+                </button>
+              )}
             </div>
           );
         }
-        return null;
+
+        return (
+          <button
+            onClick={(e) => { e.stopPropagation(); setSelectedWorkshopId(w._id); }}
+            className={`px-4 py-2 bg-consorci-darkBlue text-white font-bold text-[10px] uppercase tracking-wider transition-all hover:bg-black active:scale-95 flex items-center gap-2 whitespace-nowrap`}
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('assign_places_btn')}
+          </button>
+        );
       },
-      width: 120
+      width: 150
     }
   ];
 
-  const handleRowClick = (workshop: Workshop) => {
-    const existingRequest = requests.find(r => r.workshopId === parseInt(workshop._id));
-    if (existingRequest && existingRequest.status === REQUEST_STATUSES.PENDING) {
-      handleEdit(existingRequest);
-    } else {
-      setSelectedWorkshopId(selectedWorkshopId === workshop._id ? null : workshop._id);
-    }
-  };
 
   if (authLoading || !user) {
     return <Loading fullScreen message={tCommon('status')} />;
@@ -308,7 +313,7 @@ export default function RequestsPage() {
     >
       <div className="space-y-6 animate-in fade-in duration-500">
         {/* Catalog Section */}
-        <div className="space-y-6">
+        <div className="space-y-0">
           <DataTableToolbar
             search={{
               value: searchQuery,
@@ -324,11 +329,11 @@ export default function RequestsPage() {
             columns={columns}
             loading={loading}
             emptyMessage={tCommon('no_results')}
-            onRowClick={handleRowClick}
             hideTopBorder
+            showIndex={false}
             rowClassName={(workshop) => {
               const isSelected = selectedWorkshopId === workshop._id;
-              return `border-l-2 ${isSelected ? 'bg-background-subtle border-l-consorci-darkBlue' : 'border-l-transparent hover:border-l-consorci-lightBlue'}`;
+              return `border-l-2 ${isSelected ? 'bg-background-subtle border-l-consorci-darkBlue' : 'border-l-transparent'}`;
             }}
           />
         </div>

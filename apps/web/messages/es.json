@@ -385,7 +385,17 @@
       "reason": "Motivo de la solicitud",
       "processing": "Procesando solicitud...",
       "update_btn": "Actualizar Solicitud",
-      "send_btn": "Enviar Solicitud"
+      "send_btn": "Enviar Solicitud",
+      "assign_places_btn": "Asignar Plazas",
+      "status_pending": "Pendiente",
+      "status_approved": "Aprobado",
+      "status_rejected": "Rechazado",
+      "referents_label": "Profesores Referentes",
+      "num_students_label": "Alumnos aprox.",
+      "reason_label": "Motivo de la solicitud",
+      "cancel_btn": "Cancelar",
+      "edit_request": "Editar Solicitud",
+      "new_request": "Nueva Solicitud"
     },
     "Evaluations": {
       "title": "Seguimiento y Evaluación",
@@ -942,6 +952,7 @@
     "subtitle": "Gestiona las solicitudes de talleres para tu centro educativo.",
     "search_placeholder": "Buscar taller o sector...",
     "num_workshops": "{count} Talleres disponibles",
+    "assign_places_btn": "Asignar Plazas",
     "table_mod": "Mod",
     "table_workshop": "Taller / Sector",
     "table_referents": "Referentes",

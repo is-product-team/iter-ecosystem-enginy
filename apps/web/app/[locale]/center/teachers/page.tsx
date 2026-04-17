@@ -122,12 +122,6 @@ export default function TeachersCRUD() {
 
   const columns: Column<Teacher>[] = [
     {
-      header: "ID",
-      render: (p) => <span className="table-id">{p.teacherId}</span>,
-      width: 60,
-      align: 'center'
-    },
-    {
       header: "",
       render: (p) => (
         <Avatar
@@ -195,11 +189,11 @@ export default function TeachersCRUD() {
       />
 
       <DataTable
-        tableId="center_teachers"
         data={filteredTeachers}
         columns={columns}
         loading={loading}
         emptyMessage={tc('no_results')}
+        getRowId={p => p.teacherId}
         hideTopBorder
       />
 

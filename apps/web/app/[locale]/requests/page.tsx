@@ -17,6 +17,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from '@/components/Pagination';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
+import { School, Zap } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 
 export default function AdminRequestsPage() {
@@ -385,6 +386,7 @@ export default function AdminRequestsPage() {
               value={selectedCenterId}
               onChange={setSelectedCenterId}
               options={centers.map(c => ({ label: c.name, value: c.centerId.toString() }))}
+              icon={School}
             />
             <FilterSelect
               label="Modalitat"
@@ -395,6 +397,7 @@ export default function AdminRequestsPage() {
                 { label: tc('modality_label', { modality: 'B' }), value: 'B' },
                 { label: tc('modality_label', { modality: 'C' }), value: 'C' },
               ]}
+              icon={Zap}
             />
           </>
         }

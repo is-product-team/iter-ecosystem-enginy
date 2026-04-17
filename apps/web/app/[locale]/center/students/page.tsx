@@ -24,9 +24,23 @@ export default function StudentsCRUD() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [formData, setFormData] = useState({ fullName: '', lastName: '', idalu: '', grade: '' });
+  const [formData, setFormData] = useState({ 
+    fullName: '', 
+    lastName: '', 
+    idalu: '', 
+    grade: '',
+    dni: '',
+    phone: '',
+    email: '',
+    gender: '',
+    birthDate: '',
+    emergencyContact: '',
+    emergencyPhone: '',
+    notes: ''
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(t("all_courses"));
+  const [groupBy, setGroupBy] = useState<string | null>(null);
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -94,7 +108,20 @@ export default function StudentsCRUD() {
       }
       setIsModalOpen(false);
       setEditingStudent(null);
-      setFormData({ fullName: '', lastName: '', idalu: '', grade: '' });
+      setFormData({ 
+        fullName: '', 
+        lastName: '', 
+        idalu: '', 
+        grade: '',
+        dni: '',
+        phone: '',
+        email: '',
+        gender: '',
+        birthDate: '',
+        emergencyContact: '',
+        emergencyPhone: '',
+        notes: ''
+      });
       loadStudents();
     } catch (err: unknown) {
       toast.error((err as Error).message || tc("error_loading"));
@@ -107,7 +134,15 @@ export default function StudentsCRUD() {
       fullName: student.fullName || '', 
       lastName: student.lastName || '', 
       idalu: student.idalu || '', 
-      grade: student.grade || '' 
+      grade: student.grade || '',
+      dni: student.dni || '',
+      phone: student.phone || '',
+      email: student.email || '',
+      gender: student.gender || '',
+      birthDate: student.birthDate ? new Date(student.birthDate).toISOString().split('T')[0] : '',
+      emergencyContact: student.emergencyContact || '',
+      emergencyPhone: student.emergencyPhone || '',
+      notes: student.notes || ''
     });
     setIsModalOpen(true);
   };
@@ -133,12 +168,6 @@ export default function StudentsCRUD() {
 
   const columns: Column<Student>[] = [
     {
-      header: "ID",
-      render: (a) => <span className="table-id">{a.studentId}</span>,
-      width: 60,
-      align: 'center'
-    },
-    {
       header: "",
       render: (a) => (
         <Avatar
@@ -154,7 +183,7 @@ export default function StudentsCRUD() {
     },
     {
       header: "Nom",
-      render: (a) => <span className="table-primary">{a.fullName}</span>,
+      render: (a) => <span className="table-primary font-bold">{a.fullName}</span>,
       width: 150
     },
     {
@@ -163,11 +192,23 @@ export default function StudentsCRUD() {
       width: 180
     },
     {
+      header: "DNI",
+      render: (a) => <span className="table-id font-bold uppercase">{a.dni || '-'}</span>,
+      width: 120,
+      align: 'center'
+    },
+    {
+      header: "Telèfon",
+      render: (a) => <span className="table-detail font-medium">{a.phone || '-'}</span>,
+      width: 130,
+      align: 'center'
+    },
+    {
       header: "IDALU",
       render: (a) => (
         <span className="table-id font-bold">{a.idalu}</span>
       ),
-      width: 120,
+      width: 100,
       align: 'center'
     },
     {
@@ -179,6 +220,42 @@ export default function StudentsCRUD() {
       ),
       width: 120,
       align: 'center'
+    },
+    {
+      header: "Email",
+      render: (a) => <span className="table-detail">{a.email || '-'}</span>,
+      width: 200
+    },
+    {
+      header: "Gènere",
+      render: (a) => (
+        <span className="table-tag-gray">
+          {a.gender?.substring(0, 1) || '-'}
+        </span>
+      ),
+      width: 80,
+      align: 'center'
+    },
+    {
+      header: "Naixement",
+      render: (a) => <span className="table-id">{a.birthDate ? new Date(a.birthDate).toLocaleDateString() : '-'}</span>,
+      width: 120,
+      align: 'center'
+    },
+    {
+      header: "Emergència",
+      render: (a) => (
+        <div className="flex flex-col">
+          <span className="table-detail font-bold">{a.emergencyContact || '-'}</span>
+          <span className="table-id">{a.emergencyPhone || ''}</span>
+        </div>
+      ),
+      width: 180
+    },
+    {
+      header: "Notes",
+      render: (a) => <span className="table-id italic opacity-60 truncate block max-w-[150px]">{a.notes || '-'}</span>,
+      width: 150
     },
     {
       header: tc('actions'),
@@ -196,7 +273,24 @@ export default function StudentsCRUD() {
 
   const headerActions = (
     <button
-      onClick={() => { setEditingStudent(null); setFormData({ fullName: '', lastName: '', idalu: '', grade: '' }); setIsModalOpen(true); }}
+      onClick={() => { 
+        setEditingStudent(null); 
+        setFormData({ 
+          fullName: '', 
+          lastName: '', 
+          idalu: '', 
+          grade: '',
+          dni: '',
+          phone: '',
+          email: '',
+          gender: '',
+          birthDate: '',
+          emergencyContact: '',
+          emergencyPhone: '',
+          notes: ''
+        }); 
+        setIsModalOpen(true); 
+      }}
       className="bg-consorci-darkBlue text-white px-6 py-3 font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
@@ -231,6 +325,14 @@ export default function StudentsCRUD() {
             ]}
           />
         }
+        groups={{
+          value: groupBy || '',
+          onChange: setGroupBy,
+          options: [
+            { label: 'Curs', value: 'grade' },
+            { label: 'Gènere', value: 'gender' }
+          ]
+        }}
       />
 
       <DataTable
@@ -238,7 +340,10 @@ export default function StudentsCRUD() {
         columns={columns}
         loading={loading}
         emptyMessage={tc('no_results')}
+        getRowId={a => a.studentId}
         hideTopBorder
+        groupBy={groupBy}
+        onGroupByChange={setGroupBy}
       />
 
       {isModalOpen && (
@@ -302,36 +407,124 @@ export default function StudentsCRUD() {
               )}
 
               <form onSubmit={handleSubmit} id="student-form" className="p-10 space-y-8">
-                <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_name')}</label>
-                  <input
-                    type="text" value={formData.fullName}
-                    onChange={e => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_name')}</label>
+                    <input
+                      type="text" value={formData.fullName}
+                      onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_surnames')}</label>
+                    <input
+                      type="text" value={formData.lastName}
+                      onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_surnames')}</label>
-                  <input
-                    type="text" value={formData.lastName}
-                    onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_idalu')}</label>
+                    <input
+                      type="text" value={formData.idalu}
+                      onChange={e => setFormData({ ...formData, idalu: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all font-mono appearance-none" required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">DNI / NIE</label>
+                    <input
+                      type="text" value={formData.dni}
+                      onChange={e => setFormData({ ...formData, dni: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all font-mono uppercase appearance-none"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_idalu')}</label>
-                  <input
-                    type="text" value={formData.idalu}
-                    onChange={e => setFormData({ ...formData, idalu: e.target.value })}
-                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all font-mono appearance-none" required
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">Email</label>
+                    <input
+                      type="email" value={formData.email}
+                      onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">Telèfon</label>
+                    <input
+                      type="tel" value={formData.phone}
+                      onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                    />
+                  </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_course')}</label>
+                    <input
+                      type="text" value={formData.grade}
+                      onChange={e => setFormData({ ...formData, grade: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">Data Naixement</label>
+                    <input
+                      type="date" value={formData.birthDate}
+                      onChange={e => setFormData({ ...formData, birthDate: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">Gènere</label>
+                    <select
+                      value={formData.gender}
+                      onChange={e => setFormData({ ...formData, gender: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                    >
+                      <option value="">Selecciona...</option>
+                      <option value="Masc">Masculí</option>
+                      <option value="Fem">Femení</option>
+                      <option value="Altres">Altres</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="border-t border-border-subtle pt-8">
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-6">Contacte d'Emergència</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="block text-[12px] font-medium text-text-primary px-1">Nom de Contacte</label>
+                      <input
+                        type="text" value={formData.emergencyContact}
+                        onChange={e => setFormData({ ...formData, emergencyContact: e.target.value })}
+                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-[12px] font-medium text-text-primary px-1">Telèfon Emergència</label>
+                      <input
+                        type="tel" value={formData.emergencyPhone}
+                        onChange={e => setFormData({ ...formData, emergencyPhone: e.target.value })}
+                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_course')}</label>
-                  <input
-                    type="text" value={formData.grade}
-                    onChange={e => setFormData({ ...formData, grade: e.target.value })}
-                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
+                  <label className="block text-[12px] font-medium text-text-primary px-1">Observacions</label>
+                  <textarea
+                    value={formData.notes}
+                    onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none resize-none"
                   />
                 </div>
               </form>

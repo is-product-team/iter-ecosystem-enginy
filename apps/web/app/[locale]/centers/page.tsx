@@ -121,12 +121,6 @@ export default function CentersScreen() {
 
   const columns: Column<Center>[] = [
     {
-      header: "ID",
-      render: (center) => <span className="table-id">{center.centerId}</span>,
-      width: 60,
-      align: 'center'
-    },
-    {
       header: "",
       render: (center) => <Avatar name={center.name} size="sm" type="center" />,
       width: 50,
@@ -248,7 +242,8 @@ export default function CentersScreen() {
         data={filteredCenters}
         columns={columns}
         loading={loading}
-        emptyMessage={t('empty')}
+        emptyMessage={tCommon('no_results')}
+        getRowId={p => p.centerId}
         hideTopBorder
       />
 

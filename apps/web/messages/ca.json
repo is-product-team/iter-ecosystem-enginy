@@ -385,7 +385,17 @@
       "reason": "Motiu de la sol·licitud",
       "processing": "Processant sol·licitud...",
       "update_btn": "Actualitzar Sol·licitud",
-      "send_btn": "Enviar Sol·licitud"
+      "send_btn": "Enviar Sol·licitud",
+      "assign_places_btn": "Assignar Places",
+      "status_pending": "Pendent",
+      "status_approved": "Aprovat",
+      "status_rejected": "Rebutjat",
+      "referents_label": "Professors Referents",
+      "num_students_label": "Alumnes aprox.",
+      "reason_label": "Motiu de la sol·licitud",
+      "cancel_btn": "Cancel·lar",
+      "edit_request": "Editar Sol·licitud",
+      "new_request": "Nova Sol·licitud"
     },
     "Evaluations": {
       "title": "Seguiment i Avaluació",
@@ -942,6 +952,7 @@
     "subtitle": "Gestiona les sol·licituds de tallers per al teu centre educatiu.",
     "search_placeholder": "Cercar taller o sector...",
     "num_workshops": "{count} Tallers disponibles",
+    "assign_places_btn": "Assignar Places",
     "table_mod": "Mod",
     "table_workshop": "Taller / Sector",
     "table_referents": "Referents",

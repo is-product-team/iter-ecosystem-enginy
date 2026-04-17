@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, X, ChevronDown, LucideIcon } from 'lucide-react';
+import { Search, X, ChevronDown, LucideIcon, Layers } from 'lucide-react';
 
 interface FilterSelectProps {
   label: string;
@@ -66,6 +66,11 @@ interface DataTableToolbarProps {
   };
   filters?: React.ReactNode;
   onClear?: () => void;
+  groups?: {
+    value: string;
+    onChange: (value: string) => void;
+    options: { label: string; value: string }[];
+  };
 }
 
 export default function DataTableToolbar({
@@ -76,7 +81,8 @@ export default function DataTableToolbar({
   actions,
   search,
   filters,
-  onClear
+  onClear,
+  groups
 }: DataTableToolbarProps) {
   return (
     <div className="flex flex-col w-full border-t border-l border-r border-border-subtle bg-background-surface transition-all animate-in fade-in duration-500">
@@ -120,13 +126,25 @@ export default function DataTableToolbar({
             </div>
           ))}
 
+          {groups && (
+            <div className="xl:flex-1 border-b lg:border-r border-border-subtle h-[48px]">
+              <FilterSelect
+                label="Agrupar per..."
+                value={groups.value}
+                onChange={groups.onChange}
+                options={groups.options}
+                icon={Layers}
+              />
+            </div>
+          )}
+
           {onClear && (
             <div className="flex-none border-b border-border-subtle h-[48px]">
               <button
                 onClick={onClear}
                 className="flex items-center justify-center gap-2 px-6 h-full w-full bg-background-subtle hover:bg-background-surface text-[10px] font-bold text-text-muted hover:text-red-500 uppercase tracking-[0.2em] transition-all group"
               >
-                <X className="w-3.5 h-3.5 transition-transform group-hover:rotate-90" />
+                <X className="w-3.5 h-3.5" />
                 <span>Clear</span>
               </button>
             </div>

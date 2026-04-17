@@ -6,7 +6,15 @@ export interface Student {
   lastName: string;
   grade: string;
   idalu: string;
+  email?: string | null;
   photoUrl?: string | null;
+  dni?: string | null;
+  phone?: string | null;
+  birthDate?: string | null;
+  gender?: string | null;
+  emergencyContact?: string | null;
+  emergencyPhone?: string | null;
+  notes?: string | null;
 }
 
 const studentService = {

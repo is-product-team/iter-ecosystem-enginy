@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
+import { ClipboardCheck } from 'lucide-react';
 
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
@@ -36,6 +37,7 @@ export default function DocumentVerificationPage() {
   const [sendingNotif, setSendingNotif] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // all, pending, problem, validated
+  const [groupBy, setGroupBy] = useState<string | null>(null);
 
   const router = useRouter();
   const params = useParams();
@@ -241,12 +243,6 @@ export default function DocumentVerificationPage() {
       }
     },
     {
-      header: "ID",
-      render: (row) => <span className="table-id">{row.student?.idalu}</span>,
-      width: 80,
-      align: 'center'
-    },
-    {
       header: "Alumne",
       render: (row) => (
         <div onClick={() => setSelectedRow(row)} className="cursor-pointer">
@@ -329,6 +325,15 @@ export default function DocumentVerificationPage() {
           onClear={() => {
             setSearchTerm('');
             setStatusFilter('all');
+            setGroupBy(null);
+          }}
+          groups={{
+            value: groupBy || '',
+            onChange: setGroupBy,
+            options: [
+              { label: 'Centre', value: 'centerName' },
+              { label: 'Taller', value: 'workshopTitle' }
+            ]
           }}
           filters={
             <FilterSelect
@@ -340,6 +345,7 @@ export default function DocumentVerificationPage() {
                 { label: t('pending_validation') || 'Pendents de Validar', value: 'pending' },
                 { label: t('fully_validated') || 'Tots Validats', value: 'validated' },
               ]}
+              icon={ClipboardCheck}
             />
           }
           actions={
@@ -375,8 +381,11 @@ export default function DocumentVerificationPage() {
           columns={columns}
           loading={loading && assignments.length === 0}
           emptyMessage={tc('no_results')}
+          getRowId={(row) => row.student?.idalu || row.enrollmentId}
           rowClassName={(row) => selectedRow?.enrollmentId === row.enrollmentId ? 'bg-consorci-darkBlue/5' : ''}
           hideTopBorder
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
         />
       </div>
 

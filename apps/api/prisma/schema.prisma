@@ -238,17 +238,24 @@ enum AssignmentStatus {
 // ==========================================
 
 model Student {
-  studentId      Int     @id @default(autoincrement()) @map("id_student")
-  idalu          String  @unique
-  fullName       String  @map("nom")
-  lastName       String  @map("cognoms")
-  email          String? @unique @map("email")
-  grade          String? @map("curs")
-  photoUrl       String? @map("url_foto")
-  originCenterId Int?    @map("id_center_origin")
-  centerOrigin   Center? @relation("CenterOrigin", fields: [originCenterId], references: [centerId])
-  userId         Int?    @unique @map("id_user")
-  user           User?   @relation(fields: [userId], references: [userId], onDelete: SetNull)
+  studentId      Int       @id @default(autoincrement()) @map("id_student")
+  idalu          String    @unique
+  fullName       String    @map("nom")
+  lastName       String    @map("cognoms")
+  email          String?   @unique @map("email")
+  grade          String?   @map("curs")
+  photoUrl       String?   @map("url_foto")
+  dni            String?   @unique @map("dni")
+  phone          String?   @map("telefon")
+  birthDate      DateTime? @map("data_naixement")
+  gender         String?   @map("genere")
+  emergencyContact String? @map("contacte_emergencia")
+  emergencyPhone String?   @map("telefon_emergencia")
+  notes          String?   @map("observacions") @db.Text
+  originCenterId Int?      @map("id_center_origin")
+  centerOrigin   Center?   @relation("CenterOrigin", fields: [originCenterId], references: [centerId])
+  userId         Int?      @unique @map("id_user")
+  user           User?     @relation(fields: [userId], references: [userId], onDelete: SetNull)
 
   enrollments  Enrollment[]
   certificates Certificate[]
