@@ -27,6 +27,7 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
   const [syncToken, setSyncToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copying, setCopying] = useState(false);
+  const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar');
 
   useEffect(() => {
     if (isOpen) {
@@ -69,15 +70,18 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
   const domain = apiUrl.replace(/^https?:\/\//, '').replace(/\/api$/, '');
   const protocol = apiUrl.startsWith('https') ? 'https' : 'http';
 
-  const icalUrl = `${protocol}://${domain}/api/calendar/ics/${syncToken}`;
-  const webcalUrl = `webcal://${domain}/api/calendar/ics/${syncToken}`;
+  const icalUrl = activeTab === 'calendar' 
+    ? `${protocol}://${domain}/api/calendar/ics/${syncToken}`
+    : `${protocol}://${domain}/api/notifications/ics/${syncToken}`;
+  
+  const webcalUrl = icalUrl.replace(/^https?/, 'webcal');
   const googleUrl = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(icalUrl)}`;
 
   const copyToClipboard = () => {
     if (!syncToken) return;
     navigator.clipboard.writeText(icalUrl);
     setCopying(true);
-    toast.success(t('copy_success'));
+    toast.success(t(`${activeTab}_copy_success`));
     setTimeout(() => setCopying(false), 2000);
   };
 
@@ -107,6 +111,30 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
             className="p-2 text-text-muted hover:text-text-primary hover:bg-background-surface transition-colors"
           >
             <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-border-subtle bg-background-surface">
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-widest transition-all ${
+              activeTab === 'calendar' 
+                ? 'text-consorci-darkBlue border-b-2 border-consorci-darkBlue bg-consorci-darkBlue/5' 
+                : 'text-text-muted hover:text-text-primary'
+            }`}
+          >
+            {t('tab_calendar')}
+          </button>
+          <button
+            onClick={() => setActiveTab('notifications')}
+            className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-widest transition-all ${
+              activeTab === 'notifications' 
+                ? 'text-consorci-darkBlue border-b-2 border-consorci-darkBlue bg-consorci-darkBlue/5' 
+                : 'text-text-muted hover:text-text-primary'
+            }`}
+          >
+            {t('tab_notifications')}
           </button>
         </div>
 

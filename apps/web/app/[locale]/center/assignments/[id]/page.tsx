@@ -204,24 +204,7 @@ export default function AssignmentDetailsPage() {
         onSave={handleUpdateEnrollments}
       />
 
-      {assignment.status !== 'IN_PROGRESS' && assignment.status !== 'COMPLETED' && (
-        <div className={`p-10 flex flex-col md:flex-row items-center justify-between gap-8 border ${allDocumentsValidated ? 'bg-green-500/5 border-green-500/20' : 'bg-background-subtle border-border-subtle'}`}>
-          <div>
-            <h4 className={`text-lg font-medium ${allDocumentsValidated ? 'text-green-600' : 'text-text-primary'}`}>
-              {allDocumentsValidated ? t('finalize_section.ready_title') : t('finalize_section.not_ready_title')}
-            </h4>
-            <p className="text-[13px] text-text-muted mt-2 max-w-xl">
-              {allDocumentsValidated ? t('finalize_section.ready_desc') : t('finalize_section.not_ready_desc')}
-            </p>
-          </div>
-          {allDocumentsValidated && (
-            <div className="flex items-center gap-3 text-green-600 font-medium text-[13px] animate-pulse">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              {locale === 'ca' ? 'Activació automàtica en curs...' : 'Activación automática en curso...'}
-            </div>
-          )}
-        </div>
-      )}
+
     </DashboardLayout>
   );
 }

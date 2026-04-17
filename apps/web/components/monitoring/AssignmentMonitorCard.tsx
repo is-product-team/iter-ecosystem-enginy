@@ -34,7 +34,7 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
     const enrollments = assignment.enrollments || [];
     if (enrollments.length > 0) {
       let totalAttended = 0;
-      let totalExpected = enrollments.length * sessionsWithAttendance.length;
+      const totalExpected = enrollments.length * sessionsWithAttendance.length;
       
       enrollments.forEach(e => {
         totalAttended += e.attendance?.filter((a: any) => a.status === 'PRESENT' || a.status === 'LATE').length || 0;

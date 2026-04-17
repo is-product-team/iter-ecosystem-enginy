@@ -13,8 +13,8 @@ import { useTranslations } from 'next-intl';
 
 interface AssignmentDetail {
   workshop?: { title: string };
-  teacher1?: { user: { fullName: string } };
-  teacher2?: { user: { fullName: string } };
+  teacher1?: { userId: number; user: { fullName: string } };
+  teacher2?: { userId: number; user: { fullName: string } };
   sessions?: {
     sessionId: number;
     sessionDate: string;
@@ -116,7 +116,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                 onClick={async () => {
                   try {
                     const api = getApi();
-                    await api.post(`/assignments/${id}/sessions/bulk-assign`, { userId: assignment.teacher1.userId });
+                    await api.post(`/assignments/${id}/sessions/bulk-assign`, { userId: assignment.teacher1!.userId });
                     const res = await api.get(`/assignments/${id}`);
                     setAssignment(res.data);
                     toast.success(t('bulk_assign_success') || 'Equip sincronitzat correctament');

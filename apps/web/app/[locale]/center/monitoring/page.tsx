@@ -55,8 +55,8 @@ export default function MonitoringPage() {
     const active = assignments.filter(a => a.status === 'IN_PROGRESS' || a.status === 'READY_TO_START');
     
     let sessionsToday = 0;
-    let pendingAttendance = 0;
-    let incidents: number | string = 'TBD'; // Service not yet implemented in backend
+    const pendingAttendance = 0;
+    const incidents = 0; // Mocked for now as we don't have a service yet
 
     active.forEach(a => {
       a.sessions?.forEach(s => {

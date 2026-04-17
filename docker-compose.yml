@@ -21,10 +21,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 200M
+
 
   # Adminer (Visualizador DB)
   adminer:
@@ -46,17 +43,14 @@ services:
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
-    command: sh -c "npm install && npx turbo db:generate --filter=@iter/api && npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss"
+    command: sh -c "npm install && npx prisma generate --schema=apps/api/prisma/schema.prisma && npx prisma db push --schema=apps/api/prisma/schema.prisma --accept-data-loss"
     env_file:
       - .env
     depends_on:
       - db
     networks:
       - iter-network
-    deploy:
-      resources:
-        limits:
-          memory: 500M
+
 
   # Backend API (Dev)
   api:
@@ -65,7 +59,7 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: npx turbo dev --filter=@iter/api
+    command: npm run dev --workspace=@iter/api
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
@@ -76,8 +70,7 @@ services:
       - .env
     environment:
       - PORT=${API_PORT_INTERNAL}
-      - AI_MODEL_VISION=moondream
-      - OLLAMA_HOST=http://ollama:11434
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
     depends_on:
       setup:
         condition: service_completed_successfully
@@ -90,10 +83,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 800M
+
 
   # Frontend Web (Dev)
   web:
@@ -102,7 +92,7 @@ services:
       dockerfile: Dockerfile
       target: base
     working_dir: /app
-    command: npx turbo run dev --filter=@iter/web --parallel
+    command: npm run dev --workspace=@iter/web
     volumes:
       - .:/app
       - node_modules_cache:/app/node_modules
@@ -125,24 +115,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 2G
 
-  # IA Local (Especializada en documentos)
-  ollama:
-    image: ollama/ollama:latest
-    container_name: iter_ollama
-    restart: always
-    volumes:
-      - ollama_data:/root/.ollama
-    networks:
-      - iter-network
-    deploy:
-      resources:
-        limits:
-          memory: 2G
+
+
+
+
 
 networks:
   iter-network:
@@ -151,4 +128,4 @@ networks:
 volumes:
   postgres_data:
   node_modules_cache:
-  ollama_data:
+

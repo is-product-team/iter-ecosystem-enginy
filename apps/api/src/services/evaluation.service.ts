@@ -125,7 +125,7 @@ export class EvaluationService {
     }
 
     /**
-     * Uses the local NLP Service (Ollama) to analyze teacher observations.
+     * Uses Gemini Cloud AI to analyze teacher observations.
      * Extracts state, sentiment and score suggestion.
      */
     async analyzeObservationsAI(text: string) {

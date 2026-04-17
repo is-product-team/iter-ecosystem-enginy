@@ -8,6 +8,11 @@ RUN npm config set fetch-retries 5 && \
     npm config set fetch-retry-maxtimeout 120000
 WORKDIR /app
 
+# Instalar utilidades básicas
+RUN apt-get update && apt-get install -y \
+    wget && \
+    rm -rf /var/lib/apt/lists/*
+
 # Stage 2: Pruner (Base para poda)
 FROM base AS pruner
 RUN npm install -g turbo

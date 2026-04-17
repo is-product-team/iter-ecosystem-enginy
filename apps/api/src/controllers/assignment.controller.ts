@@ -1,9 +1,10 @@
 import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
 import { AssignmentChecklistSchema, ROLES, REQUEST_STATUSES, CHECKLIST_STEPS, PHASES } from '@iter/shared';
-import { createNotificationInternal } from './notification.controller.js';
+import { NotificationService } from '../services/notification.service.js';
 import { isPhaseActive } from '../lib/phaseUtils.js';
 import { VisionService } from '../services/vision.service.js';
+import { createNotificationInternal } from './notification.controller.js';
 import { AutoAssignmentService } from '../services/auto-assignment.service.js';
 import fs from 'fs';
 import path from 'path';
@@ -636,7 +637,7 @@ export const sendDocumentNotification = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
-    await createNotificationInternal({
+    await NotificationService.notify({
       centerId: assignment.centerId,
       title: 'incorrect_doc_title',
       message: JSON.stringify({
@@ -885,7 +886,7 @@ async function checkAndActivateAssignment(assignmentId: number) {
       await logStatusChange(assignmentId, assignment.status, 'IN_PROGRESS');
 
       // 5. Send notification to center
-      await createNotificationInternal({
+      await NotificationService.notify({
         centerId: assignment.centerId,
         title: 'registration_confirmed_title',
         message: JSON.stringify({
@@ -924,6 +925,9 @@ export const updateComplianceDocuments = async (req: Request, res: Response) => 
         }
       }
     });
+
+    // Trigger activation check and notification
+    await checkAndActivateAssignment(enrollment.assignmentId);
 
     res.json(updated);
   } catch (error) {
@@ -1000,8 +1004,8 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
 
     const url = `/uploads/documents/${fileName}`;
 
-    // --- AI VALIDATION (OLLAMA) ---
-    console.log(`[Upload] Starting AI validation with Ollama for ${documentType}...`);
+    // --- AI VALIDATION (GEMINI) ---
+    console.log(`[Upload] Starting AI validation with Gemini Cloud for ${documentType}...`);
     const visionService = new VisionService();
     let aiResult;
     try {
@@ -1047,6 +1051,10 @@ export const uploadStudentDocument = async (req: Request, res: Response) => {
     });
 
     console.log(`[Upload] Success! URL: ${url}`);
+
+    // Trigger activation check and notification
+    await checkAndActivateAssignment(enrollment.assignmentId);
+
     res.json(updated);
   } catch (error: any) {
     console.error("Error uploading document:", error);

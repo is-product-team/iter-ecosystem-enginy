@@ -1,102 +1,91 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NLPService } from './nlp.service.js';
 
+// Mock the Google Generative AI SDK
+vi.mock('@google/generative-ai', () => {
+  const generateContentMock = vi.fn();
+  const getGenerativeModelMock = vi.fn(() => ({
+    generateContent: generateContentMock
+  }));
+
+  return {
+    GoogleGenerativeAI: vi.fn().mockImplementation(() => ({
+      getGenerativeModel: getGenerativeModelMock
+    }))
+  };
+});
+
+// Import the mocked classes to set up their behaviors in tests
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
 describe('NLPService', () => {
   let service: NLPService;
+  let mockGenerateContent: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.GOOGLE_AI_API_KEY = 'test-key';
     service = new NLPService();
     
-    // Mock global fetch for Ollama calls
-    global.fetch = vi.fn();
+    // Extract the mock function to control it
+    const genAI = new (GoogleGenerativeAI as any)();
+    mockGenerateContent = genAI.getGenerativeModel().generateContent;
   });
 
-  it('should detect "LATE" status from English AI response', async () => {
-    const mockResponse = {
-      response: JSON.stringify({
-        attendanceStatus: 'LATE',
-        confidence: 0.95,
-        reason: 'Student arrived 15 minutes after start'
-      })
-    };
-
-    (global.fetch as any).mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        ok: true,
-        json: async () => mockResponse
-      })
-    });
+  it('should extract structured data from teacher feedback', async () => {
+    const inputText = "El alumno llegó puntual y trabajó muy bien la competencia Transversal, le pongo un 5.";
     
-    // Simplified mock for the internal fetch call in nlp.service.ts
-    global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => mockResponse
+    mockGenerateContent.mockResolvedValue({
+      response: {
+        text: () => JSON.stringify({
+          attendanceStatus: "PRESENT",
+          competenceUpdate: {
+            competenceName: "Transversal",
+            score: 5,
+            reason: "Excelente desempeño y puntualidad"
+          }
+        })
+      }
     });
 
-    const result = await service.processText('Student arrived 15 minutes late');
-    expect(result.attendanceStatus).toBe('LATE');
-  });
+    const result = await service.processText(inputText);
 
-  it('should detect "ABSENT" status from English AI response', async () => {
-    const mockResponse = {
-      response: JSON.stringify({
-        attendanceStatus: 'ABSENT',
-        confidence: 0.99,
-        reason: 'Not present in the classroom'
-      })
-    };
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => mockResponse
-    });
-
-    const result = await service.processText('The student did not show up today');
-    expect(result.attendanceStatus).toBe('ABSENT');
-  });
-
-  it('should handle competence updates correctly', async () => {
-    const mockResponse = {
-      response: JSON.stringify({
-        attendanceStatus: 'PRESENT',
-        confidence: 1.0,
-        competenceUpdate: {
-          competenceName: 'Punctuality',
-          score: 5,
-          reason: 'Submitted all tasks on time'
-        }
-      })
-    };
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => mockResponse
-    });
-
-    const result = await service.processText('Always submits work on time');
-    
-    expect(result.competenceUpdate).toBeDefined();
-    expect(result.competenceUpdate?.competenceName).toBe('Punctuality');
+    expect(result.attendanceStatus).toBe("PRESENT");
     expect(result.competenceUpdate?.score).toBe(5);
+    expect(result.competenceUpdate?.competenceName).toBe("Transversal");
+    expect(mockGenerateContent).toHaveBeenCalled();
   });
 
-  it('should return the original text as cleanedObservation', async () => {
-    const mockResponse = {
-      response: JSON.stringify({
-        attendanceStatus: 'PRESENT',
-        cleanedObservation: 'Clase normal sin incidencias.'
-      })
-    };
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => mockResponse
+  it('should handle negative feedback correctly', async () => {
+    const inputText = "No ha venido a clase.";
+    
+    mockGenerateContent.mockResolvedValue({
+      response: {
+        text: () => JSON.stringify({
+          attendanceStatus: "ABSENT",
+          competenceUpdate: null
+        })
+      }
     });
 
-    const text = 'Clase normal sin incidencias.';
-    const result = await service.processText(text);
-    expect(result.cleanedObservation).toBe(text);
+    const result = await service.processText(inputText);
+
+    expect(result.attendanceStatus).toBe("ABSENT");
+    expect(result.competenceUpdate).toBeUndefined();
+  });
+
+  it('should return empty analysis for very short text', async () => {
+    const result = await service.processText("ok");
+    expect(result.attendanceStatus).toBeUndefined();
+    expect(result.cleanedObservation).toBe("ok");
+  });
+
+  it('should handle AI errors gracefully', async () => {
+    mockGenerateContent.mockRejectedValue(new Error("AI_ERROR"));
+    
+    const result = await service.processText("Alguna observación importante.");
+    
+    expect(result.cleanedObservation).toBe("Alguna observación importante.");
+    expect(result.attendanceStatus).toBeUndefined();
   });
 });
