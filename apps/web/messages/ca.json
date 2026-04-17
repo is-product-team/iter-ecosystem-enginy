@@ -397,7 +397,9 @@
     },
     "Monitoring": {
       "title": "Monitorització Operativa",
-      "subtitle": "Estat de l'execució de tallers i assistència en el teu centre.",
+      "subtitle": "Estat de l'execució de tallers i assistència al teu centre.",
+      "description": "Seguiment de l'execució de tallers, assistència i incidències en temps real.",
+      "no_assignments": "No hi ha tallers actius en aquest moment.",
       "KPI": {
         "sessions_today": "Sessions Avui",
         "pending_attendance": "Fulls Pendents",

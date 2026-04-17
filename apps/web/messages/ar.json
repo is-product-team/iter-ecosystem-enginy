@@ -394,6 +394,8 @@
     "Monitoring": {
       "title": "المراقبة التشغيلية (المرحلة 3)",
       "subtitle": "حالة تنفيذ الورش والحضور في مركزك.",
+      "description": "مراقبة تنفيذ ورش العمل والحضور والحوادث في الوقت الفعلي.",
+      "no_assignments": "لا توجد ورش عمل نشطة في الوقت الحالي.",
       "KPI": {
         "sessions_today": "جلسات اليوم",
         "pending_attendance": "قوائم معلقة",
@@ -442,6 +444,10 @@
         "success_download": "¡Descarga iniciada correctamente!",
         "error_zip": "Error al generar el archivo ZIP."
       }
+    },
+    "Closure": {
+      "title": "الإغلاق والشهادات",
+      "description": "قم بإنهاء ورش العمل الخاصة بك وتنزيل الشهادات الرسمية لطلابك."
     }
   },
   "Calendar": {

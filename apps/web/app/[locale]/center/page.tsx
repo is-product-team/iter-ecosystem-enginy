@@ -168,7 +168,7 @@ export default function CenterDashboard() {
               title: t('Closure.title'),
               text: t('Closure.description'),
               icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
-              path: `/${locale}/center/assignments`, // Reuse assignments for closure monitoring
+              path: `/${locale}/center/monitoring?tab=completed`,
               active: isPhaseActive(PHASES.CLOSURE),
               phase: tc('phase_with_number', { number: 4 })
             },

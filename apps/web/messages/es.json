@@ -394,6 +394,8 @@
     "Monitoring": {
       "title": "Monitorización Operativa",
       "subtitle": "Estado de la ejecución de talleres y asistencia en tu centro.",
+      "description": "Seguimiento de la ejecución de talleres, asistencia e incidencias en tiempo real.",
+      "no_assignments": "No hay talleres activos en este momento.",
       "KPI": {
         "sessions_today": "Sesiones Hoy",
         "pending_attendance": "Hojas Pendientes",
@@ -442,6 +444,10 @@
         "success_download": "¡Descarga iniciada correctamente!",
         "error_zip": "Error al generar el archivo ZIP."
       }
+    },
+    "Closure": {
+      "title": "Cierre y Certificación",
+      "description": "Finaliza tus talleres y descarga los certificados oficiales para tus alumnos."
     }
   },
   "Calendar": {
@@ -679,39 +685,6 @@
           "title": "Cierre y Certificación",
           "description": "Finaliza talleres y emite certificados oficiales."
         }
-      }
-    },
-    "center": {
-      "title": "Panel del Centro",
-      "subtitle": "Gestión del proceso de talleres Iter.",
-      "timeline_title": "Estado del Programa Iter 25-26",
-      "loading_calendar": "Cargando calendario...",
-      "sections": {
-        "students": {
-          "title": "Gestión de Alumnos",
-          "description": "Añade alumnos de tu centro"
-        },
-        "teachers": {
-          "title": "Gestión de Profesores",
-          "description": "Añade profesores de tu centro"
-        },
-        "requests": {
-          "title": "Solicitar Talleres",
-          "description": "Solicita los talleres que desees con las plazas necesarias."
-        },
-        "assignments": {
-          "title": "Asignaciones",
-          "description": "Asigna alumnos a los talleres solicitados."
-        },
-        "sessions": {
-          "title": "Gestión de Sesiones",
-          "description": "Añade a tus profesores a los talleres asignados"
-        },
-        "closed_module": "Módulo cerrado",
-        "general": "General",
-        "phase1": "Fase 1",
-        "phase2": "Fase 2",
-        "phase3": "Fase 3"
       }
     },
     "student": {

@@ -13,6 +13,7 @@ interface CloseWorkshopSectionProps {
 
 export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assignment, onSuccess }) => {
   const t = useTranslations('AssignmentWorkshopsPage');
+  const tc = useTranslations('Common');
   const locale = useLocale();
   const id = assignment.assignmentId;
 
@@ -57,7 +58,7 @@ export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assi
       </div>
 
       <div className="border-t border-indigo-100 pt-6">
-        <h5 className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-4">Certification Summary</h5>
+        <h5 className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-4">{locale === 'ca' ? 'RESUM DE CERTIFICACIÓ' : 'RESUMEN DE CERTIFICACIÓN'}</h5>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {assignment.enrollments?.map((ins: any) => {
             const total = assignment.sessions?.length || 0;
@@ -70,15 +71,15 @@ export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assi
               <div key={ins.enrollmentId} className="bg-white/50 p-4 border border-indigo-100 flex items-center justify-between">
                 <div>
                   <p className="text-[12px] font-bold text-gray-900">{ins.student.fullName}</p>
-                  <p className="text-[10px] text-gray-500">{pct}% attendance</p>
+                  <p className="text-[10px] text-gray-500">{pct}% {locale === 'ca' ? 'assistència' : 'asistencia'}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   {!hasEvaluation ? (
-                    <span className="text-[8px] font-black uppercase bg-orange-100 text-orange-600 px-1.5 py-0.5 whitespace-nowrap">Need Eval</span>
+                    <span className="text-[8px] font-black uppercase bg-orange-100 text-orange-600 px-1.5 py-0.5 whitespace-nowrap">{tc('badges.need_eval')}</span>
                   ) : willGetCert ? (
-                    <span className="text-[8px] font-black uppercase bg-green-100 text-green-600 px-1.5 py-0.5 whitespace-nowrap">Will Certify</span>
+                    <span className="text-[8px] font-black uppercase bg-green-100 text-green-600 px-1.5 py-0.5 whitespace-nowrap">{tc('badges.will_certify')}</span>
                   ) : (
-                    <span className="text-[8px] font-black uppercase bg-gray-100 text-gray-500 px-1.5 py-0.5 whitespace-nowrap">No Cert</span>
+                    <span className="text-[8px] font-black uppercase bg-gray-100 text-gray-500 px-1.5 py-0.5 whitespace-nowrap">{tc('badges.no_cert')}</span>
                   )}
                 </div>
               </div>

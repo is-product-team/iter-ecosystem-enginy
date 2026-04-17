@@ -394,6 +394,8 @@
     "Monitoring": {
       "title": "Operational Monitoring (Phase 3)",
       "subtitle": "Status of workshop execution and attendance at your center.",
+      "description": "Monitoring of workshop execution, attendance and incidents in real time.",
+      "no_assignments": "There are no active workshops at this time.",
       "KPI": {
         "sessions_today": "Sessions Today",
         "pending_attendance": "Pending Sheets",
@@ -442,6 +444,10 @@
         "success_download": "Download started successfully!",
         "error_zip": "Error generating ZIP file."
       }
+    },
+    "Closure": {
+      "title": "Closure and Certification",
+      "description": "Finalize your workshops and download the official certificates for your students."
     }
   },
   "Calendar": {
