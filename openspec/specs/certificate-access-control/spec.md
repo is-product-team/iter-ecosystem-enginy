@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Secure Certificate Retrieval
 The system SHALL ensure that students can only retrieve their own certificates and that administrators can view all certificates.
@@ -11,24 +11,22 @@ The system SHALL ensure that students can only retrieve their own certificates a
 - **WHEN** a user with the ADMIN role calls `GET /api/certificates/my-certificates?studentId=10`
 - **THEN** the system SHALL return the certificates for student 10.
 
-### Requirement: Single Certificate PDF Download
-The API SHALL provide an endpoint to download a specific certificate as a PDF file, restricted to the certificate owner or an administrator.
-
-#### Scenario: Authorized PDF download
-- **WHEN** a student (ID: 10) calls `GET /api/certificates/download/:assignmentId` for their own certificate
-- **THEN** the system SHALL return the PDF buffer with a `Content-Type: application/pdf` header.
-
-#### Scenario: Unauthorized PDF download
-- **WHEN** a student (ID: 10) calls `GET /api/certificates/download/:assignmentId` for another student's certificate
-- **THEN** the system SHALL return a 403 Forbidden error.
-
 ### Requirement: Survey Mandatory for Certificate Access
-The system SHALL prevent students from downloading their certificates until they have completed the associated workshop satisfaction survey.
+The system SHALL prevent students from downloading their certificates until they have completed the associated workshop satisfaction survey, specifically validating the survey of the authenticated student.
 
-#### Scenario: Download blocked by missing survey
-- **WHEN** a student with a pending survey attempts to download their certificate
+#### Scenario: Download blocked by missing individual survey
+- **WHEN** Student A attempts to download their certificate but has not submitted their survey (even if Student B in the same workshop has)
 - **THEN** the system SHALL return a 403 Forbidden error with a "SURVEY_REQUIRED" message.
 
-#### Scenario: Download allowed after survey completion
-- **WHEN** a student who has submitted their survey attempts to download their certificate
+#### Scenario: Download allowed after individual survey completion
+- **WHEN** a student who has submitted their own survey attempts to download their certificate
 - **THEN** the system SHALL allow the PDF download.
+
+## ADDED Requirements
+
+### Requirement: Inclusive Attendance Calculation
+The system SHALL treat `JUSTIFIED_ABSENCE` as attended time when calculating the 80% attendance threshold for certificate issuance.
+
+#### Scenario: Student with justified absences qualifies
+- **WHEN** a student has 70% 'PRESENT' status and 15% 'JUSTIFIED_ABSENCE' status (Total 85%)
+- **THEN** the system SHALL issue a certificate for that student upon closure.
