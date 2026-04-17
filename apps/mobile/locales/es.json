@@ -23,8 +23,9 @@
     "practice_group": "Grupo de prácticas",
     "session_objectives": "Objetivos de la Sesión",
     "address": "Dirección del Centro",
-    "workshop_evaluated": "Taller Evaluado",
-    "evaluate_workshop": "Evaluar Taller",
+    "evaluated": "Valorado",
+    "workshop_evaluated": "Taller Valorado",
+    "evaluate_workshop": "Valorar Taller",
     "status": "Estado",
     "today": "Hoy",
     "tomorrow": "Mañana",
@@ -115,13 +116,15 @@
     "no_upcoming_sessions": "Sin sesiones próximas",
     "session_today": "Tienes una sesión hoy",
     "next_session_on": "Próxima sesión el {{label}}",
+    "next_session_label": "Próximo taller",
+    "current_session_label": "Ahora mismo",
+    "past_session_label": "Realizada",
     "recent_workshops": "Talleres recientes",
     "none_new": "Ninguno nuevo",
     "phase_status": "Estado de la fase",
     "pending_count_one": "{{count}} pendiente",
     "pending_count_other": "{{count}} pendientes",
-    "no_upcoming_workshops": "No tienes talleres próximos",
-    "next_session_label": "Próxima Sesión"
+    "no_upcoming_workshops": "No tienes talleres próximos"
   },
   "Evaluation": {
     "title": "Evaluación Competencial",
@@ -146,7 +149,7 @@
     "thanks_title": "Gracias",
     "thanks_message": "Tu valoración se ha enviado correctamente.",
     "model_not_found": "No se ha encontrado el modelo de cuestionario.",
-    "load_error": "No se ha podido cargar el cuestionario.",
+    "load_error": "No se han podido cargar el cuestionario.",
     "submit_error": "No se ha podido enviar el cuestionario."
   },
   "Notifications": {
@@ -209,10 +212,10 @@
     "secondary_referent": "Segundo Referente",
     "no_referents_assigned": "No hay referentes asignados a este taller todavía.",
     "no_contacts_yet": "Todavía no tienes contactos de coordinación.",
-    "group_chat_instruction": "Pronto podrás chatear directamente con el equipo de coordinación del centro."
+    "group_chat_instruction": "Pronto podrás chatear directamente con el equipo de coordinación del centro.",
+    "contact": "Contacto"
   },
-    "contact": "Contacto",
-    "Support": {
+  "Support": {
     "title": "Soporte",
     "chat_admin": "Chat con Administración",
     "direct_contact": "Contacto directo"
@@ -221,20 +224,5 @@
     "title": "Recursos",
     "materials": "Materiales y Guías",
     "view_all": "Ver todo"
-  },
-
-  "Session": {
-    "title_attendance": "Sesión - Asistencia",
-    "title_work": "Sesión - Seguimiento",
-    "attendance_header": "Registro de Sesión",
-    "attendance_instruction": "Marca la asistencia de cada alumno antes de empezar el seguimiento técnico.",
-    "work_header": "Seguimiento de Sesión",
-    "work_instruction": "Evalúa el progreso de las competencias durante el taller.",
-    "observations_label": "Observaciones de la sesión",
-    "observations_placeholder": "Añade cualquier incidencia o comentario relevante...",
-    "finish_and_send": "Finalizar y Enviar Lista",
-    "attendance_sent_success": "Lista de asistencia enviada correctamente",
-    "manage_session": "Gestionar Sesión",
-    "error_loading_students": "No se ha podido cargar la lista de alumnos"
   }
 }

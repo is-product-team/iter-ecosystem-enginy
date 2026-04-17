@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME } from '@iter/shared';
 import AttendanceSegmentedControl from './AttendanceSegmentedControl';
@@ -8,8 +8,6 @@ interface StudentSessionCardProps {
   student: any;
   status: string;
   onStatusChange: (status: string) => void;
-  onEvaluate: () => void;
-  evaluated: boolean;
   mode: 'ATTENDANCE' | 'WORK';
   disabled?: boolean;
 }
@@ -18,8 +16,6 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
   student,
   status,
   onStatusChange,
-  onEvaluate,
-  evaluated,
   mode,
   disabled
 }) => {
@@ -103,16 +99,6 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
           </Text>
         </View>
       </View>
-
-        {evaluated ? (
-            <View style={{ backgroundColor: '#E5F9EF', padding: 6, borderRadius: 12 }}>
-                <Ionicons name="checkmark-circle" size={18} color="#34C759" />
-            </View>
-        ) : (
-            <Pressable onPress={onEvaluate} style={{ padding: 6 }}>
-                <Ionicons name="ribbon-outline" size={20} color="#007AFF" />
-            </Pressable>
-        )}
 
       <AttendanceSegmentedControl 
         currentStatus={status || 'PRESENT'} 

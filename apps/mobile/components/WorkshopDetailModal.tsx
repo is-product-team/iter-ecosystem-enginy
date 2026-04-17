@@ -1,10 +1,12 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Modal, Pressable, Animated, Dimensions, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import { CalendarEvent } from './EventDetailModal';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface WorkshopDetailModalProps {
   visible: boolean;
@@ -15,146 +17,228 @@ interface WorkshopDetailModalProps {
 const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onClose, event }) => {
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  
+  // Animaciones
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 400,
+          easing: Easing.out(Easing.back(0.5)),
+          useNativeDriver: true,
+        })
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(fadeAnim, { toValue: 0, duration: 250, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: SCREEN_HEIGHT, duration: 300, useNativeDriver: true })
+      ]).start();
+    }
+  }, [visible]);
 
   if (!event) return null;
 
+  const metadata = event.metadata || {};
+  const isEvaluated = metadata.isEvaluated;
+  const isPast = metadata.isPast;
+  const isCurrent = metadata.isCurrent;
+  const isToday = metadata.isToday;
+  
+  // Logic from requirements:
+  // 1. "Pasar lista" (Manage): Enabled ONLY IF isCurrent. Disabled if isPast or future.
+  // 2. "Evaluar Taller": Enabled ONLY IF isPast. Disabled if isCurrent or future/today.
+  // 3. Status "Evaluated" (Green) only if isPast.
+  const canManage = isCurrent;
+  const canEvaluate = isPast;
+  const showEvaluated = isEvaluated && isPast;
+
+  const handleClose = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: SCREEN_HEIGHT, duration: 250, useNativeDriver: true })
+    ]).start(() => onClose());
+  };
+
   return (
     <Modal
-      animationType="slide"
-      presentationStyle="pageSheet" 
+      transparent={true}
       visible={visible}
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
+      animationType="none"
     >
-      <View className="flex-1 bg-background-page">
-          
-          {/* Header */}
-          <View className="pt-6 pb-2 px-6 bg-background-surface border-b border-border-subtle">
-             <View className="flex-row justify-between items-center mb-4">
-                 <View className="bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-                    <Text className="text-primary text-xs font-bold uppercase tracking-widest">
+      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <Animated.View 
+          style={{ 
+            ...View.prototype.style,
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            opacity: fadeAnim 
+          }} 
+        >
+          <Pressable style={{ flex: 1 }} onPress={handleClose} />
+        </Animated.View>
+        
+        <Animated.View 
+          style={{ 
+            maxHeight: SCREEN_HEIGHT * 0.90, 
+            backgroundColor: '#FFFFFF',
+            borderTopLeftRadius: 40,
+            borderTopRightRadius: 40,
+            overflow: 'hidden',
+            transform: [{ translateY: slideAnim }]
+          }}
+          className="dark:bg-black"
+        >
+          <View className="items-center pt-4 pb-1">
+             <View className="w-10 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full" />
+          </View>
+
+          {/* ── Header ── */}
+          <View className="pt-2 pb-6 px-8 flex-row justify-between items-start">
+             <View className="flex-1 mr-4">
+                 <View className="mb-2">
+                    <Text className="text-[12px] font-medium text-gray-400 uppercase tracking-[2px]">
                        {event.type === 'assignment' ? t('Common.practical_workshop') : t('Common.session')}
                     </Text>
                  </View>
-                 <TouchableOpacity 
-                   onPress={onClose} 
-                   className="w-10 h-10 bg-background-subtle rounded-full items-center justify-center"
-                 >
-                    <Ionicons name="close" size={24} color={THEME.colors.primary} />
-                 </TouchableOpacity>
-             </View>
-
-             <View className="mb-4">
-                 <Text className="text-text-primary text-3xl font-extrabold leading-tight mb-2 tracking-tight">
+                 <Text className="text-[38px] font-light text-black dark:text-white tracking-tighter leading-[42px]">
                     {event.title}
                  </Text>
-                 <Text className="text-text-secondary text-lg font-medium">
-                    {new Date(event.date).toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                 </Text>
              </View>
+             <TouchableOpacity 
+               onPress={handleClose} 
+               activeOpacity={0.7}
+               className="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-full items-center justify-center mt-2"
+             >
+                <Ionicons name="close" size={20} color={THEME.colors.gray} />
+             </TouchableOpacity>
           </View>
 
-          <ScrollView className="px-6 py-6 flex-1" showsVerticalScrollIndicator={false}>
-             
-             {/* STATS GRID */}
-             <View className="flex-row flex-wrap justify-between mb-6">
-                 {/* Stat 1: Time */}
-                 <View className="w-[48%] bg-background-surface p-4 rounded-xl shadow-sm border border-border-subtle mb-4">
-                    <View className="w-10 h-10 bg-orange-50 dark:bg-orange-900/20 rounded-lg items-center justify-center mb-3">
-                        <Ionicons name="time" size={20} color="#F97316" />
+          <ScrollView 
+            style={{ flexShrink: 1 }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 0, paddingBottom: 160 }}
+          >
+             {/* Key Info Grid */}
+             <View className="flex-row justify-between mb-6">
+                 <View className="w-[48%] bg-gray-50 dark:bg-gray-900 p-5 rounded-[28px] border border-gray-100 dark:border-gray-800">
+                    <View className="flex-row items-center mb-3">
+                        <Ionicons name="time-outline" size={14} color="#F97316" />
+                        <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest ml-2">{t('Common.time')}</Text>
                     </View>
-                    <Text className="text-text-muted text-xs font-bold uppercase tracking-wider mb-1">{t('Common.time')}</Text>
-                    <Text className="text-text-primary font-bold text-lg">
-                        {event.metadata?.time || t('Common.all_day')}
+                    <Text className="text-black dark:text-white font-light text-[22px] tracking-tighter">
+                        {metadata.time || t('Common.all_day')}
                     </Text>
                  </View>
 
-                 {/* Stat 2: Location */}
-                 <View className="w-[48%] bg-background-surface p-4 rounded-xl shadow-sm border border-border-subtle mb-4">
-                    <View className="w-10 h-10 bg-primary/10 rounded-lg items-center justify-center mb-3">
-                        <Ionicons name="location" size={20} color={THEME.colors.primary} />
+                 <View className="w-[48%] bg-gray-50 dark:bg-gray-900 p-5 rounded-[28px] border border-gray-100 dark:border-gray-800">
+                    <View className="flex-row items-center mb-3">
+                        <Ionicons name="location-outline" size={14} color={THEME.colors.primary} />
+                        <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest ml-2">{t('Common.room')}</Text>
                     </View>
-                    <Text className="text-text-muted text-xs font-bold uppercase tracking-wider mb-1">{t('Common.room')}</Text>
-                    <Text className="text-text-primary font-bold text-lg" numberOfLines={1}>
-                        {event.metadata?.center || t('Common.not_available')}
-                    </Text>
-                 </View>
-                 
-                 {/* Stat 3: Group/Class */}
-                 <View className="w-full bg-background-surface p-4 rounded-xl shadow-sm border border-border-subtle">
-                    <View className="flex-row items-center mb-2">
-                        <Ionicons name="people" size={18} color={THEME.colors.secondary} className="mr-2" />
-                        <Text className="text-text-muted text-xs font-bold uppercase tracking-wider">{t('Common.assigned_group')}</Text>
-                    </View>
-                    <Text className="text-text-primary font-medium text-base">
-                        {t('Common.practice_group')}
+                    <Text className="text-black dark:text-white font-light text-[22px] tracking-tighter" numberOfLines={1}>
+                        {metadata.center || t('Common.not_available')}
                     </Text>
                  </View>
              </View>
 
-             {/* DESCRIPTION CARD */}
+             <View className="bg-gray-50 dark:bg-gray-900 px-6 py-5 rounded-[28px] border border-gray-100 dark:border-gray-800 flex-row items-center mb-6">
+                <View className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl items-center justify-center shadow-sm mr-4">
+                    <Ionicons name="people-outline" size={20} color={THEME.colors.secondary} />
+                </View>
+                <View className="flex-1">
+                    <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest mb-0.5">{t('Common.assigned_group')}</Text>
+                    <Text className="text-black dark:text-white font-light text-[20px] tracking-tighter">{t('Common.practice_group')}</Text>
+                </View>
+             </View>
+
+             <View className="bg-gray-50 dark:bg-gray-900 px-6 py-5 rounded-[28px] border border-gray-100 dark:border-gray-800 flex-row items-center mb-6">
+                <View className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl items-center justify-center shadow-sm mr-4">
+                    <Ionicons name="calendar-outline" size={20} color="#14B8A6" />
+                </View>
+                <View className="flex-1">
+                    <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest mb-0.5">{t('Calendar.title')}</Text>
+                    <Text className="text-black dark:text-white font-light text-[20px] tracking-tighter">
+                        {new Date(event.date).toLocaleDateString(i18n.language || 'ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </Text>
+                </View>
+             </View>
+
              {event.description && (
-                 <View className="bg-background-surface p-6 rounded-2xl shadow-sm border border-border-subtle mb-6">
-                     <Text className="text-text-primary font-bold text-lg mb-3">{t('Common.session_objectives')}</Text>
-                     <Text className="text-text-secondary text-base leading-7">
+                 <View className="bg-gray-50 dark:bg-gray-900 p-6 rounded-[32px] border border-gray-100 dark:border-gray-800 mb-6">
+                     <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest mb-3">
+                        {t('Common.session_objectives')}
+                     </Text>
+                     <Text className="text-[17px] text-gray-700 dark:text-gray-300 leading-[24px] font-light tracking-tight">
                         {event.description}
                      </Text>
                  </View>
              )}
-             
-             {/* ADDRESS CARD */}
-             {event.metadata?.address && (
-                 <View className="bg-background-surface p-6 rounded-2xl shadow-sm border border-border-subtle mb-24">
-                     <Text className="text-text-primary font-bold text-lg mb-3">{t('Common.address')}</Text>
-                     <View className="flex-row items-center">
-                         <Ionicons name="map" size={20} color={THEME.colors.gray} className="mr-3" />
-                         <Text className="text-text-secondary text-base flex-1">
-                            {event.metadata.address}
-                         </Text>
-                     </View>
-                 </View>
-             )}
-
           </ScrollView>
 
-           {/* FIXED BOTTOM ACTION */}
-           {event.type === 'assignment' && event.metadata?.assignmentId && (
-               <View className="absolute bottom-0 left-0 right-0 p-6 bg-background-surface border-t border-border-subtle">
-                     <TouchableOpacity 
-                        onPress={() => {
-                          if (event.metadata.isEvaluated) return; 
-                          onClose();
-                          if (event.metadata.isEvaluation) {
-                              router.push(`/(professor)/questionnaire/${event.metadata.assignmentId}`);
-                          } else {
+           {/* ── Action Bar ── */}
+           {event.type === 'assignment' && metadata.assignmentId && (
+               <View className="absolute bottom-0 left-0 right-0 px-6 pt-4 pb-12 bg-white/95 dark:bg-black/95 border-t border-gray-100 dark:border-gray-800">
+                    <View className="flex-row gap-3">
+                         {/* Button: Pasar lista (previously Manage Session) */}
+                         <TouchableOpacity 
+                            onPress={() => {
+                              onClose();
                               router.push({
-                                pathname: `/(professor)/session/${event.metadata.assignmentId}`,
+                                pathname: `/(professor)/session/${metadata.assignmentId}`,
                                 params: { 
-                                  sessionNum: event.metadata.sessionNum,
-                                  sessionId: event.metadata.sessionId 
+                                  sessionNum: metadata.sessionNum || 1,
+                                  sessionId: metadata.sessionId 
                                 }
                               } as any);
-                          }
-                        }}
-                        className={`w-full h-14 rounded-2xl items-center justify-center shadow-lg shadow-slate-200 ${
-                            event.metadata.isEvaluation 
-                                ? (event.metadata.isEvaluated ? 'bg-green-600' : 'bg-orange-500') 
-                                : 'bg-[#4197CB]'
-                        }`}
-                        disabled={event.metadata.isEvaluated}
-                     >
-                         {event.metadata.isEvaluated ? (
-                             <View className="flex-row items-center">
-                                 <Ionicons name="checkmark-circle" size={24} color="white" style={{ marginRight: 8 }} />
-                                 <Text className="text-white text-lg font-bold tracking-wide uppercase">{t('Common.workshop_evaluated')}</Text>
-                             </View>
-                         ) : (
-                             <Text className="text-white text-lg font-bold tracking-wide uppercase">
-                                 {event.metadata.isEvaluation ? t('Common.evaluate_workshop') : t('Session.manage_session')}
-                             </Text>
-                         )}
-                     </TouchableOpacity>
+                            }}
+                            activeOpacity={0.8}
+                            disabled={!canManage}
+                            style={{ opacity: canManage ? 1 : 0.4 }}
+                            className="flex-[1.5] h-14 rounded-[22px] bg-primary items-center justify-center shadow-sm"
+                         >
+                            <Text className="text-white text-[16px] font-bold uppercase tracking-wide">
+                                {isPast ? "Pasar lista (Finalizado)" : "Pasar lista"}
+                            </Text>
+                         </TouchableOpacity>
+
+                         {/* Button: Evaluar Taller */}
+                         <TouchableOpacity 
+                            onPress={() => {
+                              if (showEvaluated) return;
+                              onClose();
+                              router.push(`/(professor)/questionnaire/${metadata.assignmentId}`);
+                            }}
+                            activeOpacity={0.7}
+                            disabled={!canEvaluate || showEvaluated}
+                            style={{ opacity: (canEvaluate && !showEvaluated) ? 1 : 0.4 }}
+                            className={`flex-1 h-14 rounded-[22px] items-center justify-center border ${
+                                showEvaluated 
+                                ? 'bg-green-500 border-green-500' 
+                                : 'bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/20'
+                            }`}
+                         >
+                            {showEvaluated ? (
+                                <View className="flex-row items-center">
+                                    <Ionicons name="checkmark-circle" size={18} color="white" style={{ marginRight: 6 }} />
+                                    <Text className="text-white text-[14px] font-bold uppercase">{t('Common.workshop_evaluated')}</Text>
+                                </View>
+                            ) : (
+                                <Text className={`text-[14px] font-bold uppercase ${canEvaluate ? 'text-red-600 dark:text-red-400' : 'text-gray-400'}`}>
+                                   {t('Common.evaluate_workshop')}
+                                </Text>
+                            )}
+                         </TouchableOpacity>
+                    </View>
                </View>
            )}
+        </Animated.View>
       </View>
     </Modal>
   );

@@ -1,4 +1,4 @@
-import { PrismaClient, Modality } from '@prisma/client';
+import { PrismaClient, Modality, QuestionnaireTarget, ResponseType } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { PHASES, ROLES } from '@iter/shared';
 import dotenv from 'dotenv';
@@ -298,6 +298,32 @@ async function seedPhases() {
   }
 }
 
+async function seedQuestionnaires() {
+  console.log('📝  Configurando modelos de cuestionarios...');
+  const teacherModel = await prisma.questionnaireModel.upsert({
+    where: { 
+      modelId: 1 // We can force id 1 for the first model if we want, or use name/target as unique but it is not unique in schema
+    },
+    update: {},
+    create: {
+      modelId: 1,
+      name: 'Workshop Evaluation (Teacher)',
+      target: QuestionnaireTarget.TEACHER,
+      questions: {
+        create: [
+          { text: 'Comportamiento alumnos', type: ResponseType.RATING },
+          { text: 'Calidad material', type: ResponseType.RATING },
+          { text: 'Grau d\'atencio alumnat al taller', type: ResponseType.RATING },
+          { text: 'Assoliment objectius', type: ResponseType.RATING },
+          { text: 'Recomanació general', type: ResponseType.RATING },
+          { text: 'Comentaris i observacions', type: ResponseType.TEXT }
+        ]
+      }
+    }
+  });
+  console.log(`✅ Modelo de evaluación para profesores creado (ID: ${teacherModel.modelId})`);
+}
+
 async function main() {
   console.log('🌱  Iniciando proceso de seeding...');
 
@@ -309,6 +335,7 @@ async function main() {
   await seedUsers(infra.roles, passDefault);
   await seedWorkshops(infra.sectors);
   await seedPhases();
+  await seedQuestionnaires();
 
   // Operative data for testing (CLEAN START)
   console.log('🧪  Preparando datos de prueba (Alumnos)...');

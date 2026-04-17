@@ -723,7 +723,8 @@
     }
   },
   "Forms": {
-    "edit_title": "Editar",
+    "edit_title": "تعديل",
+    "create_title": "ورشة عمل جديدة",
     "search": "بحث...",
     "search_by_title": "البحث بالعنوان",
     "filter_by_sector": "تصفية حسب القطاع",

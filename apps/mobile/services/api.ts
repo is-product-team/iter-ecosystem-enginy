@@ -186,7 +186,17 @@ api.interceptors.response.use(
   },
   async (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access if needed
+      console.warn('🔑 [API] 401 Unauthorized - Redirecting to login');
+      // Clear storage
+      if (Platform.OS === 'web') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } else {
+        await SecureStore.deleteItemAsync('token');
+        await SecureStore.deleteItemAsync('user');
+      }
+      // Redirect to login
+      router.replace('/login');
     }
     
     return Promise.reject(error);

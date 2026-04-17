@@ -220,6 +220,17 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
             evaluations: true,
             attendance: true
           }
+        },
+        questionnaires: {
+          where: {
+            target: 'TEACHER',
+            isCompleted: true
+          },
+          select: {
+            questionnaireId: true,
+            isCompleted: true,
+            target: true
+          }
         }
       }
     });
@@ -230,7 +241,11 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
       teacher2: assig.request?.teacher2,
       startDate: assig.startDate || assig.sessions[0]?.sessionDate || null,
       endDate: assig.endDate || assig.sessions[assig.sessions.length - 1]?.sessionDate || null,
-      enrollments: assig.enrollments.map(flattenEnrollmentDocs)
+      enrollments: assig.enrollments.map(flattenEnrollmentDocs),
+      submissions: assig.questionnaires.map(q => ({
+        ...q,
+        status: q.isCompleted ? 'RESPONDED' : 'PENDING'
+      }))
     }));
 
     res.json(transformed);
@@ -1123,10 +1138,7 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    // 2. Ensure attendance records are initialized
-    await SessionService.ensureAttendanceRecords(assignmentId, targetSession.sessionId, num, targetSession.sessionDate);
-
-    // 3. Get combined attendance list
+    // 2. Get combined attendance list
     const rawAttendance = await prisma.attendance.findMany({
       where: {
         sessionId: targetSession.sessionId

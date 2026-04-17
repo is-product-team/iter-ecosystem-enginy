@@ -67,7 +67,7 @@ export default function SupportChatScreen() {
                 <Ionicons name="chatbubble-ellipses-outline" size={40} color="#CBD5E1" />
              </View>
              <Text className="text-slate-400 font-medium text-center px-10">
-                Encara no hi ha cap conversa activa amb l'administració.
+                Encara no hi ha cap conversa activa amb l&apos;administració.
              </Text>
           </View>
         </ScrollView>

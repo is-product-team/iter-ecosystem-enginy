@@ -116,7 +116,7 @@ export default function SessionScreen() {
         setSessionMode('WORK');
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 4000);
-    } catch (error) {
+    } catch (error: any) {
         console.error("❌ [SessionScreen] Error submitting attendance:", error.response?.data || error.message);
         Alert.alert(t('Common.error'), t('Session.submit_attendance_error'));
     } finally {
@@ -138,7 +138,7 @@ export default function SessionScreen() {
       <Stack.Screen 
         options={{ 
           headerShown: true,
-          title: '',
+          headerTitle: '',
           headerBackTitle: t('Common.back'),
           headerShadowVisible: false,
           headerTransparent: true,
@@ -203,8 +203,6 @@ export default function SessionScreen() {
                         student={item}
                         status={attendance[key]}
                         onStatusChange={(status) => updateStatus(key, status)}
-                        onEvaluate={() => router.push(`/(professor)/evaluation/${item.enrollmentId}?assignmentId=${id}`)}
-                        evaluated={item.evaluated}
                         mode={sessionMode}
                         disabled={isSubmitted && sessionMode === 'WORK'}
                     />

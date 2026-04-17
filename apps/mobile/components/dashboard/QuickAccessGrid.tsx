@@ -17,59 +17,66 @@ interface QuickAccessGridProps {
   items: QuickAccessItem[];
 }
 
-function GridCard({ item }: { item: QuickAccessItem }) {
+function GridCard({ item, fullWidth = false }: { item: QuickAccessItem, fullWidth?: boolean }) {
   return (
     <TouchableOpacity
       onPress={item.onPress}
       activeOpacity={0.75}
-      className="flex-1 bg-background-surface rounded-[24px] p-4 h-[110px] justify-between shadow-sm"
+      style={{ height: fullWidth ? 100 : 110 }}
+      className={`bg-background-surface rounded-[24px] p-4 justify-between shadow-sm ${fullWidth ? 'w-full' : 'flex-1'}`}
     >
-      {/* Icon + badge */}
       <View className="flex-row items-start justify-between">
         <View
-          className="w-10 h-10 rounded-[12px] items-center justify-center"
+          className="w-10 h-10 rounded-[14px] items-center justify-center"
           style={{ backgroundColor: item.iconBg }}
         >
           <Ionicons name={item.icon} size={20} color={item.iconColor} />
         </View>
         {item.badge !== undefined && item.badge > 0 && (
-          <View className="bg-[#FF3B30] rounded-full min-w-[20px] h-[20px] items-center justify-center px-1">
-            <Text className="text-white text-[11px] font-black">{item.badge > 99 ? '99+' : item.badge}</Text>
+          <View className="bg-[#FF3B30] rounded-full min-w-[22px] h-[22px] items-center justify-center px-1.5">
+            <Text className="text-white text-[12px] font-black">{item.badge > 99 ? '99+' : item.badge}</Text>
           </View>
         )}
       </View>
 
-      {/* Label and value */}
-      <View className="mt-3">
+      <View className={fullWidth ? 'mt-0' : 'mt-3'}>
         {item.value && (
-          <Text className="text-text-primary text-[14px] font-semibold leading-tight mb-0.5" numberOfLines={1}>
+          <Text className="text-text-primary text-[15px] font-bold leading-tight mb-0.5" numberOfLines={1}>
             {item.value}
           </Text>
         )}
-        <Text className="text-text-muted text-[12px] font-medium">{item.label}</Text>
+        <Text className="text-text-muted text-[12px] font-semibold uppercase tracking-wider opacity-60">{item.label}</Text>
       </View>
     </TouchableOpacity>
   );
 }
 
 export function QuickAccessGrid({ items }: QuickAccessGridProps) {
-  // Render in rows of 2
+  if (items.length === 0) return null;
+
+  // The first item (Notifications) should be full width
+  const firstItem = items[0];
+  // The rest (Coordination, Support) should be in rows of 2
+  const restItems = items.slice(1);
   const rows: QuickAccessItem[][] = [];
-  for (let i = 0; i < items.length; i += 2) {
-    rows.push(items.slice(i, i + 2));
+  for (let i = 0; i < restItems.length; i += 2) {
+    rows.push(restItems.slice(i, i + 2));
   }
 
   return (
-    <View className="mx-4 mb-6">
+    <View className="mx-6 mb-10">
+      {/* First item - Full Width */}
+      <GridCard item={firstItem} fullWidth={true} />
+
+      {/* Subsequent items - Rows of 2 */}
       {rows.map((row, rowIdx) => (
         <View
           key={rowIdx}
-          className={`flex-row gap-4 ${rowIdx > 0 ? 'mt-4' : ''}`}
+          className="flex-row gap-4 mt-4"
         >
           {row.map((item) => (
             <GridCard key={item.id} item={item} />
           ))}
-          {/* Fill gap if odd number of items */}
           {row.length === 1 && <View className="flex-1" />}
         </View>
       ))}

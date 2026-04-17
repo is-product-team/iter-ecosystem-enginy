@@ -23,7 +23,7 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
   const progress = totalSessions > 0 ? Math.round((sessionsCompleted / totalSessions) * 100) : 0;
 
   // Calculate Weighted Status
-  let stats = { present: 0, absent: 0, late: 0, total: 0 };
+  const stats = { present: 0, absent: 0, late: 0, total: 0 };
   let weightedScore = 0;
   const enrollments = assignment.enrollments || [];
   
