@@ -45,8 +45,7 @@ export const getMyCertificates = async (req: Request, res: Response) => {
                 where.studentId = parseInt(queryStudentId as string);
             }
         } else {
-            // Other roles (Coordinators/Teachers) - for now they see nothing or we could scope by center
-            // Let's restrict to Admin/Student for now as per spec
+            // Other roles (Coordinators/Teachers)
             if (role !== ROLES.ADMIN) {
                 return res.status(403).json({ error: 'Access denied' });
             }
@@ -59,6 +58,8 @@ export const getMyCertificates = async (req: Request, res: Response) => {
                     include: { 
                         workshop: true,
                         enrollments: {
+                            // Load enrollments for survey check. 
+                            // If student, only load theirs. If Admin, load all for the assignment.
                             where: role === ROLES.STUDENT ? { studentId: userStudentId } : undefined,
                             include: { selfConsultation: true }
                         }
@@ -68,9 +69,10 @@ export const getMyCertificates = async (req: Request, res: Response) => {
             }
         });
 
-        // Add survey status for the frontend
+        // Add survey status for the frontend (Task 1.1 Fix)
         const result = certificates.map(cert => {
-            const enrollment = cert.assignment.enrollments[0];
+            // Ensure we check the survey of the specific student of this certificate
+            const enrollment = cert.assignment.enrollments.find(e => e.studentId === cert.studentId);
             return {
                 ...cert,
                 surveyCompleted: !!enrollment?.selfConsultation
@@ -87,22 +89,35 @@ export const getMyCertificates = async (req: Request, res: Response) => {
 // GET: Download a single certificate (Student/Admin)
 export const downloadCertificate = async (req: Request, res: Response) => {
     const { assignmentId } = req.params;
-    const { role, studentId } = req.user!;
+    const { studentId: queryStudentId } = req.query;
+    const { role, studentId: userStudentId } = req.user!;
     const aid = parseInt(assignmentId as string);
 
     try {
+        // Determine whose certificate we are looking for (Task 1.2 Fix)
+        let targetStudentId: number | undefined;
+        if (role === ROLES.STUDENT) {
+            targetStudentId = userStudentId || undefined;
+        } else if (queryStudentId) {
+            targetStudentId = parseInt(queryStudentId as string);
+        }
+
+        if (!targetStudentId) {
+            return res.status(400).json({ error: 'Missing student ID' });
+        }
+
         // 1. Verify certificate exists
         const certificate = await prisma.certificate.findFirst({
             where: {
                 assignmentId: aid,
-                studentId: role === ROLES.STUDENT ? studentId : undefined
+                studentId: targetStudentId
             },
             include: {
                 student: true,
                 assignment: {
                     include: {
                         enrollments: {
-                            where: role === ROLES.STUDENT ? { studentId } : undefined,
+                            where: { studentId: targetStudentId },
                             include: { selfConsultation: true }
                         }
                     }

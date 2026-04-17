@@ -110,6 +110,7 @@ export class CertificateService {
   /**
    * Issues database records for students who meet the attendance criteria.
    * Typically called when an assignment is closed.
+   * Returns a list of student IDs who were issued certificates. (Task 3.1)
    */
   async issueCertificatesForAssignment(assignmentId: number) {
     const assignment = await prisma.assignment.findUnique({
@@ -128,21 +129,23 @@ export class CertificateService {
 
     const totalSessions = assignment.sessions.length;
     
-    // Task 2.3: If no sessions, we can't calculate 80% correctly.
-    // In this domain, a workshop MUST have sessions to be valid for certification.
+    // If no sessions, we can't calculate 80% correctly.
     if (totalSessions === 0) {
         return {
             issued: 0,
+            issuedStudentIds: [],
             totalStudents: assignment.enrollments.length,
             error: 'Cannot issue certificates: No sessions found for this assignment.'
         };
     }
 
     let issued = 0;
+    const issuedStudentIds: number[] = [];
 
     for (const enrollment of assignment.enrollments) {
+        // Task 2.1: Include JUSTIFIED_ABSENCE
         const attendedCount = enrollment.attendance.filter((a: any) =>
-            a.status === 'PRESENT' || a.status === 'LATE'
+            a.status === 'PRESENT' || a.status === 'LATE' || a.status === 'JUSTIFIED_ABSENCE'
         ).length;
 
         const percentage = (attendedCount / totalSessions) * 100;
@@ -164,11 +167,13 @@ export class CertificateService {
                 }
             });
             issued++;
+            issuedStudentIds.push(enrollment.studentId);
         }
     }
 
     return {
         issued,
+        issuedStudentIds,
         totalStudents: assignment.enrollments.length
     };
   }

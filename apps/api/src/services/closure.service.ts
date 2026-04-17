@@ -48,12 +48,15 @@ export class ClosureService {
     // 4. Issue certificates
     const certResults = await certificateService.issueCertificatesForAssignment(assignmentId);
 
-    // 5. Dispatch Notifications to Students (Task 2.2)
+    // 5. Dispatch Notifications ONLY to Students who qualified (Task 3.2)
     if (certResults.issued > 0) {
-      console.log(`[ClosureService] 📢 Notifying ${assignment.enrollments.length} students about workshop closure.`);
+      console.log(`[ClosureService] 📢 Notifying ${certResults.issued} students who earned a certificate.`);
       
+      const qualifiedStudentIds = certResults.issuedStudentIds || [];
+
       for (const enrollment of assignment.enrollments) {
-        if (enrollment.student.userId) {
+        // Only notify if student is in the qualified list
+        if (enrollment.student.userId && qualifiedStudentIds.includes(enrollment.studentId)) {
             await NotificationService.notify({
               userId: enrollment.student.userId,
               title: 'workshop_completed_title',
