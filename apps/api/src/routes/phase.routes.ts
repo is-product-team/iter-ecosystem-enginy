@@ -55,7 +55,7 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
       data: { isActive: false }
     });
 
-    // Notify all centers about the start of the new phase
+    // Notify all centers about the start of the new phase (Broadcast)
     await createNotificationInternal({
       title: 'phase_start_title',
       message: JSON.stringify({
@@ -63,7 +63,8 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
         params: { name: updatedPhase.name }
       }),
       type: 'PHASE',
-      importance: 'URGENT'
+      importance: 'URGENT',
+      isBroadcast: true
     });
   }
 

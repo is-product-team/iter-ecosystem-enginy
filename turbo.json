@@ -1,7 +1,17 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env"],
-  "globalEnv": ["DATABASE_URL", "JWT_SECRET", "NODE_ENV", "PORT"],
+  "globalEnv": [
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "NODE_ENV",
+    "PORT",
+    "GOOGLE_AI_API_KEY",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASS"
+  ],
   "tasks": {
     "hygiene": {
       "cache": false

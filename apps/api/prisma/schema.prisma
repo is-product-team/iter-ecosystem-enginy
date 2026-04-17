@@ -88,6 +88,8 @@ model User {
   centerId     Int?    @map("id_center")
   center       Center? @relation(fields: [centerId], references: [centerId])
   syncToken    String? @unique @map("sync_token")
+  emailNotificationsEnabled Boolean @default(true) @map("email_notifications_enabled")
+  emailNotificationsFilter  Json?   @map("email_notifications_filter")
 
   assignments     AssignmentTeacher[]
   sessionTeachers SessionTeacher[]

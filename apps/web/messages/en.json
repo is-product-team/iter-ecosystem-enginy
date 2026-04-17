@@ -621,7 +621,12 @@
     "language": "Language",
     "coming_soon": "Feature coming soon",
     "sync_success": "Sync token generated successfully",
-    "sync_error": "Failed to generate sync token"
+    "sync_error": "Failed to generate sync token",
+    "notifications_label": "Notification Settings",
+    "email_notifications_title": "Email Notifications",
+    "email_notifications_desc": "Receive an email for every important notice or phase change.",
+    "notifications_updated": "Preferences updated",
+    "notifications_error": "Error saving preferences"
   },
   "Navigation": {
     "home": "Home",
@@ -1059,6 +1064,10 @@
     "apple_btn": "Add to Apple / Outlook",
     "copy_btn": "Copy iCal link",
     "copy_success": "Link copied to clipboard",
+    "calendar_copy_success": "Calendar link copied",
+    "notifications_copy_success": "Notices link copied",
+    "tab_calendar": "Calendar",
+    "tab_notifications": "Notices",
     "token_regenerated": "Sync token regenerated",
     "token_error": "Failed to generate token",
     "obtaining_data": "Obtaining sync data...",
