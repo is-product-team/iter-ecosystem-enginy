@@ -53,6 +53,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { label: t('home'), path: getHomePath(), show: true },
     { label: t('notifications'), path: `/${locale}/center/notifications`, show: true, isNotifications: true },
+    { label: t('issues'), path: isAdmin ? `/${locale}/admin/issues` : `/${locale}/center/issues`, show: true },
     { label: t('calendar'), path: `/${locale}/calendar`, show: true },
     { label: t('profile'), path: `/${locale}/profile`, show: true },
   ];

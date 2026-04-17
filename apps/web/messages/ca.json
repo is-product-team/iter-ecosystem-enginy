@@ -654,7 +654,8 @@
     "assignments": "Assignacions",
     "sessions": "Sessions",
     "profile": "Perfil",
-    "monitoring": "Monitorització"
+    "monitoring": "Monitorització",
+    "issues": "Incidències"
   },
   "Dashboards": {
     "admin": {
@@ -1392,5 +1393,45 @@
     "footer_note": "Feedback anònim per al centre. Sigues sincer!",
     "submit_button": "Enviar enquesta",
     "submitting": "Enviant..."
+  },
+  "Issues": {
+    "title": "Gestió d'Incidències",
+    "subtitle": "Comunicació directa amb l'administració per a la resolució de problemes.",
+    "new": "Nova Incidència",
+    "details": "Detall de la Incidència",
+    "no_incidents": "No hi ha incidències reportades.",
+    "create_success": "Incidència creada correctament.",
+    "message_success": "Missatge enviat.",
+    "status_updated": "Estat actualitzat.",
+    "priority_updated": "Prioritat actualitzada.",
+    "form": {
+      "title": "Títol de la incidència",
+      "category": "Categoria",
+      "priority": "Prioritat",
+      "description": "Descripció detallada",
+      "submit": "Obrir Incidència"
+    },
+    "chat": {
+      "placeholder": "Escriu un missatge...",
+      "system_msg": "Missatge del sistema",
+      "admin_reply": "Resposta de l'Administració"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Assumpte",
+      "status": "Estat",
+      "priority": "Prioritat",
+      "category": "Categoria",
+      "date": "Data",
+      "center": "Centre"
+    },
+    "categories": {
+      "DOCUMENTATION": "Documentació",
+      "MATERIAL": "Material",
+      "TECHNICAL": "Tècnica",
+      "ABSENCE": "Ausència",
+      "FACILITIES": "Espai",
+      "OTHER": "Altres"
+    }
   }
 }
