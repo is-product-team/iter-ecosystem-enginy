@@ -729,6 +729,7 @@
   },
   "Forms": {
     "edit_title": "Editar",
+    "create_title": "Crear",
     "search": "Cercar...",
     "search_by_title": "Cercar per títol",
     "filter_by_sector": "Filtrar per sector",
