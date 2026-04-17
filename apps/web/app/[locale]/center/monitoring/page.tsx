@@ -20,7 +20,7 @@ export default function MonitoringPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  
+
   const router = useRouter();
   const params = useParams();
   const locale = useLocale();
@@ -53,7 +53,7 @@ export default function MonitoringPage() {
   const stats = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
     const active = assignments.filter(a => a.status === 'IN_PROGRESS' || a.status === 'READY_TO_START');
-    
+
     let sessionsToday = 0;
     const pendingAttendance = 0;
     const incidents = 0; // Mocked for now as we don't have a service yet
@@ -64,7 +64,7 @@ export default function MonitoringPage() {
           sessionsToday++;
         }
       });
-      
+
       // Potential pending attendance: sessions in the past without attendance full
       const pastSessions = a.sessions?.filter(s => new Date(s.sessionDate) < new Date()) || [];
       pastSessions.forEach(s => {
@@ -84,7 +84,7 @@ export default function MonitoringPage() {
   if (authLoading || loading) return <Loading fullScreen message={tc('loading')} />;
 
   // Filter assignments for the list (e.g., only those relevant for monitoring)
-  const monitorableAssignments = assignments.filter(a => 
+  const monitorableAssignments = assignments.filter(a =>
     a.status === 'IN_PROGRESS' || a.status === 'READY_TO_START' || a.status === 'VALIDATED'
   );
 
@@ -105,15 +105,15 @@ export default function MonitoringPage() {
             <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-500 relative">
               <div className="flex justify-between items-center mb-4 bg-indigo-600 text-white p-4">
                 <span className="text-xs font-bold uppercase tracking-widest">{locale === 'ca' ? 'PROCÉS DE TANCAMENT FINAL' : 'PROCESO DE CIERRE FINAL'}</span>
-                <button 
+                <button
                   onClick={() => setSelectedAssignment(null)}
                   className="text-white hover:text-indigo-200 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
-              <CloseWorkshopSection 
-                assignment={selectedAssignment} 
+              <CloseWorkshopSection
+                assignment={selectedAssignment}
                 onSuccess={() => {
                   setSelectedAssignment(null);
                   fetchData();
@@ -129,9 +129,9 @@ export default function MonitoringPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {monitorableAssignments.map(a => (
-                <AssignmentMonitorCard 
-                  key={a.assignmentId} 
-                  assignment={a} 
+                <AssignmentMonitorCard
+                  key={a.assignmentId}
+                  assignment={a}
                   onCloseClick={(clickedAssig) => {
                     setSelectedAssignment(clickedAssig);
                     window.scrollTo({ top: 0, behavior: 'smooth' });

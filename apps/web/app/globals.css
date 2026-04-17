@@ -22,6 +22,14 @@
   --consorci-pink-red: #f26178;
   --consorci-beige: #e0c5ac;
   --consorci-yellow: #f9c311;
+
+  /* Global Pastel Palette (Text Only) */
+  --pastel-green: #10b981;
+  --pastel-orange: #f59e0b;
+  --pastel-blue: #3b82f6;
+  --pastel-red: #ef4444;
+  --pastel-purple: #8b5cf6;
+  --pastel-muted: #6b7280;
 }
 
 .dark {
@@ -214,19 +222,13 @@ h6 {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  background: linear-gradient(to right, var(--bg-surface) 30%, rgba(255, 255, 255, 0)),
-              linear-gradient(to right, rgba(255, 255, 255, 0), var(--bg-surface) 70%) 0 100%,
-              radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0)),
-              radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0)) 0 100%;
-  background-repeat: no-repeat;
   background-color: var(--bg-surface);
-  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
-  background-attachment: local, local, scroll, scroll;
 }
 
 /* Custom Thin Scrollbar (Notion-like) */
 .premium-table-container::-webkit-scrollbar {
   height: 6px;
+  width: 6px;
 }
 
 .premium-table-container::-webkit-scrollbar-track {
@@ -234,20 +236,77 @@ h6 {
 }
 
 .premium-table-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
-.premium-table-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.1);
+.premium-table-container {
+  @apply relative overflow-auto bg-white;
+  max-height: calc(100vh - 280px); /* Height adjustment for sticky header context */
 }
 
 .premium-table-container table {
-  min-width: 800px;
+  min-width: 100%;
+  border-spacing: 0;
+  border-collapse: separate; /* Required for sticky borders */
+}
+
+/* NocoDB Style: Raw Grid */
+.table-database {
+  @apply text-[12px] text-text-primary;
+}
+
+.table-database-th {
+  @apply py-1.5 px-2 font-bold text-text-muted uppercase tracking-[0.05em] border-r border-b border-border-subtle bg-transparent transition-colors;
+}
+
+.table-database-td {
+  @apply py-1.5 px-2 border-r border-b border-border-subtle bg-transparent transition-colors;
+}
+
+/* Hover effect: No background, only color change */
+.table-database-row:hover .table-database-td {
+  @apply text-consorci-darkBlue;
+}
+
+.btn-raw {
+  @apply p-1.5 text-text-muted hover:text-consorci-darkBlue bg-transparent transition-all active:scale-95;
+}
+
+.btn-raw-destructive {
+  @apply p-1.5 text-text-muted hover:text-red-600 bg-transparent transition-all active:scale-95;
+}
+
+.text-table-link {
+  @apply text-consorci-lightBlue hover:underline cursor-pointer transition-colors;
 }
 
 @media (max-width: 640px) {
   .premium-table-container table {
-    min-width: 1000px;
+    min-width: 1200px;
   }
 }
+
+/* Atomic Table Typography Styles */
+.table-id {
+  @apply font-mono text-[10px] text-text-muted opacity-60;
+}
+
+.table-primary {
+  @apply font-semibold text-[14px] text-text-primary tracking-tight;
+}
+
+.table-detail {
+  @apply text-[12px] font-medium text-text-muted;
+}
+
+.table-tag {
+  @apply text-[10px] font-bold uppercase tracking-wider;
+}
+
+.table-tag-green { @apply table-tag text-[var(--pastel-green)]; }
+.table-tag-orange { @apply table-tag text-[var(--pastel-orange)]; }
+.table-tag-blue { @apply table-tag text-[var(--pastel-blue)]; }
+.table-tag-red { @apply table-tag text-[var(--pastel-red)]; }
+.table-tag-purple { @apply table-tag text-[var(--pastel-purple)]; }
+.table-tag-muted { @apply table-tag text-[var(--pastel-muted)]; }

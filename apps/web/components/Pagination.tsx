@@ -8,6 +8,7 @@ interface PaginationProps {
   totalItems: number;
   currentItemsCount: number;
   itemName?: string;
+  variant?: 'default' | 'database';
 }
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -16,16 +17,48 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   totalItems,
   currentItemsCount,
-  itemName
+  itemName,
+  variant = 'default'
 }) => {
   const t = useTranslations('Common');
-  const itemsLabel = itemName || t('items');
-  if (totalPages <= 1) return null;
+  if (totalPages <= 1 && variant !== 'database') return null;
+
+  if (variant === 'database') {
+    return (
+      <div className="border-t border-border-subtle h-10 px-4 flex items-center justify-between gap-4 bg-transparent text-[11px] font-medium text-text-muted">
+        <div className="flex items-center gap-1">
+          {t('showing')} <span className="text-text-primary px-1">{((currentPage - 1) * 10) + 1}-{Math.min(currentPage * 10, totalItems)}</span> 
+          {t('of')} <span className="text-text-primary px-1">{totalItems}</span> 
+          {itemName || t('items')}
+        </div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="p-1 hover:text-consorci-darkBlue disabled:opacity-30 disabled:hover:text-text-muted transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-text-primary font-bold">{currentPage}</span>
+            <span className="opacity-40">/</span>
+            <span>{totalPages}</span>
+          </div>
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="p-1 hover:text-consorci-darkBlue disabled:opacity-30 disabled:hover:text-text-muted transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background-subtle/50 border-t border-border-subtle p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
       <div className="text-[10px] font-black uppercase text-text-muted tracking-widest">
-        {t('showing')} <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{currentItemsCount}</span> {t('of')} <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{totalItems}</span> {itemName}
         {t('showing')} <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{currentItemsCount}</span> {t('of')} <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{totalItems}</span> {itemName}
       </div>
       <div className="flex items-center gap-2">
@@ -39,7 +72,6 @@ const Pagination: React.FC<PaginationProps> = ({
           {t('previous')}
         </button>
         <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-bold text-consorci-darkBlue dark:text-consorci-lightBlue tracking-[0.2em]">
-          {t('page')} {currentPage} {t('of')} {totalPages}
           {t('page')} {currentPage} {t('of')} {totalPages}
         </div>
         <button

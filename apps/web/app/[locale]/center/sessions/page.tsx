@@ -10,6 +10,7 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import Pagination from '@/components/Pagination';
 import { useTranslations, useLocale } from 'next-intl';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 
 type AssignmentMode = 'single' | 'whole';
 
@@ -220,54 +221,42 @@ export default function SessionsListPage() {
       title={t('title')}
       subtitle={t('description')}
     >
-      {/* Search & Filter Bar */}
-      <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8 shadow-sm">
-        {/* Search */}
-        <div className="flex-1">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_workshop')}</label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={tc('search_placeholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
-            />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Modality Filter */}
-        <div className="lg:w-64">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">{tc('filter_by_modality')}</label>
-          <select
+      <DataTableToolbar
+        search={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: tc('search_placeholder')
+        }}
+        onClear={() => {
+          setSearchQuery("");
+          setSelectedModality(tc("all_modalities"));
+        }}
+        filters={
+          <FilterSelect
+            label={tc('filter_by_modality')}
             value={selectedModality}
-            onChange={(e) => setSelectedModality(e.target.value)}
-            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary appearance-none"
-          >
-            <option value={tc("all_modalities")}>{tc("all_modalities")}</option>
-            <option value="A">{tc('modality_label', { modality: 'A' })}</option>
-            <option value="B">{tc('modality_label', { modality: 'B' })}</option>
-            <option value="C">{tc('modality_label', { modality: 'C' })}</option>
-          </select>
-        </div>
-
-        {/* Action Button */}
-        <div className="flex items-end">
+            onChange={setSelectedModality}
+            options={[
+              { label: tc("all_modalities"), value: tc("all_modalities") },
+              { label: tc('modality_label', { modality: 'A' }), value: 'A' },
+              { label: tc('modality_label', { modality: 'B' }), value: 'B' },
+              { label: tc('modality_label', { modality: 'C' }), value: 'C' },
+            ]}
+          />
+        }
+        actions={
           <button
             onClick={() => setShowModal(true)}
-            className="bg-consorci-darkBlue text-white px-8 py-[13px] text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-3 h-[46px]"
+            className="bg-consorci-darkBlue text-white px-6 py-2 text-[12px] font-bold uppercase tracking-widest transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             {t('assign_teacher')}
           </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Flat List */}
-      <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white border border-border-subtle border-t-0 shadow-sm overflow-hidden">
         {paginatedSessions.length === 0 ? (
           <div className="p-20 text-center text-text-muted font-medium text-sm italic">
             {tc('no_results')}

@@ -12,7 +12,8 @@ import Loading from '@/components/Loading';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
-import Pagination from '@/components/Pagination';
+import DataTable, { Column } from '@/components/ui/DataTable';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 
 export default function StudentsCRUD() {
   const t = useTranslations('Center.Students');
@@ -23,11 +24,23 @@ export default function StudentsCRUD() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [formData, setFormData] = useState({ fullName: '', lastName: '', idalu: '', grade: '' });
+  const [formData, setFormData] = useState({ 
+    fullName: '', 
+    lastName: '', 
+    idalu: '', 
+    grade: '',
+    dni: '',
+    phone: '',
+    email: '',
+    gender: '',
+    birthDate: '',
+    emergencyContact: '',
+    emergencyPhone: '',
+    notes: ''
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(t("all_courses"));
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [groupBy, setGroupBy] = useState<string | null>(null);
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -78,14 +91,8 @@ export default function StudentsCRUD() {
   });
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCourse]);
-
-  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-  const paginatedStudents = filteredStudents.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    if (user) loadStudents();
+  }, [user]);
 
   const uniqueCourses = Array.from(new Set(students.map(a => a.grade))).filter(Boolean).sort();
 
@@ -101,7 +108,20 @@ export default function StudentsCRUD() {
       }
       setIsModalOpen(false);
       setEditingStudent(null);
-      setFormData({ fullName: '', lastName: '', idalu: '', grade: '' });
+      setFormData({ 
+        fullName: '', 
+        lastName: '', 
+        idalu: '', 
+        grade: '',
+        dni: '',
+        phone: '',
+        email: '',
+        gender: '',
+        birthDate: '',
+        emergencyContact: '',
+        emergencyPhone: '',
+        notes: ''
+      });
       loadStudents();
     } catch (err: unknown) {
       toast.error((err as Error).message || tc("error_loading"));
@@ -114,7 +134,15 @@ export default function StudentsCRUD() {
       fullName: student.fullName || '', 
       lastName: student.lastName || '', 
       idalu: student.idalu || '', 
-      grade: student.grade || '' 
+      grade: student.grade || '',
+      dni: student.dni || '',
+      phone: student.phone || '',
+      email: student.email || '',
+      gender: student.gender || '',
+      birthDate: student.birthDate ? new Date(student.birthDate).toISOString().split('T')[0] : '',
+      emergencyContact: student.emergencyContact || '',
+      emergencyPhone: student.emergencyPhone || '',
+      notes: student.notes || ''
     });
     setIsModalOpen(true);
   };
@@ -138,9 +166,131 @@ export default function StudentsCRUD() {
     });
   };
 
+  const columns: Column<Student>[] = [
+    {
+      header: "",
+      render: (a) => (
+        <Avatar
+          url={a.photoUrl}
+          name={`${a.fullName} ${a.lastName}`}
+          id={a.studentId}
+          type="student"
+          size="sm"
+        />
+      ),
+      width: 50,
+      align: 'center'
+    },
+    {
+      header: "Nom",
+      render: (a) => <span className="table-primary font-bold">{a.fullName}</span>,
+      width: 150
+    },
+    {
+      header: "Cognoms",
+      render: (a) => <span className="table-primary">{a.lastName}</span>,
+      width: 180
+    },
+    {
+      header: "DNI",
+      render: (a) => <span className="table-id font-bold uppercase">{a.dni || '-'}</span>,
+      width: 120,
+      align: 'center'
+    },
+    {
+      header: "Telèfon",
+      render: (a) => <span className="table-detail font-medium">{a.phone || '-'}</span>,
+      width: 130,
+      align: 'center'
+    },
+    {
+      header: "IDALU",
+      render: (a) => (
+        <span className="table-id font-bold">{a.idalu}</span>
+      ),
+      width: 100,
+      align: 'center'
+    },
+    {
+      header: "Curs",
+      render: (a) => (
+        <span className="table-tag-blue">
+          {a.grade}
+        </span>
+      ),
+      width: 120,
+      align: 'center'
+    },
+    {
+      header: "Email",
+      render: (a) => <span className="table-detail">{a.email || '-'}</span>,
+      width: 200
+    },
+    {
+      header: "Gènere",
+      render: (a) => (
+        <span className="table-tag-gray">
+          {a.gender?.substring(0, 1) || '-'}
+        </span>
+      ),
+      width: 80,
+      align: 'center'
+    },
+    {
+      header: "Naixement",
+      render: (a) => <span className="table-id">{a.birthDate ? new Date(a.birthDate).toLocaleDateString() : '-'}</span>,
+      width: 120,
+      align: 'center'
+    },
+    {
+      header: "Emergència",
+      render: (a) => (
+        <div className="flex flex-col">
+          <span className="table-detail font-bold">{a.emergencyContact || '-'}</span>
+          <span className="table-id">{a.emergencyPhone || ''}</span>
+        </div>
+      ),
+      width: 180
+    },
+    {
+      header: "Notes",
+      render: (a) => <span className="table-id italic opacity-60 truncate block max-w-[150px]">{a.notes || '-'}</span>,
+      width: 150
+    },
+    {
+      header: tc('actions'),
+      align: 'right',
+      render: (a) => (
+        <div className="flex justify-end items-center gap-4">
+          <button onClick={(e) => { e.stopPropagation(); handleEdit(a); }} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
+          <button onClick={(e) => { e.stopPropagation(); handleDelete(a.studentId); }} className="text-text-muted hover:text-red-500 transition-all">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+        </div>
+      )
+    }
+  ];
+
   const headerActions = (
     <button
-      onClick={() => { setEditingStudent(null); setFormData({ fullName: '', lastName: '', idalu: '', grade: '' }); setIsModalOpen(true); }}
+      onClick={() => { 
+        setEditingStudent(null); 
+        setFormData({ 
+          fullName: '', 
+          lastName: '', 
+          idalu: '', 
+          grade: '',
+          dni: '',
+          phone: '',
+          email: '',
+          gender: '',
+          birthDate: '',
+          emergencyContact: '',
+          emergencyPhone: '',
+          notes: ''
+        }); 
+        setIsModalOpen(true); 
+      }}
       className="bg-consorci-darkBlue text-white px-6 py-3 font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
@@ -154,118 +304,47 @@ export default function StudentsCRUD() {
       subtitle={t('description')}
       actions={headerActions}
     >
-      {/* Filters Panel */}
-      <div className="mb-8 flex flex-col lg:flex-row gap-6 bg-white border border-gray-200 p-8">
-        <div className="flex-1">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('search_placeholder')}</label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={tc('search_placeholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
-            />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-3.5 h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-
-        <div className="lg:w-64">
-          <label className="block text-[12px] font-medium text-text-primary mb-3">{t('filter_course')}</label>
-          <select
+      <DataTableToolbar
+        search={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: tc('search_placeholder')
+        }}
+        onClear={() => {
+          setSearchQuery("");
+          setSelectedCourse(t("all_courses"));
+        }}
+        filters={
+          <FilterSelect
+            label="Curs"
             value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-            className="w-full px-4 py-3 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue focus:ring-0 text-sm font-medium text-text-primary appearance-none"
-          >
-            <option value={t("all_courses")}>{t("all_courses")}</option>
-            {uniqueCourses.map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex items-end">
-          <button
-            onClick={() => { setSearchQuery(""); setSelectedCourse(t("all_courses")); }}
-            className="w-full lg:w-auto px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-all border border-transparent h-[46px]"
-          >
-            {tc('clear_filters')}
-          </button>
-        </div>
-      </div>
-
-      {loading ? (
-        <Loading />
-      ) : (
-        <div className="bg-background-surface border border-border-subtle overflow-hidden">
-          <div className="premium-table-container">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-background-subtle border-b border-border-subtle">
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{tc('table_info')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_idalu')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t('table_course')}</th>
-                  <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{tc('actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {paginatedStudents.map(a => (
-                  <tr key={a.studentId} className="hover:bg-gray-50 transition-colors group">
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-4">
-                        <Avatar
-                          url={a.photoUrl}
-                          name={`${a.fullName} ${a.lastName}`}
-                          id={a.studentId}
-                          type="student"
-                          size="md"
-                        />
-                        <div>
-                          <div className="text-sm font-medium text-text-primary tracking-tight">{a.fullName} {a.lastName}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="text-[12px] font-medium text-text-muted font-mono">{a.idalu}</span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="px-2 py-0.5 bg-background-subtle text-text-primary text-[11px] font-medium border border-border-subtle">
-                        {a.grade}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex justify-end items-center gap-4">
-                        <button onClick={() => handleEdit(a)} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
-                        <button onClick={() => handleDelete(a.studentId)} className="text-text-muted hover:text-red-500 transition-all">
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {filteredStudents.length === 0 && !loading && (
-            <div className="p-20 text-center">
-              <p className="text-text-primary font-medium text-sm">{tc('no_results')}</p>
-              <p className="text-text-muted text-[12px] font-medium mt-2">{tc('try_other_terms')}</p>
-            </div>
-          )}
-
-          {/* Paginació */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalItems={filteredStudents.length}
-            currentItemsCount={paginatedStudents.length}
-            itemName={tc('students').toLowerCase()}
+            onChange={setSelectedCourse}
+            options={[
+              { label: t("all_courses"), value: t("all_courses") },
+              ...uniqueCourses.map(c => ({ label: c, value: c }))
+            ]}
           />
-        </div>
-      )}
+        }
+        groups={{
+          value: groupBy || '',
+          onChange: setGroupBy,
+          options: [
+            { label: 'Curs', value: 'grade' },
+            { label: 'Gènere', value: 'gender' }
+          ]
+        }}
+      />
+
+      <DataTable
+        data={filteredStudents}
+        columns={columns}
+        loading={loading}
+        emptyMessage={tc('no_results')}
+        getRowId={a => a.studentId}
+        hideTopBorder
+        groupBy={groupBy}
+        onGroupByChange={setGroupBy}
+      />
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
@@ -328,36 +407,124 @@ export default function StudentsCRUD() {
               )}
 
               <form onSubmit={handleSubmit} id="student-form" className="p-10 space-y-8">
-                <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_name')}</label>
-                  <input
-                    type="text" value={formData.fullName}
-                    onChange={e => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_name')}</label>
+                    <input
+                      type="text" value={formData.fullName}
+                      onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_surnames')}</label>
+                    <input
+                      type="text" value={formData.lastName}
+                      onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_surnames')}</label>
-                  <input
-                    type="text" value={formData.lastName}
-                    onChange={e => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_idalu')}</label>
+                    <input
+                      type="text" value={formData.idalu}
+                      onChange={e => setFormData({ ...formData, idalu: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all font-mono appearance-none" required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">DNI / NIE</label>
+                    <input
+                      type="text" value={formData.dni}
+                      onChange={e => setFormData({ ...formData, dni: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all font-mono uppercase appearance-none"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_idalu')}</label>
-                  <input
-                    type="text" value={formData.idalu}
-                    onChange={e => setFormData({ ...formData, idalu: e.target.value })}
-                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all font-mono appearance-none" required
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">Email</label>
+                    <input
+                      type="email" value={formData.email}
+                      onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">Telèfon</label>
+                    <input
+                      type="tel" value={formData.phone}
+                      onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                    />
+                  </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_course')}</label>
+                    <input
+                      type="text" value={formData.grade}
+                      onChange={e => setFormData({ ...formData, grade: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">Data Naixement</label>
+                    <input
+                      type="date" value={formData.birthDate}
+                      onChange={e => setFormData({ ...formData, birthDate: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[12px] font-medium text-text-primary px-1">Gènere</label>
+                    <select
+                      value={formData.gender}
+                      onChange={e => setFormData({ ...formData, gender: e.target.value })}
+                      className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                    >
+                      <option value="">Selecciona...</option>
+                      <option value="Masc">Masculí</option>
+                      <option value="Fem">Femení</option>
+                      <option value="Altres">Altres</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="border-t border-border-subtle pt-8">
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-6">Contacte d&apos;Emergència</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="block text-[12px] font-medium text-text-primary px-1">Nom de Contacte</label>
+                      <input
+                        type="text" value={formData.emergencyContact}
+                        onChange={e => setFormData({ ...formData, emergencyContact: e.target.value })}
+                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-[12px] font-medium text-text-primary px-1">Telèfon Emergència</label>
+                      <input
+                        type="tel" value={formData.emergencyPhone}
+                        onChange={e => setFormData({ ...formData, emergencyPhone: e.target.value })}
+                        className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <label className="block text-[12px] font-medium text-text-primary px-1">{t('form_course')}</label>
-                  <input
-                    type="text" value={formData.grade}
-                    onChange={e => setFormData({ ...formData, grade: e.target.value })}
-                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none" required
+                  <label className="block text-[12px] font-medium text-text-primary px-1">Observacions</label>
+                  <textarea
+                    value={formData.notes}
+                    onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none resize-none"
                   />
                 </div>
               </form>
