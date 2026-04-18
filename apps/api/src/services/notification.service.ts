@@ -1,7 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { sendNotificationEmail } from '../services/mail.service.js';
 import { t, formatNotificationMessage } from '../utils/i18n.js';
-import { Role } from '@prisma/client';
 
 export interface NotificationData {
   title: string;
@@ -82,7 +81,7 @@ export class NotificationService {
         const parsed = JSON.parse(data.message);
         params = parsed.params || {};
       }
-    } catch (e) { /* message is just plain text */ }
+    } catch (_e) { /* message is just plain text */ }
 
     const translatedTitle = t(data.title, params, 'ca');
     const translatedMessage = formatNotificationMessage(data.message, 'ca');

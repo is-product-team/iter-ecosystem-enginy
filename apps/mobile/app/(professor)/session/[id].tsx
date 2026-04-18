@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, TextInput, Platform } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
-import api, { getStudents, getAttendance } from '../../../services/api';
+import api, { getStudents } from '../../../services/api';
 import StudentSessionCard from '../../../components/session/StudentSessionCard';
 import { StatusBar } from 'expo-status-bar';
 import { Button } from '../../../components/ui/Button';
@@ -17,7 +16,6 @@ export default function SessionScreen() {
   const paramNum = params.sessionNum as string;
   const paramId = params.sessionId as string;
   
-  const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const num = paramNum ? parseInt(paramNum) : 1;
@@ -63,7 +61,7 @@ export default function SessionScreen() {
             setIsSubmitted(true);
             setSessionMode('WORK');
         }
-      } catch (_err) {
+      } catch {
         console.log("🔍 [SessionScreen] No existing attendance found in DB");
       }
 
@@ -73,7 +71,7 @@ export default function SessionScreen() {
     } finally {
       setLoading(false);
     }
-  }, [id, num, t]);
+  }, [id, num]);
 
   useFocusEffect(
     React.useCallback(() => {

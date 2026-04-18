@@ -70,7 +70,7 @@ export default function DashboardScreen() {
           userData = await SecureStore.getItemAsync('user');
           userImage = await SecureStore.getItemAsync('user-avatar');
         }
-      } catch (_storageError) {
+      } catch {
         if (isMounted.current) router.replace('/login');
         return;
       }
@@ -124,7 +124,7 @@ export default function DashboardScreen() {
           setRefreshing(false);
       }
     }
-  }, [router, t]);
+  }, [router]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -236,7 +236,6 @@ export default function DashboardScreen() {
   const activePhase = phases.find(p => p.isActive);
   const activePhaseName = activePhase ? activePhase.name : null;
   const isEvalPhase = activePhaseName?.includes('Evaluation') || activePhaseName?.includes('Closure') || activePhaseName?.includes('Phase 4');
-  const pendingAssignments = assignments.filter(a => !isEvaluated(a));
 
   const hasTodaySession = carouselSessions.some(s => s.isToday);
 
@@ -347,7 +346,6 @@ export default function DashboardScreen() {
 
   // ── Render ────────────────────────────────────────────────────────────────
 
-  const centerName = assignments.length > 0 ? assignments[0].center.name : null;
 
   return (
     <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-subtle dark:bg-background-surface">

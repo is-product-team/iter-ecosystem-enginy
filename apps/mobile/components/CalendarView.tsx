@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import WorkshopDetailModal from './WorkshopDetailModal';
 

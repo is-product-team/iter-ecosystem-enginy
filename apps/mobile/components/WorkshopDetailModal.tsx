@@ -47,7 +47,6 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
   const isEvaluated = metadata.isEvaluated;
   const isPast = metadata.isPast;
   const isCurrent = metadata.isCurrent;
-  const isToday = metadata.isToday;
   
   // Logic from requirements:
   // 1. "Pasar lista" (Manage): Enabled ONLY IF isCurrent. Disabled if isPast or future.
@@ -74,7 +73,6 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
       <View style={{ flex: 1, justifyContent: 'flex-end' }}>
         <Animated.View 
           style={{ 
-            ...View.prototype.style,
             position: 'absolute',
             top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0,0,0,0.4)',

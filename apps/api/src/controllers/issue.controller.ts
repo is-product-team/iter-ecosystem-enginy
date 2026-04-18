@@ -12,7 +12,7 @@ export const createIssue = async (req: Request, res: Response) => {
   try {
     const issue = await IssueService.createIssue(result.data, userId);
     res.status(201).json(issue);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al crear la incidència' });
   }
 };
@@ -33,7 +33,7 @@ export const getIssues = async (req: Request, res: Response) => {
   try {
     const issues = await IssueService.getIssues(filters);
     res.json(issues);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtenir les incidències' });
   }
 };
@@ -55,7 +55,7 @@ export const getIssueById = async (req: Request, res: Response) => {
     }
 
     res.json(issue);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al obtenir la incidència' });
   }
 };
@@ -72,7 +72,7 @@ export const addMessage = async (req: Request, res: Response) => {
   try {
     const message = await IssueService.addMessage(Number(id), result.data.content, userId, result.data.isSystem);
     res.status(201).json(message);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al enviar el missatge' });
   }
 };
@@ -89,7 +89,7 @@ export const updateIssueStatus = async (req: Request, res: Response) => {
   try {
     const updated = await IssueService.updateStatus(Number(id), status, userId);
     res.json(updated);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al actualizar l\'estat' });
   }
 };
@@ -106,7 +106,7 @@ export const updateIssuePriority = async (req: Request, res: Response) => {
   try {
     const updated = await IssueService.updatePriority(Number(id), priority, userId);
     res.json(updated);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Error al actualizar la prioritat' });
   }
 };

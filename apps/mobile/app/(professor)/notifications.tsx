@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { THEME } from '@iter/shared';
 import api, { getNotifications } from '../../services/api';
 import type { Notification } from '../../services/api';
@@ -55,7 +55,7 @@ export default function NotificationsTabScreen() {
       if (translated !== `Notifications.${content}`) {
         return translated;
       }
-    } catch (e) {
+    } catch (_e) {
       // Not JSON or other error
     }
 
@@ -73,7 +73,7 @@ export default function NotificationsTabScreen() {
         const parsed = JSON.parse(notif.title);
         return parsed.params || {};
       }
-    } catch (e) {}
+    } catch (_e) {}
     return {};
   };
 

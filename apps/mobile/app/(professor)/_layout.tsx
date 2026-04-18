@@ -1,10 +1,8 @@
 import * as React from 'react';
 import { Stack } from 'expo-router';
 import { useColorScheme } from 'nativewind';
-import { useTranslation } from 'react-i18next';
 
 export default function ProfessorStackLayout() {
-  const { t } = useTranslation();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 

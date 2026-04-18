@@ -8,7 +8,6 @@ import { StatusBar } from 'expo-status-bar';
 import api from '../../../services/api';
 import { Button } from '../../../components/ui/Button';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ── Components ──────────────────────────────────────────────────────────────
 

@@ -1,20 +1,13 @@
 import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { THEME } from '@iter/shared';
 import { getMyAssignments } from '../../services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 // WhatsApp-style Section Header
-const SectionHeader = ({ title }: { title: string }) => (
-  <View className="px-6 pt-6 pb-2">
-    <Text className="text-text-muted text-[12px] font-bold uppercase tracking-wider">
-      {title}
-    </Text>
-  </View>
-);
 
 export default function CoordinationScreen() {
   const { t } = useTranslation();

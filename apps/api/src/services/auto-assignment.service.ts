@@ -104,7 +104,6 @@ export class AutoAssignmentService {
             // NEW Logic: Maximize workshop capacity usage (filling the workshop)
             // Divide the total remaining capacity among all centers that have at least one request.
             if (centers.length > 0) {
-                let leftoverSpots = remainingCapacity;
                 const numCenters = centers.length;
                 
                 // Sort centers by priority (FIFO)

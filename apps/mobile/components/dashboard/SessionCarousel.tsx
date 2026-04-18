@@ -102,7 +102,7 @@ export function SessionCarousel({ sessions, initialIndex = 0, onPressSession }: 
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [initialIndex, sessions.length]);
+  }, [initialIndex, sessions.length, scrollX]);
 
   const onScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { x: scrollX } } }],

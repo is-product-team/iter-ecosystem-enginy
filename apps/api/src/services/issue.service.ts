@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma.js';
-import { IssueInput, ISSUE_STATUSES } from '@iter/shared';
+import { IssueInput } from '@iter/shared';
 
 export class IssueService {
   /**
