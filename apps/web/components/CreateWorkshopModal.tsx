@@ -159,7 +159,7 @@ const CreateWorkshopModal = ({
         <div className="bg-background-subtle px-8 py-5 flex justify-between items-center shrink-0 border-b border-border-subtle">
           <div>
             <h2 className="text-xl font-medium text-text-primary">
-              {initialData ? t('edit_title') || "Edit Workshop" : t('create_title') || "New Workshop"}
+              {initialData ? t('edit_title') : t('create_title')}
             </h2>
             <p className="text-[11px] font-normal text-text-muted mt-1">
               {t('workshop_config_subtitle')}

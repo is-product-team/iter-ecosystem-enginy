@@ -54,7 +54,7 @@ export class NotificationService {
       // We don't 'await' this so that the API responds immediately.
       setImmediate(async () => {
         try {
-          await this.deliver(data);
+          await NotificationService.deliver(data);
         } catch (err) {
           console.error('[NotificationService] ⚠️ Background delivery failed:', err);
         }
@@ -98,19 +98,19 @@ export class NotificationService {
     } 
     // B. Specific Center
     else if (data.centerId) {
-      const coords = await prisma.user.findMany({
+      const coords = (await prisma.user.findMany({
         where: { centerId: data.centerId, role: { roleName: 'COORDINATOR' }, emailNotificationsEnabled: true },
         select: { email: true, fullName: true }
-      });
+      })) || [];
       recipients.push(...coords);
     }
     // C. Global Broadcast
     else if (data.isBroadcast) {
       const roles = data.targetRoles || ['COORDINATOR', 'ADMIN'];
-      const targets = await prisma.user.findMany({
+      const targets = (await prisma.user.findMany({
         where: { role: { roleName: { in: roles } }, emailNotificationsEnabled: true },
         select: { email: true, fullName: true }
-      });
+      })) || [];
       recipients.push(...targets);
     }
 
