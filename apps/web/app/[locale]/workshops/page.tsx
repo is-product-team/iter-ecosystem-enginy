@@ -269,7 +269,7 @@ export default function WorkshopAdminPage() {
               options={uniqueSectors.map(s => ({ label: s, value: s }))}
             />
             <FilterSelect
-              label="Modalitat"
+              label={tc("modality")}
               value={selectedModality}
               onChange={setSelectedModality}
               options={uniqueModalities.map(m => ({ label: m, value: m }))}

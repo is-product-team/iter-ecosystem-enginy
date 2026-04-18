@@ -1134,6 +1134,8 @@
     "global": "Global",
     "phase": "Fase",
     "phase_with_number": "Fase {number}",
+    "sector": "Sector",
+    "modality": "Modalidad",
     "loading": "Cargando...",
     "module_closed": "Módulo cerrado",
     "loading_calendar": "Cargando calendario...",

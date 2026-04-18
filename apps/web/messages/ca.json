@@ -1134,6 +1134,8 @@
     "global": "Global",
     "phase": "Fase",
     "phase_with_number": "Fase {number}",
+    "sector": "Sector",
+    "modality": "Modalitat",
     "loading": "Carregant...",
     "module_closed": "Mòdul tancat",
     "loading_calendar": "Carregant calendari...",
