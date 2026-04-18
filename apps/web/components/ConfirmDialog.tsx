@@ -34,11 +34,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 transition-all duration-300">
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
         onClick={onCancel}
       />
-      
+
       {/* Dialog */}
       <div className="relative bg-background-surface border border-border-subtle max-w-md w-full overflow-hidden animate-in zoom-in fade-in duration-200 flex flex-col">
         <div className="p-10 text-center">
