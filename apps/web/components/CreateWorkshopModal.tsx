@@ -50,7 +50,7 @@ const CreateWorkshopModal = ({
   const [tempEnd, setTempEnd] = useState("11:00");
 
   const daysMap: Record<number, string> = {
-    1: t('monday'), 2: t('tuesday'), 3: t('wednesday'), 4: t('thursday'), 5: t('friday')
+    1: t('monday'), 2: t('tuesday'), 3: t('wednesday'), 4: t('thursday'), 5: t('friday'), 6: t('saturday'), 0: t('sunday')
   };
 
   useEffect(() => {
@@ -297,6 +297,8 @@ const CreateWorkshopModal = ({
                       <option value={3}>{t('wednesday')}</option>
                       <option value={4}>{t('thursday')}</option>
                       <option value={5}>{t('friday')}</option>
+                      <option value={6}>{t('saturday')}</option>
+                      <option value={0}>{t('sunday')}</option>
                     </select>
                   </div>
                   <div className="flex gap-4">

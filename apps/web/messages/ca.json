@@ -813,6 +813,8 @@
     "wednesday": "Dimecres",
     "thursday": "Dijous",
     "friday": "Divendres",
+    "saturday": "Dissabte",
+    "sunday": "Diumenge",
     "Centers": {
       "edit_title": "Editar Centre",
       "create_title": "Crear Nou Centre",

@@ -812,6 +812,8 @@
     "wednesday": "Miércoles",
     "thursday": "Jueves",
     "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo",
     "Centers": {
       "edit_title": "Editar Centro",
       "create_title": "Crear Nuevo Centro",

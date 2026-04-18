@@ -801,6 +801,8 @@
     "wednesday": "Wednesday",
     "thursday": "Thursday",
     "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
     "Centers": {
       "edit_title": "Edit Center",
       "create_title": "Create New Center",
