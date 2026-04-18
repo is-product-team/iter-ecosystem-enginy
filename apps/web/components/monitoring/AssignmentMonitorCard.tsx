@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { Assignment } from '@/services/assignmentService';
+import Button from '../ui/Button';
+import { useRouter } from 'next/navigation';
 
 interface AssignmentMonitorCardProps {
   assignment: Assignment;
@@ -15,6 +16,7 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
   const t = useTranslations('Center.Monitoring.Assignments');
   const tAssig = useTranslations('AssignmentWorkshopsPage');
   const locale = useLocale();
+  const router = useRouter();
   
   // Calculate Progress
   const today = new Date();
@@ -113,23 +115,31 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
       {/* Action area */}
       <div className="mt-8 flex flex-col gap-3">
         {canBeClosed && onCloseClick && (
-          <button 
+          <Button 
             onClick={() => onCloseClick(assignment)}
-            className="w-full py-3 bg-indigo-600 text-white text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition active:scale-[0.98] shadow-md"
+            variant="primary"
+            fullWidth
+            size="sm"
+            className="tracking-widest uppercase font-black"
           >
             {tAssig('close_section.confirm_btn')}
-          </button>
+          </Button>
         )}
         
-        <Link 
-          href={`/${locale}/center/sessions?assignmentId=${assignment.assignmentId}`}
-          className="flex items-center justify-between w-full py-3 px-4 bg-background-subtle border border-border-subtle hover:border-consorci-darkBlue hover:bg-background-surface transition-all text-[11px] font-medium text-text-primary uppercase tracking-wider group"
+        <Button 
+          onClick={() => router.push(`/${locale}/center/sessions?assignmentId=${assignment.assignmentId}`)}
+          variant="outline"
+          fullWidth
+          size="sm"
+          className="uppercase tracking-wider group"
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          }
         >
           {t('view_details')}
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-          </svg>
-        </Link>
+        </Button>
       </div>
     </div>
   );
