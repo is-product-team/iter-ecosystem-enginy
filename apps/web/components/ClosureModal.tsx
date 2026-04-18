@@ -3,7 +3,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Assignment } from '@/services/assignmentService';
-import Loading from './Loading';
+import Button from './ui/Button';
 
 interface ClosureModalProps {
   isOpen: boolean;
@@ -111,23 +111,20 @@ const ClosureModal: React.FC<ClosureModalProps> = ({
         </div>
 
         <div className="bg-background-subtle px-10 py-6 border-t border-border-subtle flex gap-4 justify-end">
-          <button
+          <Button
             onClick={onCancel}
             disabled={isProcessing}
-            className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors disabled:opacity-50"
+            variant="outline"
           >
             {tc('cancel')}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
-            disabled={isProcessing}
-            className={`px-8 py-3 text-[12px] font-bold text-white transition-all active:scale-[0.98] flex items-center gap-3 ${
-              isProcessing ? 'bg-consorci-darkBlue/50 cursor-not-allowed' : 'bg-consorci-darkBlue hover:bg-black'
-            }`}
+            loading={isProcessing}
+            variant="primary"
           >
-            {isProcessing && <Loading size="mini" white />}
             {isProcessing ? t('closing_process') : t('confirm_closure')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

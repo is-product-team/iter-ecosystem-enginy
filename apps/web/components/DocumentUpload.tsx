@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import getApi from '@/services/api';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import Button from './ui/Button';
 
 interface DocumentUploadProps {
   assignmentId: number;
@@ -27,6 +28,7 @@ export default function DocumentUpload({
   variant = 'default'
 }: DocumentUploadProps) {
   const t = useTranslations('Common');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   // --- Upload and Validation States ---
   const [uploading, setUploading] = useState(false); // Indicates if the HTTP upload to backend is in progress
   const [currentUrl, setCurrentUrl] = useState(initialUrl); // Current URL of the uploaded document
@@ -122,28 +124,28 @@ export default function DocumentUpload({
   if (variant === 'table') {
     return (
       <div className="flex items-center gap-3">
-        <label className={`shrink-0 cursor-pointer w-8 h-8 flex items-center justify-center transition-all border ${
-          uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted' : 
-          currentUrl ? 'border-green-200 bg-green-50 text-green-600 hover:bg-green-100' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
-        }`} title={currentUrl ? t('change') : t('attach')}>
-          {uploading || validatingAI ? (
-            <div className="relative w-4 h-4 flex items-center justify-center keep-rounded overflow-hidden">
-               <div className="absolute inset-0 border-2 border-consorci-darkBlue/20 keep-rounded"></div>
-               <div className="absolute inset-0 border-2 border-t-consorci-darkBlue animate-spin keep-rounded"></div>
-            </div>
-          ) : currentUrl ? (
+        <Button
+          onClick={() => fileInputRef.current?.click()}
+          variant={currentUrl ? 'subtle' : 'outline'}
+          size="sm"
+          className={`!p-0 w-8 h-8 ${currentUrl ? 'border-green-200 bg-green-50 text-green-600 hover:bg-green-100' : ''}`}
+          loading={uploading || validatingAI}
+          title={currentUrl ? t('change') : t('attach')}
+        >
+          {currentUrl ? (
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           ) : (
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           )}
-          <input
-            type="file"
-            className="hidden"
-            accept="application/pdf,image/*"
-            onChange={handleFileChange}
-            disabled={uploading || validatingAI}
-          />
-        </label>
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="hidden"
+          accept="application/pdf,image/*"
+          onChange={handleFileChange}
+          disabled={uploading || validatingAI}
+        />
         {currentUrl && (
           <a
             href={`${process.env.NEXT_PUBLIC_API_URL}${currentUrl}`}
@@ -188,29 +190,32 @@ export default function DocumentUpload({
 
         <div className="flex flex-col items-end gap-2">
           {overrideMode && pendingFile && (
-            <button
+            <Button
               onClick={() => handleValidUpload(pendingFile)}
-              className="px-3 py-1 text-[10px] font-medium text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 transition-all"
+              variant="danger"
+              size="sm"
+              className="py-1 px-3 text-[10px]"
             >
               {t('force_manual_upload')}
-            </button>
+            </Button>
           )}
           
-          <label className={`shrink-0 cursor-pointer px-4 py-2 text-[11px] font-medium transition-all border flex items-center gap-2 ${
-            uploading || validatingAI ? 'bg-background-subtle border-border-subtle text-text-muted opacity-80' : 'border-consorci-darkBlue text-consorci-darkBlue hover:bg-background-subtle'
-          }`}>
-            {(uploading || validatingAI) && (
-              <div className="w-3 h-3 border border-t-transparent border-current animate-spin keep-rounded" />
-            )}
+          <Button 
+            onClick={() => fileInputRef.current?.click()}
+            variant="outline"
+            size="sm"
+            loading={uploading || validatingAI}
+          >
             {uploading ? t('uploading') : validatingAI ? t('validating_ai') : currentUrl ? t('change') : t('attach')}
-            <input
-              type="file"
-              className="hidden"
-              accept="application/pdf,image/*"
-              onChange={handleFileChange}
-              disabled={uploading || validatingAI}
-            />
-          </label>
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            accept="application/pdf,image/*"
+            onChange={handleFileChange}
+            disabled={uploading || validatingAI}
+          />
         </div>
       </div>
     </div>

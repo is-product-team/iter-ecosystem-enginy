@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import centerService, { Center } from "../services/centerService";
-import Loading from "./Loading";
+import Button from "./ui/Button";
 import { useTranslations } from "next-intl";
 
 type CreateCenterModalProps = {
@@ -99,15 +99,17 @@ const CreateCenterModal = ({
               {initialData ? t('edit_subtitle') : t('create_subtitle')}
             </p>
           </div>
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
             onClick={onClose}
-            className="text-text-muted hover:text-text-primary transition-colors"
+            className="!p-2 text-text-muted hover:!text-text-primary"
             aria-label={tCommon('close') || "Close"}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div className="p-6 overflow-y-auto custom-scrollbar">
@@ -198,29 +200,20 @@ const CreateCenterModal = ({
         </div>
 
         <div className="bg-background-subtle px-8 py-5 border-t border-border-subtle flex justify-end gap-4">
-          <button
+          <Button
             onClick={onClose}
-            className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors"
-          >
-            {tCommon('cancel')}
-          </button>
-          <button
-            className={`px-8 py-3 text-[12px] font-medium text-white transition-all active:scale-[0.98] ${loading
-              ? "bg-background-subtle text-text-muted cursor-not-allowed"
-              : "bg-consorci-darkBlue hover:bg-consorci-actionBlue"
-              }`}
-            onClick={handleSubmit}
+            variant="outline"
             disabled={loading}
           >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loading size="sm" white message="" />
-                {t('processing')}
-              </span>
-            ) : (
-              initialData ? t('save_changes') : t('create_center')
-            )}
-          </button>
+            {tCommon('cancel')}
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="primary"
+            loading={loading}
+          >
+            {loading ? t('processing') : (initialData ? t('save_changes') : t('create_center'))}
+          </Button>
         </div>
       </div>
     </div>

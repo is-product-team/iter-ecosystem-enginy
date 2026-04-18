@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import api from '@/services/api';
 import { toast } from 'sonner';
-import Loading from '../Loading';
+import Button from '../ui/Button';
 
 interface SyncCalendarModalProps {
   isOpen: boolean;
@@ -106,12 +106,14 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
               <p className="text-xs text-text-muted mt-0.5">{t('modal_subtitle')}</p>
             </div>
           </div>
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
             onClick={onClose}
-            className="p-2 text-text-muted hover:text-text-primary hover:bg-background-surface transition-colors"
+            className="!p-2 text-text-muted hover:!text-text-primary hover:bg-background-surface"
           >
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         {/* Tabs */}
@@ -174,13 +176,15 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
                   <div className="flex-1 px-4 py-2 font-mono text-[11px] text-text-muted truncate">
                     {syncToken ? icalUrl : '••••••••••••••••••••••••••••••••'}
                   </div>
-                  <button
+                  <Button
                     onClick={copyToClipboard}
-                    className="p-2.5 bg-background-surface hover:bg-consorci-darkBlue hover:text-white transition-all border-l border-border-subtle"
+                    variant="subtle"
+                    size="sm"
+                    className="!p-2.5 bg-background-surface hover:bg-consorci-darkBlue hover:text-white border-l border-border-subtle !rounded-none"
                     title={t('copy_btn')}
                   >
                     {copying ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -210,20 +214,22 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
 
         {/* Footer */}
         <div className="px-8 py-5 border-t border-border-subtle bg-background-subtle flex justify-between items-center">
-          <button
+          <Button
             onClick={generateToken}
-            className="text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors flex items-center gap-2"
+            variant="link"
+            size="sm"
+            loading={loading}
+            icon={<RefreshCw className="w-3.5 h-3.5" />}
           >
-            {loading ? <Loading size="mini" /> : <RefreshCw className="w-3.5 h-3.5" />}
             {t('regenerate_btn')}
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={onClose}
-            className="px-6 py-2.5 bg-background-surface border border-border-subtle hover:border-text-primary text-[13px] font-medium transition-all"
+            variant="outline"
           >
             {t('close')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
