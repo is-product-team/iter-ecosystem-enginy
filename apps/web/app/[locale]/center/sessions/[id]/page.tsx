@@ -68,7 +68,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
     };
 
     fetchData();
-  }, [id, router]);
+  }, [id, router, tCommon]);
 
   const handleAddSessionStaff = async (sessionId: number, userId: number) => {
     try {

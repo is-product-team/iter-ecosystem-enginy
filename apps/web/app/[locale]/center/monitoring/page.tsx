@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
@@ -31,7 +31,7 @@ export default function MonitoringPage() {
     }
   }, [user, authLoading, router, locale]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (user && user.center?.centerId) {
       try {
         const data = await assignmentService.getByCenter(user.center.centerId);
@@ -43,11 +43,11 @@ export default function MonitoringPage() {
         setLoading(false);
       }
     }
-  };
+  }, [user, tc]);
 
   useEffect(() => {
     fetchData();
-  }, [user]);
+  }, [fetchData]);
 
   // Compute Stats for KPIOverview
   const stats = useMemo(() => {
