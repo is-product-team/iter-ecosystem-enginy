@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert, Modal, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 import { useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -48,12 +49,23 @@ export default function NewIssueScreen() {
 
     setSubmitting(true);
     try {
+      let centerId = 0;
+      try {
+        const userData = await SecureStore.getItemAsync('user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          centerId = user.centerId || 0;
+        }
+      } catch (e) {
+        console.warn('Error reading user centerId:', e);
+      }
+
       await issueService.create({
         title,
         description,
         category,
         priority,
-        centerId: 0, // Backend identifies center from token for TEACHER role
+        centerId,
       });
       router.back();
     } catch (error) {

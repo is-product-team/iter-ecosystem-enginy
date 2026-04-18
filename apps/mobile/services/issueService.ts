@@ -33,24 +33,24 @@ export interface Issue {
 
 const issueService = {
   getAll: async (): Promise<Issue[]> => {
-    const response = await api.get('/issues');
+    const response = await api.get('issues');
     return response.data;
   },
 
   getById: async (id: number): Promise<Issue> => {
-    const response = await api.get(`/issues/${id}`);
+    const response = await api.get(`issues/${id}`);
     return response.data;
   },
 
   create: async (data: IssueInput): Promise<Issue> => {
-    const response = await api.post('/issues', data);
+    const response = await api.post('issues', data);
     return response.data;
   },
 
-  addMessage: async (issueId: number, content: string, isSystem: boolean = false): Promise<IssueMessage> => {
-    const response = await api.post(`/issues/${issueId}/messages`, { content, isSystem });
+  addMessage: async (issueId: number, content: string): Promise<any> => {
+    const response = await api.post(`issues/${issueId}/messages`, { content, isSystem: false });
     return response.data;
-  }
+  },
 };
 
 export default issueService;
