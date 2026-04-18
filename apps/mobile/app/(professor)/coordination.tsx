@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { THEME } from '@iter/shared';
 import { getMyAssignments } from '../../services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -46,15 +46,25 @@ export default function CoordinationScreen() {
   }
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
+    <View style={{ paddingTop: insets.top + 60 }} className="flex-1 bg-background-page">
+      <Stack.Screen 
+        options={{ 
+          headerShown: true, 
+          headerTitle: '', 
+          headerTransparent: true,
+          headerShadowVisible: false,
+          headerBackTitle: t('Common.back'),
+          headerTintColor: '#4197CB',
+        }} 
+      />
       
-      {/* Refined Left-Aligned Header */}
-      <View className="px-6 pt-8 pb-6 bg-background-surface border-b border-border-subtle">
-         <Text className="text-[11px] font-black text-text-muted uppercase tracking-[2px] mb-1">
+      {/* Apple-style Large Header */}
+      <View className="px-8 pb-6">
+         <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
            {t('Coordination.teacher_space')}
          </Text>
-         <Text className="text-2xl font-black text-text-primary tracking-tight" style={{ fontFamily: THEME.fonts.primary }}>
-           {t('Coordination.collaboration')}
+         <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
+           {t('Coordination.title')}
          </Text>
       </View>
 
@@ -62,10 +72,15 @@ export default function CoordinationScreen() {
         <View className="pb-10">
           {assignments.length > 0 ? (
             assignments.map((assig) => (
-              <View key={assig.assignmentId} className="">
-                <SectionHeader title={assig.workshop.title} />
+              <View key={assig.assignmentId} className="mb-4">
+                {/* Workshop Header - Like a WhatsApp Group/Date Header */}
+                <View className="px-8 py-3 bg-background-subtle/50">
+                  <Text className="text-[#4197CB] text-[13px] font-bold uppercase tracking-widest">
+                    {assig.workshop.title}
+                  </Text>
+                </View>
                 
-                <View className="border-t border-b border-border-subtle bg-background-surface">
+                <View className="bg-background-surface border-t border-b border-border-subtle">
                   {[
                     { teacher: assig.teacher1, label: t('Coordination.main_referent') },
                     { teacher: assig.teacher2, label: t('Coordination.secondary_referent') }
@@ -74,65 +89,87 @@ export default function CoordinationScreen() {
                     const isLast = idx === arr.length - 1 || !arr[idx+1].teacher;
                     
                     return (
-                      <View 
-                        key={`${assig.assignmentId}-${idx}`}
-                        className="p-5 flex-row items-center relative"
-                      >
-                         <View className="w-12 h-12 rounded-full bg-background-subtle items-center justify-center mr-4 border border-border-subtle">
-                            <Text className="text-text-primary font-black text-lg">{item.teacher.name?.charAt(0)}</Text>
-                         </View>
-                         
-                         <View className="flex-1">
-                            <Text className="text-text-muted text-[10px] font-black uppercase tracking-widest mb-0.5">{item.label}</Text>
-                            <Text className="text-text-primary text-base font-bold mb-2">{item.teacher.name}</Text>
-                            
-                            <View className="flex-row space-x-6">
-                               {item.teacher.contact && (
-                                 <TouchableOpacity onPress={() => handleCall(item.teacher.contact)} className="flex-row items-center bg-background-subtle px-3 py-1.5 rounded-lg border border-border-subtle">
-                                   <Ionicons name="call" size={14} color={THEME.colors.primary} />
-                                   <Text className="text-primary font-black text-[10px] uppercase ml-2 tracking-widest">{t('Common.call')}</Text>
-                                 </TouchableOpacity>
-                               )}
-                               <TouchableOpacity onPress={() => handleEmail(item.teacher.email || 'info@consorci.cat')} className="flex-row items-center bg-background-subtle px-3 py-1.5 rounded-lg border border-border-subtle">
-                                 <Ionicons name="mail" size={14} color={THEME.colors.primary} />
-                                 <Text className="text-primary font-black text-[10px] uppercase ml-2 tracking-widest">{t('Common.email')}</Text>
-                               </TouchableOpacity>
-                            </View>
-                         </View>
-
-                         {!isLast && (
-                           <View className="absolute bottom-0 left-20 right-0 h-[0.5px] bg-border-subtle" />
-                         )}
+                      <View key={`${assig.assignmentId}-${idx}`}>
+                        <TouchableOpacity 
+                          activeOpacity={0.7}
+                          className="flex-row items-center p-5"
+                        >
+                          {/* Avatar - WhatsApp Style */}
+                          <View className="w-14 h-14 rounded-full bg-background-subtle items-center justify-center mr-4 border border-border-subtle shadow-sm">
+                             <Text className="text-[#4197CB] font-bold text-xl">{item.teacher.name?.charAt(0)}</Text>
+                          </View>
+                          
+                          <View className="flex-1">
+                             <View className="flex-row justify-between items-center mb-1">
+                                <Text className="text-text-primary text-[17px] font-semibold">{item.teacher.name}</Text>
+                                <Text className="text-text-muted text-[11px] font-bold uppercase tracking-tighter opacity-60">{item.label}</Text>
+                             </View>
+                             
+                             {/* WhatsApp Style Action Row */}
+                             <View className="flex-row items-center mt-2 space-x-8">
+                                {item.teacher.contact && (
+                                  <TouchableOpacity 
+                                    onPress={() => handleCall(item.teacher.contact)}
+                                    className="flex-row items-center"
+                                  >
+                                    <View className="w-8 h-8 rounded-full bg-[#4197CB]/10 items-center justify-center mr-2">
+                                      <Ionicons name="call" size={14} color="#4197CB" />
+                                    </View>
+                                    <Text className="text-[#4197CB] font-bold text-[13px]">{t('Common.call')}</Text>
+                                  </TouchableOpacity>
+                                )}
+                                <TouchableOpacity 
+                                  onPress={() => handleEmail(item.teacher.email || 'info@consorci.cat')}
+                                  className="flex-row items-center"
+                                >
+                                  <View className="w-8 h-8 rounded-full bg-[#4197CB]/10 items-center justify-center mr-2">
+                                    <Ionicons name="mail" size={14} color="#4197CB" />
+                                  </View>
+                                  <Text className="text-[#4197CB] font-bold text-[13px]">{t('Common.email')}</Text>
+                                </TouchableOpacity>
+                             </View>
+                          </View>
+                        </TouchableOpacity>
+                        {!isLast && (
+                           <View className="ml-[88px] h-[0.5px] bg-border-subtle" />
+                        )}
                       </View>
                     );
                   })}
 
                   {!assig.teacher1 && !assig.teacher2 && (
-                    <View className="p-10 items-center">
-                       <Ionicons name="people-outline" size={32} color={THEME.colors.primary} className="opacity-20 mb-3" />
-                       <Text className="text-text-muted font-bold text-xs uppercase text-center">{t('Coordination.no_referents_assigned')}</Text>
+                    <View className="p-8 items-center">
+                       <Ionicons name="people-outline" size={32} color="#CBD5E1" className="mb-2" />
+                       <Text className="text-text-muted text-sm font-medium italic">{t('Coordination.no_referents_assigned')}</Text>
                     </View>
                   )}
                 </View>
               </View>
             ))
           ) : (
-            <View className="items-center py-20 bg-background-surface border-t border-b border-border-subtle">
-               <Ionicons name="school-outline" size={48} color={THEME.colors.primary} className="opacity-20 mb-4" />
-               <Text className="text-text-muted font-bold uppercase tracking-widest text-[10px] text-center">{t('Coordination.no_contacts_yet')}</Text>
+            <View className="items-center py-24 px-10">
+               <View className="w-20 h-20 bg-background-subtle rounded-full items-center justify-center mb-6">
+                  <Ionicons name="school-outline" size={40} color="#CBD5E1" />
+               </View>
+               <Text className="text-slate-400 font-medium text-center">{t('Coordination.no_contacts_yet')}</Text>
             </View>
           )}
 
-          <SectionHeader title={t('Common.coming_soon')} />
-          <View className="bg-background-surface border-t border-b border-border-subtle p-6 flex-row items-center">
-            <View className="w-12 h-12 bg-primary/10 rounded-2xl items-center justify-center mr-4 border border-primary/20">
-              <Ionicons name="chatbubbles" size={20} color={THEME.colors.primary} />
+          {/* Support Section - Like a WhatsApp archived or official chat info */}
+          <View className="mt-6">
+            <View className="px-8 py-3">
+              <Text className="text-text-muted text-[13px] font-bold uppercase tracking-widest">{t('Common.coming_soon')}</Text>
             </View>
-            <View className="flex-1">
-              <Text className="text-text-primary font-bold text-base mb-1">{t('Coordination.group_chat_instruction').split('.')[0]}</Text>
-              <Text className="text-text-secondary text-sm leading-tight">
-                {t('Coordination.group_chat_instruction')}
-              </Text>
+            <View className="bg-background-surface border-t border-b border-border-subtle p-6 flex-row items-center">
+              <View className="w-14 h-14 bg-[#4197CB]/10 rounded-full items-center justify-center mr-4 border border-[#4197CB]/20">
+                <Ionicons name="chatbubbles" size={24} color="#4197CB" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-text-primary font-bold text-[17px] mb-1">{t('Coordination.group_chat_instruction').split('.')[0]}</Text>
+                <Text className="text-text-secondary text-sm leading-snug">
+                  {t('Coordination.group_chat_instruction')}
+                </Text>
+              </View>
             </View>
           </View>
         </View>

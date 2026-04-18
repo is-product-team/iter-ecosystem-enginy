@@ -23,8 +23,9 @@
     "practice_group": "Grup de pràctiques",
     "session_objectives": "Objectius de la Sessió",
     "address": "Direcció del Centre",
-    "workshop_evaluated": "Taller Avaluat",
-    "evaluate_workshop": "Avaluar Taller",
+    "evaluated": "Valorat",
+    "workshop_evaluated": "Taller Valorat",
+    "evaluate_workshop": "Valorar Taller",
     "status": "Estat",
     "today": "Avui",
     "tomorrow": "Demà",
@@ -52,7 +53,7 @@
       "access_restricted": "Accés Restringit",
       "go_to_web": "Anar a la Plataforma Web",
       "submit": "Entrar",
-      "welcome_title": "Te donem la benvinguda a Iter",
+      "welcome_title": "Et donem la benvinguda a Iter",
       "welcome_subtitle": "Gestió avançada de mòduls duales i seguiment d'alumnes per a professors tècnics.",
       "login_problems": "Tens problemes per accedir-hi?",
       "privacy_footer": "En iniciar la sessió, acceptes la nostra Política de Privacitat i els Termes de Servei de la Plataforma Iter."
@@ -84,7 +85,7 @@
   },
   "Routes": {
     "session": "Sessió",
-    "evaluation": "Evaluació",
+    "evaluation": "Avaluació",
     "questionnaire": "Valoració Taller"
   },
   "Session": {
@@ -115,6 +116,9 @@
     "no_upcoming_sessions": "Sense sessions properes",
     "session_today": "Tens una sessió avui",
     "next_session_on": "Pròxima sessió el {{label}}",
+    "next_session_label": "Proper taller",
+    "current_session_label": "Ara mateix",
+    "past_session_label": "Realitzada",
     "recent_workshops": "Tallers recents",
     "none_new": "Cap de nou",
     "phase_status": "Estat de la fase",
@@ -150,11 +154,31 @@
     "submit_error": "No s'ha pogut enviar el qüestionari."
   },
   "Notifications": {
-    "tagline": "Comunicacions",
-    "title": "Avisos Oficials",
+    "tagline": "Notificacions",
+    "title": "Avisos i Missatges",
     "mark_read": "Marcar com a llegit",
     "delete": "Eliminar",
-    "empty": "No hi ha avisos nous"
+    "empty": "No hi ha avisos nous",
+    "phase_start_title": "Nova Fase: {{name}}",
+    "phase_start_msg": "La fase \"{{name}}\" ha començat. Consulta el calendari per a més detalls.",
+    "calendar_sync_title": "Sincronització de Calendari (Sistema)",
+    "calendar_sync_msg": "Verificació de calendari en segon pla executada",
+    "session_reminder_title": "Recordatori: Sessió de Taller",
+    "session_reminder_msg": "Tens una sessió per al taller \"{{title}}\" programada per avui a les {{time}}.",
+    "milestone_reminder_title": "Pròxima Fita: {{title}}",
+    "milestone_reminder_msg": "Recordatori: La fita \"{{title}}\" està programada per a les properes 24 hores.",
+    "request_status_title": "Sol·licitud {{status}}",
+    "request_status_msg": "La teva sol·licitud per al taller \"{{title}}\" ha estat {{status_low}}.",
+    "incorrect_doc_title": "Documentació Incorrecta",
+    "incorrect_doc_msg": "Hola, el document {{doc}} del taller {{title}} és incorrecte. {{comment}}",
+    "registration_confirmed_title": "Matrícula Confirmada: Taller en Curs",
+    "registration_confirmed_msg": "La matrícula per al taller \"{{title}}\" s'ha completat correctament. El taller ja està actiu i s'han generat les sessions al teu calendari.",
+    "workshop_assigned_title": "Taller Assignat (Tetris)!",
+    "workshop_assigned_msg": "La teva sol·licitud per al taller \"{{title}}\" ha estat aprovada i assignada.",
+    "assignments_published_title": "Assignacions Publicades",
+    "assignments_published_msg": "Ja pots consultar les assignacions i començar a introduir les dades dels alumnes.",
+    "Approved": "Aprovada",
+    "Rejected": "Rebutjada"
   },
   "Tabs": {
     "dashboard": "Inici",
@@ -182,7 +206,8 @@
   },
   "Coordination": {
     "teacher_space": "Espai del Docent",
-    "collaboration": "Coordinació i Suport",
+    "title": "Coordinació",
+    "collaboration": "Equip de Coordinació",
     "teaching_team": "Equip Docent",
     "main_referent": "Referent Principal",
     "secondary_referent": "Segon Referent",
@@ -190,5 +215,29 @@
     "no_contacts_yet": "Encara no tens contactes de coordinació.",
     "group_chat_instruction": "Aviat podràs xatejar directament amb l'equip de coordinació del centre.",
     "contact": "Contacte"
+  },
+  "Support": {
+    "title": "Suport",
+    "chat_admin": "Xat amb Administració",
+    "direct_contact": "Contacte directe"
+  },
+  "Resources": {
+    "title": "Recursos",
+    "materials": "Materials i Guies",
+    "view_all": "Veure tot"
+  },
+  "Session": {
+    "title_attendance": "Sessió - Asistència",
+    "title_work": "Sessió - Seguiment",
+    "attendance_header": "Registre de Sessió",
+    "attendance_instruction": "Marca l'assistència de cada alumne abans de començar el seguiment tècnic.",
+    "work_header": "Seguiment de Sessió",
+    "work_instruction": "Avalua el progrés de les competències durant el taller.",
+    "observations_label": "Observacions de la sessió",
+    "observations_placeholder": "Afegeix qualsevol incidència o comentari rellevant...",
+    "finish_and_send": "Finalitzar i Enviar Llista",
+    "attendance_sent_success": "Llista d'assistència enviada correctament",
+    "manage_session": "Gestionar Sessió",
+    "error_loading_students": "No s'ha pogut carregar la llista d'alumnes"
   }
 }

@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { getMyAssignments, getPhases, getNotifications } from '../../../services/api';
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
-import { HeroCard } from '../../../components/dashboard/HeroCard';
+import { SessionCarousel } from '../../../components/dashboard/SessionCarousel';
 import { QuickAccessGrid } from '../../../components/dashboard/QuickAccessGrid';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -50,6 +50,13 @@ export default function DashboardScreen() {
   const [unreadCount, setUnreadCount] = React.useState(0);
   const [avatar, setAvatar] = React.useState<string | null>(null);
 
+  const isMounted = React.useRef(true);
+
+  React.useEffect(() => {
+    isMounted.current = true;
+    return () => { isMounted.current = false; };
+  }, []);
+
   const checkRoleAndFetchData = React.useCallback(async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
@@ -64,29 +71,31 @@ export default function DashboardScreen() {
           userImage = await SecureStore.getItemAsync('user-avatar');
         }
       } catch (_storageError) {
-        router.replace('/login');
+        if (isMounted.current) router.replace('/login');
         return;
       }
 
       if (userData) {
         const user = JSON.parse(userData);
-        if (user.firstName) setUserName(user.firstName);
-        else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
+        if (isMounted.current) {
+            if (user.firstName) setUserName(user.firstName);
+            else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
 
-        if (user.fullName) {
-          const initials = user.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
-          setUserInitials(initials);
+            if (user.fullName) {
+              const initials = user.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
+              setUserInitials(initials);
+            }
+
+            if (userImage) setAvatar(userImage);
         }
-
-        if (userImage) setAvatar(userImage);
 
         const roleName = user.role?.roleName;
         if (roleName !== 'PROFESSOR' && roleName !== 'TEACHER') {
-          router.replace('/login');
+          if (isMounted.current) router.replace('/login');
           return;
         }
       } else {
-        router.replace('/login');
+        if (isMounted.current) router.replace('/login');
         return;
       }
 
@@ -96,6 +105,8 @@ export default function DashboardScreen() {
         getNotifications(),
       ]);
 
+      if (!isMounted.current) return;
+
       const phasesData = phasesRes.data as any;
       const phasesArray = Array.isArray(phasesData) ? phasesData : phasesData.data;
       setPhases(Array.isArray(phasesArray) ? phasesArray : []);
@@ -103,11 +114,15 @@ export default function DashboardScreen() {
       setUnreadCount(notifsRes.data.filter((n: any) => !n.isRead).length);
     } catch (error: any) {
       console.error('Error fetching dashboard data:', error);
-      setPhases([]);
-      setAssignments([]);
+      if (isMounted.current) {
+          setPhases([]);
+          setAssignments([]);
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (isMounted.current) {
+          setLoading(false);
+          setRefreshing(false);
+      }
     }
   }, [router, t]);
 
@@ -123,14 +138,51 @@ export default function DashboardScreen() {
 
   // ── Derived data ─────────────────────────────────────────────────────────
 
-  const getNextSession = () => {
-    if (assignments.length === 0) return null;
+  const getAllSessions = () => {
+    if (assignments.length === 0) return [];
     const now = new Date();
-    const allSessions: any[] = [];
+    const all: any[] = [];
+    
     assignments.forEach(assign => {
       if (assign.sessions && assign.sessions.length > 0) {
-        assign.sessions.forEach((session: any) => {
-          allSessions.push({
+        // Sort sessions of THIS assignment to get correct index
+        const sortedAssignmentSessions = [...assign.sessions].sort((a, b) => 
+          new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime()
+        );
+
+        sortedAssignmentSessions.forEach((session: any, index: number) => {
+          // sessionDate is typically "YYYY-MM-DD" or ISO string
+          // We want to treat it as a LOCAL date
+          const dateParts = session.sessionDate.split('T')[0].split('-');
+          const year = parseInt(dateParts[0], 10);
+          const month = parseInt(dateParts[1], 10) - 1; // 0-indexed
+          const day = parseInt(dateParts[2], 10);
+
+          const startDate = new Date(year, month, day);
+          
+          // Parse time if available (e.g., "08:00")
+          if (session.startTime) {
+            const [hours, minutes] = session.startTime.split(':').map(Number);
+            startDate.setHours(hours, minutes, 0, 0);
+          }
+          
+          const endDate = new Date(startDate);
+          if (session.endTime) {
+            const [hours, minutes] = session.endTime.split(':').map(Number);
+            endDate.setHours(hours, minutes, 0, 0);
+          } else {
+            // Default: session is not "past" until the end of the day
+            endDate.setHours(23, 59, 59, 999);
+          }
+
+          const isPast = endDate < now;
+          const isCurrent = now >= startDate && now <= endDate;
+          const isToday = startDate.toDateString() === now.toDateString();
+          const evaluated = assign.submissions?.some((s: any) => s.status === 'RESPONDED' && s.target === 'TEACHER');
+
+          all.push({
+            sessionId: session.sessionId,
+            sessionNum: index + 1, // 1-based index
             assignmentId: assign.assignmentId,
             workshop: assign.workshop,
             center: assign.center,
@@ -138,23 +190,20 @@ export default function DashboardScreen() {
             startTime: session.startTime,
             endTime: session.endTime,
             isSession: true,
+            isPast,
+            isCurrent,
+            isToday,
+            isEvaluated: evaluated,
             submissions: assign.submissions,
+            // Add a sort key for stable sorting
+            sortTime: startDate.getTime()
           });
-        });
-      } else {
-        allSessions.push({
-          assignmentId: assign.assignmentId,
-          workshop: assign.workshop,
-          center: assign.center,
-          startDate: assign.startDate,
-          startTime: null,
-          isSession: false,
-          submissions: assign.submissions,
         });
       }
     });
-    allSessions.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-    return allSessions.find(s => new Date(s.startDate).getTime() >= now.getTime() - 72000000) || allSessions[allSessions.length - 1];
+
+    // Sort by date/time
+    return all.sort((a, b) => a.sortTime - b.sortTime);
   };
 
   const isEvaluated = (assignment: any) => {
@@ -162,9 +211,26 @@ export default function DashboardScreen() {
     return assignment.submissions.some((s: any) => s.status === 'RESPONDED' && s.target === 'TEACHER');
   };
 
-  const nextWorkshop = getNextSession();
+  const carouselSessions = getAllSessions();
+  const initialCarouselIndex = React.useMemo(() => {
+    if (carouselSessions.length === 0) return 0;
+    
+    // 1. Prioritize any currently active session
+    const currentIdx = carouselSessions.findIndex(s => s.isCurrent);
+    if (currentIdx !== -1) return currentIdx;
+
+    // 2. Otherwise, find the first upcoming session
+    const upcomingIdx = carouselSessions.findIndex(s => !s.isPast);
+    if (upcomingIdx !== -1) return upcomingIdx;
+
+    // 3. Fallback to the last past session (most recent)
+    return Math.max(0, carouselSessions.length - 1);
+  }, [carouselSessions]);
+
+  const nextWorkshop = carouselSessions[initialCarouselIndex];
+  
   const recentWorkshops = assignments
-    .filter(a => a.assignmentId !== nextWorkshop?.assignmentId)
+    .filter(a => !carouselSessions.some(s => s.assignmentId === a.assignmentId && !s.isPast))
     .slice(0, 3);
 
   const activePhase = phases.find(p => p.isActive);
@@ -172,10 +238,7 @@ export default function DashboardScreen() {
   const isEvalPhase = activePhaseName?.includes('Evaluation') || activePhaseName?.includes('Closure') || activePhaseName?.includes('Phase 4');
   const pendingAssignments = assignments.filter(a => !isEvaluated(a));
 
-  const today = new Date();
-  const hasTodaySession = nextWorkshop
-    ? new Date(nextWorkshop.startDate).toDateString() === today.toDateString()
-    : false;
+  const hasTodaySession = carouselSessions.some(s => s.isToday);
 
   const { greeting, subtitle } = getContextualGreeting(
     t,
@@ -185,8 +248,38 @@ export default function DashboardScreen() {
     i18n
   );
 
+  const handleSessionClick = (session: any) => {
+    const formattedEvent: CalendarEvent = {
+      id: session.assignmentId,
+      title: session.workshop.title,
+      date: session.startDate,
+      type: 'assignment',
+      description: session.workshop.description || t('Common.no_description'),
+      metadata: {
+        time: `${session.startTime || '09:00'} - ${session.endTime || '13:00'}`,
+        center: session.center.name,
+        address: session.center.address,
+        assignmentId: session.assignmentId,
+        isEvaluation: isEvalPhase,
+        isEvaluated: session.isEvaluated,
+        sessionNum: session.sessionNum, // USE THE CORRECT INDEX (1, 2, 3...)
+        sessionId: session.sessionId,
+        isPast: session.isPast,
+        isCurrent: session.isCurrent,
+        isToday: session.isToday,
+      },
+    };
+    setSelectedWorkshop(formattedEvent);
+    setModalVisible(true);
+  };
+
   const handleWorkshopClick = (assignment: any) => {
     const evaluated = isEvaluated(assignment);
+    const now = new Date();
+    const startDate = new Date(assignment.startDate);
+    const endDate = new Date(startDate);
+    endDate.setHours(startDate.getHours() + 4); // Generic fallback
+
     const formattedEvent: CalendarEvent = {
       id: assignment.assignmentId,
       title: assignment.workshop.title,
@@ -200,6 +293,9 @@ export default function DashboardScreen() {
         assignmentId: assignment.assignmentId,
         isEvaluation: isEvalPhase,
         isEvaluated: evaluated,
+        isPast: endDate < now,
+        isCurrent: now >= startDate && now <= endDate,
+        isToday: startDate.toDateString() === now.toDateString(),
       },
     };
     setSelectedWorkshop(formattedEvent);
@@ -230,32 +326,23 @@ export default function DashboardScreen() {
       onPress: () => router.push('/(professor)/notifications'),
     },
     {
-      id: 'phase',
-      icon: 'rocket' as const,
-      iconColor: THEME.colors.primary,
-      iconBg: `${THEME.colors.primary}15`,
-      label: t('Dashboard.phase_status'),
-      value: activePhaseName || 'N/A',
-      onPress: () => {},
-    },
-    {
       id: 'coordination',
       icon: 'people' as const,
       iconColor: '#34C759',
       iconBg: '#34C75915',
-      label: t('Coordination.collaboration'),
-      value: t('Coordination.contact'),
+      label: t('Coordination.title'),
+      value: t('Coordination.collaboration'),
       onPress: () => router.push('/(professor)/coordination'),
     },
-    ...(isEvalPhase && pendingAssignments.length > 0 ? [{
-      id: 'evaluations',
-      icon: 'star' as const,
+    {
+      id: 'support',
+      icon: 'chatbubble-ellipses' as const,
       iconColor: '#FF9500',
       iconBg: '#FF950015',
-      label: t('Evaluation.title'),
-      value: t('Dashboard.pending_count', { count: pendingAssignments.length }),
-      onPress: () => router.push(`/(professor)/questionnaire/${pendingAssignments[0].assignmentId}`),
-    }] : []),
+      label: t('Support.title'),
+      value: t('Support.chat_admin'),
+      onPress: () => router.push('/(professor)/support'),
+    },
   ];
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -271,25 +358,20 @@ export default function DashboardScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.colors.primary} />
         }
       >
-        {/* ── Contextual Header ── */}
-        <View className="px-5 pt-10 pb-6 flex-row justify-between items-center">
+        {/* ── Apple-style Header ── */}
+        <View className="px-8 pt-6 pb-10 flex-row justify-between items-start">
           <View className="flex-1 mr-4">
-            <Text className="text-[32px] font-bold text-text-primary dark:text-white tracking-tighter leading-tight">
+            <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
               {greeting}
             </Text>
-            {centerName && (
-              <Text className="text-[13px] font-bold text-primary uppercase tracking-widest mt-1">
-                {centerName}
-              </Text>
-            )}
-            <Text className="text-[15px] font-medium text-text-muted mt-0.5">
+            <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
               {subtitle}
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => router.push('/profile')}
             activeOpacity={0.8}
-            className="w-12 h-12 rounded-full bg-primary items-center justify-center overflow-hidden"
+            className="w-12 h-12 rounded-full bg-primary items-center justify-center overflow-hidden mt-2"
           >
             {avatar ? (
               <Image source={{ uri: avatar }} className="w-full h-full" />
@@ -299,17 +381,11 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* ── Hero Card ── */}
-        <HeroCard
-          workshop={nextWorkshop ? {
-            title: nextWorkshop.workshop.title,
-            center: nextWorkshop.center.name,
-            date: nextWorkshop.startDate,
-            startTime: nextWorkshop.startTime,
-            endTime: nextWorkshop.endTime,
-            isToday: hasTodaySession,
-          } : undefined}
-          onPress={nextWorkshop ? () => handleWorkshopClick(nextWorkshop) : undefined}
+        {/* ── Sessions Carousel ── */}
+        <SessionCarousel
+          sessions={carouselSessions}
+          initialIndex={initialCarouselIndex}
+          onPressSession={handleSessionClick}
         />
 
         {/* ── Quick Access Grid ── */}

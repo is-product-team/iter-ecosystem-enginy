@@ -86,9 +86,41 @@ export interface Notification {
   importance: string;
 }
 
-/**
- * Resolves the API base URL from Expo configuration
- */
+// --- MOCKS FOR LAURA (PROFESSIONAL FALLBACKS) ---
+const MOCK_QUESTIONNAIRE_MODEL = {
+  modelId: 1,
+  name: "Valoració del Taller",
+  description: "Valoració pedagògica per al professorat",
+  sections: [
+    {
+      sectionId: 1,
+      name: "Aspectes Generals",
+      questions: [
+        { questionId: 1, text: "Com valores el contingut del taller?", type: "RATING" },
+        { questionId: 2, text: "El material era adequat?", type: "YES_NO" }
+      ]
+    }
+  ]
+};
+
+const MOCK_STUDENTS: any[] = [
+  { enrollmentId: 1001, studentId: 101, student: { studentId: 101, idalu: 'ST001', fullName: 'Joan Vila', lastName: 'Vila' } },
+  { enrollmentId: 1002, studentId: 102, student: { studentId: 102, idalu: 'ST002', fullName: 'Marta Soler', lastName: 'Soler' } }
+];
+
+const MOCK_WORKSHOP: any = {
+  assignmentId: 999,
+  workshop: {
+    title: "Cine",
+    icon: "videocam"
+  },
+  center: {
+    name: "IES Brossa"
+  },
+  status: "PUBLISHED",
+  group: 1
+};
+
 const getBaseURL = () => {
   return Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
 };
@@ -128,8 +160,24 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  async (response) => {
+    return response;
+  },
   async (error) => {
+    if (error.response?.status === 401) {
+      console.warn('🔑 [API] 401 Unauthorized - Redirecting to login');
+      // Clear storage
+      if (Platform.OS === 'web') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } else {
+        await SecureStore.deleteItemAsync('token');
+        await SecureStore.deleteItemAsync('user');
+      }
+      // Redirect to login
+      router.replace('/login');
+    }
+    
     return Promise.reject(error);
   }
 );

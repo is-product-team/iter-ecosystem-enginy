@@ -23,8 +23,9 @@
     "practice_group": "Grupo de prácticas",
     "session_objectives": "Objetivos de la Sesión",
     "address": "Dirección del Centro",
-    "workshop_evaluated": "Taller Evaluado",
-    "evaluate_workshop": "Evaluar Taller",
+    "evaluated": "Valorado",
+    "workshop_evaluated": "Taller Valorado",
+    "evaluate_workshop": "Valorar Taller",
     "status": "Estado",
     "today": "Hoy",
     "tomorrow": "Mañana",
@@ -115,13 +116,15 @@
     "no_upcoming_sessions": "Sin sesiones próximas",
     "session_today": "Tienes una sesión hoy",
     "next_session_on": "Próxima sesión el {{label}}",
+    "next_session_label": "Próximo taller",
+    "current_session_label": "Ahora mismo",
+    "past_session_label": "Realizada",
     "recent_workshops": "Talleres recientes",
     "none_new": "Ninguno nuevo",
     "phase_status": "Estado de la fase",
     "pending_count_one": "{{count}} pendiente",
     "pending_count_other": "{{count}} pendientes",
-    "no_upcoming_workshops": "No tienes talleres próximos",
-    "next_session_label": "Próxima Sesión"
+    "no_upcoming_workshops": "No tienes talleres próximos"
   },
   "Evaluation": {
     "title": "Evaluación Competencial",
@@ -146,15 +149,35 @@
     "thanks_title": "Gracias",
     "thanks_message": "Tu valoración se ha enviado correctamente.",
     "model_not_found": "No se ha encontrado el modelo de cuestionario.",
-    "load_error": "No se ha podido cargar el cuestionario.",
+    "load_error": "No se han podido cargar el cuestionario.",
     "submit_error": "No se ha podido enviar el cuestionario."
   },
   "Notifications": {
-    "tagline": "Comunicaciones",
-    "title": "Avisos Oficiales",
+    "tagline": "Notificaciones",
+    "title": "Avisos y Mensajes",
     "mark_read": "Marcar como leído",
     "delete": "Eliminar",
-    "empty": "No hay avisos nuevos"
+    "empty": "No hay avisos nuevos",
+    "phase_start_title": "Nueva Fase: {{name}}",
+    "phase_start_msg": "La fase \"{{name}}\" ha comenzado. Consulta el calendario para más detalles.",
+    "calendar_sync_title": "Sincronización de Calendario (Sistema)",
+    "calendar_sync_msg": "Verificación de calendario en segundo plano ejecutada",
+    "session_reminder_title": "Recordatorio: Sesión de Taller",
+    "session_reminder_msg": "Tienes una sesión para el taller \"{{title}}\" programada para hoy a las {{time}}.",
+    "milestone_reminder_title": "Próximo Hito: {{title}}",
+    "milestone_reminder_msg": "Recordatorio: El hito \"{{title}}\" está programado para las próximas 24 horas.",
+    "request_status_title": "Solicitud {{status}}",
+    "request_status_msg": "Tu solicitud para el taller \"{{title}}\" ha sido {{status_low}}.",
+    "incorrect_doc_title": "Documentación Incorrecta",
+    "incorrect_doc_msg": "Hola, el documento {{doc}} del taller {{title}} es incorrecto. {{comment}}",
+    "registration_confirmed_title": "Matrícula Confirmada: Taller en Curso",
+    "registration_confirmed_msg": "La matrícula para el taller \"{{title}}\" se ha completado correctamente. El taller ya está activo y se han generado las sesiones en tu calendario.",
+    "workshop_assigned_title": "Taller Asignado (Tetris)!",
+    "workshop_assigned_msg": "Tu solicitud para el taller \"{{title}}\" ha sido aprobada y asignada.",
+    "assignments_published_title": "Asignaciones Publicadas",
+    "assignments_published_msg": "Ya puedes consultar las asignaciones y empezar a introducir los datos de los alumnos.",
+    "Approved": "Aprobada",
+    "Rejected": "Rechazada"
   },
   "Tabs": {
     "dashboard": "Inicio",
@@ -182,7 +205,8 @@
   },
   "Coordination": {
     "teacher_space": "Espacio del Docente",
-    "collaboration": "Coordinación y Soporte",
+    "title": "Coordinación",
+    "collaboration": "Equipo de Coordinación",
     "teaching_team": "Equipo Docente",
     "main_referent": "Referente Principal",
     "secondary_referent": "Segundo Referente",
@@ -190,5 +214,15 @@
     "no_contacts_yet": "Todavía no tienes contactos de coordinación.",
     "group_chat_instruction": "Pronto podrás chatear directamente con el equipo de coordinación del centro.",
     "contact": "Contacto"
+  },
+  "Support": {
+    "title": "Soporte",
+    "chat_admin": "Chat con Administración",
+    "direct_contact": "Contacto directo"
+  },
+  "Resources": {
+    "title": "Recursos",
+    "materials": "Materiales y Guías",
+    "view_all": "Ver todo"
   }
 }

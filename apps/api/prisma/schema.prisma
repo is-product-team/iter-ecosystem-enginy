@@ -523,6 +523,7 @@ model Question {
   text       String
   type       ResponseType       @map("tipus")
   options    Json?              @map("opcions") // For choice questions
+  responses  QuestionnaireResponse[]
 
   @@map("preguntes")
 }
@@ -532,6 +533,7 @@ model QuestionnaireResponse {
   questionnaireId Int           @map("id_questionnaire")
   questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [questionnaireId], onDelete: Cascade)
   questionId      Int           @map("id_question")
+  question        Question      @relation(fields: [questionId], references: [questionId], onDelete: Cascade)
   value           String        @db.Text @map("valor")
 
   @@map("respostes_questionari")

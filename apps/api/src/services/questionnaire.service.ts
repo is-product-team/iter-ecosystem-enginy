@@ -164,25 +164,164 @@ export class QuestionnaireService {
         return this.submitPublicSurvey(data);
     }
 
-    async getSatisfactionMetrics() {
-        // Global metrics (reusing the aggregation logic without assignment filter)
-        const aggregations = await prisma.studentSelfConsultation.aggregate({
-            _avg: {
-                workshopClarity: true,
-                materialQuality: true,
-                learningInterest: true,
-                supportRating: true,
-                experienceRating: true,
-                teacherRating: true,
+    async getSatisfactionMetrics(centerId?: number) {
+        try {
+            const whereClause: any = {};
+            if (centerId) {
+                whereClause.enrollment = {
+                    assignment: { centerId: centerId }
+                };
+            }
+
+            // 1. Student Self-Consultation Metrics
+            const studentAggregations = await prisma.studentSelfConsultation.aggregate({
+                where: whereClause,
+                _avg: {
+                    workshopClarity: true,
+                    materialQuality: true,
+                    learningInterest: true,
+                    supportRating: true,
+                    experienceRating: true,
+                    teacherRating: true,
+                },
+                _count: {
+                    _all: true
+                }
+            });
+
+            // 2. Teacher Evaluation Metrics
+            const teacherWhere: any = {
+                questionnaire: { 
+                    target: 'TEACHER', 
+                    isCompleted: true
+                },
+                question: { type: 'RATING' }
+            };
+
+            if (centerId) {
+                teacherWhere.questionnaire.assignment = { centerId: centerId };
+            }
+
+            const teacherRatings = await prisma.questionnaireResponse.findMany({
+                where: teacherWhere,
+                select: {
+                    value: true,
+                    questionnaireId: true,
+                    question: { select: { text: true } }
+                }
+            });
+
+            const teacherAverages: Record<string, number> = {};
+            const sums: Record<string, { s: number, c: number }> = {};
+            const uniqueQuestionnaires = new Set();
+
+            teacherRatings.forEach(r => {
+                uniqueQuestionnaires.add(r.questionnaireId);
+                const val = parseInt(r.value);
+                if (!isNaN(val)) {
+                    if (!sums[r.question.text]) sums[r.question.text] = { s: 0, c: 0 };
+                    sums[r.question.text].s += val;
+                    sums[r.question.text].c += 1;
+                }
+            });
+
+            Object.keys(sums).forEach(key => {
+                teacherAverages[key] = sums[key].s / sums[key].c;
+            });
+
+            return {
+                globalAverages: studentAggregations._avg,
+                totalSubmissions: studentAggregations._count._all,
+                teacherAverages,
+                totalTeacherSubmissions: uniqueQuestionnaires.size
+            };
+        } catch (error: any) {
+            console.error("❌ [QuestionnaireService] Error in getSatisfactionMetrics:", error);
+            throw new Error(`Failed to aggregate satisfaction metrics: ${error.message}`);
+        }
+    }
+
+    async getAssignmentResponses(assignmentId: number) {
+        // Get the teacher's questionnaire for this assignment
+        const questionnaire = await prisma.questionnaire.findFirst({
+            where: {
+                assignmentId,
+                target: 'TEACHER',
+                isCompleted: true
             },
-            _count: {
-                _all: true
+            include: {
+                responses: {
+                    include: {
+                        question: true
+                    }
+                }
             }
         });
 
-        return {
-            globalAverages: aggregations._avg,
-            totalSubmissions: aggregations._count._all
+        if (!questionnaire) return null;
+
+        return questionnaire.responses.map(r => ({
+            question: r.question.text,
+            type: r.question.type,
+            value: r.value
+        }));
+    }
+
+    async getEvaluationsList(centerId?: number) {
+        const whereClause: any = {
+            target: 'TEACHER',
+            isCompleted: true
         };
+
+        if (centerId) {
+            whereClause.assignment = { centerId };
+        }
+
+        const questionnaires = await prisma.questionnaire.findMany({
+            where: whereClause,
+            include: {
+                assignment: {
+                    include: {
+                        workshop: true,
+                        teachers: {
+                            include: {
+                                user: {
+                                    select: { fullName: true }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    include: {
+                        question: true
+                    }
+                }
+            },
+            orderBy: {
+                completedAt: 'desc'
+            }
+        });
+
+        return questionnaires.map(q => {
+            const metrics: Record<string, string | number> = {};
+            q.responses.forEach(r => {
+                if (r.question.type === 'RATING') {
+                    metrics[r.question.text] = parseInt(r.value);
+                } else {
+                    metrics[r.question.text] = r.value;
+                }
+            });
+
+            return {
+                questionnaireId: q.questionnaireId,
+                assignmentId: q.assignmentId,
+                workshopTitle: q.assignment.workshop.title,
+                modality: q.assignment.workshop.modality,
+                teacherName: q.assignment.teachers.find(t => t.isPrincipal)?.user.fullName || q.assignment.teachers[0]?.user.fullName || 'N/A',
+                date: q.completedAt,
+                metrics
+            };
+        });
     }
 }
