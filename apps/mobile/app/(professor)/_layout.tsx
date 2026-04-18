@@ -27,6 +27,8 @@ export default function ProfessorStackLayout() {
       <Stack.Screen name="session/[id]" />
       <Stack.Screen name="questionnaire/[id]" />
       <Stack.Screen name="support" />
+      <Stack.Screen name="issue/new" />
+      <Stack.Screen name="issue/[id]" />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="coordination" />
     </Stack>

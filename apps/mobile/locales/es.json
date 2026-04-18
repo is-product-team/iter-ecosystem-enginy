@@ -224,5 +224,45 @@
     "title": "Recursos",
     "materials": "Materiales y Guías",
     "view_all": "Ver todo"
+  },
+  "Issues": {
+    "title": "Gestión de Incidencias",
+    "subtitle": "Comunicación directa con la administración para la resolución de problemas.",
+    "new": "Nueva Incidencia",
+    "details": "Detalle de la Incidencia",
+    "no_incidents": "No hay incidencias reportadas.",
+    "create_success": "Incidencia creada correctamente.",
+    "message_success": "Mensaje enviado.",
+    "status_updated": "Estado actualizado.",
+    "priority_updated": "Prioridad actualizada.",
+    "form": {
+      "title": "Título de la incidencia",
+      "category": "Categoría",
+      "priority": "Prioridad",
+      "description": "Descripción detallada",
+      "submit": "Abrir Incidencia"
+    },
+    "chat": {
+      "placeholder": "Escribe un mensaje...",
+      "system_msg": "Mensaje del sistema",
+      "admin_reply": "Respuesta de la Administración"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Asunto",
+      "status": "Estado",
+      "priority": "Prioridad",
+      "category": "Categoría",
+      "date": "Fecha",
+      "center": "Centro"
+    },
+    "categories": {
+      "DOCUMENTATION": "Documentación",
+      "MATERIAL": "Material",
+      "TECHNICAL": "Técnica",
+      "ABSENCE": "Ausencia",
+      "FACILITIES": "Espacio",
+      "OTHER": "Otros"
+    }
   }
 }

@@ -1,98 +1,176 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import issueService, { Issue } from '@/services/issueService';
+import { THEME } from '@iter/shared';
 
-export default function SupportChatScreen() {
+export default function SupportScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const [message, setMessage] = React.useState('');
+  const router = useRouter();
+  
+  const [issues, setIssues] = React.useState<Issue[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const fetchIssues = async () => {
+    try {
+      const data = await issueService.getAll();
+      setIssues(data);
+    } catch (error) {
+      console.error('Error fetching issues:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchIssues();
+  }, []);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchIssues();
+  }, []);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'OPEN': return '#3B82F6'; // Blue
+      case 'IN_PROGRESS': return '#F59E0B'; // Amber
+      case 'RESOLVED': return '#10B981'; // Green
+      case 'CLOSED': return '#64748B'; // Slate
+      default: return '#64748B';
+    }
+  };
+
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case 'CRITICAL': return { name: 'alert-circle', color: '#EF4444' };
+      case 'HIGH': return { name: 'chevron-up-circle', color: '#F97316' };
+      case 'MEDIUM': return { name: 'remove-circle', color: '#F59E0B' };
+      default: return { name: 'chevron-down-circle', color: '#10B981' };
+    }
+  };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-background-page"
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-      <View style={{ paddingTop: insets.top + 60 }} className="flex-1">
-        <Stack.Screen 
-          options={{ 
-            headerShown: true, 
-            headerTitle: '', 
-            headerTransparent: true,
-            headerShadowVisible: false,
-            headerBackTitle: t('Common.back'),
-            headerTintColor: '#4197CB',
-          }} 
-        />
-        
-        {/* Apple-style Large Header */}
-        <View className="px-8 pb-6">
+    <View style={{ paddingTop: insets.top + 60 }} className="flex-1 bg-background-page">
+      <Stack.Screen 
+        options={{ 
+          headerShown: true, 
+          headerTitle: '', 
+          headerTransparent: true,
+          headerShadowVisible: false,
+          headerBackTitle: t('Common.back'),
+          headerTintColor: '#4197CB',
+        }} 
+      />
+      
+      {/* Apple-style Large Header */}
+      <View className="px-8 pb-6 flex-row justify-between items-end">
+        <View className="flex-1">
            <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
              {t('Support.direct_contact')}
            </Text>
-           <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
-             {t('Support.title')}
+           <Text className="text-[38px] font-light text-black dark:text-white tracking-tight leading-[42px]">
+             {t('Issues.title')}
            </Text>
         </View>
+        <TouchableOpacity 
+          onPress={() => router.push('/issue/new')}
+          className="w-12 h-12 bg-primary rounded-full items-center justify-center shadow-lg"
+          activeOpacity={0.8}
+        >
+          <Ionicons name="add" size={28} color="white" />
+        </TouchableOpacity>
+      </View>
 
+      {loading && !refreshing ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color={THEME.colors.primary} size="large" />
+        </View>
+      ) : (
         <ScrollView 
           className="flex-1 px-6" 
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.colors.primary} />
+          }
         >
-          {/* Support Info Card */}
-          <View className="bg-white dark:bg-gray-800 p-6 rounded-[24px] mb-8 shadow-sm border border-border-subtle">
-            <View className="flex-row items-center mb-4">
-               <View className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-2xl items-center justify-center mr-4">
-                  <Ionicons name="chatbubbles" size={24} color="#FF9500" />
+          {issues.length === 0 ? (
+            <View className="items-center py-20">
+               <View className="w-24 h-24 bg-background-subtle rounded-full items-center justify-center mb-6">
+                  <Ionicons name="chatbubble-ellipses-outline" size={48} color="#CBD5E1" />
                </View>
-               <View>
-                  <Text className="text-text-primary font-bold text-lg">{t('Support.chat_admin')}</Text>
-                  <Text className="text-text-muted text-sm">{t('Common.coming_soon')}</Text>
-               </View>
+               <Text className="text-slate-400 font-medium text-center px-10 text-[16px]">
+                  {t('Issues.no_incidents')}
+               </Text>
+               <TouchableOpacity 
+                 onPress={() => router.push('/issue/new')}
+                 className="mt-8 px-8 py-3 bg-white dark:bg-gray-800 rounded-full border border-border-subtle shadow-sm"
+               >
+                  <Text className="text-primary font-bold">{t('Issues.new')}</Text>
+               </TouchableOpacity>
             </View>
-            <Text className="text-text-secondary leading-relaxed">
-              {t('Coordination.group_chat_instruction')}
-            </Text>
-          </View>
-
-          {/* Placeholder for chat history */}
-          <View className="items-center py-20">
-             <View className="w-20 h-20 bg-background-subtle rounded-full items-center justify-center mb-4">
-                <Ionicons name="chatbubble-ellipses-outline" size={40} color="#CBD5E1" />
-             </View>
-             <Text className="text-slate-400 font-medium text-center px-10">
-                Encara no hi ha cap conversa activa amb l&apos;administració.
-             </Text>
-          </View>
+          ) : (
+            <View className="space-y-4 pt-2">
+              {issues.map((issue) => {
+                const priorityIcon = getPriorityIcon(issue.priority);
+                return (
+                  <TouchableOpacity
+                    key={issue.issueId}
+                    onPress={() => router.push(`/issue/${issue.issueId}`)}
+                    activeOpacity={0.7}
+                    className="bg-white dark:bg-gray-800 p-5 rounded-[24px] shadow-sm border border-border-subtle"
+                  >
+                    <View className="flex-row justify-between items-start mb-3">
+                      <View className="flex-1 mr-4">
+                        <Text className="text-text-primary font-bold text-[17px] mb-1" numberOfLines={1}>
+                          {issue.title}
+                        </Text>
+                        <Text className="text-text-muted text-[13px]">
+                          {new Date(issue.createdAt).toLocaleDateString()} • {t(`Issues.categories.${issue.category}`)}
+                        </Text>
+                      </View>
+                      <View 
+                        className="px-3 py-1 rounded-full" 
+                        style={{ backgroundColor: `${getStatusColor(issue.status)}20` }}
+                      >
+                        <Text 
+                          className="text-[11px] font-bold" 
+                          style={{ color: getStatusColor(issue.status) }}
+                        >
+                          {issue.status}
+                        </Text>
+                      </View>
+                    </View>
+                    
+                    <View className="flex-row items-center justify-between border-t border-slate-50 dark:border-slate-700/50 pt-3">
+                      <View className="flex-row items-center">
+                        <Ionicons name={priorityIcon.name as any} size={16} color={priorityIcon.color} />
+                        <Text className="text-text-muted text-[13px] ml-1.5 font-medium">
+                          {issue.priority}
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center">
+                        <Text className="text-primary text-[13px] font-bold mr-1">
+                          {issue._count?.messages || 0}
+                        </Text>
+                        <Ionicons name="chatbubbles-outline" size={16} color={THEME.colors.primary} />
+                        <Ionicons name="chevron-forward" size={14} color="#CBD5E1" style={{ marginLeft: 8 }} />
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </ScrollView>
-
-        {/* Input Area (Placeholder) */}
-        <View 
-          style={{ paddingBottom: insets.bottom + 20 }} 
-          className="px-6 pt-4 bg-background-surface border-t border-border-subtle"
-        >
-           <View className="flex-row items-center bg-background-subtle rounded-2xl px-4 py-2 border border-border-subtle">
-              <TextInput 
-                className="flex-1 py-2 text-text-primary text-[16px]"
-                placeholder="Escriu un missatge..."
-                placeholderTextColor="#94A3B8"
-                value={message}
-                onChangeText={setMessage}
-                multiline
-              />
-              <TouchableOpacity 
-                disabled={!message.trim()}
-                className={`ml-2 w-10 h-10 rounded-full items-center justify-center ${message.trim() ? 'bg-primary' : 'bg-slate-200'}`}
-              >
-                 <Ionicons name="arrow-up" size={24} color="white" />
-              </TouchableOpacity>
-           </View>
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+      )}
+    </View>
   );
 }
