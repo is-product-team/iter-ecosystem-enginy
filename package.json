@@ -16,6 +16,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "clean": "turbo run clean && rm -rf node_modules **/.next **/dist **/.turbo",
     "db:generate": "turbo run db:generate",
+    "db:migrate": "turbo run db:migrate",
     "db:push": "turbo run db:push",
     "db:seed": "turbo run db:seed",
     "db:clean": "turbo run db:clean",

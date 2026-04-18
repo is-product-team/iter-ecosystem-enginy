@@ -116,7 +116,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                 onClick={async () => {
                   try {
                     const api = getApi();
-                    await api.post(`/assignments/${id}/sessions/bulk-assign`, { userId: assignment.teacher1!.userId });
+                    await api.post(`/assignments/${id}/sessions/bulk-assign`, { userId: assignment.teacher1?.userId });
                     const res = await api.get(`/assignments/${id}`);
                     setAssignment(res.data);
                     toast.success(t('bulk_assign_success') || 'Equip sincronitzat correctament');

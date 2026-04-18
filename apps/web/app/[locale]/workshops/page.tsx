@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination from "@/components/Pagination";
 import workshopService, { Workshop } from "@/services/workshopService";
+import DataTable, { Column } from "@/components/ui/DataTable";
+import DataTableToolbar, { FilterSelect } from "@/components/ui/DataTableToolbar";
 
 export default function WorkshopAdminPage() {
   const t = useTranslations('Admin.Workshops');
@@ -28,24 +30,20 @@ export default function WorkshopAdminPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSector, setSelectedSector] = useState(tc("all_sectors"));
   const [selectedModality, setSelectedModality] = useState(tc("all_modalities"));
+  const [groupBy, setGroupBy] = useState<string | null>(null);
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
-    setCurrentPage(1);
   };
 
   const handleSectorChange = (val: string) => {
     setSelectedSector(val);
-    setCurrentPage(1);
   };
 
   const handleModalityChange = (val: string) => {
     setSelectedModality(val);
-    setCurrentPage(1);
   };
   const [isCreateModalVisible, setCreateModalVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -120,12 +118,6 @@ export default function WorkshopAdminPage() {
     });
   }, [workshops, searchQuery, selectedSector, selectedModality, tc]);
 
-  const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
-  const paginatedWorkshops = filteredWorkshops.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
   const handleWorkshopSaved = (savedWorkshop: Workshop) => {
     setWorkshops((prev) => {
       const exists = prev.find((w) => w._id === savedWorkshop._id);
@@ -162,6 +154,76 @@ export default function WorkshopAdminPage() {
     });
   };
 
+  const columns: Column<Workshop>[] = [
+    {
+      header: "Taller",
+      render: (workshop) => <span className="table-primary">{workshop.title}</span>,
+      width: 250
+    },
+    {
+      header: "Sector",
+      render: (workshop) => <span className="table-tag-muted">{workshop.sector}</span>,
+      width: 150
+    },
+    {
+      header: "Modalitat",
+      render: (workshop) => (
+        <span className={
+          workshop.modality === 'A' ? 'table-tag-green' :
+          workshop.modality === 'B' ? 'table-tag-orange' :
+          'table-tag-blue'
+        }>
+          {workshop.modality}
+        </span>
+      ),
+      width: 100,
+      align: 'center'
+    },
+    {
+      header: "Hores",
+      render: (workshop) => <span className="table-detail">{workshop.technicalDetails?.durationHours ?? 0}h</span>,
+      width: 80,
+      align: 'center'
+    },
+    {
+      header: "Places",
+      render: (workshop) => <span className="table-detail">{workshop.technicalDetails?.maxPlaces ?? 0}</span>,
+      width: 80,
+      align: 'center'
+    },
+    {
+      header: "Descripció",
+      render: (workshop) => (
+        <span className="table-detail italic">
+          {workshop.technicalDetails?.description || "-"}
+        </span>
+      ),
+      width: 500
+    },
+    {
+      header: t("table_actions"),
+      align: 'right',
+      render: (workshop) => (
+        <div className="flex justify-end items-center gap-4">
+          <button
+            onClick={(e) => { e.stopPropagation(); handleEdit(workshop); }}
+            className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
+          >
+            {tc("edit")}
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDelete(workshop._id); }}
+            className="text-text-muted hover:text-red-600 transition-colors"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      )
+    }
+  ];
+
   if (authLoading || !user || user.role.name !== ROLES.ADMIN) {
     return <Loading fullScreen message={tc("authenticating")} />;
   }
@@ -187,158 +249,59 @@ export default function WorkshopAdminPage() {
       subtitle={t("management_subtitle")}
       actions={headerActions}
     >
-      {/* Filters Panel */}
-      <div className="mb-10 flex flex-col lg:flex-row gap-8 bg-background-surface border border-border-subtle p-10">
-        {/* Text Search */}
-        <div className="flex-1">
-          <label className="block text-[13px] font-medium text-text-primary mb-3">{tc("search_by_title")}</label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={tc("search_placeholder")}
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-11 pr-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary placeholder:text-text-muted transition-all"
+      <DataTableToolbar
+        search={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: tc('search_placeholder')
+        }}
+        onClear={() => {
+          setSearchQuery("");
+          setSelectedSector(tc("all_sectors"));
+          setSelectedModality(tc("all_modalities"));
+        }}
+        filters={
+          <>
+            <FilterSelect
+              label={tc("sector")}
+              value={selectedSector}
+              onChange={setSelectedSector}
+              options={uniqueSectors.map(s => ({ label: s, value: s }))}
             />
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Sector Filter */}
-        <div className="lg:w-64">
-          <label className="block text-[13px] font-medium text-text-primary mb-3">{tc("filter_by_sector")}</label>
-          <select
-            value={selectedSector}
-            onChange={(e) => handleSectorChange(e.target.value)}
-            className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
-          >
-            {uniqueSectors.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Modality Filter */}
-        <div className="lg:w-64">
-          <label className="block text-[11px] font-medium text-text-primary mb-3">{tc("filter_by_modality")}</label>
-          <select
-            value={selectedModality}
-            onChange={(e) => handleModalityChange(e.target.value)}
-            className="w-full px-4 py-3.5 bg-background-subtle border border-border-subtle focus:border-consorci-darkBlue outline-none text-sm font-medium text-text-primary appearance-none"
-          >
-            {uniqueModalities.map(m => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Action: Clear */}
-        <div className="flex items-end">
-          <button
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedSector(tc("all_sectors"));
-              setSelectedModality(tc("all_modalities"));
-            }}
-            className="w-full lg:w-auto px-6 py-3 text-[13px] font-medium text-text-muted hover:text-red-500 hover:bg-red-500/5 transition-all h-[49px]"
-          >
-            {tc("clear_filters")}
-          </button>
-        </div>
-      </div>
+            <FilterSelect
+              label="Modalitat"
+              value={selectedModality}
+              onChange={setSelectedModality}
+              options={uniqueModalities.map(m => ({ label: m, value: m }))}
+            />
+          </>
+        }
+        groups={{
+          value: groupBy || '',
+          onChange: setGroupBy,
+          options: [
+            { label: 'Sector', value: 'sector' },
+            { label: 'Modalitat', value: 'modality' }
+          ]
+        }}
+      />
 
       {/* Workshops Table */}
-      {loading ? (
-        <Loading message={t("loading_catalog")} />
-      ) : filteredWorkshops.length > 0 ? (
-        <>
-          <div className="bg-background-surface border border-border-subtle overflow-hidden">
-            <div className="premium-table-container">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-background-subtle border-b border-border-subtle">
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_info")}</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_classification")}</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary">{t("table_details")}</th>
-                    <th className="px-6 py-4 text-[12px] font-medium text-text-primary text-right">{t("table_actions")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border-subtle">
-                  {paginatedWorkshops.map((workshop) => (
-                    <tr key={workshop._id} className="hover:bg-background-subtle transition-colors group">
-                      <td className="px-6 py-6" title={workshop.title}>
-                        <div className="flex items-center gap-5">
-                          <div className="w-10 h-10 bg-background-subtle flex items-center justify-center text-text-primary group-hover:bg-consorci-darkBlue group-hover:text-white transition-colors border border-border-subtle">
-                            <WorkshopIcon iconName={workshop.icon} className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="text-[15px] font-medium text-text-primary leading-tight">{workshop.title}</div>
-                            <div className="text-[12px] font-medium text-text-muted mt-1 uppercase tracking-tighter opacity-70">{tc("id_label", { id: workshop._id })}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6 text-[13px] font-medium text-text-primary">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-consorci-darkBlue">{workshop.sector}</span>
-                          <span className="text-text-muted opacity-70">{tc("modality_label", { modality: workshop.modality })}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
-                            {tc("duration_label", { hours: workshop.technicalDetails?.durationHours ?? 0 })} • {tc("places_label", { count: workshop.technicalDetails?.maxPlaces ?? 0 })}
-                          </div>
-                          <div className="text-[12px] text-text-muted font-medium line-clamp-1 max-w-[240px] opacity-70">
-                            {workshop.technicalDetails?.description}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6">
-                        <div className="flex justify-end items-center gap-4">
-                          <button
-                            onClick={() => handleEdit(workshop)}
-                            className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
-                          >
-                            {tc("edit")}
-                          </button>
-                          <button
-                            onClick={() => handleDelete(workshop._id)}
-                            className="p-2 text-text-muted hover:text-red-600 transition-all"
-                          >
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalItems={filteredWorkshops.length}
-            currentItemsCount={paginatedWorkshops.length}
-            itemName={tc("workshops").toLowerCase()}
-          />
-        </>
-      ) : (
-        <div className="text-center py-32 bg-background-surface border border-dashed border-border-subtle">
-          <div className="w-16 h-16 bg-background-subtle flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <p className="text-text-primary font-medium text-sm">{tc("no_results")}</p>
-          <p className="text-text-muted text-[11px] font-normal mt-1">{tc("try_other_terms")}</p>
+      {error ? (
+        <div className="bg-red-50 border-l-4 border-red-500 p-6 mb-10">
+          <p className="text-red-700 font-bold text-sm">{error}</p>
         </div>
+      ) : (
+        <DataTable
+          data={filteredWorkshops}
+          columns={columns}
+          loading={loading}
+          emptyMessage={tc("no_results")}
+          getRowId={p => p._id}
+          hideTopBorder
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
+        />
       )}
 
       <CreateWorkshopModal
