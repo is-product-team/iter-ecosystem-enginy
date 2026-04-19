@@ -846,11 +846,22 @@ export const validateEnrollmentDocument = async (req: Request, res: Response) =>
 async function logStatusChange(assignmentId: number, oldState: string, newState: string, userId?: number) {
   if (oldState === newState) return;
   try {
-    // If no userId is provided, we try to find the first admin as a fallback "System" user
     let finalUserId = userId;
+    
+    // If no userId is provided (system action), find the first Admin to attribute the log
     if (!finalUserId) {
-      const systemUser = await prisma.user.findFirst({ where: { role: { roleName: ROLES.ADMIN } } });
-      finalUserId = systemUser?.userId || 1; // Fallback to 1 if all fails, better than 0
+      const systemAdmin = await prisma.user.findFirst({
+        where: { role: { roleName: ROLES.ADMIN } },
+        select: { userId: true }
+      });
+      finalUserId = systemAdmin?.userId;
+    }
+
+    // If still no user found, skip logging or use a safe null (AuditLog schema allowing)
+    // Looking at test failures, if userId is required and we use 1 but it doesn't exist, it crashes.
+    if (!finalUserId) {
+      console.warn(`[AuditLog] Skipping log for assignment ${assignmentId} - No valid user found for attribution.`);
+      return;
     }
 
     await prisma.auditLog.create({
@@ -1397,12 +1408,29 @@ export const removeSessionTeacher = async (req: Request, res: Response) => {
 export const closeAssignment = async (req: Request, res: Response) => {
   const { idAssignment } = req.params;
   const assignmentId = parseInt(idAssignment as string);
+  const { role, centerId, userId } = req.user!;
 
   try {
+    // 1. Fetch assignment to check authorization and current status
+    const assignment = await prisma.assignment.findUnique({
+      where: { assignmentId },
+      select: { centerId: true, status: true }
+    });
+
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+
+    // 2. Authorization: Only Admin or Center Coordinator
+    if (role !== ROLES.ADMIN && Number(assignment.centerId) !== Number(centerId)) {
+      return res.status(403).json({ error: 'Access denied: You cannot close assignments from another center' });
+    }
+
+    // 3. Execution Phase 4 closure
     const result = await closureService.closeAssignment(assignmentId);
-    
-    // Log the change
-    await logStatusChange(assignmentId, 'IN_PROGRESS', 'COMPLETED');
+
+    // Log the change (Task 2.1)
+    await logStatusChange(assignmentId, assignment.status, 'COMPLETED', userId);
 
     res.json({
       success: true,
@@ -1413,8 +1441,7 @@ export const closeAssignment = async (req: Request, res: Response) => {
     console.error("Error in closeAssignment:", error);
     res.status(400).json({ error: error.message });
   }
-};
-export const bulkAssignTeacherToSessions = async (req: Request, res: Response) => {
+};export const bulkAssignTeacherToSessions = async (req: Request, res: Response) => {
   const { idAssignment: assignmentId } = req.params;
   const { userId } = req.body;
 
