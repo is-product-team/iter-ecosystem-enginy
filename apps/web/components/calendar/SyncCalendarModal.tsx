@@ -118,26 +118,28 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
 
         {/* Tabs */}
         <div className="flex border-b border-border-subtle bg-background-surface">
-          <button
+          <Button
             onClick={() => setActiveTab('calendar')}
-            className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-widest transition-all ${
+            variant="subtle"
+            className={`flex-1 !py-4 !h-auto !text-[11px] !font-bold !uppercase !tracking-widest !rounded-none transition-all ${
               activeTab === 'calendar' 
-                ? 'text-consorci-darkBlue border-b-2 border-consorci-darkBlue bg-consorci-darkBlue/5' 
-                : 'text-text-muted hover:text-text-primary'
+                ? '!text-consorci-darkBlue !border-b-2 !border-consorci-darkBlue !bg-consorci-darkBlue/5' 
+                : '!text-text-muted hover:!text-text-primary'
             }`}
           >
             {t('tab_calendar')}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setActiveTab('notifications')}
-            className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-widest transition-all ${
+            variant="subtle"
+            className={`flex-1 !py-4 !h-auto !text-[11px] !font-bold !uppercase !tracking-widest !rounded-none transition-all ${
               activeTab === 'notifications' 
-                ? 'text-consorci-darkBlue border-b-2 border-consorci-darkBlue bg-consorci-darkBlue/5' 
-                : 'text-text-muted hover:text-text-primary'
+                ? '!text-consorci-darkBlue !border-b-2 !border-consorci-darkBlue !bg-consorci-darkBlue/5' 
+                : '!text-text-muted hover:!text-text-primary'
             }`}
           >
             {t('tab_notifications')}
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
