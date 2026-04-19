@@ -122,11 +122,11 @@ const MOCK_WORKSHOP: any = {
 };
 
 const getBaseURL = () => {
-  return Constants.expoConfig?.extra?.apiUrl;
+  return Constants.expoConfig?.extra?.apiUrl || '';
 };
 
 const api = axios.create({
-  baseURL: getBaseURL().endsWith('/') ? getBaseURL() : `${getBaseURL()}/`,
+  baseURL: getBaseURL() ? (getBaseURL().endsWith('/') ? getBaseURL() : `${getBaseURL()}/`) : 'http://localhost:3000/',
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',

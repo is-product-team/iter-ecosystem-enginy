@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl, Image, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -13,10 +13,6 @@ import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
 import { SessionCarousel } from '../../../components/dashboard/SessionCarousel';
 import { QuickAccessGrid } from '../../../components/dashboard/QuickAccessGrid';
 import { PageHeader } from '../../../components/ui/PageHeader';
-import * as ExpoConstants from 'expo-constants';
-
-const Constants = ExpoConstants.default || ExpoConstants;
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -53,9 +49,7 @@ export default function DashboardScreen() {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [selectedWorkshop, setSelectedWorkshop] = React.useState<CalendarEvent | null>(null);
   const [userName, setUserName] = React.useState(t('Common.professor'));
-  const [userInitials, setUserInitials] = React.useState(t('Common.initials_fallback'));
   const [unreadCount, setUnreadCount] = React.useState(0);
-  const [avatar, setAvatar] = React.useState<string | null>(null);
 
   const isMounted = React.useRef(true);
 
@@ -68,14 +62,11 @@ export default function DashboardScreen() {
     try {
       if (isRefresh) setRefreshing(true);
       let userData = null;
-      let userImage = null;
       try {
         if (Platform.OS === 'web') {
           userData = localStorage.getItem('user');
-          userImage = localStorage.getItem('user-avatar');
         } else {
           userData = await SecureStore.getItemAsync('user');
-          userImage = await SecureStore.getItemAsync('user-avatar');
         }
       } catch {
         if (isMounted.current) router.replace('/login');
@@ -87,18 +78,6 @@ export default function DashboardScreen() {
         if (isMounted.current) {
           if (user.firstName) setUserName(user.firstName);
           else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
-
-          if (user.fullName) {
-            const initials = user.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
-            setUserInitials(initials);
-          }
-
-          if (userImage) {
-            const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-            const path = userImage.startsWith('/') ? userImage : `/${userImage}`;
-            const fullUrl = userImage.startsWith('http') ? userImage : `${baseUrl}${path}`;
-            setAvatar(fullUrl);
-          }
         }
 
         const roleName = user.role?.roleName;
@@ -115,13 +94,6 @@ export default function DashboardScreen() {
       getMe().then(res => {
         if (res.data && isMounted.current) {
           const profile = res.data;
-          if (profile.photoUrl) {
-            const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-            const path = profile.photoUrl.startsWith('/') ? profile.photoUrl : `/${profile.photoUrl}`;
-            const absoluteUrl = profile.photoUrl.startsWith('http') ? profile.photoUrl : `${baseUrl}${path}`;
-
-            setAvatar(absoluteUrl);
-          }
           if (profile.fullName) {
              setUserName(profile.fullName.split(' ')[0]);
           }

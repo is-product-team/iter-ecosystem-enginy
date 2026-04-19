@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import { THEME } from '@iter/shared';
+import { View, ActivityIndicator, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { getCalendar } from '../../../services/api';
 import CalendarView, { CalendarEvent } from '../../../components/CalendarView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,12 +15,6 @@ export default function CalendarTabScreen() {
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
   const [isRangeFetching, setIsRangeFetching] = React.useState(false);
-
-  const onRefresh = React.useCallback(async () => {
-    setRefreshing(true);
-    await fetchRangeData(new Date());
-    setRefreshing(false);
-  }, [fetchRangeData]);
 
   const fetchRangeData = React.useCallback(async (date: Date) => {
     const year = date.getFullYear();
@@ -39,6 +32,12 @@ export default function CalendarTabScreen() {
       setLoading(false);
     }
   }, []);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await fetchRangeData(new Date());
+    setRefreshing(false);
+  }, [fetchRangeData]);
 
   React.useEffect(() => {
     fetchRangeData(new Date());

@@ -4,7 +4,7 @@ jest.mock('expo-asset');
 jest.mock('expo-constants', () => ({
   expoConfig: {
     extra: {
-      API_URL: 'http://localhost:3000',
+      apiUrl: 'http://localhost:3000',
     },
   },
 }));

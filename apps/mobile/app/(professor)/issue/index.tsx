@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -155,7 +155,7 @@ export default function IssueListScreen() {
                 {t('Issues.no_incidents')}
               </Text>
               <Text className="text-[14px] text-text-muted text-center leading-relaxed mb-8">
-                Aquí veuràs l'historial de les teves consultes i la comunicació amb l'administració.
+                Aquí veuràs l&apos;historial de les teves consultes i la comunicació amb l&apos;administració.
               </Text>
               <TouchableOpacity 
                 onPress={() => router.push('/(professor)/issue/new')}

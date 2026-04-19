@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Moda
 import { Ionicons } from '@expo/vector-icons';
 import { THEME, ROLES } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { useTranslation } from 'react-i18next';
@@ -139,6 +139,35 @@ export default function PerfilScreen() {
   const insets = useSafeAreaInsets();
   const { colorScheme, setColorScheme } = useColorScheme();
 
+  const [notifications, setNotifications] = React.useState(true);
+  const [user, setUser] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [loadingImage, setLoadingImage] = React.useState(false);
+
+  // Modal States
+  const [langModalVisible, setLangModalVisible] = React.useState(false);
+  const [themeModalVisible, setThemeModalVisible] = React.useState(false);
+
+  const fetchUserProfile = React.useCallback(async () => {
+    try {
+      const response = await api.get('/auth/me');
+      const updatedUser = response.data;
+      setUser(updatedUser);
+
+      // Sync local storage
+      if (Platform.OS === 'web') {
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } else {
+        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+      }
+    } catch (e) {
+      console.error("Error refreshing user profile", e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await fetchUserProfile();
@@ -211,40 +240,6 @@ export default function PerfilScreen() {
       setLangModalVisible(true);
     }
   };
-
-  const [notifications, setNotifications] = React.useState(true);
-  const [user, setUser] = React.useState<any>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [refreshing, setRefreshing] = React.useState(false);
-  const [loadingImage, setLoadingImage] = React.useState(false);
-
-  const fetchUserProfile = React.useCallback(async () => {
-    try {
-      const response = await api.get('/auth/me');
-      const updatedUser = response.data;
-      setUser(updatedUser);
-
-      // Sync local storage
-      if (Platform.OS === 'web') {
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-      } else {
-        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
-      }
-    } catch (e) {
-      console.error("Error refreshing user profile", e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchUserProfile();
-    }, [fetchUserProfile])
-  );
-
-  // Modal States
-  const [langModalVisible, setLangModalVisible] = React.useState(false);
-  const [themeModalVisible, setThemeModalVisible] = React.useState(false);
 
   React.useEffect(() => {
     async function loadUser() {

@@ -128,21 +128,17 @@ export function SessionCarousel({ sessions, initialIndex = 0, onPressSession }: 
       : null;
 
     let badgeText = t('Dashboard.next_session_label');
-    let badgeColor = '#F2F2F7';
     let textColor = '#8E8E93';
 
     if (item.isCurrent) {
       badgeText = t('Dashboard.current_session_label') || 'ARA MATEIX';
-      badgeColor = '#34C75915';
       textColor = '#34C759';
     } else if (item.isPast) {
       const showEvaluated = item.isEvaluated;
       badgeText = showEvaluated ? t('Common.evaluated') || 'VALORAT' : t('Dashboard.past_session_label') || 'REALITZADA';
-      badgeColor = showEvaluated ? '#34C75915' : '#FF3B3010';
       textColor = showEvaluated ? '#34C759' : '#FF3B30';
     } else if (item.isToday) {
       badgeText = t('Common.today');
-      badgeColor = '#007AFF15';
       textColor = '#007AFF';
     }
 
