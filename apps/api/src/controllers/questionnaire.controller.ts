@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { QuestionnaireService } from '../services/questionnaire.service.js';
+import { ROLES } from '@iter/shared';
 
 const questionnaireService = new QuestionnaireService();
 
@@ -12,6 +13,47 @@ export const getModels = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Failed to retrieve questionnaire models' });
     }
 };
+
+export const getReports = async (req: Request, res: Response) => {
+    try {
+        const { role, centerId } = req.user!;
+        const filterCenterId = role === ROLES.COORDINATOR ? centerId : undefined;
+
+        const metrics = await questionnaireService.getSatisfactionMetrics(filterCenterId);
+        res.json(metrics);
+    } catch (error) {
+        console.error("Error in questionnaire.controller.getReports:", error);
+        res.status(500).json({ error: 'Failed to retrieve satisfaction reports' });
+    }
+};
+
+export const getEvaluationsList = async (req: Request, res: Response) => {
+    try {
+        const { role, centerId } = req.user!;
+        const filterCenterId = role === ROLES.COORDINATOR ? centerId : undefined;
+
+        const list = await questionnaireService.getEvaluationsList(filterCenterId);
+        res.json(list);
+    } catch (error) {
+        console.error("Error in questionnaire.controller.getEvaluationsList:", error);
+        res.status(500).json({ error: 'Failed to retrieve evaluations list' });
+    }
+};
+
+export const getAssignmentEvaluation = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+        const responses = await questionnaireService.getAssignmentResponses(parseInt(id as string));
+        if (!responses) {
+            return res.status(404).json({ error: 'Evaluation not found for this assignment' });
+        }
+        res.json(responses);
+    } catch (error) {
+        console.error("Error in questionnaire.controller.getAssignmentEvaluation:", error);
+        res.status(500).json({ error: 'Failed to retrieve assignment evaluation' });
+    }
+};
+
 
 export const createModel = async (req: Request, res: Response) => {
     try {
@@ -66,15 +108,5 @@ export const submitSelfConsultation = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Error in questionnaire.controller.submitSelfConsultation:", error);
         res.status(500).json({ error: 'Failed to submit student self-consultation' });
-    }
-};
-
-export const getReports = async (req: Request, res: Response) => {
-    try {
-        const metrics = await questionnaireService.getSatisfactionMetrics();
-        res.json(metrics);
-    } catch (error) {
-        console.error("Error in questionnaire.controller.getReports:", error);
-        res.status(500).json({ error: 'Failed to retrieve satisfaction reports' });
     }
 };

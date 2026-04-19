@@ -119,8 +119,50 @@ export const CenterAttendanceSchema = z.object({
   observations: z.string().optional().nullable()
 });
 
+// Incidents / Issues - Aligned with Prisma Enums
+export const ISSUE_STATUSES = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+} as const;
+
+export const ISSUE_PRIORITIES = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+} as const;
+
+export const ISSUE_CATEGORIES = {
+  DOCUMENTATION: 'DOCUMENTATION',
+  MATERIAL: 'MATERIAL',
+  TECHNICAL: 'TECHNICAL',
+  ABSENCE: 'ABSENCE',
+  FACILITIES: 'FACILITIES',
+  OTHER: 'OTHER'
+} as const;
+
+export const IssueSchema = z.object({
+  title: z.string().min(3).max(100),
+  description: z.string().min(1),
+  priority: z.nativeEnum(ISSUE_PRIORITIES).optional(),
+  category: z.nativeEnum(ISSUE_CATEGORIES),
+  centerId: z.number().int(),
+  assignmentId: z.number().int().optional().nullable(),
+  sessionId: z.number().int().optional().nullable()
+});
+
+export const IssueMessageSchema = z.object({
+  issueId: z.number().int(),
+  content: z.string().min(1),
+  isSystem: z.boolean().optional().default(false)
+});
+
 export type WorkshopInput = z.infer<typeof WorkshopSchema>;
 export type StudentInput = z.infer<typeof StudentSchema>;
 export type RequestInput = z.infer<typeof RequestSchema>;
 export type AssignmentChecklistInput = z.infer<typeof AssignmentChecklistSchema>;
 export type CenterAttendanceInput = z.infer<typeof CenterAttendanceSchema>;
+export type IssueInput = z.infer<typeof IssueSchema>;
+export type IssueMessageInput = z.infer<typeof IssueMessageSchema>;

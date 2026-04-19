@@ -50,7 +50,12 @@ export const getAssignments = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
-        request: true, // Include request for fallback dates
+        request: {
+          include: {
+            teacher1: { include: { user: { select: { fullName: true } } } },
+            teacher2: { include: { user: { select: { fullName: true } } } }
+          }
+        },
         sessions: {
           orderBy: { sessionDate: 'asc' }
         },
@@ -79,6 +84,8 @@ export const getAssignments = async (req: Request, res: Response) => {
     // Transform assignments to flatten enrollment docs and handle dates
     const transformed = assignments.map(assig => ({
       ...assig,
+      teacher1: assig.request?.teacher1,
+      teacher2: assig.request?.teacher2,
       startDate: assig.startDate || assig.sessions[0]?.sessionDate || null,
       endDate: assig.endDate || assig.sessions[assig.sessions.length - 1]?.sessionDate || null,
       enrollments: assig.enrollments.map(flattenEnrollmentDocs)
@@ -102,7 +109,12 @@ export const getAssignmentById = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
-        request: true,
+        request: {
+          include: {
+            teacher1: { include: { user: { select: { fullName: true } } } },
+            teacher2: { include: { user: { select: { fullName: true } } } }
+          }
+        },
         sessions: {
           orderBy: { sessionDate: 'asc' },
           include: {
@@ -110,7 +122,8 @@ export const getAssignmentById = async (req: Request, res: Response) => {
               include: {
                 user: true
               }
-            }
+            },
+            attendance: true
           }
         },
         teachers: {
@@ -135,6 +148,8 @@ export const getAssignmentById = async (req: Request, res: Response) => {
     // Transform
     const transformed = {
       ...assignment,
+      teacher1: assignment.request?.teacher1,
+      teacher2: assignment.request?.teacher2,
       startDate: assignment.startDate || assignment.sessions[0]?.sessionDate || null,
       endDate: assignment.endDate || assignment.sessions[assignment.sessions.length - 1]?.sessionDate || null,
       enrollments: assignment.enrollments.map(flattenEnrollmentDocs)
@@ -180,7 +195,12 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
         workshop: true,
         center: true,
         checklist: true,
-        request: true,
+        request: {
+          include: {
+            teacher1: { include: { user: { select: { fullName: true } } } },
+            teacher2: { include: { user: { select: { fullName: true } } } }
+          }
+        },
         teachers: {
           include: { user: { select: { fullName: true, userId: true } } }
         },
@@ -191,13 +211,26 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
               include: {
                 user: true
               }
-            }
+            },
+            attendance: true
           }
         },
         enrollments: {
           include: {
             student: true,
-            evaluations: true
+            evaluations: true,
+            attendance: true
+          }
+        },
+        questionnaires: {
+          where: {
+            target: 'TEACHER',
+            isCompleted: true
+          },
+          select: {
+            questionnaireId: true,
+            isCompleted: true,
+            target: true
           }
         }
       }
@@ -205,9 +238,15 @@ export const getAssignmentsByCenter = async (req: Request, res: Response) => {
 
     const transformed = assignments.map(assig => ({
       ...assig,
+      teacher1: assig.request?.teacher1,
+      teacher2: assig.request?.teacher2,
       startDate: assig.startDate || assig.sessions[0]?.sessionDate || null,
       endDate: assig.endDate || assig.sessions[assig.sessions.length - 1]?.sessionDate || null,
-      enrollments: assig.enrollments.map(flattenEnrollmentDocs)
+      enrollments: assig.enrollments.map(flattenEnrollmentDocs),
+      submissions: assig.questionnaires.map(q => ({
+        ...q,
+        status: q.isCompleted ? 'RESPONDED' : 'PENDING'
+      }))
     }));
 
     res.json(transformed);
@@ -225,7 +264,7 @@ export const getStudents = async (req: Request, res: Response) => {
       where: { assignmentId: parseInt(assignmentId as string) },
       include: {
         student: true,
-        evaluations: { select: { evaluationId: true } } // include evaluation check
+        evaluations: { select: { evaluationId: true } }
       }
     });
 
@@ -1107,10 +1146,7 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    // 2. Ensure attendance records are initialized
-    await SessionService.ensureAttendanceRecords(assignmentId, targetSession.sessionId, num, targetSession.sessionDate);
-
-    // 3. Get combined attendance list
+    // 2. Get combined attendance list
     const rawAttendance = await prisma.attendance.findMany({
       where: {
         sessionId: targetSession.sessionId
