@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import {
@@ -9,13 +9,13 @@ import {
   Copy,
   RefreshCw,
   X,
-  ExternalLink,
   ShieldCheck,
   Smartphone
 } from 'lucide-react';
 import api from '@/services/api';
 import { toast } from 'sonner';
 import Button from '../ui/Button';
+import Loading from '../Loading';
 
 interface SyncCalendarModalProps {
   isOpen: boolean;
@@ -29,13 +29,7 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
   const [copying, setCopying] = useState(false);
   const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar');
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchSyncToken();
-    }
-  }, [isOpen]);
-
-  const fetchSyncToken = async () => {
+  const fetchSyncToken = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api().get('/profile/sync-token');
@@ -45,7 +39,13 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchSyncToken();
+    }
+  }, [isOpen, fetchSyncToken]);
 
   const generateToken = async () => {
     if (!confirm(t('regenerate_confirm'))) return;
@@ -66,7 +66,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
 
   // URL Construction
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-  // Clean apiUrl if it has /api prefix (typical in this project context)
   const domain = apiUrl.replace(/^https?:\/\//, '').replace(/\/api$/, '');
   const protocol = apiUrl.startsWith('https') ? 'https' : 'http';
 
@@ -87,15 +86,12 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="relative w-full max-w-xl bg-background-surface border border-border-subtle shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border-subtle bg-background-subtle">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-consorci-darkBlue/10 flex items-center justify-center text-consorci-darkBlue">
@@ -116,7 +112,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
           </Button>
         </div>
 
-        {/* Tabs */}
         <div className="flex border-b border-border-subtle bg-background-surface">
           <Button
             onClick={() => setActiveTab('calendar')}
@@ -142,7 +137,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
           </Button>
         </div>
 
-        {/* Content */}
         <div className="p-8 space-y-8">
           {loading ? (
             <div className="py-12 flex flex-col items-center justify-center space-y-4">
@@ -150,7 +144,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
             </div>
           ) : (
             <>
-              {/* Buttons Section */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <a
                   href={googleUrl}
@@ -171,7 +164,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
                 </a>
               </div>
 
-              {/* URL Section */}
               <div className="space-y-3">
                 <label className="text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('copy_btn')}</label>
                 <div className="flex items-center gap-2 p-1 border border-border-subtle bg-background-subtle">
@@ -190,7 +182,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
                 </div>
               </div>
 
-              {/* Instructions Section */}
               <div className="p-6 bg-background-subtle border border-border-subtle space-y-4">
                 <div className="flex items-center gap-2 text-consorci-darkBlue">
                   <ShieldCheck className="w-4 h-4" />
@@ -214,7 +205,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-8 py-5 border-t border-border-subtle bg-background-subtle flex justify-between items-center">
           <Button
             onClick={generateToken}

@@ -155,6 +155,7 @@ export default function AdminReportsPage() {
                     >
                         {t('view_details')}
                     </Button>
+                </div>
 
             </div>
         </DashboardLayout>

@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Assignment } from '@/services/assignmentService';
 import Button from '../ui/Button';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface AssignmentMonitorCardProps {
   assignment: Assignment;
@@ -103,34 +103,6 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
             </div>
         </div>
 
-      {/* Action area */}
-      <div className="mt-8 flex flex-col gap-3">
-        {canBeClosed && onCloseClick && (
-          <Button 
-            onClick={() => onCloseClick(assignment)}
-            variant="primary"
-            fullWidth
-            size="sm"
-            className="tracking-widest uppercase font-black"
-          >
-            {tAssig('close_section.confirm_btn')}
-          </Button>
-        )}
-        
-        <Button 
-          onClick={() => router.push(`/${locale}/center/sessions?assignmentId=${assignment.assignmentId}`)}
-          variant="outline"
-          fullWidth
-          size="sm"
-          className="uppercase tracking-wider group"
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          }
-        >
-          {t('view_details')}
-        </Button>
         {/* Status / Alerts - Inline */}
         {sessions.some(s => !s.staff || s.staff.length === 0) && (
             <div className="flex items-center gap-1.5 mb-4">
@@ -139,33 +111,41 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
             </div>
         )}
 
-        {/* Actions - Combined Row */}
-        <div className="mt-auto flex items-center gap-2">
-            {canBeClosed && onCloseClick && (
-                <button 
-                    onClick={() => onCloseClick(assignment)}
-                    className="flex-1 py-3 bg-consorci-darkBlue text-white text-[9px] font-normal uppercase tracking-[0.15em] hover:bg-black transition-all"
-                >
-                    {tAssig('close_section.confirm_btn')}
-                </button>
-            )}
-            
-            <Link 
-                href={`/${locale}/center/sessions?assignmentId=${assignment.assignmentId}`}
-                className={`group/link flex items-center justify-between border-b border-black/10 hover:border-consorci-darkBlue py-2.5 transition-all ${canBeClosed ? 'px-2' : 'w-full'}`}
+        {/* Action area */}
+        <div className="mt-auto flex flex-col gap-3">
+          {canBeClosed && onCloseClick && (
+            <Button 
+              onClick={() => onCloseClick(assignment)}
+              variant="primary"
+              fullWidth
+              size="sm"
+              className="tracking-widest uppercase font-black"
             >
-                <span className="text-[9px] font-normal text-consorci-darkBlue uppercase tracking-[0.15em]">{t('view_details')}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2 text-consorci-darkBlue transition-transform group-hover/link:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              {tAssig('close_section.confirm_btn')}
+            </Button>
+          )}
+          
+          <Button 
+            onClick={() => router.push(`/${locale}/center/sessions?assignmentId=${assignment.assignmentId}`)}
+            variant="outline"
+            fullWidth
+            size="sm"
+            className="uppercase tracking-wider group"
+          >
+            <span className="flex items-center justify-between w-full">
+                <span>{t('view_details')}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-            </Link>
+            </span>
+          </Button>
         </div>
       </div>
     </div>
   );
 };
 
-const StatItemMini = ({ label, value, color }: { label: string, value: number, color: string }) => (
+const StatItemMini = ({ label, value, color }: { label: string; value: number; color: string }) => (
     <div className="text-center">
         <p className={`text-lg font-light tabular-nums leading-none mb-1 ${value > 0 ? color : 'text-neutral-200'}`}>{value}</p>
         <p className="text-[8px] font-normal text-neutral-400 uppercase tracking-tighter">{label}</p>

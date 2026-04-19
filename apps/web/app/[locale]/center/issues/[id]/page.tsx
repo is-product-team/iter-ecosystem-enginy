@@ -1,20 +1,20 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import issueService, { Issue, IssueMessage } from '@/services/issueService';
+import issueService, { Issue } from '@/services/issueService';
 import Loading from '@/components/Loading';
 import { format } from 'date-fns';
 import { ca, es } from 'date-fns/locale';
+import Button from '@/components/ui/Button';
 
 export default function CenterIssueDetailPage() {
   const t = useTranslations('Issues');
   const tCommon = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const params = useParams();
   const id = params?.id ? Number(params.id) : null;
   const locale = params?.locale || 'ca';
@@ -26,7 +26,7 @@ export default function CenterIssueDetailPage() {
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const loadIssue = async () => {
+  const loadIssue = useCallback(async () => {
     if (!id) return;
     try {
       const data = await issueService.getById(id);
@@ -36,21 +36,21 @@ export default function CenterIssueDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     if (user && id) {
       loadIssue();
     }
-  }, [user, id]);
+  }, [user, id, loadIssue]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [issue?.messages]);
+  }, [issue?.messages, scrollToBottom]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +100,7 @@ export default function CenterIssueDetailPage() {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 sm:p-10 custom-scrollbar">
-          {issue.messages?.map((msg, idx) => {
+          {issue.messages?.map((msg) => {
             const isMe = msg.senderId === user?.userId;
             const isAdmin = msg.sender?.role.roleName === 'ADMIN';
 
@@ -150,13 +150,15 @@ export default function CenterIssueDetailPage() {
               className="flex-1 px-6 py-4 bg-background-subtle border border-border-subtle text-sm font-medium focus:border-consorci-darkBlue outline-none transition-all"
               disabled={issue.status === 'CLOSED'}
             />
-            <button
+            <Button
               type="submit"
               disabled={!newMessage.trim() || sending || issue.status === 'CLOSED'}
-              className="px-8 py-4 bg-consorci-darkBlue text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black transition-all active:scale-95 disabled:opacity-50"
+              loading={sending}
+              variant="primary"
+              className="px-8 !py-4 font-bold !text-[11px] uppercase tracking-widest"
             >
-              {sending ? '...' : tCommon('send')}
-            </button>
+              {tCommon('send')}
+            </Button>
           </form>
         </div>
       </div>
