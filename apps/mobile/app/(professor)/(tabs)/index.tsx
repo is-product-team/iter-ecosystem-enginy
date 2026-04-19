@@ -398,8 +398,6 @@ export default function DashboardScreen() {
         <PageHeader 
           title={greeting} 
           subtitle={subtitle} 
-          profileImage={avatar}
-          userInitials={userInitials}
         />
 
         {/* ── Sessions Carousel ── */}

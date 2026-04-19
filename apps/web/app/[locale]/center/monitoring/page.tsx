@@ -149,142 +149,70 @@ export default function MonitoringPage() {
       <div className="w-full pb-20">
         <KPIOverview stats={stats} />
 
-        <div className="flex flex-col gap-10">
-          <div className="flex items-center justify-between border-b border-border-subtle">
-            <div className="flex gap-8">
-              <button
-                onClick={() => handleTabChange('active')}
-                className={`pb-4 text-sm font-bold uppercase tracking-widest transition-all relative ${
-                  activeTab === 'active' 
-                    ? 'text-indigo-600' 
-                    : 'text-text-muted hover:text-text-primary'
-                }`}
-              >
-                {t('tabs.active')}
-                {activeTab === 'active' && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600" />
-                )}
-              </button>
-              <button
-                onClick={() => handleTabChange('completed')}
-                className={`pb-4 text-sm font-bold uppercase tracking-widest transition-all relative ${
-                  activeTab === 'completed' 
-                    ? 'text-indigo-600' 
-                    : 'text-text-muted hover:text-text-primary'
-                }`}
-              >
-                {t('tabs.completed')}
-                {activeTab === 'completed' && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600" />
-                )}
-              </button>
+        <div className="flex flex-col gap-16 mt-12">
+          {/* Active Workshops Section */}
+          <section className="space-y-8">
+            <div className="border-b border-border-subtle pb-4 flex items-center justify-between">
+              <h3 className="text-xl font-bold uppercase tracking-tight text-text-primary">{t('tabs.active')}</h3>
+              <span className="text-[10px] font-black text-consorci-darkBlue bg-consorci-darkBlue/5 px-3 py-1 border border-consorci-darkBlue/10 uppercase tracking-widest">
+                {assignments.filter(a => a.status !== 'COMPLETED').length} {t('tabs.active').toLowerCase()}
+              </span>
             </div>
-          </div>
 
-          {selectedAssignment && (
-            <div id="closure-section" className="mb-10 animate-in fade-in slide-in-from-top-4 duration-500 relative flex flex-col gap-8">
-              {/* Closure Header */}
-              <div className="flex justify-between items-center bg-blue-900 text-white p-6 shadow-lg">
-                <div className="flex flex-col">
-                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-70">
-                        {locale === 'ca' ? 'GESTIÓ DE TANCAMENT' : 'GESTIÓN DE CIERRE'}
-                    </span>
-                    <span className="text-xl font-black uppercase tracking-tighter">
-                        {selectedAssignment.workshop?.title}
-                    </span>
+            {selectedAssignment && (
+              <div id="closure-section" className="animate-in fade-in slide-in-from-top-4 duration-500 relative flex flex-col gap-0 border border-border-subtle shadow-2xl z-20">
+                {/* Closure Header */}
+                <div className="flex justify-between items-center bg-consorci-darkBlue text-white p-8">
+                  <div className="flex flex-col">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-1">
+                          {locale === 'ca' ? 'GESTIÓ DE TANCAMENT' : 'GESTIÓN DE CIERRE'}
+                      </span>
+                      <span className="text-2xl font-black uppercase tracking-tighter">
+                          {selectedAssignment.workshop?.title}
+                      </span>
+                  </div>
+                  <Button 
+                    onClick={() => setSelectedAssignment(null)}
+                    variant="subtle"
+                    size="sm"
+                    className="text-white hover:!text-consorci-lightBlue !p-2"
+                  >
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </Button>
                 </div>
-                <Button 
-                  onClick={() => setSelectedAssignment(null)}
-                  variant="subtle"
-                  size="sm"
-                  className="text-white hover:!text-blue-200 !p-1"
-                >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                </Button>
-              </div>
 
-              {/* Closure Section Only */}
-              <div className="bg-gray-50 p-8 border border-neutral-200">
-                <CloseWorkshopSection 
-                    assignment={selectedAssignment} 
-                    onSuccess={() => {
-                        setSelectedAssignment(null);
-                        fetchData();
+                {/* Closure Section Only */}
+                <div className="bg-background-surface p-0">
+                  <CloseWorkshopSection 
+                      assignment={selectedAssignment} 
+                      onSuccess={() => {
+                          setSelectedAssignment(null);
+                          fetchData();
+                      }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {assignments.filter(a => a.status !== 'COMPLETED').length === 0 ? (
+              <div className="p-20 text-center bg-background-surface border border-dashed border-border-subtle">
+                <p className="text-sm text-text-muted font-medium italic">{t('no_assignments')}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {assignments.filter(a => a.status !== 'COMPLETED').map(a => (
+                  <AssignmentMonitorCard 
+                    key={a.assignmentId} 
+                    assignment={a} 
+                    onCloseClick={(clickedAssig) => {
+                      setSelectedAssignment(clickedAssig);
+                      window.scrollTo({ top: 400, behavior: 'smooth' });
                     }}
-                />
+                  />
+                ))}
               </div>
-            </div>
-          )}
-
-          {filteredAssignments.length === 0 ? (
-            <div className="p-20 text-center bg-background-surface border border-dashed border-border-subtle">
-              <p className="text-sm text-text-muted font-medium italic">
-                {activeTab === 'active' ? t('no_assignments') : t('no_completed_assignments')}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredAssignments.map(a => (
-                <AssignmentMonitorCard 
-                  key={a.assignmentId} 
-                  assignment={a} 
-                  onCloseClick={(clickedAssig) => {
-                    setSelectedAssignment(clickedAssig);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Evaluations List Section */}
-          {evaluations.length > 0 && (
-            <div className="mt-12 space-y-6">
-              <div className="border-b border-border-subtle pb-6">
-                <h3 className="text-xl font-medium text-text-primary tracking-tight">{t('tabs.evaluations')}</h3>
-              </div>
-              <TeacherEvaluationsTable 
-                evaluations={evaluations} 
-                onViewDetails={(assignmentId) => {
-                  const assignment = assignments.find(a => a.assignmentId === assignmentId);
-                  if (assignment) {
-                    setFeedbackAssignment(assignment);
-                    setTimeout(() => {
-                        document.getElementById('feedback-section')?.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                  }
-                }} 
-              />
-            </div>
-          )}
-
-          {/* Teacher Feedback Detail - MOVED BELOW TABLE */}
-          {feedbackAssignment && feedbackData && (
-            <div id="feedback-section" className="mt-12 animate-in fade-in slide-in-from-bottom-4 duration-500 relative flex flex-col gap-6">
-              <div className="flex justify-between items-center bg-blue-50 border-l-4 border-blue-600 p-6">
-                <div className="flex flex-col">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600">
-                        {t('Feedback.title')}
-                    </span>
-                    <span className="text-lg font-black uppercase tracking-tighter text-blue-900">
-                        {feedbackAssignment.workshop?.title}
-                    </span>
-                </div>
-                <Button 
-                  onClick={() => setFeedbackAssignment(null)}
-                  variant="subtle"
-                  size="sm"
-                  className="text-blue-600 hover:!text-blue-900 !p-1"
-                >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                </Button>
-              </div>
-
-              <div className="animate-in fade-in duration-700">
-                <TeacherFeedback responses={feedbackData} />
-              </div>
-            </div>
-          )}
+            )}
+          </section>
         </div>
       </div>
     </DashboardLayout>

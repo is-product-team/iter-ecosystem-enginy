@@ -48,25 +48,25 @@ export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assi
   };
 
   return (
-    <div className="p-8 flex flex-col gap-8 shadow-sm border bg-indigo-50 border-indigo-100 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="p-8 flex flex-col gap-8 shadow-sm border bg-background-subtle border-border-subtle mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <h4 className="text-lg font-black uppercase text-indigo-700">{t('close_section.title')}</h4>
-          <p className="text-xs text-gray-600 mt-1 max-w-xl">{t('close_section.desc')}</p>
+          <h4 className="text-lg font-black uppercase text-consorci-darkBlue">{t('close_section.title')}</h4>
+          <p className="text-xs text-text-muted mt-1 max-w-xl">{t('close_section.desc')}</p>
         </div>
         <Button
           onClick={handleClose}
           variant="primary"
           size="lg"
           loading={loading}
-          className="bg-indigo-600 hover:bg-indigo-700 shadow-xl tracking-widest uppercase font-black"
+          className="shadow-xl tracking-widest uppercase font-black"
         >
           {t('close_section.confirm_btn')}
         </Button>
       </div>
 
-      <div className="border-t border-indigo-100 pt-6">
-        <h5 className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-4">{locale === 'ca' ? 'RESUM DE CERTIFICACIÓ' : 'RESUMEN DE CERTIFICACIÓN'}</h5>
+      <div className="border-t border-border-subtle pt-6">
+        <h5 className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-4">{locale === 'ca' ? 'RESUM DE CERTIFICACIÓ' : 'RESUMEN DE CERTIFICACIÓN'}</h5>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {assignment.enrollments?.map((ins: any) => {
             const total = assignment.sessions?.length || 0;
@@ -76,18 +76,18 @@ export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assi
             const willGetCert = pct >= 80 && hasEvaluation;
             
             return (
-              <div key={ins.enrollmentId} className="bg-white/50 p-4 border border-indigo-100 flex items-center justify-between">
+              <div key={ins.enrollmentId} className="bg-background-surface p-4 border border-border-subtle flex items-center justify-between">
                 <div>
-                  <p className="text-[12px] font-bold text-gray-900">{ins.student.fullName}</p>
-                  <p className="text-[10px] text-gray-500">{pct}% {locale === 'ca' ? 'assistència' : 'asistencia'}</p>
+                  <p className="text-[12px] font-bold text-text-primary">{ins.student.fullName}</p>
+                  <p className="text-[10px] text-text-muted">{pct}% {locale === 'ca' ? 'assistència' : 'asistencia'}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   {!hasEvaluation ? (
-                    <span className="text-[8px] font-black uppercase bg-orange-100 text-orange-600 px-1.5 py-0.5 whitespace-nowrap">{tc('badges.need_eval')}</span>
+                    <span className="text-[8px] font-black uppercase bg-orange-500/10 text-orange-600 px-1.5 py-0.5 whitespace-nowrap">{tc('badges.need_eval')}</span>
                   ) : willGetCert ? (
-                    <span className="text-[8px] font-black uppercase bg-green-100 text-green-600 px-1.5 py-0.5 whitespace-nowrap">{tc('badges.will_certify')}</span>
+                    <span className="text-[8px] font-black uppercase bg-consorci-green/10 text-consorci-green px-1.5 py-0.5 whitespace-nowrap">{tc('badges.will_certify')}</span>
                   ) : (
-                    <span className="text-[8px] font-black uppercase bg-gray-100 text-gray-500 px-1.5 py-0.5 whitespace-nowrap">{tc('badges.no_cert')}</span>
+                    <span className="text-[8px] font-black uppercase bg-background-subtle text-text-muted px-1.5 py-0.5 whitespace-nowrap">{tc('badges.no_cert')}</span>
                   )}
                 </div>
               </div>

@@ -227,6 +227,15 @@ export default function NewIssueScreen() {
             headerShadowVisible: false,
             headerBackTitle: t('Common.back'),
             headerTintColor: '#4197CB',
+            headerRight: () => (
+              <TouchableOpacity 
+                onPress={() => router.push('/(professor)/issue')}
+                className="mr-4 p-2"
+                activeOpacity={0.7}
+              >
+                <Ionicons name="chatbubbles-outline" size={24} color="#4197CB" />
+              </TouchableOpacity>
+            ),
           }} 
         />
         
@@ -252,7 +261,7 @@ export default function NewIssueScreen() {
             <TextInput 
               className="bg-white dark:bg-gray-800 border border-border-subtle rounded-2xl px-6 py-5 text-text-primary text-[17px] shadow-sm font-medium"
               placeholder="Ex: Problema amb el material..."
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor="#475569"
               value={title}
               onChangeText={setTitle}
             />
@@ -274,7 +283,7 @@ export default function NewIssueScreen() {
             <TextInput 
               className="bg-white dark:bg-gray-800 border border-border-subtle rounded-[24px] px-6 py-5 text-text-primary text-[17px] min-h-[180px] shadow-sm leading-relaxed"
               placeholder="Explica'ns què ha passat amb detall..."
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor="#475569"
               value={description}
               onChangeText={setDescription}
               multiline

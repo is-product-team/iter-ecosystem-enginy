@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Modal, Pressable, Image, ActivityIndicator, StyleSheet, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Modal, Pressable, Image, ActivityIndicator, StyleSheet, RefreshControl, ActionSheetIOS } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME, ROLES } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
@@ -148,6 +148,69 @@ export default function PerfilScreen() {
   const handleThemeChange = (val: 'light' | 'dark' | 'system') => {
     setColorScheme(val);
   };
+
+  const handleLanguageChange = async (val: string) => {
+    await i18n.changeLanguage(val);
+    if (Platform.OS === 'web') {
+      localStorage.setItem('user-language', val);
+    } else {
+      await SecureStore.setItemAsync('user-language', val);
+    }
+  };
+
+  const showThemeSelection = () => {
+    const options = [
+      t('Profile.appearance_options.light'),
+      t('Profile.appearance_options.dark'),
+      t('Profile.appearance_options.system'),
+      t('Common.cancel')
+    ];
+    const values: ('light' | 'dark' | 'system')[] = ['light', 'dark', 'system'];
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex: 3,
+          title: t('Profile.appearance'),
+          userInterfaceStyle: colorScheme === 'dark' ? 'dark' : 'light'
+        },
+        (buttonIndex) => {
+          if (buttonIndex < 3) {
+            handleThemeChange(values[buttonIndex]);
+          }
+        }
+      );
+    } else {
+      setThemeModalVisible(true);
+    }
+  };
+
+  const showLanguageSelection = () => {
+    const options = [
+      t('Profile.languages.ca'),
+      t('Profile.languages.es'),
+      t('Common.cancel')
+    ];
+    const values = ['ca', 'es'];
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex: 2,
+          title: t('Profile.language'),
+        },
+        (buttonIndex) => {
+          if (buttonIndex < 2) {
+            handleLanguageChange(values[buttonIndex]);
+          }
+        }
+      );
+    } else {
+      setLangModalVisible(true);
+    }
+  };
   
   const [notifications, setNotifications] = React.useState(true);
   const [user, setUser] = React.useState<any>(null);
@@ -207,7 +270,14 @@ export default function PerfilScreen() {
 
   const getProfileImage = () => {
     if (user?.photoUrl) {
-      return { uri: user.photoUrl.startsWith('http') ? user.photoUrl : `${API_URL}${user.photoUrl}` };
+      if (user.photoUrl.startsWith('http')) {
+        return { uri: user.photoUrl };
+      }
+      
+      // Robust join of API_URL and photoUrl
+      const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+      const path = user.photoUrl.startsWith('/') ? user.photoUrl : `/${user.photoUrl}`;
+      return { uri: `${baseUrl}${path}` };
     }
     return null;
   };
@@ -436,7 +506,7 @@ export default function PerfilScreen() {
               iconColor="#5856D6" 
               title={t('Profile.appearance')}
               subtitle={currentThemeLabel}
-              onPress={() => setThemeModalVisible(true)}
+              onPress={showThemeSelection}
            />
 
            <SettingItem 
@@ -445,7 +515,7 @@ export default function PerfilScreen() {
               title={t('Profile.language')}
               subtitle={currentLangLabel}
               isLast
-              onPress={() => setLangModalVisible(true)}
+              onPress={showLanguageSelection}
            />
         </View>
 
@@ -500,14 +570,7 @@ export default function PerfilScreen() {
         title={t('Profile.language')}
         t={t}
         selectedValue={i18n.language.startsWith('ca') ? 'ca' : 'es'}
-        onSelect={async (val) => {
-          await i18n.changeLanguage(val);
-          if (Platform.OS === 'web') {
-            localStorage.setItem('user-language', val);
-          } else {
-            await SecureStore.setItemAsync('user-language', val);
-          }
-        }}
+        onSelect={handleLanguageChange}
         options={[
           { label: t('Profile.languages.ca'), value: 'ca' },
           { label: t('Profile.languages.es'), value: 'es' },
