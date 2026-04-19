@@ -404,12 +404,7 @@
     "Monitoring": {
       "title": "Operational Monitoring",
       "subtitle": "Status of workshop execution and attendance at your center.",
-<<<<<<< HEAD
-      "description": "Monitoring of workshop execution, attendance and incidents in real time.",
-      "no_assignments": "There are no active workshops at this time.",
-=======
       "description": "Control attendance, milestones, and the status of all your active workshops.",
->>>>>>> dev
       "KPI": {
         "sessions_today": "Sessions Today",
         "pending_attendance": "Pending Sheets",

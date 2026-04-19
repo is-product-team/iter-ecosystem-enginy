@@ -404,12 +404,8 @@
     "Monitoring": {
       "title": "Monitorización Operativa",
       "subtitle": "Estado de la ejecución de talleres y asistencia en tu centro.",
-<<<<<<< HEAD
       "description": "Seguimiento de la ejecución de talleres, asistencia e incidencias en tiempo real.",
       "no_assignments": "No hay talleres activos en este momento.",
-=======
-      "description": "Controla la asistencia, los hitos y el estado de todos tus talleres activos.",
->>>>>>> dev
       "KPI": {
         "sessions_today": "Sesiones Hoy",
         "pending_attendance": "Hojas Pendientes",

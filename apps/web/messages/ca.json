@@ -403,14 +403,8 @@
     },
     "Monitoring": {
       "title": "Monitorització Operativa",
-<<<<<<< HEAD
-      "subtitle": "Estat de l'execució de tallers i assistència al teu centre.",
-      "description": "Seguimiento de la ejecución de talleres, asistencia e incidencias en tiempo real.",
-      "no_assignments": "No hi ha tallers actius en aquest moment.",
-=======
       "subtitle": "Estat de l'execució de tallers i assistència en el teu centre.",
       "description": "Controla l'asistència, les fites i l'estat de tots els teus tallers actius.",
->>>>>>> dev
       "KPI": {
         "sessions_today": "Sessions Avui",
         "pending_attendance": "Fulls Pendents",
@@ -484,10 +478,6 @@
       "no_completed": "No hi ha tallers finalitzats recents.",
       "messages": {
         "error_analytics": "No s'ha pogut carregar l'analítica.",
-<<<<<<< HEAD
-        "success_download": "¡Descàrrega iniciada correctament!",
-        "error_zip": "Error en generar el fitxer ZIP."
-=======
         "success_download": "Descàrrega iniciada correctament!",
         "error_zip": "Error en generar l'arxiu ZIP."
       },
@@ -495,7 +485,6 @@
         "title": "Valoració del Professorat",
         "description": "Mètriques agregades de les sessions realitzades",
         "responses_count": "{count} RESPOSTES"
->>>>>>> dev
       }
     },
     "Closure": {
