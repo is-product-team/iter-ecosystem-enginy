@@ -10,12 +10,12 @@ interface ButtonProps extends TouchableOpacityProps {
 export function Button({ label, loading, variant = 'primary', className = '', disabled, ...props }: ButtonProps) {
   const baseClass = "py-4 items-center justify-center rounded-xl flex-row";
   
-  let variantClass = "bg-primary";
+  let variantClass = "bg-[#4197CB]";
   let textClass = "text-white";
 
   if (variant === 'secondary') {
     variantClass = "bg-transparent border border-border-subtle";
-    textClass = "text-primary";
+    textClass = "text-[#4197CB]";
   } else if (variant === 'danger') {
     variantClass = "bg-[#FF3B30]";
   }

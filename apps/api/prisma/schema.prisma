@@ -97,6 +97,8 @@ model User {
   teachers        Teacher[]
   student         Student?
   logs            AuditLog[]
+  createdIssues   Issue[]            @relation("IssueCreator")
+  issueMessages   IssueMessage[]
 
   @@map("usuaris")
 }
@@ -410,18 +412,66 @@ model Notification {
 }
 
 model Issue {
-  issueId     Int      @id @default(autoincrement()) @map("id_issue")
-  centerId    Int      @map("id_center")
-  center      Center   @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
-  description String   @map("descripcio") @db.Text
-  createdAt   DateTime @default(now()) @map("data_creacio")
+  issueId      Int           @id @default(autoincrement()) @map("id_issue")
+  title        String?       @map("titol")
+  description  String        @map("descripcio") @db.Text
+  status       IssueStatus   @default(OPEN) @map("estat")
+  priority     IssuePriority @default(MEDIUM) @map("prioritat")
+  category     IssueCategory @default(OTHER) @map("categoria")
+  
+  centerId     Int           @map("id_center")
+  center       Center        @relation(fields: [centerId], references: [centerId], onDelete: Cascade)
+  
+  creatorId    Int           @map("id_creador")
+  creator      User          @relation("IssueCreator", fields: [creatorId], references: [userId])
 
-  assignmentId Int?        @map("id_assignacio")
-  assignment   Assignment? @relation(fields: [assignmentId], references: [assignmentId], onDelete: SetNull)
-  sessionId    Int?        @map("id_sessio")
-  session      Session?    @relation(fields: [sessionId], references: [sessionId], onDelete: SetNull)
+  assignmentId Int?          @map("id_assignacio")
+  assignment   Assignment?   @relation(fields: [assignmentId], references: [assignmentId], onDelete: SetNull)
+  sessionId    Int?          @map("id_sessio")
+  session      Session?      @relation(fields: [sessionId], references: [sessionId], onDelete: SetNull)
+
+  messages     IssueMessage[]
+  
+  createdAt    DateTime      @default(now()) @map("data_creacio")
+  resolvedAt   DateTime?     @map("data_resolucio")
 
   @@map("incidencies")
+}
+
+model IssueMessage {
+  messageId    Int      @id @default(autoincrement()) @map("id_missatge")
+  issueId      Int      @map("id_issue")
+  issue        Issue    @relation(fields: [issueId], references: [issueId], onDelete: Cascade)
+  senderId     Int?     @map("id_sender")
+  sender       User?    @relation(fields: [senderId], references: [userId])
+  content      String   @db.Text @map("contingut")
+  isSystem     Boolean  @default(false) @map("es_sistema")
+  createdAt    DateTime @default(now()) @map("data_creacio")
+
+  @@map("missatges_incidencia")
+}
+
+enum IssueStatus {
+  OPEN        @map("Oberta")
+  IN_PROGRESS @map("En curs")
+  RESOLVED    @map("Resolta")
+  CLOSED      @map("Tancada")
+}
+
+enum IssuePriority {
+  LOW      @map("Baixa")
+  MEDIUM   @map("Mitjana")
+  HIGH     @map("Alta")
+  CRITICAL @map("Crítica")
+}
+
+enum IssueCategory {
+  DOCUMENTATION @map("Documentació")
+  MATERIAL      @map("Material")
+  TECHNICAL     @map("Tècnica")
+  ABSENCE       @map("Ausència")
+  FACILITIES    @map("Espai")
+  OTHER         @map("Altres")
 }
 
 enum QuestionnaireTarget {
@@ -474,6 +524,7 @@ model Question {
   text       String
   type       ResponseType       @map("tipus")
   options    Json?              @map("opcions") // For choice questions
+  responses  QuestionnaireResponse[]
 
   @@map("preguntes")
 }
@@ -483,6 +534,7 @@ model QuestionnaireResponse {
   questionnaireId Int           @map("id_questionnaire")
   questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [questionnaireId], onDelete: Cascade)
   questionId      Int           @map("id_question")
+  question        Question      @relation(fields: [questionId], references: [questionId], onDelete: Cascade)
   value           String        @db.Text @map("valor")
 
   @@map("respostes_questionari")

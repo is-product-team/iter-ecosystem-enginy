@@ -724,7 +724,7 @@
   },
   "Forms": {
     "edit_title": "تعديل",
-    "create_title": "إنشاء",
+    "create_title": "ورشة عمل جديدة",
     "search": "بحث...",
     "search_by_title": "البحث بالعنوان",
     "filter_by_sector": "تصفية حسب القطاع",
@@ -763,6 +763,8 @@
     "wednesday": "الأربعاء",
     "thursday": "الخميس",
     "friday": "الجمعة",
+    "saturday": "السبت",
+    "sunday": "الأحد",
     "Centers": {
       "edit_title": "Editar Centro",
       "create_title": "Crear Nuevo Centro",

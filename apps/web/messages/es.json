@@ -404,6 +404,7 @@
     "Monitoring": {
       "title": "Monitorización Operativa",
       "subtitle": "Estado de la ejecución de talleres y asistencia en tu centro.",
+      "description": "Controla la asistencia, los hitos y el estado de todos tus talleres activos.",
       "KPI": {
         "sessions_today": "Sesiones Hoy",
         "pending_attendance": "Hojas Pendientes",
@@ -413,18 +414,45 @@
       "Assignments": {
         "title": "Estado de los Talleres",
         "progress": "Progreso",
+        "sessions": "sesiones",
         "health": "Salud de la Asistencia",
-        "view_details": "Gestionar Sesiones",
+        "health_label": "Salud de la Asistencia",
+        "present": "Presente",
+        "late": "Retraso",
+        "absent": "Falta",
+        "staff_needed": "Profesorado pendiente",
+        "view_details": "Asignar Profesores",
         "no_staff": "⚠️ Sin profesor asignado",
         "attendance_ok": "Asistencia al día",
         "attendance_warning": "Faltan hojas por rellenar"
       },
       "tabs": {
         "active": "Talleres en Ejecución",
+        "evaluations": "Historial de Evaluaciones",
         "completed": "Resultados y Certificados (Fase 4)"
+      },
+      "EvaluationsTable": {
+        "title": "Evaluaciones por Taller",
+        "subtitle": "Historial detallado de las valoraciones del profesorado",
+        "search_placeholder": "Buscar taller o profesor...",
+        "columns": {
+          "workshop": "Taller",
+          "teacher": "Profesor/a",
+          "modality": "Mod.",
+          "date": "Fecha"
+        },
+        "view_feedback": "Ver Feedback",
+        "no_results": "No se han encontrado evaluaciones con estos filtros.",
+        "total_count": "Total: {count} evaluaciones registradas"
+      },
+      "Feedback": {
+        "title": "Valoración del Docente",
+        "comments_label": "Comentarios y observaciones",
+        "no_feedback": "Este taller aún no tiene valoración del profesor."
       },
       "no_active_assignments": "No hay talleres activos en este momento.",
       "no_completed_assignments": "No hay talleres finalizados recientemente.",
+      "no_assignments": "No se han encontrado talleres para monitorización.",
       "finished_on": "Finalizado el {date}",
       "view_analytics": "Ver Analítica",
       "certificates_zip": "Certificados (ZIP)",
@@ -448,9 +476,14 @@
       "no_active": "No hay talleres activos en este momento.",
       "no_completed": "No hay talleres finalizados recientemente.",
       "messages": {
-        "error_analytics": "No se ha podido cargar la analítica.",
+        "error_analytics": "No se pudo cargar la analítica.",
         "success_download": "¡Descarga iniciada correctamente!",
         "error_zip": "Error al generar el archivo ZIP."
+      },
+      "Satisfaction": {
+        "title": "Valoración del Profesorado",
+        "description": "Métricas agregadas de las sesiones realizadas",
+        "responses_count": "{count} RESPUESTAS"
       }
     }
   },
@@ -654,7 +687,8 @@
     "assignments": "Asignaciones",
     "sessions": "Sesiones",
     "profile": "Perfil",
-    "monitoring": "Monitorización"
+    "monitoring": "Monitorización",
+    "issues": "Incidencias"
   },
   "Dashboards": {
     "admin": {
@@ -739,7 +773,7 @@
   },
   "Forms": {
     "edit_title": "Editar",
-    "create_title": "Crear",
+    "create_title": "Nuevo taller",
     "search": "Buscar...",
     "search_by_title": "Buscar por título",
     "filter_by_sector": "Filtrar por sector",
@@ -778,6 +812,8 @@
     "wednesday": "Miércoles",
     "thursday": "Jueves",
     "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo",
     "Centers": {
       "edit_title": "Editar Centro",
       "create_title": "Crear Nuevo Centro",
@@ -1129,6 +1165,11 @@
     }
   },
   "Common": {
+    "success": "Éxito",
+    "view": "Ver",
+    "notif_preamble": "Tienes documentos pendientes para",
+    "notif_mid": "y",
+    "notif_reason": "Por favor, súbelos para completar el proceso.",
     "general": "General",
     "configuration": "Configuración",
     "global": "Global",
@@ -1163,6 +1204,8 @@
     "view_document": "Ver documento",
     "pending": "Pendiente",
     "authenticating": "Verificando credenciales...",
+    "evaluated": "Valorado",
+    "workshop_evaluated": "Taller Valorado",
     "search": "Buscar...",
     "all_statuses": "Todos los estados",
     "actions": "Acciones",
@@ -1267,7 +1310,11 @@
     "Execution": "Ejecución y Seguimiento",
     "Closure": "Cierre y Certificación",
     "Approved": "Aprobada",
+    "Aprobada": "Aprobada",
+    "aprobada": "Aprobada",
     "Rejected": "Rechazada",
+    "Rechazada": "Rechazada",
+    "rechazada": "Rechazada",
     "phase_start_title": "Nueva Fase: {name}",
     "phase_start_msg": "La fase \"{name}\" ha comenzado. Consulta el calendario para más detalles.",
     "calendar_sync_title": "Sincronización de Calendario (Sistema)",
@@ -1396,5 +1443,45 @@
     "footer_note": "Feedback anónimo para el centro. ¡Sé sincero!",
     "submit_button": "Enviar encuesta",
     "submitting": "Enviando..."
+  },
+  "Issues": {
+    "title": "Gestión de Incidencias",
+    "subtitle": "Comunicación directa con la administración para la resolución de problemas.",
+    "new": "Nueva Incidencia",
+    "details": "Detalle de la Incidencia",
+    "no_incidents": "No hay incidencias reportadas.",
+    "create_success": "Incidencia creada correctamente.",
+    "message_success": "Mensaje enviado.",
+    "status_updated": "Estado actualizado.",
+    "priority_updated": "Prioridad actualizada.",
+    "form": {
+      "title": "Título de la incidencia",
+      "category": "Categoría",
+      "priority": "Prioridad",
+      "description": "Descripción detallada",
+      "submit": "Abrir Incidencia"
+    },
+    "chat": {
+      "placeholder": "Escribe un mensaje...",
+      "system_msg": "Mensaje del sistema",
+      "admin_reply": "Respuesta de la Administración"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Asunto",
+      "status": "Estado",
+      "priority": "Prioridad",
+      "category": "Categoría",
+      "date": "Fecha",
+      "center": "Centro"
+    },
+    "categories": {
+      "DOCUMENTATION": "Documentación",
+      "MATERIAL": "Material",
+      "TECHNICAL": "Técnica",
+      "ABSENCE": "Ausencia",
+      "FACILITIES": "Espacio",
+      "OTHER": "Otros"
+    }
   }
 }

@@ -402,7 +402,7 @@ export default function PerfilScreen() {
               iconColor="#007AFF" 
               title={t('Profile.help')}
               isLast
-              onPress={() => {}}
+              onPress={() => router.push('/support')}
            />
         </View>
 

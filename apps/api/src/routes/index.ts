@@ -20,6 +20,7 @@ import surveyRoutes from './survey.routes.js';
 import uploadRoutes from './upload.routes.js';
 import profileRoutes from './profile.routes.js';
 import phase3StatsRoutes from './phase3-stats.routes.js';
+import issueRoutes from './issue.routes.js';
 
 // --- Define Base Routes ---
 
@@ -39,6 +40,7 @@ router.use('/requests', requestRoutes);
 router.use('/assignments', assignmentRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/evaluation', evaluationRoutes); 
+router.use('/issues', issueRoutes);
 
 // Student and Teacher Routes
 router.use('/students', studentRoutes);

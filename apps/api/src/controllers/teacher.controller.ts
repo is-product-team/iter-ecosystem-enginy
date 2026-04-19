@@ -197,11 +197,31 @@ export const getTeacherAssignments = async (req: Request, res: Response) => {
         },
         sessions: {
           orderBy: { sessionDate: 'asc' }
+        },
+        questionnaires: {
+          where: {
+            target: 'TEACHER',
+            isCompleted: true
+          },
+          select: {
+            questionnaireId: true,
+            isCompleted: true,
+            target: true
+          }
         }
       }
     });
 
-    res.json(assignments);
+    // Map questionnaires to submissions for frontend compatibility
+    const transformed = assignments.map(assig => ({
+      ...assig,
+      submissions: assig.questionnaires.map(q => ({
+        ...q,
+        status: q.isCompleted ? 'RESPONDED' : 'PENDING'
+      }))
+    }));
+
+    res.json(transformed);
   } catch (error) {
     console.error("Error fetching teacher assignments:", error);
     res.status(500).json({ error: 'Failed to retrieve center assignments.' });

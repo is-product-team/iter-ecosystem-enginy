@@ -51,7 +51,7 @@ const CreateWorkshopModal = ({
   const [tempEnd, setTempEnd] = useState("11:00");
 
   const daysMap: Record<number, string> = {
-    1: t('monday'), 2: t('tuesday'), 3: t('wednesday'), 4: t('thursday'), 5: t('friday')
+    1: t('monday'), 2: t('tuesday'), 3: t('wednesday'), 4: t('thursday'), 5: t('friday'), 6: t('saturday'), 0: t('sunday')
   };
 
   useEffect(() => {
@@ -286,10 +286,9 @@ const CreateWorkshopModal = ({
           <div className="md:w-5/12 bg-background-subtle p-8 overflow-y-auto">
             <section>
               <h3 className="text-[11px] font-medium text-text-primary mb-6 flex items-center gap-2 border-b border-border-subtle pb-3">
-                <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                {t('schedule')}
+              <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {t('schedule')}
               </h3>
-
               <div className="bg-background-surface p-6 border border-border-subtle mb-8 relative">
                 <h4 className="text-[11px] font-medium text-text-muted mb-4 text-center">{t('add_slot')}</h4>
                 <div className="space-y-4">
@@ -303,6 +302,8 @@ const CreateWorkshopModal = ({
                       <option value={3}>{t('wednesday')}</option>
                       <option value={4}>{t('thursday')}</option>
                       <option value={5}>{t('friday')}</option>
+                      <option value={6}>{t('saturday')}</option>
+                      <option value={0}>{t('sunday')}</option>
                     </select>
                   </div>
                   <div className="flex gap-4">

@@ -125,6 +125,7 @@ export const createLinkedIncident = async (req: Request, res: Response) => {
             data: {
                 centerId: parseInt(centerId),
                 description,
+                creatorId: userId,
                 assignmentId: assignmentId ? parseInt(assignmentId) : undefined,
                 sessionId: sessionId ? parseInt(sessionId) : undefined
             }
