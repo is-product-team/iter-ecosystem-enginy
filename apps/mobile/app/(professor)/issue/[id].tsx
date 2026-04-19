@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
+import { useLocalSearchParams, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import issueService, { Issue } from '@/services/issueService';
@@ -11,7 +11,6 @@ export default function IssueDetailScreen() {
   const { id } = useLocalSearchParams();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   const scrollViewRef = React.useRef<ScrollView>(null);
 
   const [issue, setIssue] = React.useState<Issue | null>(null);
@@ -19,7 +18,7 @@ export default function IssueDetailScreen() {
   const [message, setMessage] = React.useState('');
   const [sending, setSending] = React.useState(false);
 
-  const fetchIssue = async () => {
+  const fetchIssue = React.useCallback(async () => {
     try {
       const data = await issueService.getById(Number(id));
       setIssue(data);
@@ -30,11 +29,11 @@ export default function IssueDetailScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   React.useEffect(() => {
     fetchIssue();
-  }, [id]);
+  }, [fetchIssue]);
 
   const handleSendMessage = async () => {
     if (!message.trim() || sending) return;
@@ -108,7 +107,7 @@ export default function IssueDetailScreen() {
           <View className="items-center mb-8 px-4">
              <View className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 w-full">
                 <Text className="text-text-secondary text-[15px] italic leading-relaxed">
-                  "{issue.description}"
+                  &quot;{issue.description}&quot;
                 </Text>
                 <Text className="text-[11px] text-text-muted mt-2 text-right">
                    {new Date(issue.createdAt).toLocaleString()}
@@ -119,8 +118,6 @@ export default function IssueDetailScreen() {
           {/* Messages */}
           {issue.messages?.map((msg) => {
             const isSystem = msg.isSystem;
-            // Admin role or just different from creator? (For demo, assume if senderId exists and it's not the creator, it's admin)
-            const isAdmin = msg.senderId !== issue.creatorId && msg.senderId !== null;
             const isMe = msg.senderId === issue.creatorId;
 
             if (isSystem) {

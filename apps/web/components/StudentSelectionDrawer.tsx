@@ -6,6 +6,7 @@ import studentService, { Student } from '@/services/studentService';
 import { Enrollment } from '@/services/assignmentService';
 import Loading from '@/components/Loading';
 import Avatar from '@/components/Avatar';
+import Button from '@/components/ui/Button';
 
 interface StudentSelectionDrawerProps {
   isOpen: boolean;
@@ -99,9 +100,14 @@ export default function StudentSelectionDrawer({
               {t('selection_drawer.selected', { count: selectedIds.length, total: maxSeats })}
             </p>
           </div>
-          <button onClick={onClose} className="text-text-muted hover:text-red-500 transition-colors">
+          <Button
+            variant="subtle"
+            size="sm"
+            onClick={onClose}
+            className="text-text-muted hover:!text-red-500 !p-1"
+          >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
+          </Button>
         </div>
 
         <div className="p-8 border-b border-border-subtle bg-background-surface">
@@ -158,21 +164,22 @@ export default function StudentSelectionDrawer({
         </div>
 
         <div className="p-8 bg-background-subtle border-t border-border-subtle flex gap-4">
-          <button 
+          <Button 
             onClick={onClose}
-            className="flex-1 py-4 border border-border-subtle text-text-muted font-medium text-[13px] hover:bg-background-surface transition-all"
+            variant="outline"
+            fullWidth
+            disabled={saving || loading}
           >
             {tCommon('cancel')}
-          </button>
-          <button 
+          </Button>
+          <Button 
             onClick={handleSave}
-            disabled={saving || loading}
-            className={`flex-[2] py-4 bg-consorci-darkBlue text-white font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98] ${
-              saving || loading ? 'opacity-50' : ''
-            }`}
+            variant="primary"
+            fullWidth
+            loading={saving}
           >
             {saving ? tCommon('loading') : tCommon('save')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import api from '@/services/api';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 import { useRouter, usePathname } from '@/i18n/routing';
+import Button from '@/components/ui/Button';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -121,12 +122,12 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-          <button 
+          <Button 
             onClick={() => toast.info(t('coming_soon'))}
-            className="px-8 py-3 bg-consorci-darkBlue hover:bg-black text-white text-[13px] font-medium transition-all active:scale-[0.95]"
+            variant="primary"
           >
             {t('edit_profile')}
-          </button>
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -163,12 +164,13 @@ export default function ProfilePage() {
               </div>
               
               <div className="bg-background-surface border border-border-subtle p-8 shadow-sm">
-                <button 
+                <Button 
                   onClick={() => toast.info(t('coming_soon'))}
-                  className="w-full py-3 bg-background-subtle border border-border-subtle text-text-primary hover:border-text-primary text-[13px] font-medium transition-all"
+                  variant="outline"
+                  fullWidth
                 >
                   {t('change_password')}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -185,25 +187,16 @@ export default function ProfilePage() {
                 {/* Theme Selection */}
                 <div>
                   <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">{t('appearance_label')}</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { id: 'system', label: t('themes.system') },
-                      { id: 'light', label: t('themes.light') },
-                      { id: 'dark', label: t('themes.dark') }
-                    ].map((option) => (
-                      <button
-                        key={option.id}
-                        onClick={() => setTheme(option.id)}
-                        className={`px-4 py-2 text-[12px] font-medium border transition-all ${
-                          mounted && theme === option.id 
-                            ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' 
-                            : 'bg-background-subtle border-border-subtle text-text-primary hover:border-text-primary'
-                        }`}
+                    {['system', 'light', 'dark'].map((id) => (
+                      <Button
+                        key={id}
+                        onClick={() => setTheme(id)}
+                        variant={mounted && theme === id ? 'primary' : 'outline'}
+                        size="sm"
                       >
-                        {option.label}
-                      </button>
+                        {t(`themes.${id}`)}
+                      </Button>
                     ))}
-                  </div>
                 </div>
 
                 {/* Language Selection */}

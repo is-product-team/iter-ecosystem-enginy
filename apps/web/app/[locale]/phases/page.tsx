@@ -9,6 +9,7 @@ import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 import { toast } from "sonner";
 import { Calendar, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 interface Phase {
   phaseId: number;
@@ -174,25 +175,16 @@ export default function PhaseManagementPage() {
                   </div>
 
                   <div className="lg:w-64 flex flex-col justify-center lg:border-l border-border-subtle lg:pl-10">
-                    <button
+                    <Button
+                      variant={phase.isActive ? 'outline' : 'primary'}
+                      size="sm"
                       onClick={() => togglePhase(phase.phaseId, phase.isActive)}
-                      disabled={updating === phase.phaseId || phase.isActive}
-                      className={`w-full py-3.5 text-[12px] font-medium uppercase tracking-widest transition-all ${
-                        phase.isActive
-                          ? 'bg-background-subtle text-text-muted border border-border-subtle cursor-default'
-                          : 'bg-consorci-darkBlue text-white hover:bg-black active:scale-[0.98]'
-                      }`}
+                      disabled={phase.isActive}
+                      loading={updating === phase.phaseId}
+                      className="w-full uppercase tracking-widest px-0"
                     >
-                      {updating === phase.phaseId
-                        ? (
-                          <div className="flex items-center justify-center gap-3">
-                            <Loading size="mini" white />
-                            {t('processing')}
-                          </div>
-                        )
-                        : (phase.isActive ? t('active') : t('activate_phase'))
-                      }
-                    </button>
+                      {phase.isActive ? t('active') : t('activate_phase')}
+                    </Button>
                     {!phase.isActive && (
                       <p className="mt-4 text-[10px] text-text-muted font-medium text-center italic opacity-60">
                         {t('activation_hint')}

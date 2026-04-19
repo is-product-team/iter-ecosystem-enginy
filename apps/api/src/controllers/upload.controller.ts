@@ -34,6 +34,10 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
       const user = await prisma.user.findUnique({ where: { userId: targetId } });
       if (!user) return res.status(404).json({ error: 'User not found.' });
       targetName = sanitizeFileName(user.fullName);
+    } else if (type === 'center') {
+      const center = await prisma.center.findUnique({ where: { centerId: targetId } });
+      if (!center) return res.status(404).json({ error: 'Center not found.' });
+      targetName = sanitizeFileName(center.name);
     } else {
       return res.status(400).json({ error: 'Invalid profile type.' });
     }
@@ -54,6 +58,11 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
     if (type === 'student') {
       await prisma.student.update({
         where: { studentId: targetId },
+        data: { photoUrl: url }
+      });
+    } else if (type === 'center') {
+      await prisma.center.update({
+        where: { centerId: targetId },
         data: { photoUrl: url }
       });
     } else {

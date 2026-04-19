@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService, { Assignment } from '@/services/assignmentService';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import DataTable, { Column } from '@/components/ui/DataTable';
@@ -296,12 +297,14 @@ export default function DocumentVerificationPage() {
       header: tc('actions'),
       align: 'right',
       render: (row) => (
-        <button
+        <Button
           onClick={() => setSelectedRow(row)}
-          className="inline-flex items-center justify-center px-4 py-2 border border-border-subtle text-[11px] font-bold text-text-muted hover:text-consorci-darkBlue hover:border-consorci-darkBlue transition-all"
+          variant="outline"
+          size="sm"
+          className="!px-4 !py-2 font-bold !text-[11px] !text-text-muted hover:!text-consorci-darkBlue"
         >
           {tc('view')}
-        </button>
+        </Button>
       )
     }
   ];
@@ -350,16 +353,18 @@ export default function DocumentVerificationPage() {
           }
           actions={
             selectedDocs.length > 0 && (
-              <button
+              <Button
                 onClick={handleBulkApprove}
                 disabled={loading}
-                className="px-8 h-full bg-green-600 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2"
+                loading={loading}
+                variant="primary"
+                className="px-8 h-full font-bold !text-[11px] uppercase tracking-widest"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 {t('btn_bulk_approve') || 'Validació Massiva'} ({selectedDocs.length})
-              </button>
+              </Button>
             )
           }
         />
@@ -399,9 +404,13 @@ export default function DocumentVerificationPage() {
                 <h3 className="text-xl font-bold text-text-primary tracking-tight">{selectedRow.student?.fullName}</h3>
                 <p className="text-[13px] font-medium text-text-muted mt-1">{selectedRow.workshopTitle} • {selectedRow.centerName}</p>
               </div>
-              <button onClick={() => setSelectedRow(null)} className="p-2 text-text-muted hover:text-red-500 transition-colors">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
+                <Button 
+                  variant="subtle"
+                  onClick={() => setSelectedRow(null)} 
+                  className="!p-2 !h-auto !bg-transparent text-text-muted hover:!text-red-500"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-8 space-y-12">
@@ -417,21 +426,22 @@ export default function DocumentVerificationPage() {
                       <div className="flex gap-3">
                         {url && (
                           <>
-                            <button
+                            <Button
                               onClick={() => handleValidateDocument(selectedRow.enrollmentId, doc.field, !valid)}
-                              className={`px-6 py-2 text-[11px] font-bold transition-all ${valid
-                                ? 'bg-red-50 text-red-600 border border-red-500/20 hover:bg-black hover:text-white'
-                                : 'bg-green-600 text-white hover:bg-black'
-                                }`}
+                              variant={valid ? 'outline' : 'primary'}
+                              size="sm"
+                              className={`px-6 !py-2 !font-bold ${valid ? 'hover:!bg-red-50 hover:!text-red-600 hover:!border-red-500/20' : ''}`}
                             >
                               {valid ? t('btn_unvalidate') : t('btn_validate')}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                               onClick={() => handleOpenNotification(selectedRow, doc.id)}
-                              className="px-4 py-2 border border-border-subtle text-text-muted text-[11px] font-bold hover:bg-background-subtle"
+                              variant="outline"
+                              size="sm"
+                              className="!px-4 !py-2 !text-text-muted hover:!bg-background-subtle"
                             >
                               {t('report_problem_btn')}
-                            </button>
+                            </Button>
                           </>
                         )}
                       </div>
@@ -484,9 +494,13 @@ export default function DocumentVerificationPage() {
                 </svg>
                 {t('report_modal_title')}
               </h3>
-              <button onClick={() => setShowNotificationModal(false)} className="text-text-muted hover:text-red-500 transition-colors">
+              <Button 
+                variant="subtle"
+                onClick={() => setShowNotificationModal(false)} 
+                className="!p-2 !h-auto !bg-transparent text-text-muted hover:!text-red-500"
+              >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
+              </Button>
             </div>
 
             <div className="p-10 space-y-8">
@@ -546,20 +560,22 @@ export default function DocumentVerificationPage() {
               </div>
 
               <div className="flex gap-4 pt-4">
-                <button
+                <Button
                   onClick={() => setShowNotificationModal(false)}
-                  className="flex-1 py-4 border border-border-subtle text-text-muted font-bold text-[13px] hover:bg-background-subtle transition-all"
+                  variant="outline"
+                  className="flex-1 !py-4 !text-text-muted font-bold !text-[13px]"
                 >
                   {tc('cancel')}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={sendNotification}
                   disabled={sendingNotif || notificationData.documentName === 'select' || !notificationData.comment}
-                  className={`flex-[2] py-4 font-bold text-[13px] flex items-center justify-center gap-3 transition-all ${sendingNotif || notificationData.documentName === 'select' || !notificationData.comment ? 'bg-background-subtle text-text-muted' : 'bg-consorci-darkBlue text-white hover:bg-black'
-                    }`}
+                  loading={sendingNotif}
+                  variant="primary"
+                  className="flex-[2] !py-4 font-bold !text-[13px]"
                 >
-                  {sendingNotif ? <Loading size="mini" white /> : t('send_notification')}
-                </button>
+                  {t('send_notification')}
+                </Button>
               </div>
             </div>
           </div>

@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { toast } from 'sonner';
 import getApi from '@/services/api';
 import { Assignment } from '@/services/assignmentService';
+import Button from '../ui/Button';
 
 interface CloseWorkshopSectionProps {
   assignment: Assignment;
@@ -15,6 +16,7 @@ export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assi
   const t = useTranslations('AssignmentWorkshopsPage');
   const locale = useLocale();
   const id = assignment.assignmentId;
+  const [loading, setLoading] = useState(false);
 
   const handleClose = async () => {
     const pendingEvaluations = assignment.enrollments?.filter(e => !e.evaluations || e.evaluations.length === 0).length || 0;
@@ -27,6 +29,7 @@ export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assi
     if (!confirm(t('close_section.confirm_dialog'))) return;
 
     try {
+      setLoading(true);
       const api = getApi();
       await api.post(`/assignments/${id}/close`);
       toast.success(t('close_section.success'));
@@ -38,6 +41,8 @@ export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assi
     } catch (_e: any) {
       const message = _e.response?.data?.error || t('close_section.error');
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,12 +53,15 @@ export const CloseWorkshopSection: React.FC<CloseWorkshopSectionProps> = ({ assi
           <h4 className="text-lg font-black uppercase text-indigo-700">{t('close_section.title')}</h4>
           <p className="text-xs text-gray-600 mt-1 max-w-xl">{t('close_section.desc')}</p>
         </div>
-        <button
+        <Button
           onClick={handleClose}
-          className="px-8 py-4 bg-indigo-600 text-white text-[11px] font-black uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition active:scale-[0.98]"
+          variant="primary"
+          size="lg"
+          loading={loading}
+          className="bg-indigo-600 hover:bg-indigo-700 shadow-xl tracking-widest uppercase font-black"
         >
           {t('close_section.confirm_btn')}
-        </button>
+        </Button>
       </div>
 
       <div className="border-t border-indigo-100 pt-6">

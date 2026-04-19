@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
+import Button from './ui/Button';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -33,11 +34,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 transition-all duration-300">
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
         onClick={onCancel}
       />
-      
+
       {/* Dialog */}
       <div className="relative bg-background-surface border border-border-subtle max-w-md w-full overflow-hidden animate-in zoom-in fade-in duration-200 flex flex-col">
         <div className="p-10 text-center">
@@ -55,22 +56,20 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </div>
 
         <div className="bg-background-subtle px-8 py-5 border-t border-border-subtle flex gap-4">
-          <button
+          <Button
             onClick={onCancel}
-            className="flex-1 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors"
+            variant="outline"
+            fullWidth
           >
             {finalCancelLabel}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
-            className={`flex-1 py-3 text-[12px] font-medium text-white transition-all active:scale-[0.98] ${
-              isDestructive 
-                ? 'bg-red-500 hover:bg-red-600' 
-                : 'bg-consorci-darkBlue hover:bg-consorci-actionBlue'
-            }`}
+            variant={isDestructive ? 'danger' : 'primary'}
+            fullWidth
           >
             {finalConfirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

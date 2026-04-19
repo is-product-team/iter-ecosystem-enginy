@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Button from './Button';
 
 interface FilterPanelProps {
   children: React.ReactNode;
@@ -42,15 +43,17 @@ export default function FilterPanel({
         
         {onClear && (
           <div className="flex w-full xl:w-auto mt-4 xl:mt-0">
-            <button
+            <Button
               onClick={onClear}
-              className="w-full xl:w-auto px-6 py-2 text-[10px] font-bold text-text-muted uppercase tracking-[0.1em] hover:text-consorci-darkBlue transition-all h-[42px] border border-border-subtle flex items-center justify-center gap-2 bg-transparent"
+              variant="subtle"
+              size="sm"
+              className="w-full xl:w-auto !px-6 !py-2 !h-[42px] uppercase tracking-[0.1em] !text-text-muted hover:!text-consorci-darkBlue font-bold"
             >
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h18M6 6v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
               </svg>
               {clearLabel}
-            </button>
+            </Button>
           </div>
         )}
       </div>

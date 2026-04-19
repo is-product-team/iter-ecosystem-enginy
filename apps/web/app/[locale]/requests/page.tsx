@@ -12,6 +12,7 @@ import assignmentService from '@/services/assignmentService';
 import centerService, { Center } from '@/services/centerService';
 import api from '@/services/api';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Pagination from '@/components/Pagination';
@@ -281,31 +282,37 @@ export default function AdminRequestsPage() {
       render: (r) => (
         <div className="flex justify-center gap-2">
           {r.status === REQUEST_STATUSES.PENDING && (
-            <button
+            <Button
               onClick={(e) => { e.stopPropagation(); handleApprove(r.requestId); }}
-              className="bg-consorci-darkBlue text-white px-4 py-2 text-[11px] font-bold uppercase tracking-wider transition-all hover:bg-black active:scale-95"
+              variant="primary"
+              size="sm"
+              className="!px-4 !py-2 uppercase tracking-wider"
             >
               Asignar plazas
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); handleEditClick(r); }}
-            className="btn-raw"
+            variant="subtle"
+            size="sm"
+            className="!p-1.5 hover:!text-consorci-darkBlue"
             title={tc('edit')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); handleReject(r.requestId); }}
-            className="btn-raw-destructive"
+            variant="subtle"
+            size="sm"
+            className="!p-1.5 hover:!text-red-500 hover:!bg-red-50"
             title={t('reject_btn')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
       ),
       width: 250
@@ -365,15 +372,17 @@ export default function AdminRequestsPage() {
   }
 
   const headerActions = (
-    <button
+    <Button
       onClick={handleRunTetris}
-      className="bg-consorci-darkBlue text-white px-8 py-3.5 text-[13px] font-semibold transition-all hover:bg-black hover:-translate-y-0.5 active:scale-[0.98] flex items-center justify-center gap-3 h-[49px]"
+      variant="primary"
+      size="md"
+      className="px-8 !py-3.5 !text-[13px] h-[49px]"
     >
       <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
         <path d="M11.5 2L14 9L21 11.5L14 14L11.5 21L9 14L2 11.5L9 9L11.5 2Z" />
       </svg>
       {t('run_tetris_btn')}
-    </button>
+    </Button>
   );
 
   return (
@@ -515,19 +524,21 @@ export default function AdminRequestsPage() {
                 />
               </div>
               <div className="flex gap-4 pt-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="flex-1 py-4 text-[13px] font-bold text-text-muted hover:text-text-primary hover:bg-background-subtle transition-all"
+                  variant="subtle"
+                  className="flex-1 !py-4 !font-bold !text-text-muted hover:!text-text-primary"
                 >
                   {tc('cancel')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  className="flex-[1.5] py-4 bg-consorci-darkBlue text-white text-[13px] font-bold transition-all hover:bg-black hover:scale-[1.02] active:scale-[0.98]"
+                  variant="primary"
+                  className="flex-[1.5] !py-4 !font-bold"
                 >
                   {tc('save')}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays } from 'date-fns';
 import { enUS, ca, es, arSA } from 'date-fns/locale';
 import Loading from '../Loading';
+import Button from './Button';
 import { useTranslations, useLocale } from 'next-intl';
 
 const dateLocales: Record<string, any> = {
@@ -123,19 +124,34 @@ const Calendar: React.FC<CalendarProps> = ({ events, onEventClick, onRangeChange
             )}
           </div>
           <div className="flex bg-background-subtle p-1.5 gap-1.5 border border-border-subtle">
-            <button onClick={prevMonth} className="w-10 h-10 flex items-center justify-center hover:bg-background-surface transition-colors text-text-muted">
+            <Button 
+              variant="subtle" 
+              size="sm" 
+              onClick={prevMonth} 
+              className="w-10 h-10 !p-0"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
               </svg>
-            </button>
-            <button onClick={() => setCurrentDate(new Date())} className="px-6 h-10 bg-background-surface border border-border-subtle text-[12px] font-medium text-text-primary hover:bg-background-subtle transition-colors">
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setCurrentDate(new Date())} 
+              className="px-6 h-10 !bg-background-surface"
+            >
               {t('today')}
-            </button>
-            <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center hover:bg-background-surface transition-colors text-text-muted">
+            </Button>
+            <Button 
+              variant="subtle" 
+              size="sm" 
+              onClick={nextMonth} 
+              className="w-10 h-10 !p-0"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
 

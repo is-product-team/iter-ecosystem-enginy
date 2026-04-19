@@ -2,7 +2,9 @@
 
 import React, { useState } from "react";
 import centerService, { Center } from "../services/centerService";
-import Loading from "./Loading";
+import Button from "./ui/Button";
+import Avatar from "./Avatar";
+import getApi from "../services/api";
 import { useTranslations } from "next-intl";
 
 type CreateCenterModalProps = {
@@ -26,6 +28,8 @@ const CreateCenterModal = ({
   const [address, setAddress] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,6 +42,7 @@ const CreateCenterModal = ({
         setAddress(initialData.address || "");
         setContactPhone(initialData.contactPhone || "");
         setContactEmail(initialData.contactEmail || "");
+        setPhotoUrl(initialData.photoUrl || null);
       } else {
         // Reset form
         setCenterCode("");
@@ -45,10 +50,33 @@ const CreateCenterModal = ({
         setAddress("");
         setContactPhone("");
         setContactEmail("");
+        setPhotoUrl(null);
       }
       setError(null);
     }
   }, [visible, initialData]);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !initialData) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('photo', file);
+
+    try {
+      const api = getApi();
+      const response = await api.post(`/upload/profile/center/${initialData.centerId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setPhotoUrl(response.data.photoUrl);
+    } catch (err) {
+      console.error("Error uploading center photo:", err);
+      setError("Error uploading image");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!centerCode || !name) {
@@ -99,15 +127,17 @@ const CreateCenterModal = ({
               {initialData ? t('edit_subtitle') : t('create_subtitle')}
             </p>
           </div>
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
             onClick={onClose}
-            className="text-text-muted hover:text-text-primary transition-colors"
+            className="!p-2 text-text-muted hover:!text-text-primary"
             aria-label={tCommon('close') || "Close"}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div className="p-6 overflow-y-auto custom-scrollbar">
@@ -133,6 +163,29 @@ const CreateCenterModal = ({
               </div>
             </div>
           )}
+
+          <div className="flex flex-col items-center mb-8 pb-8 border-b border-border-subtle/50">
+            <div className="relative group">
+              <Avatar
+                url={photoUrl}
+                name={name || "Center"}
+                size="xl"
+                type="center"
+                className="shadow-md border-2 border-border-subtle"
+              />
+              {initialData && (
+                <label className="absolute bottom-0 right-0 bg-consorci-darkBlue text-white p-2 rounded-full cursor-pointer shadow-lg hover:bg-black transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <input type="file" className="hidden" accept="image/*" onChange={handlePhotoUpload} disabled={uploading} />
+                </label>
+              )}
+            </div>
+            {uploading && <p className="text-[10px] font-bold text-consorci-darkBlue mt-2 animate-pulse uppercase tracking-widest">Uploading...</p>}
+            {!initialData && <p className="text-[10px] text-text-muted mt-2 text-center uppercase tracking-widest font-medium">Create center first to upload photo</p>}
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -198,29 +251,20 @@ const CreateCenterModal = ({
         </div>
 
         <div className="bg-background-subtle px-8 py-5 border-t border-border-subtle flex justify-end gap-4">
-          <button
+          <Button
             onClick={onClose}
-            className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors"
-          >
-            {tCommon('cancel')}
-          </button>
-          <button
-            className={`px-8 py-3 text-[12px] font-medium text-white transition-all active:scale-[0.98] ${loading
-              ? "bg-background-subtle text-text-muted cursor-not-allowed"
-              : "bg-consorci-darkBlue hover:bg-consorci-actionBlue"
-              }`}
-            onClick={handleSubmit}
+            variant="outline"
             disabled={loading}
           >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loading size="sm" white message="" />
-                {t('processing')}
-              </span>
-            ) : (
-              initialData ? t('save_changes') : t('create_center')
-            )}
-          </button>
+            {tCommon('cancel')}
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="primary"
+            loading={loading}
+          >
+            {loading ? t('processing') : (initialData ? t('save_changes') : t('create_center'))}
+          </Button>
         </div>
       </div>
     </div>

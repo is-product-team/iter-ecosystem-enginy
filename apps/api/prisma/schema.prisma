@@ -55,6 +55,7 @@ model Center {
   centerCode   String  @unique @map("codi_center")
   name         String  @map("nom")
   address      String? @map("adreca")
+  photoUrl     String? @map("url_foto")
   contactPhone String? @map("telefon_contacte")
   contactEmail String? @map("email_contacte")
 

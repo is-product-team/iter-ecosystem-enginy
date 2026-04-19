@@ -9,6 +9,7 @@ import { login as apiLogin } from '@/lib/auth';
 import { useAuth } from '@/context/AuthContext';
 import { PHASES, ROLES } from '@iter/shared';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -136,12 +137,13 @@ export default function LoginPage() {
             >
               <span>{t('download_app')}</span>
             </a>
-            <button
+            <Button
+              variant="subtle"
               onClick={() => setShowProfessorLink(false)}
-              className="mt-8 text-[13px] font-semibold text-consorci-darkBlue hover:underline underline-offset-4"
+              className="mt-8 !font-semibold !text-consorci-darkBlue hover:underline underline-offset-4"
             >
               {t('back_to_login')}
-            </button>
+            </Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -168,10 +170,11 @@ export default function LoginPage() {
                   placeholder={t('password_placeholder')}
                   required
                 />
-                <button
+                <Button
                   type="button"
+                  variant="subtle"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-consorci-darkBlue transition-colors p-1 opacity-40 hover:opacity-100"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 !p-1 !h-auto !bg-transparent opacity-40 hover:opacity-100"
                 >
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -184,32 +187,33 @@ export default function LoginPage() {
                       <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                     </svg>
                   )}
-                </button>
+                </Button>
               </div>
             </div>
 
             <div className="pt-2">
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-consorci-darkBlue hover:bg-black text-white text-[13px] font-bold tracking-tight transition-all duration-300 disabled:opacity-50 active:scale-[0.98] flex items-center justify-center min-h-[52px]"
+                loading={loading}
+                variant="primary"
+                size="lg"
+                fullWidth
+                className="min-h-[52px] !font-bold !tracking-tight"
               >
-                {loading ? (
-                  <Loading size="mini" white message="" />
-                ) : (
-                  <span>{t('submit')}</span>
-                )}
-              </button>
+                {t('submit')}
+              </Button>
             </div>
 
             <div className="text-center pt-8 border-t border-black/[0.03] dark:border-white/[0.03]">
-              <button 
+              <Button 
                 type="button"
+                variant="subtle"
                 onClick={() => setShowInfo(true)}
-                className="text-[13px] font-semibold text-text-muted hover:text-consorci-darkBlue transition-colors"
+                className="!font-semibold !text-text-muted hover:!text-consorci-darkBlue"
               >
                 {t('no_account_link')}
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -226,12 +230,13 @@ export default function LoginPage() {
           
           {/* Modal Card */}
           <div className="relative w-full max-w-[860px] bg-background-surface p-10 md:p-14 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 overflow-hidden">
-            <button 
+            <Button 
+              variant="subtle"
               onClick={() => setShowInfo(false)}
-              className="absolute right-6 top-6 p-2 text-text-muted hover:text-text-primary transition-colors rounded-full hover:bg-black/5"
+              className="absolute right-6 top-6 !p-2 !h-auto !bg-transparent text-text-muted hover:text-text-primary transition-colors rounded-full hover:bg-black/5"
             >
               <X size={20} />
-            </button>
+            </Button>
 
             <div className="text-center mb-14">
               <h3 className="text-[28px] font-semibold tracking-tight text-text-primary mb-4">
