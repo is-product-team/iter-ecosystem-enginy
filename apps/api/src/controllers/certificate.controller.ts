@@ -27,18 +27,24 @@ export const generateCertificates = async (req: Request, res: Response) => {
 // GET: List certificates for current user or filter by student (for Admin)
 export const getMyCertificates = async (req: Request, res: Response) => {
     const { studentId: queryStudentId } = req.query;
-    const { role, studentId: userStudentId } = req.user!;
+    const { role, userId } = req.user!;
 
     try {
         const where: any = {};
+        let finalStudentId: number | undefined;
         
         // Security Scoping
         if (role === ROLES.STUDENT) {
             // Students can ONLY see their own certificates
-            if (!userStudentId) {
-                return res.status(403).json({ error: 'No student ID associated with this user' });
+            const student = await prisma.student.findUnique({
+                where: { userId }
+            });
+            
+            if (!student) {
+                return res.status(403).json({ error: 'No student record associated with this user' });
             }
-            where.studentId = userStudentId;
+            finalStudentId = student.studentId;
+            where.studentId = finalStudentId;
         } else if (role === ROLES.ADMIN) {
             // Admins can filter by studentId if provided
             if (queryStudentId) {
@@ -60,7 +66,7 @@ export const getMyCertificates = async (req: Request, res: Response) => {
                         enrollments: {
                             // Load enrollments for survey check. 
                             // If student, only load theirs. If Admin, load all for the assignment.
-                            where: role === ROLES.STUDENT ? { studentId: userStudentId } : undefined,
+                            where: role === ROLES.STUDENT ? { studentId: finalStudentId } : undefined,
                             include: { selfConsultation: true }
                         }
                     }
@@ -90,14 +96,19 @@ export const getMyCertificates = async (req: Request, res: Response) => {
 export const downloadCertificate = async (req: Request, res: Response) => {
     const { assignmentId } = req.params;
     const { studentId: queryStudentId } = req.query;
-    const { role, studentId: userStudentId } = req.user!;
+    const { role, userId } = req.user!;
     const aid = parseInt(assignmentId as string);
 
     try {
         // Determine whose certificate we are looking for (Task 1.2 Fix)
         let targetStudentId: number | undefined;
+        
         if (role === ROLES.STUDENT) {
-            targetStudentId = userStudentId || undefined;
+            const student = await prisma.student.findUnique({
+                where: { userId }
+            });
+            if (!student) return res.status(404).json({ error: 'Student profile not found' });
+            targetStudentId = student.studentId;
         } else if (queryStudentId) {
             targetStudentId = parseInt(queryStudentId as string);
         }

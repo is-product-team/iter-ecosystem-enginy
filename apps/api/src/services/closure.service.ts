@@ -52,7 +52,7 @@ export class ClosureService {
     if (certResults.issued > 0) {
       console.log(`[ClosureService] 📢 Notifying ${certResults.issued} students who earned a certificate.`);
       
-      const qualifiedStudentIds = certResults.issuedStudentIds || [];
+      const qualifiedStudentIds: number[] = certResults.issuedStudentIds || [];
 
       for (const enrollment of assignment.enrollments) {
         // Only notify if student is in the qualified list

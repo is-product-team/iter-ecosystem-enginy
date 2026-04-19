@@ -1,12 +1,7 @@
 'use client';
 
-<<<<<<< HEAD
-import { useEffect, useState, useMemo } from 'react';
-import { useRouter, useParams, useSearchParams } from 'next/navigation';
-=======
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
->>>>>>> dev
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
@@ -64,14 +59,14 @@ export default function MonitoringPage() {
     }
   }, [user, tc]);
 
-  const fetchFeedback = async (assignmentId: number) => {
+  const fetchFeedback = useCallback(async (assignmentId: number) => {
     try {
         const data = await questionnaireService.getAssignmentEvaluation(assignmentId);
         setFeedbackData(data);
     } catch (_error) {
         setFeedbackData(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -84,7 +79,7 @@ export default function MonitoringPage() {
     } else {
         setFeedbackData(null);
     }
-  }, [feedbackAssignment]);
+  }, [feedbackAssignment, fetchFeedback]);
 
   useEffect(() => {
     if (selectedAssignment) {
@@ -113,15 +108,10 @@ export default function MonitoringPage() {
       // Sessions in the past that don't have attendance records yet
       const pastSessions = sessions.filter(s => new Date(s.sessionDate) < new Date());
       pastSessions.forEach(s => {
-<<<<<<< HEAD
-        // If it was in the past and no attendance records...
-        // This is a simplification provided by dev branch logic
-=======
         const hasAttendance = s.attendance && s.attendance.length > 0;
         if (!hasAttendance) {
           pendingAttendance++;
         }
->>>>>>> dev
       });
     });
 
@@ -158,7 +148,6 @@ export default function MonitoringPage() {
       <div className="w-full pb-20">
         <KPIOverview stats={stats} />
 
-<<<<<<< HEAD
         <div className="flex flex-col gap-10">
           <div className="flex items-center justify-between border-b border-border-subtle">
             <div className="flex gap-8">
@@ -189,11 +178,6 @@ export default function MonitoringPage() {
                 )}
               </button>
             </div>
-=======
-        <div className="flex flex-col gap-10 mt-12">
-          <div className="flex items-center justify-between border-b border-border-subtle pb-6">
-            <h3 className="text-xl font-medium text-text-primary tracking-tight">{t('tabs.active')}</h3>
->>>>>>> dev
           </div>
 
           {selectedAssignment && (
