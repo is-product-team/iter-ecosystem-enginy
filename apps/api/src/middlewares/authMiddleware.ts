@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { ROLES } from '@iter/shared';
-
+import prisma from '../lib/prisma.js';
 import { env } from '../config/env.js';
 
 const JWT_SECRET = env.JWT_SECRET;
@@ -26,14 +26,28 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
 
   if (!token) return res.status(401).json({ error: 'Token no proporcionado' });
 
-  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+  jwt.verify(token, JWT_SECRET, async (err: any, user: any) => {
     if (err) {
-
       return res.status(401).json({ error: 'Token inválido o expirado' });
     }
 
-    req.user = user;
-    next();
+    // Verify user still exists in the database to handle deleted users/reset DBs
+    try {
+      const userExists = await prisma.user.findUnique({
+        where: { userId: user.userId },
+        select: { userId: true }
+      });
+
+      if (!userExists) {
+        return res.status(401).json({ error: 'Sesión inválida: el usuario ya no existe' });
+      }
+
+      req.user = user;
+      next();
+    } catch (dbErr) {
+      console.error('❌ [AUTH] Error checking user existence:', dbErr);
+      return res.status(500).json({ error: 'Error interno en la autenticación' });
+    }
   });
 };
 
