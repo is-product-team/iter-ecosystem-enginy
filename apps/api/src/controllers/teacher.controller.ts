@@ -96,15 +96,62 @@ export const createTeacher = async (req: Request, res: Response) => {
 
 export const updateTeacher = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { name, contact, password, email, centerId } = req.body;
+  
   try {
-    const teacher = await prisma.teacher.update({
-      where: { teacherId: parseInt(id as string) },
-      data: req.body
+    const teacherId = parseInt(id as string);
+    
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Get existing teacher to find user
+      const existingTeacher = await tx.teacher.findUnique({
+        where: { teacherId },
+        include: { user: true }
+      });
+      
+      if (!existingTeacher) throw new Error('Teacher not found');
+
+      // 2. Update User data if provided
+      const userData: any = {};
+      if (name) userData.fullName = name;
+      if (email) userData.email = email;
+      if (password) {
+        const bcrypt = await import('bcrypt');
+        userData.passwordHash = await bcrypt.default.hash(password, 10);
+      }
+
+      if (Object.keys(userData).length > 0) {
+        await tx.user.update({
+          where: { userId: existingTeacher.userId },
+          data: userData
+        });
+      }
+
+      // 3. Update Teacher data
+      const teacherData: any = {};
+      if (name) teacherData.name = name;
+      if (contact) teacherData.contact = contact;
+      if (centerId) teacherData.centerId = parseInt(centerId);
+
+      return await tx.teacher.update({
+        where: { teacherId },
+        data: teacherData,
+        include: {
+          user: {
+            select: {
+              userId: true,
+              fullName: true,
+              email: true,
+              photoUrl: true
+            }
+          }
+        }
+      });
     });
-    res.json(teacher);
-  } catch (error) {
+
+    res.json(result);
+  } catch (error: any) {
     console.error("Error in teacher.controller.updateTeacher:", error);
-    res.status(500).json({ error: 'Failed to update teacher' });
+    res.status(500).json({ error: error.message || 'Failed to update teacher' });
   }
 };
 
@@ -150,11 +197,31 @@ export const getTeacherAssignments = async (req: Request, res: Response) => {
         },
         sessions: {
           orderBy: { sessionDate: 'asc' }
+        },
+        questionnaires: {
+          where: {
+            target: 'TEACHER',
+            isCompleted: true
+          },
+          select: {
+            questionnaireId: true,
+            isCompleted: true,
+            target: true
+          }
         }
       }
     });
 
-    res.json(assignments);
+    // Map questionnaires to submissions for frontend compatibility
+    const transformed = assignments.map(assig => ({
+      ...assig,
+      submissions: assig.questionnaires.map(q => ({
+        ...q,
+        status: q.isCompleted ? 'RESPONDED' : 'PENDING'
+      }))
+    }));
+
+    res.json(transformed);
   } catch (error) {
     console.error("Error fetching teacher assignments:", error);
     res.status(500).json({ error: 'Failed to retrieve center assignments.' });

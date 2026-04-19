@@ -5,6 +5,7 @@ import workshopService, { Workshop } from "../services/workshopService";
 import sectorService, { Sector } from "../services/sectorService";
 import WorkshopIcon, { SVG_ICONS } from "./WorkshopIcon";
 import Loading from "./Loading";
+import Button from "./ui/Button";
 import { useTranslations } from "next-intl";
 
 type CreateWorkshopModalProps = {
@@ -50,7 +51,7 @@ const CreateWorkshopModal = ({
   const [tempEnd, setTempEnd] = useState("11:00");
 
   const daysMap: Record<number, string> = {
-    1: t('monday'), 2: t('tuesday'), 3: t('wednesday'), 4: t('thursday'), 5: t('friday')
+    1: t('monday'), 2: t('tuesday'), 3: t('wednesday'), 4: t('thursday'), 5: t('friday'), 6: t('saturday'), 0: t('sunday')
   };
 
   useEffect(() => {
@@ -159,15 +160,19 @@ const CreateWorkshopModal = ({
         <div className="bg-background-subtle px-8 py-5 flex justify-between items-center shrink-0 border-b border-border-subtle">
           <div>
             <h2 className="text-xl font-medium text-text-primary">
-              {initialData ? t('edit_title') || "Edit Workshop" : t('create_title') || "New Workshop"}
+              {initialData ? t('edit_title') : t('create_title')}
             </h2>
             <p className="text-[11px] font-normal text-text-muted mt-1">
               {t('workshop_config_subtitle')}
             </p>
           </div>
-          <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
+          <Button 
+            variant="subtle" 
+            onClick={onClose} 
+            className="!p-2 !h-auto !bg-transparent !text-text-muted hover:!text-text-primary"
+          >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -235,10 +240,8 @@ const CreateWorkshopModal = ({
 
             <section>
               <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">{t('technical_details')}</h3>
-              <h3 className="text-[11px] font-medium text-text-muted mb-6 border-b border-background-subtle pb-3">{t('technical_details')}</h3>
               <div className="grid grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-[11px] font-medium text-text-primary mb-2">{t('duration')} (h)</label>
                   <label className="block text-[11px] font-medium text-text-primary mb-2">{t('duration')} (h)</label>
                   <input
                     type="number"
@@ -249,7 +252,6 @@ const CreateWorkshopModal = ({
                 </div>
                 <div>
                   <label className="block text-[11px] font-medium text-text-primary mb-2">{t('places')}</label>
-                  <label className="block text-[11px] font-medium text-text-primary mb-2">{t('places')}</label>
                   <input
                     type="number"
                     value={maxPlaces}
@@ -258,7 +260,6 @@ const CreateWorkshopModal = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-medium text-text-primary mb-2">{t('icon')}</label>
                   <label className="block text-[11px] font-medium text-text-primary mb-2">{t('icon')}</label>
                   <div className="relative group/icon">
                     <button className="w-full flex items-center justify-between px-4 py-3 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary group-hover/icon:border-consorci-darkBlue transition-all">
@@ -285,13 +286,10 @@ const CreateWorkshopModal = ({
           <div className="md:w-5/12 bg-background-subtle p-8 overflow-y-auto">
             <section>
               <h3 className="text-[11px] font-medium text-text-primary mb-6 flex items-center gap-2 border-b border-border-subtle pb-3">
-                <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                {t('schedule')}
-                {t('schedule')}
+              <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {t('schedule')}
               </h3>
-
               <div className="bg-background-surface p-6 border border-border-subtle mb-8 relative">
-                <h4 className="text-[11px] font-medium text-text-muted mb-4 text-center">{t('add_slot')}</h4>
                 <h4 className="text-[11px] font-medium text-text-muted mb-4 text-center">{t('add_slot')}</h4>
                 <div className="space-y-4">
                   <div>
@@ -304,6 +302,8 @@ const CreateWorkshopModal = ({
                       <option value={3}>{t('wednesday')}</option>
                       <option value={4}>{t('thursday')}</option>
                       <option value={5}>{t('friday')}</option>
+                      <option value={6}>{t('saturday')}</option>
+                      <option value={0}>{t('sunday')}</option>
                     </select>
                   </div>
                   <div className="flex gap-4">
@@ -315,16 +315,18 @@ const CreateWorkshopModal = ({
                       <input type="time" value={tempEnd} onChange={(e) => setTempEnd(e.target.value)} className="w-full px-3 py-2 text-sm font-medium text-text-primary border border-border-subtle bg-background-subtle focus:border-consorci-darkBlue outline-none" />
                     </div>
                   </div>
-                  <button
+                  <Button
                     onClick={addScheduleSlot}
-                    className="w-full py-3 bg-consorci-darkBlue text-white text-[11px] font-medium hover:bg-consorci-actionBlue transition-all active:scale-95"
+                    variant="primary"
+                    size="sm"
+                    fullWidth
+                    className="!py-3 !text-[11px]"
                   >
                     + {t('add_day')}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
-              <h4 className="text-[11px] font-medium text-text-muted mb-4 px-1">{t('configured_days')}</h4>
               <h4 className="text-[11px] font-medium text-text-muted mb-4 px-1">{t('configured_days')}</h4>
               <div className="space-y-3">
                 {schedule.map((slot, idx) => (
@@ -357,21 +359,23 @@ const CreateWorkshopModal = ({
           )}
 
           <div className="flex gap-4">
-            <button onClick={onClose} className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors">
+            <Button 
+              variant="subtle" 
+              onClick={onClose} 
+              className="!text-text-muted hover:!text-text-primary"
+            >
               {tCommon('cancel')}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSubmit}
               disabled={loading}
-              className="px-10 py-3 bg-consorci-darkBlue text-white text-[12px] font-medium hover:bg-consorci-actionBlue disabled:opacity-50 transition-all active:scale-[0.98]"
+              loading={loading}
+              variant="primary"
+              size="md"
+              className="px-10"
             >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <Loading size="sm" white message="" />
-                  {t('saving')}
-                </div>
-              ) : t('save_workshop')}
-            </button>
+              {t('save_workshop')}
+            </Button>
           </div>
         </div>
       </div>

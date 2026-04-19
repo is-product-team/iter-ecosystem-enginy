@@ -1,17 +1,21 @@
 import * as React from 'react';
-import { View, Text, ScrollView, Pressable, ActivityIndicator, Alert, TextInput } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
-import api, { getStudents, getAttendance } from '../../../services/api';
+import api, { getStudents } from '../../../services/api';
 import StudentSessionCard from '../../../components/session/StudentSessionCard';
+import { StatusBar } from 'expo-status-bar';
+import { Button } from '../../../components/ui/Button';
 
 export default function SessionScreen() {
   const { t } = useTranslation();
-  const { id, sessionNum: paramNum, sessionId: paramId } = useLocalSearchParams<{ id: string, sessionNum?: string, sessionId?: string }>();
-  const router = useRouter();
+  const params = useLocalSearchParams();
+  const id = params.id as string;
+  const paramNum = params.sessionNum as string;
+  const paramId = params.sessionId as string;
+  
   const insets = useSafeAreaInsets();
 
   const num = paramNum ? parseInt(paramNum) : 1;
@@ -27,47 +31,47 @@ export default function SessionScreen() {
   const [showSuccess, setShowSuccess] = React.useState(false);
 
   const fetchData = React.useCallback(async () => {
+    console.log("🔍 [SessionScreen] Fetching REAL data for ID:", id);
     setLoading(true);
     try {
-      // 1. Get List of Enrollments (Standardized)
-      const studentsRes = await getStudents(id as string);
-      const enrollmentList = studentsRes.data;
-      setEnrollments(enrollmentList);
+      const studentsRes = await getStudents(id);
+      console.log("🔍 [SessionScreen] API response for students:", studentsRes.data?.length);
+      const studentList = studentsRes.data || [];
       
-      // 2. Initial state: Mark all as PRESENT by default
+      setEnrollments(studentList);
+      
       const initialAttendance: any = {};
-      enrollmentList.forEach((e: any) => {
-          initialAttendance[e.studentId] = 'PRESENT';
+      studentList.forEach((s: any) => {
+          const key = String(s.enrollmentId || s.studentId);
+          initialAttendance[key] = 'PRESENT';
       });
 
-      // 3. Check if attendance already exists (to pre-fill)
       try {
+        console.log("🔍 [SessionScreen] Checking existing attendance for assignment:", id, "session:", num);
         const existingRes = await api.get(`assignments/${id}/sessions/${num}`);
         if (existingRes.data && existingRes.data.length > 0) {
+            console.log("🔍 [SessionScreen] Existing attendance found:", existingRes.data.length, "records");
             existingRes.data.forEach((record: any) => {
-                initialAttendance[record.studentId] = record.status;
+                const key = String(record.enrollmentId || record.studentId);
+                initialAttendance[key] = record.status;
             });
             if(existingRes.data[0].observations) {
                 setObservations(existingRes.data[0].observations);
             }
             setIsSubmitted(true);
+            setSessionMode('WORK');
         }
-      } catch (_err) {
-        // No existing attendance for this specific session
+      } catch {
+        console.log("🔍 [SessionScreen] No existing attendance found in DB");
       }
 
       setAttendance(initialAttendance);
-      if (isSubmitted) {
-          setSessionMode('WORK');
-      }
-
     } catch (error) {
-      console.error("Error fetching session data:", error);
-      Alert.alert(t('Common.error'), t('Session.error_loading_students'));
+      console.error("❌ [SessionScreen] Error fetching real session data:", error);
     } finally {
       setLoading(false);
     }
-  }, [id, num, isSubmitted, t]);
+  }, [id, num]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -75,29 +79,43 @@ export default function SessionScreen() {
     }, [fetchData])
   );
 
-  const updateStatus = (studentId: string, status: string) => {
-    if (isSubmitted && sessionMode === 'WORK') return;
-    setAttendance(prev => ({ ...prev, [studentId]: status }));
+  const updateStatus = (key: string, status: string) => {
+    console.log("👆 [SessionScreen] Updating status for student", key, "to:", status);
+    if (isSubmitted && sessionMode === 'WORK') {
+        console.log("🚫 [SessionScreen] Update blocked: Session already submitted and in WORK mode");
+        return;
+    }
+    setAttendance(prev => {
+        const newState = { ...prev, [key]: status };
+        console.log("✅ [SessionScreen] New attendance state for", key, ":", newState[key]);
+        return newState;
+    });
   };
 
   const submitAttendance = async () => {
+    console.log("🚀 [SessionScreen] Submitting attendance...");
     setSubmitting(true);
     try {
-        const payload = enrollments.map(e => ({
-            enrollmentId: e.enrollmentId,
-            status: attendance[e.studentId] || 'PRESENT',
-            observations: observations
-        }));
+        const payload = enrollments.map(s => {
+            const key = String(s.enrollmentId || s.studentId);
+            return {
+                enrollmentId: s.enrollmentId,
+                status: attendance[key] || 'PRESENT',
+                observations: observations
+            };
+        });
 
+        console.log("📦 [SessionScreen] Payload:", JSON.stringify(payload));
+        // Using the correct endpoint: assignments/:id/sessions/:num
         await api.post(`assignments/${id}/sessions/${num}`, payload); 
         
+        console.log("✅ [SessionScreen] Attendance submitted successfully");
         setIsSubmitted(true);
         setSessionMode('WORK');
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 4000);
-        
-    } catch (error) {
-        console.error("Error submitting attendance:", error);
+    } catch (error: any) {
+        console.error("❌ [SessionScreen] Error submitting attendance:", error.response?.data || error.message);
         Alert.alert(t('Common.error'), t('Session.submit_attendance_error'));
     } finally {
         setSubmitting(false);
@@ -106,201 +124,131 @@ export default function SessionScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background-page">
-        <ActivityIndicator size="large" color={THEME.colors.primary} />
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#007AFF" />
       </View>
     );
   }
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
+    <View className="flex-1 bg-white">
+      <StatusBar style="dark" />
       <Stack.Screen 
         options={{ 
-          title: sessionMode === 'ATTENDANCE' ? t('Session.title_attendance') : t('Session.title_work'),
+          headerShown: true,
+          headerTitle: '',
           headerBackTitle: t('Common.back'),
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: THEME.colors.background },
-          headerTitleStyle: { 
-            fontFamily: THEME.fonts.primary, 
-            fontWeight: '800',
-            fontSize: 17 
-          }
+          headerTransparent: true,
+          headerTintColor: '#007AFF',
         }} 
       />
       
       {showSuccess && (
           <View style={{
             position: 'absolute',
-            top: 20,
-            left: 24,
-            right: 24,
-            zIndex: 50,
-            backgroundColor: THEME.colors.success,
+            top: insets.top + 60,
+            left: 20,
+            right: 20,
+            zIndex: 1000,
+            backgroundColor: '#34C759',
             padding: 16,
-            borderRadius: 20,
+            borderRadius: 16,
             flexDirection: 'row',
             alignItems: 'center',
-            shadowColor: THEME.colors.success,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.3,
-            shadowRadius: 12,
-            elevation: 8,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 10,
+            elevation: 5
           }}>
-              <Ionicons name="checkmark-circle" size={24} color="white" />
-              <Text style={{ 
-                color: 'white', 
-                fontWeight: '800', 
-                marginLeft: 12,
-                fontSize: 14,
-                fontFamily: THEME.fonts.primary
-              }}>{t('Session.attendance_sent_success')}</Text>
+              <Ionicons name="checkmark-circle" size={22} color="white" />
+              <Text style={{ color: 'white', fontWeight: '600', marginLeft: 10, fontSize: 14 }}>
+                {t('Session.attendance_sent_success')}
+              </Text>
           </View>
       )}
 
-      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 24, paddingBottom: 120 }}>
+      <ScrollView 
+        className="flex-1" 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={{ 
+            paddingTop: insets.top + 60, 
+            paddingBottom: 120,
+            paddingHorizontal: 24
+        }}
+      >
          
-         <View style={{ marginBottom: 40, marginTop: 12, paddingHorizontal: 8 }}>
-            <View className="flex-row justify-between items-center mb-1">
-               <View className="flex-row items-center gap-2">
-                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: THEME.colors.success }} />
-                 <Text className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">En línia</Text>
-               </View>
-               {isSubmitted && (
-                 <View className="bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 flex-row items-center gap-1">
-                   <Ionicons name="cloud-done" size={12} color={THEME.colors.success} />
-                   <Text className="text-[10px] font-bold text-emerald-700 uppercase">Sincronitzat</Text>
-                 </View>
-               )}
-            </View>
-            <View className="flex-row justify-between items-end">
-              <View className="flex-1">
-                <Text style={{ 
-                  color: THEME.colors.text.primary, 
-                  fontSize: 34, 
-                  fontWeight: '900', 
-                  marginBottom: 12,
-                  fontFamily: THEME.fonts.primary,
-                  letterSpacing: -1
-                }}>
-                    {sessionMode === 'ATTENDANCE' ? t('Session.attendance_header') : t('Session.work_header')}
-                </Text>
-              </View>
-              {sessionMode === 'ATTENDANCE' && !isSubmitted && (
-                <Pressable 
-                  onPress={() => {
-                    const allPresent: any = {};
-                    enrollments.forEach(e => allPresent[e.studentId] = 'PRESENT');
-                    setAttendance(allPresent);
-                  }}
-                  className="bg-indigo-50 px-5 py-2.5 rounded-2xl mb-3 border border-indigo-100 active:bg-indigo-100"
-                >
-                  <Text className="text-indigo-700 font-black text-[10px] uppercase tracking-widest">{t('Session.mark_all_present') || 'Tots presents'}</Text>
-                </Pressable>
-              )}
-            </View>
-            <Text style={{ 
-              color: THEME.colors.text.muted, 
-              fontSize: 15, 
-              fontWeight: '400', 
-              lineHeight: 24,
-              fontFamily: THEME.fonts.primary,
-              maxWidth: '90%'
-            }}>
+         {/* Apple-style Header (Matched with Login) */}
+         <View className="mb-10 px-2">
+            <Text className="text-[40px] font-light text-black tracking-tight leading-[44px] mb-2">
+                {sessionMode === 'ATTENDANCE' ? t('Session.attendance_header') : t('Session.work_header')}
+            </Text>
+            <Text className="text-[16px] font-normal text-gray-500 leading-relaxed max-w-[90%]">
                 {sessionMode === 'ATTENDANCE' 
                     ? t('Session.attendance_instruction') 
                     : t('Session.work_instruction')}
             </Text>
          </View>
 
-         {enrollments.map((item) => (
-             <StudentSessionCard
-                key={item.enrollmentId}
-                student={{
-                  ...item.student,
-                  imageRightsValidated: item.enrollment?.imageRightsValidated
-                }}
-                status={attendance[item.studentId]}
-                onStatusChange={(status) => updateStatus(String(item.studentId), status)}
-                onEvaluate={() => router.push(`/(professor)/evaluation/${item.enrollmentId}?assignmentId=${id}`)}
-                evaluated={item.evaluated}
-                mode={sessionMode}
-                disabled={isSubmitted && sessionMode === 'WORK'}
-             />
-         ))}
+         {/* Student List */}
+         <View className="mb-8">
+            {enrollments.map((item, index) => {
+                const key = String(item.enrollmentId || item.studentId);
+                return (
+                    <StudentSessionCard
+                        key={key || `student-${index}`}
+                        student={item}
+                        status={attendance[key]}
+                        onStatusChange={(status) => updateStatus(key, status)}
+                        mode={sessionMode}
+                        disabled={isSubmitted && sessionMode === 'WORK'}
+                    />
+                );
+            })}
+         </View>
 
+         {/* Observations */}
          {sessionMode === 'ATTENDANCE' && (
-            <View className="mt-4">
-                <Text className="text-text-primary font-bold mb-3 ml-1">{t('Session.observations_label')}</Text>
+            <View className="mb-10">
+                <Text className="text-gray-400 font-medium text-[13px] mb-3 ml-1 uppercase tracking-widest">
+                    {t('Session.observations_label')}
+                </Text>
                 <TextInput 
-                    className="bg-background-surface p-5 rounded-[32px] text-text-primary h-32 leading-6 border border-border-subtle shadow-sm"
+                    className="bg-[#F2F2F7] p-5 rounded-2xl text-black h-32 leading-relaxed"
                     multiline
                     textAlignVertical="top"
                     placeholder={t('Session.observations_placeholder')}
-                    placeholderTextColor={THEME.colors.text.muted}
+                    placeholderTextColor="#AEAEB2"
                     value={observations}
                     onChangeText={setObservations}
                 />
             </View>
          )}
-      </ScrollView>
 
-      {sessionMode === 'ATTENDANCE' && (
-        <View style={{ 
-          position: 'absolute', 
-          bottom: 30, 
-          left: 20, 
-          right: 20, 
-          paddingBottom: insets.bottom / 2,
-        }}>
-            <Pressable 
+         {/* Submit Button (Apple style like Login) */}
+         {!isSubmitted && (
+            <Button
+                label={(t('Session.finish_and_send') || 'Finalitzar i Enviar Llista') as string}
                 onPress={submitAttendance}
-                disabled={submitting || isSubmitted}
-                style={({ pressed }) => [
-                  {
-                    width: '100%',
-                    height: 68,
-                    borderRadius: 22,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: submitting || isSubmitted ? '#CBD5E1' : '#0F172A',
-                    opacity: pressed ? 0.9 : 1,
-                    // Shadow Pro (Sutil y profunda)
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 12 },
-                    shadowOpacity: submitting || isSubmitted ? 0 : 0.15,
-                    shadowRadius: 20,
-                    elevation: 8,
-                  }
-                ]}
-            >
-                {submitting ? (
-                    <ActivityIndicator color="white" />
-                ) : (
-                    <Text style={{ 
-                      color: 'white', 
-                      fontSize: 16, 
-                      fontWeight: 'bold', 
-                      letterSpacing: 2,
-                      textTransform: 'uppercase'
-                    }}>
-                        {t('Session.finish_and_send')}
-                    </Text>
-                )}
-            </Pressable>
-        </View>
-      )}
+                loading={submitting}
+                className="rounded-2xl h-[60px] mt-4"
+            />
+         )}
 
-      {sessionMode === 'WORK' && !isSubmitted && (
-          <View className="absolute bottom-6 right-6">
-              <Pressable 
-                onPress={() => setSessionMode('ATTENDANCE')}
-                className="w-14 h-14 bg-white rounded-full items-center justify-center shadow-lg border border-border-subtle"
-                style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
-              >
-                  <Ionicons name="list" size={24} color={THEME.colors.primary} />
-              </Pressable>
-          </View>
-      )}
+         {/* Mode Switcher */}
+         {isSubmitted && sessionMode === 'WORK' && (
+            <Button
+                label="Editar Assistència"
+                onPress={() => {
+                    setIsSubmitted(false);
+                    setSessionMode('ATTENDANCE');
+                }}
+                variant="secondary"
+                className="rounded-2xl h-[60px] mt-4"
+            />
+         )}
+      </ScrollView>
     </View>
   );
 }

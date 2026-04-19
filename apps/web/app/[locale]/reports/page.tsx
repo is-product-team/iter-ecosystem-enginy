@@ -5,6 +5,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { evaluationService } from '@/services/evaluationService';
 import { useTranslations } from 'next-intl';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 
 export default function AdminReportsPage() {
     const [metrics, setMetrics] = useState<unknown>(null);
@@ -127,7 +128,14 @@ export default function AdminReportsPage() {
                                 <div className="py-10 text-center text-text-muted italic text-[13px]">{tc('no_data') || 'No data'}</div>
                             )}
                         </div>
-                        <button className="mt-12 w-full py-4 bg-consorci-darkBlue text-white font-medium text-[13px] hover:bg-black transition-all active:scale-[0.98]">{t('download_pdf')}</button>
+                        <Button 
+                            variant="primary" 
+                            size="md" 
+                            fullWidth 
+                            className="mt-12 !py-4"
+                        >
+                            {t('download_pdf')}
+                        </Button>
                     </div>
                 </div>
 
@@ -140,7 +148,13 @@ export default function AdminReportsPage() {
                         <h4 className="text-[13px] font-medium text-red-700 mb-1">{t('low_rating_alerts')}</h4>
                         <p className="text-[13px] text-red-900/60 font-medium">{t('low_rating_msg')}</p>
                     </div>
-                    <button className="ml-auto bg-red-600 text-white px-8 py-3.5 text-[13px] font-medium hover:bg-black transition-all active:scale-[0.98]">{t('view_details')}</button>
+                    <Button 
+                        variant="danger" 
+                        size="md" 
+                        className="ml-auto px-8"
+                    >
+                        {t('view_details')}
+                    </Button>
                 </div>
 
             </div>

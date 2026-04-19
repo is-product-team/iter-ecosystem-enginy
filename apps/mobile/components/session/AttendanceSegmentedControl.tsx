@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, Pressable, Animated } from 'react-native';
 import { THEME } from '@iter/shared';
 
 interface AttendanceSegmentedControlProps {
@@ -15,34 +14,19 @@ const AttendanceSegmentedControl: React.FC<AttendanceSegmentedControlProps> = ({
   disabled
 }) => {
   const options = [
-    { 
-      label: 'PRESENT', 
-      value: 'PRESENT', 
-      icon: 'checkmark', 
-      iconBg: '#48A461', 
-      iconColor: '#FFFFFF' 
-    },
-    { 
-      label: 'ABSENT', 
-      value: 'ABSENT', 
-      icon: 'close', 
-      iconBg: '#F8A4A4', 
-      iconColor: '#991B1B' 
-    },
-    { 
-      label: 'LATE', 
-      value: 'LATE', 
-      icon: 'L', 
-      iconBg: '#CB9C2A', 
-      iconColor: '#FFFFFF' 
-    }
+    { label: 'Present', value: 'PRESENT' },
+    { label: 'Absent', value: 'ABSENT' },
+    { label: 'Retard', value: 'LATE' }
   ];
 
   return (
     <View style={{ 
       flexDirection: 'row', 
-      gap: 10, // Apretamos un poco el gap para ganar ancho de botón
+      backgroundColor: '#F2F2F7', 
+      borderRadius: 12, 
+      padding: 2,
       width: '100%',
+      height: 40,
     }}>
       {options.map((opt) => {
         const isActive = currentStatus === opt.value;
@@ -51,46 +35,27 @@ const AttendanceSegmentedControl: React.FC<AttendanceSegmentedControlProps> = ({
             key={opt.value}
             onPress={() => !disabled && onStatusChange(opt.value)}
             disabled={disabled}
-            style={({ pressed }) => [
-              {
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingVertical: 20,
-                borderRadius: 20,
-                backgroundColor: '#F3F4F6',
-                borderWidth: isActive ? 1.5 : 0,
-                borderColor: THEME.colors.primary,
-                opacity: pressed ? 0.8 : 1,
-              }
-            ]}
-          >
-            <View style={{ 
-              width: 36, 
-              height: 36, 
-              borderRadius: 18, 
-              backgroundColor: opt.iconBg, 
-              alignItems: 'center', 
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 12
-            }}>
-              {opt.icon === 'L' ? (
-                <Text style={{ color: opt.iconColor, fontWeight: '900', fontSize: 18 }}>L</Text>
-              ) : (
-                <Ionicons 
-                    name={opt.icon as any} 
-                    size={20} 
-                    color={opt.iconColor} 
-                />
-              )}
-            </View>
+              borderRadius: 10,
+              backgroundColor: isActive ? 'white' : 'transparent',
+              // Apple-style subtle shadow for the active item
+              shadowColor: isActive ? '#000' : 'transparent',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              elevation: isActive ? 2 : 0,
+            }}
+          >
             <Text 
               style={{
-                fontSize: 12,
-                fontWeight: 'bold',
-                letterSpacing: 0.5,
-                color: '#000000',
-                fontFamily: THEME.fonts.primary
+                fontSize: 13,
+                fontWeight: isActive ? '600' : '500',
+                color: isActive ? '#000000' : '#8E8E93',
+                fontFamily: THEME.fonts.primary,
               }}
             >
               {opt.label}

@@ -14,6 +14,7 @@ import Pagination from "@/components/Pagination";
 import workshopService, { Workshop } from "@/services/workshopService";
 import DataTable, { Column } from "@/components/ui/DataTable";
 import DataTableToolbar, { FilterSelect } from "@/components/ui/DataTableToolbar";
+import Button from "@/components/ui/Button";
 
 export default function WorkshopAdminPage() {
   const t = useTranslations('Admin.Workshops');
@@ -205,15 +206,16 @@ export default function WorkshopAdminPage() {
       align: 'right',
       render: (workshop) => (
         <div className="flex justify-end items-center gap-4">
-          <button
+          <Button
+            variant="link"
+            size="sm"
             onClick={(e) => { e.stopPropagation(); handleEdit(workshop); }}
-            className="text-[13px] font-medium text-consorci-darkBlue hover:text-text-primary transition-colors"
           >
             {tc("edit")}
-          </button>
+          </Button>
           <button
             onClick={(e) => { e.stopPropagation(); handleDelete(workshop._id); }}
-            className="text-text-muted hover:text-red-600 transition-colors"
+            className="text-text-muted hover:text-red-600 transition-colors p-1"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -229,18 +231,19 @@ export default function WorkshopAdminPage() {
   }
 
   const headerActions = (
-    <button
+    <Button
+      icon={
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+        </svg>
+      }
       onClick={() => {
         setEditingWorkshop(null);
         setCreateModalVisible(true);
       }}
-      className="flex items-center gap-2 px-6 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-      </svg>
       {t("new_workshop")}
-    </button>
+    </Button>
   );
 
   return (
@@ -269,7 +272,7 @@ export default function WorkshopAdminPage() {
               options={uniqueSectors.map(s => ({ label: s, value: s }))}
             />
             <FilterSelect
-              label="Modalitat"
+              label={tc("modality")}
               value={selectedModality}
               onChange={setSelectedModality}
               options={uniqueModalities.map(m => ({ label: m, value: m }))}

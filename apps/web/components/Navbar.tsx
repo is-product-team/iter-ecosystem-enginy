@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react';
 import logoImg from '../public/logo.png';
 import logoInversImg from '../public/logo-invers.png';
 
+import Button from '@/components/ui/Button';
+
 const Navbar: React.FC = () => {
   const t = useTranslations('Navigation');
   const metaT = useTranslations('Metadata');
@@ -53,6 +55,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { label: t('home'), path: getHomePath(), show: true },
     { label: t('notifications'), path: `/${locale}/center/notifications`, show: true, isNotifications: true },
+    { label: t('issues'), path: isAdmin ? `/${locale}/admin/issues` : `/${locale}/center/issues`, show: true },
     { label: t('calendar'), path: `/${locale}/calendar`, show: true },
     { label: t('profile'), path: `/${locale}/profile`, show: true },
   ];
@@ -121,12 +124,13 @@ const Navbar: React.FC = () => {
                   {user?.role?.name ? commonT(`roles.${user.role.name}`) : ''} {user?.center?.centerCode ? `• ${user.center.centerCode}` : ''}
                 </span>
               </div>
-              <button
+              <Button
                 onClick={logout}
-                className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[12px] font-medium px-5 py-2 transition-all active:scale-[0.98]"
+                variant="primary"
+                size="sm"
               >
                 {commonT('logout')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

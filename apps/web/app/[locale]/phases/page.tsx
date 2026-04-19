@@ -9,6 +9,7 @@ import getApi from "@/services/api";
 import Loading from "@/components/Loading";
 import { toast } from "sonner";
 import { Calendar, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 interface Phase {
   phaseId: number;
@@ -82,15 +83,15 @@ export default function PhaseManagementPage() {
       title={t('roadmap_title')}
       subtitle={t('roadmap_subtitle')}
     >
-      <div className="w-full pb-20 space-y-12">
+      <div className="w-full pb-20 space-y-8">
         {/* Institutional Notice */}
-        <div className="bg-background-surface border border-border-subtle p-10 flex flex-col md:flex-row items-start md:items-center gap-8">
-          <div className="w-14 h-14 bg-background-subtle flex items-center justify-center border border-border-subtle shrink-0">
-            <Clock className="w-6 h-6 text-consorci-darkBlue dark:text-text-primary" strokeWidth={1.5} />
+        <div className="bg-background-surface border border-border-subtle p-6 flex flex-col md:flex-row items-start md:items-center gap-6">
+          <div className="w-12 h-12 bg-background-subtle flex items-center justify-center border border-border-subtle shrink-0">
+            <Clock className="w-5 h-5 text-consorci-darkBlue dark:text-text-primary" strokeWidth={1.5} />
           </div>
           <div className="flex-1">
-            <h3 className="text-[13px] font-medium text-text-muted mb-2 uppercase tracking-wider">{t('institutional_notice_title')}</h3>
-            <p className="text-[15px] text-text-primary font-medium leading-relaxed max-w-3xl">
+            <h3 className="text-[11px] font-medium text-text-muted mb-1 uppercase tracking-wider">{t('institutional_notice_title')}</h3>
+            <p className="text-[14px] text-text-primary font-medium leading-relaxed max-w-3xl">
               {t('institutional_notice_desc')}
             </p>
           </div>
@@ -99,7 +100,7 @@ export default function PhaseManagementPage() {
         {loading ? (
           <Loading message={t('loading_roadmap')} />
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-4">
             {phases.sort((a, b) => a.order - b.order).map((phase) => (
               <div
                 key={phase.phaseId}
@@ -109,11 +110,11 @@ export default function PhaseManagementPage() {
                     : 'border-border-subtle opacity-80'
                 }`}
               >
-                <div className="p-10 flex flex-col lg:flex-row justify-between gap-12">
-                  <div className="flex-1 space-y-8">
+                <div className="p-6 flex flex-col lg:flex-row justify-between gap-8">
+                  <div className="flex-1 space-y-6">
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-6">
-                        <div className={`w-12 h-12 flex items-center justify-center text-[15px] font-medium border transition-colors ${
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 flex items-center justify-center text-[13px] font-medium border transition-colors ${
                           phase.isActive 
                             ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' 
                             : 'bg-background-subtle text-text-muted border-border-subtle'
@@ -121,7 +122,7 @@ export default function PhaseManagementPage() {
                           {phase.order}
                         </div>
                         <div>
-                          <h3 className="text-[20px] font-medium text-text-primary tracking-tight">
+                          <h3 className="text-[16px] font-semibold text-text-primary tracking-tight">
                             {tp.has(`${phase.name}.name`) ? tp(`${phase.name}.name`) : phase.name}
                           </h3>
                           <div className="flex items-center gap-3 mt-2">
@@ -141,7 +142,7 @@ export default function PhaseManagementPage() {
                       </div>
                     </div>
 
-                    <p className="text-[14px] text-text-secondary font-medium leading-relaxed max-w-2xl">
+                    <p className="text-[13px] text-text-secondary font-medium leading-relaxed max-w-2xl">
                       {tp.has(`${phase.name}.description`) ? tp(`${phase.name}.description`) : phase.description}
                     </p>
 
@@ -155,7 +156,7 @@ export default function PhaseManagementPage() {
                           type="date"
                           value={phase.startDate ? phase.startDate.split('T')[0] : ''}
                           onChange={(e) => updatePhaseDate(phase.phaseId, 'startDate', e.target.value)}
-                          className="w-full bg-background-subtle border border-border-subtle text-[13px] font-medium text-text-primary px-5 py-3.5 focus:outline-none focus:border-consorci-darkBlue transition-all"
+                          className="w-full bg-background-subtle border border-border-subtle text-[13px] font-medium text-text-primary px-4 py-2.5 focus:outline-none focus:border-consorci-darkBlue transition-all"
                         />
                       </div>
                       <div className="space-y-3">
@@ -167,32 +168,23 @@ export default function PhaseManagementPage() {
                           type="date"
                           value={phase.endDate ? phase.endDate.split('T')[0] : ''}
                           onChange={(e) => updatePhaseDate(phase.phaseId, 'endDate', e.target.value)}
-                          className="w-full bg-background-subtle border border-border-subtle text-[13px] font-medium text-text-primary px-5 py-3.5 focus:outline-none focus:border-consorci-darkBlue transition-all"
+                          className="w-full bg-background-subtle border border-border-subtle text-[13px] font-medium text-text-primary px-4 py-2.5 focus:outline-none focus:border-consorci-darkBlue transition-all"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="lg:w-72 flex flex-col justify-center lg:border-l border-border-subtle lg:pl-12">
-                    <button
+                  <div className="lg:w-64 flex flex-col justify-center lg:border-l border-border-subtle lg:pl-10">
+                    <Button
+                      variant={phase.isActive ? 'outline' : 'primary'}
+                      size="sm"
                       onClick={() => togglePhase(phase.phaseId, phase.isActive)}
-                      disabled={updating === phase.phaseId || phase.isActive}
-                      className={`w-full py-5 text-[12px] font-medium uppercase tracking-widest transition-all ${
-                        phase.isActive
-                          ? 'bg-background-subtle text-text-muted border border-border-subtle cursor-default'
-                          : 'bg-consorci-darkBlue text-white hover:bg-black active:scale-[0.98]'
-                      }`}
+                      disabled={phase.isActive}
+                      loading={updating === phase.phaseId}
+                      className="w-full uppercase tracking-widest px-0"
                     >
-                      {updating === phase.phaseId
-                        ? (
-                          <div className="flex items-center justify-center gap-3">
-                            <Loading size="mini" white />
-                            {t('processing')}
-                          </div>
-                        )
-                        : (phase.isActive ? t('active') : t('activate_phase'))
-                      }
-                    </button>
+                      {phase.isActive ? t('active') : t('activate_phase')}
+                    </Button>
                     {!phase.isActive && (
                       <p className="mt-4 text-[10px] text-text-muted font-medium text-center italic opacity-60">
                         {t('activation_hint')}

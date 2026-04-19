@@ -10,7 +10,9 @@
     "SMTP_HOST",
     "SMTP_PORT",
     "SMTP_USER",
-    "SMTP_PASS"
+    "SMTP_PASS",
+    "EXPO_PUBLIC_API_URL",
+    "EXPO_PUBLIC_LOCAL_IP"
   ],
   "tasks": {
     "hygiene": {

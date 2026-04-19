@@ -385,7 +385,17 @@
       "reason": "Reason for request",
       "processing": "Processing request...",
       "update_btn": "Update Request",
-      "send_btn": "Send Request"
+      "send_btn": "Send Request",
+      "assign_places_btn": "Assign Places",
+      "status_pending": "Pending",
+      "status_approved": "Approved",
+      "status_rejected": "Rejected",
+      "referents_label": "Referent Teachers",
+      "num_students_label": "Approx. Students",
+      "reason_label": "Reason for Request",
+      "cancel_btn": "Cancel",
+      "edit_request": "Edit Request",
+      "new_request": "New Request"
     },
     "Evaluations": {
       "title": "Monitoring and Evaluation",
@@ -394,8 +404,12 @@
     "Monitoring": {
       "title": "Operational Monitoring",
       "subtitle": "Status of workshop execution and attendance at your center.",
+<<<<<<< HEAD
       "description": "Monitoring of workshop execution, attendance and incidents in real time.",
       "no_assignments": "There are no active workshops at this time.",
+=======
+      "description": "Control attendance, milestones, and the status of all your active workshops.",
+>>>>>>> dev
       "KPI": {
         "sessions_today": "Sessions Today",
         "pending_attendance": "Pending Sheets",
@@ -405,18 +419,45 @@
       "Assignments": {
         "title": "Workshop Status",
         "progress": "Progress",
+        "sessions": "sessions",
         "health": "Attendance Health",
-        "view_details": "Manage Sessions",
+        "health_label": "Attendance Health",
+        "present": "Present",
+        "late": "Late",
+        "absent": "Absent",
+        "staff_needed": "Staff needed",
+        "view_details": "Assign Teachers",
         "no_staff": "⚠️ No teacher assigned",
         "attendance_ok": "Attendance up to date",
         "attendance_warning": "Attendance sheets missing"
       },
       "tabs": {
         "active": "Workshops in Execution",
+        "evaluations": "Evaluations History",
         "completed": "Results and Certificates (Phase 4)"
+      },
+      "EvaluationsTable": {
+        "title": "Evaluations per Workshop",
+        "subtitle": "Detailed history of teacher evaluations",
+        "search_placeholder": "Search workshop or teacher...",
+        "columns": {
+          "workshop": "Workshop",
+          "teacher": "Teacher",
+          "modality": "Mod.",
+          "date": "Date"
+        },
+        "view_feedback": "View Feedback",
+        "no_results": "No evaluations found with these filters.",
+        "total_count": "Total: {count} evaluations registered"
+      },
+      "Feedback": {
+        "title": "Teacher Assessment",
+        "comments_label": "Comments and observations",
+        "no_feedback": "This workshop does not have teacher feedback yet."
       },
       "no_active_assignments": "No active workshops at this time.",
       "no_completed_assignments": "No recently completed workshops.",
+      "no_assignments": "No workshops found for monitoring.",
       "finished_on": "Completed on {date}",
       "view_analytics": "View Analytics",
       "certificates_zip": "Certificates (ZIP)",
@@ -443,6 +484,11 @@
         "error_analytics": "Could not load analytics.",
         "success_download": "Download started successfully!",
         "error_zip": "Error generating ZIP file."
+      },
+      "Satisfaction": {
+        "title": "Teacher Evaluation",
+        "description": "Aggregate metrics from conducted sessions",
+        "responses_count": "{count} RESPONSES"
       }
     },
     "Closure": {
@@ -735,6 +781,7 @@
   },
   "Forms": {
     "edit_title": "Edit",
+    "create_title": "New Workshop",
     "search": "Search...",
     "search_by_title": "Search by title",
     "filter_by_sector": "Filter by sector",
@@ -773,6 +820,8 @@
     "wednesday": "Wednesday",
     "thursday": "Thursday",
     "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
     "Centers": {
       "edit_title": "Edit Center",
       "create_title": "Create New Center",
@@ -953,6 +1002,7 @@
     "subtitle": "Manage workshop requests for your educational center.",
     "search_placeholder": "Search workshop or sector...",
     "num_workshops": "{count} Workshops available",
+    "assign_places_btn": "Assign Places",
     "table_mod": "Mod",
     "table_workshop": "Workshop / Sector",
     "table_referents": "Referents",
@@ -1120,11 +1170,18 @@
     }
   },
   "Common": {
+    "success": "Success",
+    "view": "View",
+    "notif_preamble": "You have pending documents for",
+    "notif_mid": "and",
+    "notif_reason": "Please upload them to complete the process.",
     "general": "General",
     "configuration": "Configuration",
     "global": "Global",
     "phase": "Phase",
     "phase_with_number": "Phase {number}",
+    "sector": "Sector",
+    "modality": "Modality",
     "loading": "Loading...",
     "module_closed": "Module closed",
     "loading_calendar": "Loading calendar...",
@@ -1152,6 +1209,8 @@
     "view_document": "View document",
     "pending": "Pending",
     "authenticating": "Authenticating...",
+    "evaluated": "Evaluated",
+    "workshop_evaluated": "Workshop Evaluated",
     "search": "Search...",
     "all_statuses": "All Statuses",
     "actions": "Actions",
@@ -1256,7 +1315,11 @@
     "Execution": "Execution and Monitoring",
     "Closure": "Closure and Certification",
     "Approved": "Approved",
+    "Aprobada": "Approved",
+    "aprobada": "Approved",
     "Rejected": "Rejected",
+    "Rechazada": "Rejected",
+    "rechazada": "Rejected",
     "phase_start_title": "New Phase: {name}",
     "phase_start_msg": "The phase \"{name}\" has started. Check the calendar for details.",
     "calendar_sync_title": "Calendar Synchronization (System)",

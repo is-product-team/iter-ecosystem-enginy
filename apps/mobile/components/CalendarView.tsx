@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import WorkshopDetailModal from './WorkshopDetailModal';
 
@@ -47,33 +46,21 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
     onMonthChange?.(newDate);
   };
 
-  const weekdays = useMemo(() => {
-    const baseDate = new Date(2024, 0, 1); // Monday, Jan 1st 2024
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(baseDate);
-      d.setDate(d.getDate() + i);
-      return d.toLocaleDateString(i18n.language, { weekday: 'short' }).slice(0, 2).toUpperCase();
-    });
-  }, [i18n.language]);
-
   const calendarDays = useMemo(() => {
     const totalDays = daysInMonth(year, currentDate.getMonth());
-    const firstDay = (firstDayOfMonth(year, currentDate.getMonth()) + 6) % 7; // Adjust to Monday start
+    const firstDay = (firstDayOfMonth(year, currentDate.getMonth()) + 6) % 7; 
     const days = [];
 
-    // Padding for previous month
     for (let i = 0; i < firstDay; i++) {
       days.push({ day: null, date: null });
     }
 
-    // Days of current month
     for (let d = 1; d <= totalDays; d++) {
       const date = new Date(year, currentDate.getMonth(), d);
       const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       days.push({ day: d, date: dateStr });
     }
 
-    // Padding for next month to complete the last week
     while (days.length % 7 !== 0) {
       days.push({ day: null, date: null });
     }
@@ -91,177 +78,149 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventClick, onMon
 
   const dayEvents = useMemo(() => getEventsForDay(selectedDate), [selectedDate, getEventsForDay]);
 
-  const getEventColor = (type: string) => {
-    switch (type) {
-      case 'milestone': return THEME.colors.primary;
-      case 'deadline': return THEME.colors.accent;
-      case 'assignment': return THEME.colors.secondary;
-      default: return THEME.colors.gray;
-    }
-  };
-
-
   const handleEventClick = (event: CalendarEvent) => {
     setSelectedEvent(event);
     setModalVisible(true);
   };
 
   return (
-    <View className="flex-1 bg-background-page">
+    <View className="flex-1 bg-white dark:bg-black">
 
-      {/* Calendar Grid (Seamless) */}
-      <View className="px-6 pb-4 pt-2">
-        <View className="pb-4">
-
-          {/* Header */}
-          <View className="flex-row items-center justify-between mb-4">
-            <View className="flex-row items-baseline">
-              <Text className="text-2xl font-extrabold text-text-primary mr-2 capitalize">
-                {monthName}
-              </Text>
-              <Text className="text-lg font-bold text-primary">
-                {year}
-              </Text>
-            </View>
-            <View className="flex-row space-x-2">
-              <TouchableOpacity onPress={prevMonth} className="w-8 h-8 rounded-full bg-background-subtle items-center justify-center">
-                <Ionicons name="chevron-back" size={18} color={THEME.colors.primary} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={nextMonth} className="w-8 h-8 rounded-full bg-background-subtle items-center justify-center">
-                <Ionicons name="chevron-forward" size={18} color={THEME.colors.primary} />
-              </TouchableOpacity>
-            </View>
+      {/* Modern Apple-style Calendar Grid */}
+      <View className="px-8 pb-6 pt-2">
+        
+        {/* Month Selector */}
+        <View className="flex-row items-center justify-between mb-8">
+          <View>
+            <Text className="text-[24px] font-semibold text-black dark:text-white capitalize">
+              {monthName} <Text className="font-light text-gray-400">{year}</Text>
+            </Text>
           </View>
-
-          {/* Weekdays */}
-          <View className="flex-row mb-2">
-            {[
-              t('Calendar.weekdays.dl'),
-              t('Calendar.weekdays.dt'),
-              t('Calendar.weekdays.dc'),
-              t('Calendar.weekdays.dj'),
-              t('Calendar.weekdays.dv'),
-              t('Calendar.weekdays.ds'),
-              t('Calendar.weekdays.dg'),
-            ].map(d => (
-              <View key={d} className="flex-1 items-center">
-                <Text className="text-[10px] font-bold text-text-muted">{d}</Text>
-              </View>
-            ))}
+          <View className="flex-row bg-[#F2F2F7] dark:bg-[#1C1C1E] p-1 rounded-full">
+            <TouchableOpacity onPress={prevMonth} className="w-8 h-8 items-center justify-center">
+              <Ionicons name="chevron-back" size={18} color="#007AFF" />
+            </TouchableOpacity>
+            <View className="w-[1px] h-4 bg-gray-300 dark:bg-gray-700 self-center" />
+            <TouchableOpacity onPress={nextMonth} className="w-8 h-8 items-center justify-center">
+              <Ionicons name="chevron-forward" size={18} color="#007AFF" />
+            </TouchableOpacity>
           </View>
-
-          {/* Grid */}
-          <View className="flex-row flex-wrap">
-            {calendarDays.map((dateObj, idx) => {
-              const isSelected = dateObj.date === selectedDate;
-              const isToday = dateObj.date === new Date().toISOString().split('T')[0];
-              const dayEventsForDot = dateObj.date ? getEventsForDay(dateObj.date) : [];
-
-              return (
-                <TouchableOpacity
-                  key={idx}
-                  onPress={() => dateObj.date && setSelectedDate(dateObj.date)}
-                  className="w-[14.28%] aspect-square items-center justify-center"
-                  disabled={!dateObj.date}
-                >
-                  {dateObj.day && (
-                    <View className="items-center">
-                      <View className={`w-8 h-8 items-center justify-center rounded-full mb-1 ${isSelected ? 'bg-primary' : isToday ? 'bg-primary/20 border border-primary/40' : ''
-                        }`}>
-                        <Text className={`text-sm font-bold ${isSelected ? 'text-white' : isToday ? 'text-primary' : 'text-text-primary'
-                          }`}>
-                          {dateObj.day}
-                        </Text>
-                      </View>
-
-                      {/* Event Dots */}
-                      <View className="flex-row space-x-[2px] h-1">
-                        {dayEventsForDot.slice(0, 3).map((e, i) => (
-                          <View
-                            key={i}
-                            className="w-1 h-1 rounded-full"
-                            style={{
-                              backgroundColor: e.type === 'milestone' ? '#6366F1' :
-                                e.type === 'deadline' ? '#EF4444' :
-                                  e.type === 'assignment' ? THEME.colors.primary : THEME.colors.gray
-                            }}
-                          />
-                        ))}
-                      </View>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          {/* Subtle loading overlay on the grid */}
-          {isLoading && (
-            <View className="absolute inset-0 bg-white/30 items-center justify-center">
-              <ActivityIndicator color={THEME.colors.primary} />
-            </View>
-          )}
-        </View>
-      </View>
-
-      {/* Events List / Agenda (Scrollable) */}
-      <View className="flex-1 px-4">
-        <View className="py-3">
-          <Text className="text-text-muted text-xs font-bold uppercase tracking-widest pl-2">
-            {new Date(selectedDate).toLocaleDateString(i18n.language || 'ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
-          </Text>
         </View>
 
-        <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
-          {dayEvents.length === 0 ? (
-            <View className="items-center justify-center py-10 rounded-2xl border-2 border-dashed border-border-subtle">
-              <Text className="text-text-muted font-medium text-sm">{t('Calendar.no_events')}</Text>
+        {/* Weekdays Labels */}
+        <View className="flex-row mb-4">
+          {[
+            t('Calendar.weekdays.dl'),
+            t('Calendar.weekdays.dt'),
+            t('Calendar.weekdays.dc'),
+            t('Calendar.weekdays.dj'),
+            t('Calendar.weekdays.dv'),
+            t('Calendar.weekdays.ds'),
+            t('Calendar.weekdays.dg'),
+          ].map(d => (
+            <View key={d} className="flex-1 items-center">
+              <Text className="text-[11px] font-bold text-gray-400 uppercase tracking-tighter">{d}</Text>
             </View>
-          ) : (
-            dayEvents.map(event => (
+          ))}
+        </View>
+
+        {/* Days Grid */}
+        <View className="flex-row flex-wrap">
+          {calendarDays.map((dateObj, idx) => {
+            const isSelected = dateObj.date === selectedDate;
+            const isToday = dateObj.date === new Date().toISOString().split('T')[0];
+            const dayEventsForDot = dateObj.date ? getEventsForDay(dateObj.date) : [];
+
+            return (
               <TouchableOpacity
-                key={event.id}
-                onPress={() => handleEventClick(event)}
-                className="bg-background-surface rounded-2xl p-4 mb-3 shadow-sm border border-border-subtle flex-row"
+                key={idx}
+                onPress={() => dateObj.date && setSelectedDate(dateObj.date)}
+                className="w-[14.28%] aspect-square items-center justify-center mb-1"
+                disabled={!dateObj.date}
               >
-                {/* Time Column */}
-                <View className="w-16 border-r border-border-subtle mr-4 justify-center">
-                  <Text className="text-text-primary font-bold text-sm">
-                    {event.metadata?.hora ? event.metadata.hora.split(' - ')[0] : t('Calendar.all_day')}
-                  </Text>
-                  {event.metadata?.hora && (
-                    <Text className="text-text-muted text-[10px] font-bold">
-                      {event.metadata.hora.split(' - ')[1]}
-                    </Text>
-                  )}
-                </View>
-
-                {/* Content */}
-                <View className="flex-1 justify-center">
-                  <View className="flex-row items-center mb-1">
-                    <View className={`w-2 h-2 rounded-full mr-2`} style={{ backgroundColor: getEventColor(event.type) }} />
-                    <Text className="text-text-primary font-bold text-base flex-1" numberOfLines={1}>{event.title}</Text>
-                  </View>
-
-                  {event.metadata?.adreca && (
-                    <View className="flex-row items-center">
-                      <Ionicons name="location" size={12} color={THEME.colors.gray} className="mr-1" />
-                      <Text className="text-text-secondary text-xs font-medium" numberOfLines={1}>
-                        {event.metadata.adreca}
+                {dateObj.day && (
+                  <View className="items-center justify-center w-full h-full">
+                    <View className={`w-9 h-9 items-center justify-center rounded-full ${
+                        isSelected ? 'bg-black dark:bg-white' : 
+                        isToday ? 'bg-[#007AFF15]' : ''
+                      }`}>
+                      <Text className={`text-[15px] ${
+                          isSelected ? 'font-bold text-white dark:text-black' : 
+                          isToday ? 'font-bold text-[#007AFF]' : 'font-medium text-black dark:text-white'
+                        }`}>
+                        {dateObj.day}
                       </Text>
                     </View>
-                  )}
-                </View>
 
-                {/* Arrow */}
-                <View className="justify-center pl-2">
-                  <Ionicons name="chevron-forward" size={16} color={THEME.colors.gray} />
-                </View>
+                    {/* Minimal Dots */}
+                    <View className="flex-row space-x-[3px] absolute bottom-1">
+                      {dayEventsForDot.slice(0, 1).map((_, i) => (
+                        <View
+                          key={i}
+                          className={`w-1 h-1 rounded-full ${isSelected ? 'bg-transparent' : 'bg-gray-300 dark:bg-gray-600'}`}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                )}
               </TouchableOpacity>
-            ))
-          )}
-        </ScrollView>
+            );
+          })}
+        </View>
+
+        {isLoading && (
+          <View className="absolute inset-0 bg-white/50 dark:bg-black/50 items-center justify-center rounded-3xl">
+            <ActivityIndicator color="#007AFF" />
+          </View>
+        )}
       </View>
+
+      {/* Agenda Header */}
+      <View className="px-8 pt-4 pb-2 border-t border-[#F2F2F7] dark:border-[#1C1C1E]">
+        <Text className="text-[13px] font-bold text-gray-400 uppercase tracking-widest">
+          {new Date(selectedDate).toLocaleDateString(i18n.language || 'ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+        </Text>
+      </View>
+
+      {/* Scrollable Events List */}
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40 }}>
+        {dayEvents.length === 0 ? (
+          <View className="py-12 items-center justify-center bg-[#F9F9F9] dark:bg-[#1C1C1E] rounded-[24px] border border-dashed border-gray-200 dark:border-gray-800">
+            <Text className="text-gray-400 font-medium text-[14px]">{t('Calendar.no_events')}</Text>
+          </View>
+        ) : (
+          dayEvents.map(event => (
+            <TouchableOpacity
+              key={event.id}
+              onPress={() => handleEventClick(event)}
+              activeOpacity={0.7}
+              style={{
+                backgroundColor: '#F9F9F9',
+                borderRadius: 20,
+                padding: 20,
+                marginBottom: 12,
+                borderWidth: 1,
+                borderColor: '#EFEFEF',
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <View className="flex-row items-center mb-1">
+                  <View className="w-2 h-2 rounded-full bg-[#007AFF] mr-3" />
+                  <Text className="text-black font-semibold text-[16px] flex-1" numberOfLines={1}>
+                    {event.title}
+                  </Text>
+                </View>
+                <Text className="text-gray-500 text-[13px] ml-5 font-medium">
+                  {event.metadata?.hora || t('Calendar.all_day')}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color="#AEAEB2" />
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
 
       <WorkshopDetailModal
         visible={modalVisible}

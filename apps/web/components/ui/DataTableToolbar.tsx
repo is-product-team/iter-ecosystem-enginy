@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Search, X, ChevronDown, LucideIcon, Layers } from 'lucide-react';
+import Button from './Button';
 
 interface FilterSelectProps {
   label: string;
@@ -140,13 +141,15 @@ export default function DataTableToolbar({
 
           {onClear && (
             <div className="flex-none border-b border-border-subtle h-[48px]">
-              <button
+              <Button
                 onClick={onClear}
-                className="flex items-center justify-center gap-2 px-6 h-full w-full bg-background-subtle hover:bg-background-surface text-[10px] font-bold text-text-muted hover:text-red-500 uppercase tracking-[0.2em] transition-all group"
+                variant="subtle"
+                size="sm"
+                className="h-full w-full uppercase tracking-[0.2em] !text-text-muted hover:!text-red-500 font-bold"
               >
                 <X className="w-3.5 h-3.5" />
                 <span>Clear</span>
-              </button>
+              </Button>
             </div>
           )}
           

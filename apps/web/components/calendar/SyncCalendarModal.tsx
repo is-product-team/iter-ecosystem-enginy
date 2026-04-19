@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import {
@@ -9,12 +9,12 @@ import {
   Copy,
   RefreshCw,
   X,
-  ExternalLink,
   ShieldCheck,
   Smartphone
 } from 'lucide-react';
 import api from '@/services/api';
 import { toast } from 'sonner';
+import Button from '../ui/Button';
 import Loading from '../Loading';
 
 interface SyncCalendarModalProps {
@@ -29,13 +29,7 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
   const [copying, setCopying] = useState(false);
   const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar');
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchSyncToken();
-    }
-  }, [isOpen]);
-
-  const fetchSyncToken = async () => {
+  const fetchSyncToken = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api().get('/profile/sync-token');
@@ -45,7 +39,13 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchSyncToken();
+    }
+  }, [isOpen, fetchSyncToken]);
 
   const generateToken = async () => {
     if (!confirm(t('regenerate_confirm'))) return;
@@ -66,7 +66,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
 
   // URL Construction
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-  // Clean apiUrl if it has /api prefix (typical in this project context)
   const domain = apiUrl.replace(/^https?:\/\//, '').replace(/\/api$/, '');
   const protocol = apiUrl.startsWith('https') ? 'https' : 'http';
 
@@ -87,15 +86,12 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="relative w-full max-w-xl bg-background-surface border border-border-subtle shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border-subtle bg-background-subtle">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-consorci-darkBlue/10 flex items-center justify-center text-consorci-darkBlue">
@@ -106,39 +102,41 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
               <p className="text-xs text-text-muted mt-0.5">{t('modal_subtitle')}</p>
             </div>
           </div>
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
             onClick={onClose}
-            className="p-2 text-text-muted hover:text-text-primary hover:bg-background-surface transition-colors"
+            className="!p-2 text-text-muted hover:!text-text-primary hover:bg-background-surface"
           >
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
-        {/* Tabs */}
         <div className="flex border-b border-border-subtle bg-background-surface">
-          <button
+          <Button
             onClick={() => setActiveTab('calendar')}
-            className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-widest transition-all ${
+            variant="subtle"
+            className={`flex-1 !py-4 !h-auto !text-[11px] !font-bold !uppercase !tracking-widest !rounded-none transition-all ${
               activeTab === 'calendar' 
-                ? 'text-consorci-darkBlue border-b-2 border-consorci-darkBlue bg-consorci-darkBlue/5' 
-                : 'text-text-muted hover:text-text-primary'
+                ? '!text-consorci-darkBlue !border-b-2 !border-consorci-darkBlue !bg-consorci-darkBlue/5' 
+                : '!text-text-muted hover:!text-text-primary'
             }`}
           >
             {t('tab_calendar')}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setActiveTab('notifications')}
-            className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-widest transition-all ${
+            variant="subtle"
+            className={`flex-1 !py-4 !h-auto !text-[11px] !font-bold !uppercase !tracking-widest !rounded-none transition-all ${
               activeTab === 'notifications' 
-                ? 'text-consorci-darkBlue border-b-2 border-consorci-darkBlue bg-consorci-darkBlue/5' 
-                : 'text-text-muted hover:text-text-primary'
+                ? '!text-consorci-darkBlue !border-b-2 !border-consorci-darkBlue !bg-consorci-darkBlue/5' 
+                : '!text-text-muted hover:!text-text-primary'
             }`}
           >
             {t('tab_notifications')}
-          </button>
+          </Button>
         </div>
 
-        {/* Content */}
         <div className="p-8 space-y-8">
           {loading ? (
             <div className="py-12 flex flex-col items-center justify-center space-y-4">
@@ -146,7 +144,6 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
             </div>
           ) : (
             <>
-              {/* Buttons Section */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <a
                   href={googleUrl}
@@ -167,24 +164,24 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
                 </a>
               </div>
 
-              {/* URL Section */}
               <div className="space-y-3">
                 <label className="text-[11px] font-bold text-text-muted uppercase tracking-widest">{t('copy_btn')}</label>
                 <div className="flex items-center gap-2 p-1 border border-border-subtle bg-background-subtle">
                   <div className="flex-1 px-4 py-2 font-mono text-[11px] text-text-muted truncate">
                     {syncToken ? icalUrl : '••••••••••••••••••••••••••••••••'}
                   </div>
-                  <button
+                  <Button
                     onClick={copyToClipboard}
-                    className="p-2.5 bg-background-surface hover:bg-consorci-darkBlue hover:text-white transition-all border-l border-border-subtle"
+                    variant="subtle"
+                    size="sm"
+                    className="!p-2.5 bg-background-surface hover:bg-consorci-darkBlue hover:text-white border-l border-border-subtle !rounded-none"
                     title={t('copy_btn')}
                   >
                     {copying ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
-              {/* Instructions Section */}
               <div className="p-6 bg-background-subtle border border-border-subtle space-y-4">
                 <div className="flex items-center gap-2 text-consorci-darkBlue">
                   <ShieldCheck className="w-4 h-4" />
@@ -208,22 +205,23 @@ export default function SyncCalendarModal({ isOpen, onClose }: SyncCalendarModal
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-8 py-5 border-t border-border-subtle bg-background-subtle flex justify-between items-center">
-          <button
+          <Button
             onClick={generateToken}
-            className="text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors flex items-center gap-2"
+            variant="link"
+            size="sm"
+            loading={loading}
+            icon={<RefreshCw className="w-3.5 h-3.5" />}
           >
-            {loading ? <Loading size="mini" /> : <RefreshCw className="w-3.5 h-3.5" />}
             {t('regenerate_btn')}
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={onClose}
-            className="px-6 py-2.5 bg-background-surface border border-border-subtle hover:border-text-primary text-[13px] font-medium transition-all"
+            variant="outline"
           >
             {t('close')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -20,6 +20,8 @@
     "db:push": "turbo run db:push",
     "db:seed": "turbo run db:seed",
     "db:clean": "turbo run db:clean",
+    "db:migrate:local": "npx dotenv -e .env -- sh -c 'DATABASE_URL=\"postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$DB_PORT_EXTERNAL/$POSTGRES_DB?schema=public\" npx prisma migrate dev --schema apps/api/prisma/schema.prisma'",
+    "db:migrate:prod": "npx prisma migrate deploy --schema apps/api/prisma/schema.prisma",
     "db:studio": "turbo run studio",
     "test": "turbo run test",
     "verify": "turbo run lint type-check test --filter=@iter/api --filter=@iter/web --filter=@iter/mobile",

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { useLocale, useTranslations } from 'next-intl';
 import { Globe, ChevronDown, Check } from 'lucide-react';
+import Button from './ui/Button';
 
 const LANGUAGES = [
   { id: 'ca', label: 'Català', flag: 'CA' },
@@ -47,18 +48,21 @@ export default function LanguageSelector() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 px-4 py-2.5 bg-background-surface border border-border-subtle hover:border-text-primary transition-all duration-300 shadow-sm group"
+        className="!gap-3 hover:!border-text-primary px-4 bg-background-surface group"
+        icon={
+          <ChevronDown 
+            size={14} 
+            className={`text-text-muted transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
+          />
+        }
       >
         <Globe size={16} className="text-text-muted group-hover:text-text-primary transition-colors" />
         <span className="text-[13px] font-medium text-text-primary">{activeLanguage.label}</span>
-        <ChevronDown 
-          size={14} 
-          className={`text-text-muted transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} 
-        />
-      </button>
+      </Button>
 
       {isOpen && (
         <div className="absolute z-50 mt-2 w-64 right-0 ltr:right-0 rtl:left-0 bg-background-page/95 backdrop-blur-xl border border-border-subtle shadow-2xl animate-in fade-in zoom-in-95 duration-200 origin-top">
@@ -68,34 +72,40 @@ export default function LanguageSelector() {
             </div>
             
             {LANGUAGES.map((lang) => (
-              <button
+              <Button
                 key={lang.id}
+                variant="subtle"
+                fullWidth
                 onClick={() => handleLanguageChange(lang.id)}
-                className={`w-full flex items-center justify-between px-4 py-3 hover:bg-consorci-darkBlue hover:text-white transition-colors group ${
+                className={`!justify-between !px-4 !py-3 !rounded-none transition-colors group ${
                   currentLocale === lang.id ? 'bg-consorci-darkBlue/5' : ''
                 }`}
+                icon={
+                  currentLocale === lang.id && (
+                    <Check size={14} className="text-consorci-darkBlue group-hover:text-white" />
+                  )
+                }
               >
                 <div className="flex items-center gap-3">
                   <span className={`text-[13px] ${currentLocale === lang.id ? 'font-bold' : 'font-medium'}`}>
                     {lang.label}
                   </span>
                 </div>
-                {currentLocale === lang.id && (
-                  <Check size={14} className="text-consorci-darkBlue group-hover:text-white" />
-                )}
-              </button>
+              </Button>
             ))}
 
             <div className="border-t border-border-subtle mt-1 pt-1">
-              <button
+              <Button
+                variant="subtle"
+                fullWidth
                 onClick={handleReset}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-background-subtle transition-colors text-text-muted hover:text-text-primary"
+                className="!justify-start !px-4 !py-3 !rounded-none text-text-muted hover:!text-text-primary"
               >
                 <div className="w-5 flex justify-center">
                   <span className="text-[10px] opacity-60">⚙️</span>
                 </div>
                 <span className="text-[12px] font-medium italic">{t('system_default')}</span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -70,7 +70,7 @@ export default function DesignateTeachersPage({ params }: { params: Promise<{ id
     };
 
     fetchData();
-  }, [id, router]);
+  }, [id, router, t]);
 
   const handleSave = async () => {
     if (!teacher1Id) {

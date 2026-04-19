@@ -41,7 +41,7 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
         };
 
         fetchData();
-    }, [id, router]);
+    }, [id, router, t]);
 
     if (loading || !assignment) {
         return <Loading fullScreen message={t('loading_enrollments')} />;

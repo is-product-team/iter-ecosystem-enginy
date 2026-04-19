@@ -403,9 +403,14 @@
     },
     "Monitoring": {
       "title": "Monitorització Operativa",
+<<<<<<< HEAD
       "subtitle": "Estat de l'execució de tallers i assistència al teu centre.",
       "description": "Seguimiento de la ejecución de talleres, asistencia e incidencias en tiempo real.",
       "no_assignments": "No hi ha tallers actius en aquest moment.",
+=======
+      "subtitle": "Estat de l'execució de tallers i assistència en el teu centre.",
+      "description": "Controla l'asistència, les fites i l'estat de tots els teus tallers actius.",
+>>>>>>> dev
       "KPI": {
         "sessions_today": "Sessions Avui",
         "pending_attendance": "Fulls Pendents",
@@ -415,18 +420,46 @@
       "Assignments": {
         "title": "Estat dels Tallers",
         "progress": "Progrés",
+        "sessions": "sessions",
         "health": "Salut de l'Asistència",
-        "view_details": "Gestionar Sessions",
+        "health_label": "Salut de l'Assistència",
+        "present": "Present",
+        "late": "Retard",
+        "absent": "Falta",
+        "staff_needed": "Professorat pendent",
+        "view_details": "Assignar Professors",
         "no_staff": "⚠️ Sense professor assignat",
         "attendance_ok": "Asistència al dia",
         "attendance_warning": "Falten fulls per omplir"
       },
       "tabs": {
         "active": "Tallers en Execució",
+        "evaluations": "Historial d'Avaluacions",
         "completed": "Resultats i Certificats (Fase 4)"
       },
+      "EvaluationsTable": {
+        "title": "Avaluacions per Taller",
+        "subtitle": "Historial detallat de les valoracions del professorat",
+        "search_placeholder": "Cercar taller o professor...",
+
+        "columns": {
+          "workshop": "Taller",
+          "teacher": "Professor/a",
+          "modality": "Mod.",
+          "date": "Data"
+        },
+        "view_feedback": "Veure Feedback",
+        "no_results": "No s'han trobat avaluacions amb aquests filtres.",
+        "total_count": "Total: {count} avaluacions registrades"
+      },
+      "Feedback": {
+        "title": "Valoració del Docent",
+        "comments_label": "Comentaris i observacions",
+        "no_feedback": "Aquest taller encara no té valoració del professor."
+      },
       "no_active_assignments": "No hi ha tallers actius en aquest moment.",
-      "no_completed_assignments": "No hi ha tallers finalitzats recents.",
+      "no_completed_assignments": "No hi ha tallers finalitzats recentment.",
+      "no_assignments": "No s'han trobat tallers per monitoratge.",
       "finished_on": "Finalitzat el {date}",
       "view_analytics": "Veure Analítica",
       "certificates_zip": "Certificats (ZIP)",
@@ -451,8 +484,18 @@
       "no_completed": "No hi ha tallers finalitzats recents.",
       "messages": {
         "error_analytics": "No s'ha pogut carregar l'analítica.",
+<<<<<<< HEAD
         "success_download": "¡Descàrrega iniciada correctament!",
         "error_zip": "Error en generar el fitxer ZIP."
+=======
+        "success_download": "Descàrrega iniciada correctament!",
+        "error_zip": "Error en generar l'arxiu ZIP."
+      },
+      "Satisfaction": {
+        "title": "Valoració del Professorat",
+        "description": "Mètriques agregades de les sessions realitzades",
+        "responses_count": "{count} RESPOSTES"
+>>>>>>> dev
       }
     },
     "Closure": {
@@ -660,7 +703,8 @@
     "assignments": "Assignacions",
     "sessions": "Sessions",
     "profile": "Perfil",
-    "monitoring": "Monitorització"
+    "monitoring": "Monitorització",
+    "issues": "Incidències"
   },
   "Dashboards": {
     "admin": {
@@ -712,6 +756,7 @@
   },
   "Forms": {
     "edit_title": "Editar",
+    "create_title": "Nou taller",
     "search": "Cercar...",
     "search_by_title": "Cercar per títol",
     "filter_by_sector": "Filtrar per sector",
@@ -750,6 +795,8 @@
     "wednesday": "Dimecres",
     "thursday": "Dijous",
     "friday": "Divendres",
+    "saturday": "Dissabte",
+    "sunday": "Diumenge",
     "Centers": {
       "edit_title": "Editar Centre",
       "create_title": "Crear Nou Centre",
@@ -1088,11 +1135,18 @@
     }
   },
   "Common": {
+    "success": "Èxit",
+    "view": "Veure",
+    "notif_preamble": "Tens documents pendents per a",
+    "notif_mid": "i",
+    "notif_reason": "Si us plau, puja'ls per completar el procés.",
     "general": "General",
     "configuration": "Configuració",
     "global": "Global",
     "phase": "Fase",
     "phase_with_number": "Fase {number}",
+    "sector": "Sector",
+    "modality": "Modalitat",
     "loading": "Carregant...",
     "module_closed": "Mòdul tancat",
     "loading_calendar": "Carregant calendari...",
@@ -1120,7 +1174,14 @@
     "view_document": "Veure document",
     "pending": "Pendent",
     "authenticating": "Verificant credencials...",
+<<<<<<< HEAD
     "search": "Cercar...",
+=======
+    "evaluated": "Valorat",
+    "workshop_evaluated": "Taller Valorat",
+    "search": "Cercar...",
+
+>>>>>>> dev
     "all_statuses": "Tots els estats",
     "actions": "Accions",
     "ok": "Acceptar",
@@ -1138,9 +1199,9 @@
     "delete_success": "Element eliminat correctament.",
     "delete_error": "S'ha produït un error en eliminar l'element.",
     "delete_confirm_title": "Confirmar eliminació",
-    "delete_confirm_msg": "Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
-    "places_label": "Places",
-    "duration_label": "Durada",
+    "delete_confirm_msg": "¿Estàs segur que vols eliminar aquest element? Aquesta acció no es pot desfer.",
+    "places_label": "{count} Places",
+    "duration_label": "{hours}h",
     "clear_filters": "Netejar filtres",
     "no_results": "No s'han trobat resultats",
     "try_other_terms": "Prova amb altres termes de cerca.",
@@ -1152,14 +1213,14 @@
     "save": "Desar",
     "all_sectors": "Tots els sectors",
     "all_modalities": "Totes les modalitats",
-    "modality_label": "Modalitat",
+    "modality_label": "Modalitat {modality}",
     "no_description": "No hi ha descripció disponible.",
     "new": "Nou",
     "system_default": "Predeterminat del Sistema",
     "select_language": "Seleccionar Idioma",
     "all_centers": "Tots els centres",
     "search_placeholder": "Ex: Fusteria, Robòtica...",
-    "id_label": "ID",
+    "id_label": "ID: {id}",
     "save_success": "Operació completada amb èxit.",
     "error_loading": "Error en carregar les dades.",
     "fill_all_fields": "Si us plau, completa tots els camps.",
@@ -1224,7 +1285,11 @@
     "Execution": "Execució i Seguimiento",
     "Closure": "Tancament i Certificació",
     "Approved": "Aprovada",
+    "Aprobada": "Aprovada",
+    "aprobada": "Aprovada",
     "Rejected": "Rebutjada",
+    "Rechazada": "Rebutjada",
+    "rechazada": "Rebutjada",
     "phase_start_title": "Nova Fase: {name}",
     "phase_start_msg": "La fase \"{name}\" ha començat. Consulta el calendari per a més detalls.",
     "calendar_sync_title": "Sincronització de Calendari (Sistema)",
@@ -1271,6 +1336,7 @@
     }
   },
   "DesignateTeachersPage": {
+    "page_title": "Designar Docents: {title}",
     "page_subtitle": "Designa l'equip docent responsable que s'encarregarà del seguiment i l'assistència.",
     "selection_of_referents": "Equip Docente (Practicantes)",
     "main_teacher": "Docent Principal",
@@ -1352,5 +1418,45 @@
     "footer_note": "Feedback anònim per al centre. Sigues sincer!",
     "submit_button": "Enviar enquesta",
     "submitting": "Enviant..."
+  },
+  "Issues": {
+    "title": "Gestió d'Incidències",
+    "subtitle": "Comunicació directa amb l'administració per a la resolució de problemes.",
+    "new": "Nova Incidència",
+    "details": "Detall de la Incidència",
+    "no_incidents": "No hi ha incidències reportades.",
+    "create_success": "Incidència creada correctament.",
+    "message_success": "Missatge enviat.",
+    "status_updated": "Estat actualitzat.",
+    "priority_updated": "Prioritat actualitzada.",
+    "form": {
+      "title": "Títol de la incidència",
+      "category": "Categoria",
+      "priority": "Prioritat",
+      "description": "Descripció detallada",
+      "submit": "Obrir Incidència"
+    },
+    "chat": {
+      "placeholder": "Escriu un missatge...",
+      "system_msg": "Missatge del sistema",
+      "admin_reply": "Resposta de l'Administració"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Assumpte",
+      "status": "Estat",
+      "priority": "Prioritat",
+      "category": "Categoria",
+      "date": "Data",
+      "center": "Centre"
+    },
+    "categories": {
+      "DOCUMENTATION": "Documentació",
+      "MATERIAL": "Material",
+      "TECHNICAL": "Tècnica",
+      "ABSENCE": "Ausència",
+      "FACILITIES": "Espai",
+      "OTHER": "Altres"
+    }
   }
 }
