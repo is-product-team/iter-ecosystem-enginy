@@ -149,7 +149,7 @@ export default function ClosurePage() {
 
             {completedAssignments.length === 0 ? (
                 <div className="p-20 text-center bg-background-subtle/30 border border-border-subtle italic text-[11px] text-text-muted uppercase tracking-widest">
-                    No hi ha tallers finalitzats en l'historial
+                    No hi ha tallers finalitzats en l&apos;historial
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 opacity-90">
