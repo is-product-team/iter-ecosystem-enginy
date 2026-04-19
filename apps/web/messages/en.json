@@ -691,7 +691,8 @@
     "assignments": "Assignments",
     "sessions": "Sessions",
     "profile": "Profile",
-    "monitoring": "Monitoring"
+    "monitoring": "Monitoring",
+    "issues": "Issues"
   },
   "Dashboards": {
     "admin": {
@@ -1442,5 +1443,54 @@
     "footer_note": "Anonymous feedback for the center. Be honest!",
     "submit_button": "Submit Survey",
     "submitting": "Submitting..."
-  }
-}
+    },
+    "Issues": {
+    "title": "Incident Management",
+    "subtitle": "Direct communication with administration for problem resolution.",
+    "new": "New Incident",
+    "details": "Incident Details",
+    "no_incidents": "No incidents reported.",
+    "create_success": "Incident created successfully.",
+    "message_success": "Message sent.",
+    "status_open": "Open",
+    "status_in_progress": "In Progress",
+    "status_resolved": "Resolved",
+    "status_closed": "Closed",
+    "priority_low": "Low",
+    "priority_medium": "Medium",
+    "priority_high": "High",
+    "priority_critical": "Critical",
+    "filter_status": "Filter by status",
+    "filter_priority": "Filter by priority",
+    "filter_category": "Filter by category",
+    "form": {
+      "title": "Incident Title",
+      "category": "Category",
+      "priority": "Priority",
+      "description": "Detailed description",
+      "submit": "Open Incident"
+    },
+    "chat": {
+      "placeholder": "Write a message...",
+      "system_msg": "System message",
+      "admin_reply": "Administration Reply"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Subject",
+      "status": "Status",
+      "priority": "Priority",
+      "category": "Category",
+      "date": "Date",
+      "center": "Center"
+    },
+    "categories": {
+      "DOCUMENTATION": "Documentation",
+      "MATERIAL": "Material",
+      "TECHNICAL": "Technical",
+      "ABSENCE": "Absence",
+      "FACILITIES": "Space",
+      "OTHER": "Other"
+    }
+    }
+    }

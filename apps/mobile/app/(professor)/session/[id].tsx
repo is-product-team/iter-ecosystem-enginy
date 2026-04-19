@@ -14,7 +14,6 @@ export default function SessionScreen() {
   const params = useLocalSearchParams();
   const id = params.id as string;
   const paramNum = params.sessionNum as string;
-  const paramId = params.sessionId as string;
   
   const insets = useSafeAreaInsets();
 

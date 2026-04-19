@@ -47,15 +47,6 @@ export default function SupportScreen() {
     }
   };
 
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
-      case 'CRITICAL': return { name: 'alert-circle', color: '#EF4444' };
-      case 'HIGH': return { name: 'chevron-up-circle', color: '#F97316' };
-      case 'MEDIUM': return { name: 'remove-circle', color: '#F59E0B' };
-      default: return { name: 'chevron-down-circle', color: '#10B981' };
-    }
-  };
-
   return (
     <View style={{ paddingTop: insets.top + 60 }} className="flex-1 bg-background-page">
       <Stack.Screen 
@@ -119,7 +110,6 @@ export default function SupportScreen() {
           ) : (
             <View className="space-y-4 pt-2">
               {issues.map((issue) => {
-                const priorityIcon = getPriorityIcon(issue.priority);
                 return (
                   <TouchableOpacity
                     key={issue.issueId}
@@ -151,17 +141,13 @@ export default function SupportScreen() {
                     
                     <View className="flex-row items-center justify-between border-t border-slate-50 dark:border-slate-700/50 pt-3">
                       <View className="flex-row items-center">
-                        <Ionicons name={priorityIcon.name as any} size={16} color={priorityIcon.color} />
-                        <Text className="text-text-muted text-[13px] ml-1.5 font-medium">
-                          {issue.priority}
+                        <Ionicons name="chatbubbles-outline" size={16} color={THEME.colors.primary} />
+                        <Text className="text-primary text-[13px] font-bold ml-1.5">
+                          {issue._count?.messages || 0} {t('Issues.chat.messages') || 'missatges'}
                         </Text>
                       </View>
                       <View className="flex-row items-center">
-                        <Text className="text-primary text-[13px] font-bold mr-1">
-                          {issue._count?.messages || 0}
-                        </Text>
-                        <Ionicons name="chatbubbles-outline" size={16} color={THEME.colors.primary} />
-                        <Ionicons name="chevron-forward" size={14} color="#CBD5E1" style={{ marginLeft: 8 }} />
+                        <Ionicons name="chevron-forward" size={14} color="#CBD5E1" />
                       </View>
                     </View>
                   </TouchableOpacity>

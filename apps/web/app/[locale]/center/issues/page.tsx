@@ -9,18 +9,21 @@ import DashboardLayout from '@/components/DashboardLayout';
 import issueService, { Issue } from '@/services/issueService';
 import Loading from '@/components/Loading';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
+import Button from '@/components/ui/Button';
 import { format } from 'date-fns';
 import { ca, es } from 'date-fns/locale';
+import { AlertCircle, Clock, CheckCircle2, XCircle, Plus } from 'lucide-react';
 
 export default function CenterIssuesPage() {
   const t = useTranslations('Issues');
-  const tCommon = useTranslations('Common');
+  const tc = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
 
   const router = useRouter();
   const params = useParams();
@@ -34,7 +37,6 @@ export default function CenterIssuesPage() {
       setIssues(data);
     } catch (err) {
       console.error(err);
-      setError('Error carregant les incidències');
     } finally {
       setLoading(false);
     }
@@ -52,14 +54,18 @@ export default function CenterIssuesPage() {
   }, [user, authLoading, router, locale, loadIssues]);
 
   const filteredIssues = useMemo(() => {
-    if (!searchQuery) return issues;
-    const query = searchQuery.toLowerCase();
-    return issues.filter(issue => 
-      issue.title.toLowerCase().includes(query) || 
-      issue.description.toLowerCase().includes(query) ||
-      issue.issueId.toString().includes(query)
-    );
-  }, [issues, searchQuery]);
+    return issues.filter(issue => {
+      const matchesSearch = !searchQuery || 
+        issue.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        issue.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        issue.issueId.toString().includes(searchQuery);
+      
+      const matchesStatus = statusFilter === 'all' || issue.status === statusFilter;
+      const matchesPriority = priorityFilter === 'all' || issue.priority === priorityFilter;
+
+      return matchesSearch && matchesStatus && matchesPriority;
+    });
+  }, [issues, searchQuery, statusFilter, priorityFilter]);
 
   const columns: Column<Issue>[] = [
     {
@@ -75,50 +81,35 @@ export default function CenterIssuesPage() {
           <span className="text-[11px] text-text-muted line-clamp-1">{item.description}</span>
         </div>
       ),
-      width: 300,
+      width: 450,
     },
     {
       header: t('table.category'),
       render: (item) => (
-        <span className="table-tag-muted">
+        <span className="table-tag-muted capitalize">
           {t(`categories.${item.category}`)}
         </span>
       ),
       width: 150,
     },
     {
-      header: t('table.priority'),
-      render: (item) => {
-        const priorityColors: Record<string, string> = {
-          LOW: 'table-tag-green',
-          MEDIUM: 'table-tag-orange',
-          HIGH: 'table-tag-red',
-          CRITICAL: 'table-tag-purple',
-        };
-        return (
-          <span className={priorityColors[item.priority] || 'table-tag-muted'}>
-            {item.priority}
-          </span>
-        );
-      },
-      width: 120,
-    },
-    {
       header: t('table.status'),
       render: (item) => {
-        const statusColors: Record<string, string> = {
-          OPEN: 'text-orange-600',
-          IN_PROGRESS: 'text-blue-600',
-          RESOLVED: 'text-green-600',
-          CLOSED: 'text-text-muted',
+        const config: Record<string, { color: string, icon: any }> = {
+          OPEN: { color: 'text-blue-600', icon: AlertCircle },
+          IN_PROGRESS: { color: 'text-orange-600', icon: Clock },
+          RESOLVED: { color: 'text-green-600', icon: CheckCircle2 },
+          CLOSED: { color: 'text-text-muted', icon: XCircle },
         };
+        const { color, icon: Icon } = config[item.status] || config.OPEN;
         return (
-          <span className={`text-[10px] font-bold tracking-widest uppercase ${statusColors[item.status]}`}>
+          <div className={`flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase ${color}`}>
+            <Icon size={12} strokeWidth={3} />
             {t(`status_${item.status.toLowerCase()}` as any)}
-          </span>
+          </div>
         );
       },
-      width: 120,
+      width: 130,
     },
     {
       header: t('table.date'),
@@ -135,35 +126,55 @@ export default function CenterIssuesPage() {
     return <Loading fullScreen />;
   }
 
+  const headerActions = (
+    <Button
+      onClick={() => router.push(`/${locale}/center/issues/new`)}
+      variant="primary"
+      size="md"
+      className="flex items-center gap-2 px-6 h-[49px]"
+    >
+      <Plus size={18} />
+      {t('new')}
+    </Button>
+  );
+
   return (
     <DashboardLayout
       title={t('title')}
       subtitle={t('subtitle')}
+      actions={headerActions}
     >
-      <div className="space-y-6">
-        <div className="flex justify-between items-center bg-background-subtle p-6 border border-border-subtle">
-          <div className="flex-1 max-w-md">
-            <DataTableToolbar
-              search={{
-                value: searchQuery,
-                onChange: setSearchQuery,
-                placeholder: tCommon('search')
-              }}
-              resultsCount={filteredIssues.length}
-              itemName="incidències"
-            />
-          </div>
-          
-          <button
-            onClick={() => router.push(`/${locale}/center/issues/new`)}
-            className="px-6 py-3 bg-consorci-darkBlue text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black transition-all active:scale-95 flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-            {t('new')}
-          </button>
-        </div>
+      <div className="space-y-0">
+        <DataTableToolbar
+          search={{
+            value: searchQuery,
+            onChange: setSearchQuery,
+            placeholder: tc('search')
+          }}
+          onClear={() => {
+            setSearchQuery('');
+            setStatusFilter('all');
+          }}
+          filters={
+            <>
+              <FilterSelect
+                label={t('filter_status')}
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                  { label: tc('all_statuses'), value: 'all' },
+                  ...Object.values(ISSUE_STATUSES).map(s => ({
+                    label: t(`status_${s.toLowerCase()}` as any),
+                    value: s
+                  }))
+                ]}
+                icon={Clock}
+              />
+            </>
+          }
+          resultsCount={filteredIssues.length}
+          itemName="incidències"
+        />
 
         <DataTable
           data={filteredIssues}
@@ -172,6 +183,7 @@ export default function CenterIssuesPage() {
           emptyMessage={t('no_incidents')}
           onRowClick={(item) => router.push(`/${locale}/center/issues/${item.issueId}`)}
           rowClassName="cursor-pointer hover:bg-background-subtle transition-colors"
+          hideTopBorder
         />
       </div>
     </DashboardLayout>

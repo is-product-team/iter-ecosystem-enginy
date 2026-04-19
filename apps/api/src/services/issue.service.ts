@@ -18,6 +18,14 @@ export class IssueService {
           assignmentId: data.assignmentId,
           sessionId: data.sessionId,
           status: 'OPEN',
+          attachments: data.attachments ? {
+            create: data.attachments.map(att => ({
+              fileName: att.fileName,
+              fileUrl: att.fileUrl,
+              fileType: att.fileType,
+              fileSize: att.fileSize
+            }))
+          } : undefined
         },
       });
 
@@ -28,6 +36,14 @@ export class IssueService {
           senderId: creatorId,
           content: data.description,
           isSystem: false,
+          attachments: data.attachments ? {
+            create: data.attachments.map(att => ({
+              fileName: att.fileName,
+              fileUrl: att.fileUrl,
+              fileType: att.fileType,
+              fileSize: att.fileSize
+            }))
+          } : undefined
         },
       });
 
@@ -38,13 +54,21 @@ export class IssueService {
   /**
    * Adds a message to an existing issue.
    */
-  static async addMessage(issueId: number, content: string, senderId: number, isSystem = false) {
+  static async addMessage(issueId: number, content: string, senderId: number, isSystem = false, attachments?: any[]) {
     return await prisma.issueMessage.create({
       data: {
         issueId,
         senderId,
         content,
         isSystem,
+        attachments: attachments ? {
+          create: attachments.map(att => ({
+            fileName: att.fileName,
+            fileUrl: att.fileUrl,
+            fileType: att.fileType,
+            fileSize: att.fileSize
+          }))
+        } : undefined
       },
       include: {
         sender: {
@@ -53,6 +77,7 @@ export class IssueService {
             role: { select: { roleName: true } },
           },
         },
+        attachments: true
       },
     });
   }
@@ -142,6 +167,7 @@ export class IssueService {
       include: {
         center: true,
         creator: { select: { fullName: true, role: true } },
+        attachments: true,
         messages: {
           include: {
             sender: {
@@ -150,6 +176,7 @@ export class IssueService {
                 role: { select: { roleName: true } },
               },
             },
+            attachments: true
           },
           orderBy: { createdAt: 'asc' },
         },

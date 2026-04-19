@@ -119,6 +119,13 @@ export const CenterAttendanceSchema = z.object({
   observations: z.string().optional().nullable()
 });
 
+export const AttachmentSchema = z.object({
+  fileName: z.string(),
+  fileUrl: z.string(),
+  fileType: z.string(),
+  fileSize: z.number().int()
+});
+
 // Incidents / Issues - Aligned with Prisma Enums
 export const ISSUE_STATUSES = {
   OPEN: 'OPEN',
@@ -150,13 +157,15 @@ export const IssueSchema = z.object({
   category: z.nativeEnum(ISSUE_CATEGORIES),
   centerId: z.number().int(),
   assignmentId: z.number().int().optional().nullable(),
-  sessionId: z.number().int().optional().nullable()
+  sessionId: z.number().int().optional().nullable(),
+  attachments: z.array(AttachmentSchema).optional()
 });
 
 export const IssueMessageSchema = z.object({
   issueId: z.number().int(),
   content: z.string().min(1),
-  isSystem: z.boolean().optional().default(false)
+  isSystem: z.boolean().optional().default(false),
+  attachments: z.array(AttachmentSchema).optional()
 });
 
 export type WorkshopInput = z.infer<typeof WorkshopSchema>;

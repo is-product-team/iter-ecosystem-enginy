@@ -5,6 +5,11 @@ const expoConfig = require('eslint-config-expo/flat');
 module.exports = defineConfig([
   expoConfig,
   {
+    rules: {
+      'import/no-unresolved': ['error', { ignore: ['expo-document-picker'] }],
+    },
+  },
+  {
     ignores: ['dist/*'],
   },
 ]);

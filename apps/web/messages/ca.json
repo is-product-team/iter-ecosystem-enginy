@@ -1163,14 +1163,9 @@
     "view_document": "Veure document",
     "pending": "Pendent",
     "authenticating": "Verificant credencials...",
-<<<<<<< HEAD
-    "search": "Cercar...",
-=======
     "evaluated": "Valorat",
     "workshop_evaluated": "Taller Valorat",
     "search": "Cercar...",
-
->>>>>>> dev
     "all_statuses": "Tots els estats",
     "actions": "Accions",
     "ok": "Acceptar",
@@ -1416,8 +1411,17 @@
     "no_incidents": "No hi ha incidències reportades.",
     "create_success": "Incidència creada correctament.",
     "message_success": "Missatge enviat.",
-    "status_updated": "Estat actualitzat.",
-    "priority_updated": "Prioritat actualitzada.",
+    "status_open": "Oberta",
+    "status_in_progress": "En Curs",
+    "status_resolved": "Resolta",
+    "status_closed": "Tancada",
+    "priority_low": "Baixa",
+    "priority_medium": "Mitjana",
+    "priority_high": "Alta",
+    "priority_critical": "Crítica",
+    "filter_status": "Filtrar per estat",
+    "filter_priority": "Filtrar per prioritat",
+    "filter_category": "Filtrar per categoria",
     "form": {
       "title": "Títol de la incidència",
       "category": "Categoria",

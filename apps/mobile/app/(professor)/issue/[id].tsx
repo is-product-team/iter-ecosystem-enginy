@@ -1,11 +1,19 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Image, Modal, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
+import * as WebBrowser from 'expo-web-browser';
 import issueService, { Issue } from '@/services/issueService';
+import api from '@/services/api';
 import { THEME } from '@iter/shared';
+import * as ExpoConstants from 'expo-constants';
+
+const Constants = ExpoConstants.default || ExpoConstants;
+const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
 
 export default function IssueDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -17,12 +25,15 @@ export default function IssueDetailScreen() {
   const [loading, setLoading] = React.useState(true);
   const [message, setMessage] = React.useState('');
   const [sending, setSending] = React.useState(false);
+  
+  const [selectedFiles, setSelectedFiles] = React.useState<any[]>([]);
+  const [attachmentModalVisible, setAttachmentModalVisible] = React.useState(false);
+  const [previewImage, setPreviewImage] = React.useState<string | null>(null);
 
   const fetchIssue = React.useCallback(async () => {
     try {
       const data = await issueService.getById(Number(id));
       setIssue(data);
-      // Auto scroll to bottom
       setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 300);
     } catch (error) {
       console.error('Error fetching issue:', error);
@@ -35,18 +46,86 @@ export default function IssueDetailScreen() {
     fetchIssue();
   }, [fetchIssue]);
 
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
+      quality: 0.6,
+      allowsMultipleSelection: true,
+      selectionLimit: 5 - selectedFiles.length,
+    });
+
+    if (!result.canceled) {
+      const newFiles = result.assets.map(asset => ({
+        uri: asset.uri,
+        name: asset.fileName || `chat_media_${Date.now()}.${asset.mimeType?.split('/')[1] || 'jpg'}`,
+        type: asset.mimeType || 'image/jpeg',
+      }));
+      setSelectedFiles([...selectedFiles, ...newFiles]);
+    }
+    setAttachmentModalVisible(false);
+  };
+
+  const pickDocument = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: 'application/pdf',
+      multiple: true,
+    });
+
+    if (!result.canceled) {
+      const newFiles = result.assets.map(asset => ({
+        uri: asset.uri,
+        name: asset.name,
+        type: asset.mimeType || 'application/pdf',
+      }));
+      setSelectedFiles([...selectedFiles, ...newFiles]);
+    }
+    setAttachmentModalVisible(false);
+  };
+
   const handleSendMessage = async () => {
-    if (!message.trim() || sending) return;
+    if ((!message.trim() && selectedFiles.length === 0) || sending) return;
     
     setSending(true);
     try {
-      await issueService.addMessage(Number(id), message);
+      let uploadedFiles = [];
+      
+      // 1. Upload attachments if any
+      if (selectedFiles.length > 0) {
+        const formData = new FormData();
+        selectedFiles.forEach((file) => {
+          // @ts-ignore
+          formData.append('files', {
+            uri: Platform.OS === 'ios' ? file.uri.replace('file://', '') : file.uri,
+            name: file.name,
+            type: file.type,
+          });
+        });
+
+        const uploadRes = await api.post('/upload/multimedia', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        uploadedFiles = uploadRes.data.files;
+      }
+
+      // 2. Send Message
+      await issueService.addMessage(Number(id), message || 'Adjunt multimedia', uploadedFiles);
+      
       setMessage('');
+      setSelectedFiles([]);
       await fetchIssue();
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
       setSending(false);
+    }
+  };
+
+  const openFile = async (url: string, type: string) => {
+    const fullUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+    if (type.startsWith('image/')) {
+      setPreviewImage(fullUrl);
+    } else {
+      await WebBrowser.openBrowserAsync(fullUrl);
     }
   };
 
@@ -59,6 +138,27 @@ export default function IssueDetailScreen() {
   }
 
   if (!issue) return null;
+
+  const renderAttachments = (attachments: any[]) => {
+    if (!attachments || attachments.length === 0) return null;
+    return (
+      <View className="flex-row flex-wrap gap-2 mt-2">
+        {attachments.map((att, idx) => (
+          <TouchableOpacity 
+            key={idx} 
+            onPress={() => openFile(att.fileUrl, att.fileType)}
+            className="w-20 h-20 bg-background-subtle rounded-xl overflow-hidden border border-border-subtle items-center justify-center"
+          >
+            {att.fileType.startsWith('image/') ? (
+              <Image source={{ uri: att.fileUrl.startsWith('http') ? att.fileUrl : `${API_URL}${att.fileUrl}` }} className="w-full h-full" />
+            ) : (
+              <Ionicons name={att.fileType.includes('pdf') ? 'document-text' : 'videocam'} size={32} color="#4197CB" />
+            )}
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
 
   return (
     <KeyboardAvoidingView 
@@ -79,21 +179,26 @@ export default function IssueDetailScreen() {
         />
 
         {/* Header Info */}
-        <View className="px-8 pb-4 border-b border-border-subtle">
+        <View className="px-8 pb-4 border-b border-border-subtle bg-background-surface">
            <Text className="text-[14px] font-bold text-primary uppercase tracking-widest mb-1">
              #{issue.issueId} • {t(`Issues.categories.${issue.category}`)}
            </Text>
            <Text className="text-[28px] font-bold text-text-primary tracking-tight leading-[32px] mb-2">
              {issue.title}
            </Text>
-           <View className="flex-row items-center">
-             <View 
-                className="w-2 h-2 rounded-full mr-2" 
-                style={{ backgroundColor: issue.status === 'OPEN' ? '#3B82F6' : '#10B981' }} 
-             />
-             <Text className="text-text-muted text-[13px] font-medium">
-                {issue.status} • {issue.priority}
-             </Text>
+           <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center">
+                <View 
+                    className="w-2 h-2 rounded-full mr-2" 
+                    style={{ backgroundColor: issue.status === 'OPEN' ? '#3B82F6' : '#10B981' }} 
+                />
+                <Text className="text-text-muted text-[13px] font-medium">
+                    {issue.status}
+                </Text>
+              </View>
+              <Text className="text-[11px] font-bold text-slate-300 uppercase tracking-widest">
+                 {issue.center?.name}
+              </Text>
            </View>
         </View>
 
@@ -103,18 +208,6 @@ export default function IssueDetailScreen() {
           showsVerticalScrollIndicator={false}
           onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
         >
-          {/* Initial Description as first "message" */}
-          <View className="items-center mb-8 px-4">
-             <View className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 w-full">
-                <Text className="text-text-secondary text-[15px] italic leading-relaxed">
-                  &quot;{issue.description}&quot;
-                </Text>
-                <Text className="text-[11px] text-text-muted mt-2 text-right">
-                   {new Date(issue.createdAt).toLocaleString()}
-                </Text>
-             </View>
-          </View>
-
           {/* Messages */}
           {issue.messages?.map((msg) => {
             const isSystem = msg.isSystem;
@@ -124,7 +217,7 @@ export default function IssueDetailScreen() {
               return (
                 <View key={msg.messageId} className="items-center my-4">
                   <View className="bg-background-subtle px-4 py-1.5 rounded-full border border-border-subtle">
-                    <Text className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
+                    <Text className="text-[11px] font-bold text-text-muted uppercase tracking-wider text-center">
                       {msg.content}
                     </Text>
                   </View>
@@ -135,22 +228,25 @@ export default function IssueDetailScreen() {
             return (
               <View 
                 key={msg.messageId} 
-                className={`mb-4 flex-row ${isMe ? 'justify-end' : 'justify-start'}`}
+                className={`mb-6 flex-row ${isMe ? 'justify-end' : 'justify-start'}`}
               >
                 {!isMe && (
-                  <View className="w-8 h-8 rounded-full bg-slate-200 items-center justify-center mr-2 self-end">
-                    <Ionicons name="person" size={16} color="#94A3B8" />
+                  <View className="w-8 h-8 rounded-full bg-slate-100 items-center justify-center mr-2 self-end border border-slate-200">
+                    <Ionicons name="person" size={14} color="#4197CB" />
                   </View>
                 )}
                 <View 
-                  className={`max-w-[80%] p-4 rounded-3xl ${isMe ? 'bg-primary rounded-br-none' : 'bg-white dark:bg-gray-800 border border-border-subtle rounded-bl-none'}`}
-                  style={Platform.OS === 'ios' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2 } : {}}
+                  className={`max-w-[85%] p-4 rounded-3xl ${isMe ? 'bg-primary rounded-br-none' : 'bg-white dark:bg-gray-800 border border-border-subtle rounded-bl-none shadow-sm'}`}
                 >
-                  <Text className={`text-[15px] leading-relaxed ${isMe ? 'text-white' : 'text-text-primary'}`}>
+                  <Text className={`text-[15px] leading-relaxed font-medium ${isMe ? 'text-white' : 'text-text-primary'}`}>
                     {msg.content}
                   </Text>
-                  <Text className={`text-[10px] mt-1.5 text-right ${isMe ? 'opacity-70 text-white' : 'text-text-muted'}`}>
-                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  
+                  {/* Message Attachments */}
+                  {renderAttachments(msg.attachments as any[])}
+
+                  <Text className={`text-[9px] mt-2 text-right uppercase font-bold tracking-tighter ${isMe ? 'opacity-70 text-white' : 'text-text-muted'}`}>
+                    {msg.sender?.fullName.split(' ')[0]} • {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </Text>
                 </View>
               </View>
@@ -158,30 +254,99 @@ export default function IssueDetailScreen() {
           })}
         </ScrollView>
 
+        {/* Selected Files Row */}
+        {selectedFiles.length > 0 && (
+          <View className="bg-background-surface border-t border-border-subtle p-3 flex-row gap-2">
+             {selectedFiles.map((file, idx) => (
+               <View key={idx} className="relative w-14 h-14 bg-background-subtle rounded-xl border border-border-subtle overflow-hidden">
+                  {file.type.startsWith('image/') ? (
+                    <Image source={{ uri: file.uri }} className="w-full h-full" />
+                  ) : (
+                    <View className="w-full h-full items-center justify-center">
+                       <Ionicons name={file.type.includes('pdf') ? 'document-text' : 'videocam'} size={20} color="#4197CB" />
+                    </View>
+                  )}
+                  <TouchableOpacity 
+                    onPress={() => setSelectedFiles(selectedFiles.filter((_, i) => i !== idx))}
+                    className="absolute -top-1 -right-1 bg-red-500 w-5 h-5 rounded-full items-center justify-center"
+                  >
+                     <Ionicons name="close" size={12} color="white" />
+                  </TouchableOpacity>
+               </View>
+             ))}
+          </View>
+        )}
+
         {/* Input Area */}
         <View 
-          style={{ paddingBottom: insets.bottom + 10 }} 
+          style={{ paddingBottom: Math.max(insets.bottom, 20) }} 
           className="px-4 pt-3 bg-background-surface border-t border-border-subtle"
         >
-           <View className="flex-row items-end bg-background-subtle rounded-[24px] px-4 py-2 border border-border-subtle">
-              <TextInput 
-                className="flex-1 min-h-[40px] max-h-[120px] py-2 text-text-primary text-[16px]"
-                placeholder={t('Issues.chat.placeholder')}
-                placeholderTextColor="#94A3B8"
-                value={message}
-                onChangeText={setMessage}
-                multiline
-              />
+           <View className="flex-row items-end gap-2">
               <TouchableOpacity 
-                disabled={!message.trim() || sending}
-                onPress={handleSendMessage}
-                className={`ml-2 w-10 h-10 rounded-full items-center justify-center ${message.trim() ? 'bg-primary' : 'bg-slate-200'}`}
+                onPress={() => setAttachmentModalVisible(true)}
+                className="w-11 h-11 bg-background-subtle rounded-full items-center justify-center border border-border-subtle mb-1"
               >
-                 {sending ? <ActivityIndicator size="small" color="white" /> : <Ionicons name="arrow-up" size={24} color="white" />}
+                 <Ionicons name="add" size={24} color="#4197CB" />
               </TouchableOpacity>
+
+              <View className="flex-1 flex-row items-end bg-background-subtle rounded-[24px] px-4 py-2 border border-border-subtle">
+                <TextInput 
+                  className="flex-1 min-h-[42px] max-h-[120px] py-2 text-text-primary text-[16px] font-medium"
+                  placeholder={t('Issues.chat.placeholder')}
+                  placeholderTextColor="#94A3B8"
+                  value={message}
+                  onChangeText={setMessage}
+                  multiline
+                />
+                <TouchableOpacity 
+                  disabled={(!message.trim() && selectedFiles.length === 0) || sending}
+                  onPress={handleSendMessage}
+                  className={`ml-2 w-9 h-9 rounded-full items-center justify-center ${ (message.trim() || selectedFiles.length > 0) ? 'bg-primary' : 'bg-slate-200'}`}
+                >
+                  {sending ? <ActivityIndicator size="small" color="white" /> : <Ionicons name="arrow-up" size={22} color="white" />}
+                </TouchableOpacity>
+              </View>
            </View>
         </View>
       </View>
+
+      {/* Attachment Modal */}
+      <Modal visible={attachmentModalVisible} transparent animationType="slide">
+        <Pressable className="flex-1 bg-black/40 justify-end" onPress={() => setAttachmentModalVisible(false)}>
+           <View className="bg-background-surface rounded-t-[32px] p-8 pb-12">
+              <View className="w-12 h-1.5 bg-gray-200 rounded-full self-center mb-6" />
+              <Text className="text-xl font-bold text-text-primary mb-8 text-center uppercase tracking-widest">Enviar Adjunt</Text>
+              <View className="flex-row justify-around">
+                 <TouchableOpacity onPress={pickImage} className="items-center">
+                    <View className="w-16 h-16 bg-blue-50 rounded-full items-center justify-center mb-3">
+                       <Ionicons name="images" size={28} color={THEME.colors.primary} />
+                    </View>
+                    <Text className="text-[13px] font-bold text-text-primary">Galeria</Text>
+                 </TouchableOpacity>
+                 <TouchableOpacity onPress={pickDocument} className="items-center">
+                    <View className="w-16 h-16 bg-red-50 rounded-full items-center justify-center mb-3">
+                       <Ionicons name="document-attach" size={28} color="#EF4444" />
+                    </View>
+                    <Text className="text-[13px] font-bold text-text-primary">Document</Text>
+                 </TouchableOpacity>
+              </View>
+           </View>
+        </Pressable>
+      </Modal>
+
+      {/* Image Preview Modal */}
+      <Modal visible={!!previewImage} transparent animationType="fade">
+        <Pressable className="flex-1 bg-black/95 items-center justify-center" onPress={() => setPreviewImage(null)}>
+           {previewImage && <Image source={{ uri: previewImage }} className="w-full h-[80%] shrink-0" resizeMode="contain" />}
+           <TouchableOpacity 
+             onPress={() => setPreviewImage(null)} 
+             className="absolute top-12 right-6 w-10 h-10 bg-white/10 rounded-full items-center justify-center"
+           >
+              <Ionicons name="close" size={28} color="white" />
+           </TouchableOpacity>
+        </Pressable>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
