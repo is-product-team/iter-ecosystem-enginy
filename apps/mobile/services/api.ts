@@ -6,9 +6,9 @@ import * as ExpoConstants from 'expo-constants';
 
 // For backward compatibility or different export styles
 const Constants = ExpoConstants.default || ExpoConstants;
-import type { 
-  Role, 
-  Phase, 
+import type {
+  Role,
+  Phase,
 } from '@iter/shared';
 
 export interface Student {
@@ -122,7 +122,7 @@ const MOCK_WORKSHOP: any = {
 };
 
 const getBaseURL = () => {
-  return Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
+  return Constants.expoConfig?.extra?.apiUrl;
 };
 
 const api = axios.create({
@@ -177,7 +177,7 @@ api.interceptors.response.use(
       // Redirect to login
       router.replace('/login');
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -198,37 +198,37 @@ export const logout = async () => {
 };
 
 // --- Auth ---
-export const login = (data: { email: string; password?: string }) => 
+export const login = (data: { email: string; password?: string }) =>
   api.post<{ token: string; user: { userId: number; role: Role; centerId?: number } }>('auth/login', data);
 
-export const getMyAssignments = () => 
+export const getMyAssignments = () =>
   api.get<Assignment[]>('teachers/me/assignments');
 
-export const getChecklist = (id: string | number) => 
+export const getChecklist = (id: string | number) =>
   api.get(`assignments/${id}/checklist`);
 
-export const getStudents = (id: string | number) => 
+export const getStudents = (id: string | number) =>
   api.get<Enrollment[]>(`assignments/${id}/students`);
 
 // --- Questionnaires ---
-export const getQuestionnaireModels = () => 
-    api.get('questionnaires/models');
+export const getQuestionnaireModels = () =>
+  api.get('questionnaires/models');
 
-export const getQuestionnaireModel = (id: string | number) => 
-    api.get(`questionnaires/model/${id}`);
+export const getQuestionnaireModel = (id: string | number) =>
+  api.get(`questionnaires/model/${id}`);
 
-export const postQuestionnaireResponse = (data: any) => 
-    api.post('questionnaires/respond', data);
+export const postQuestionnaireResponse = (data: any) =>
+  api.post('questionnaires/respond', data);
 
-export const trackQuestionnaire = (data: any) => 
-    api.post('questionnaires/track', data);
+export const trackQuestionnaire = (data: any) =>
+  api.post('questionnaires/track', data);
 
 // --- Attendance ---
-export const getAttendance = (assignmentId: string | number) => 
+export const getAttendance = (assignmentId: string | number) =>
   api.get<Attendance[]>(`attendance/assignments/${assignmentId}`);
 
-export const postAttendance = (data: { 
-  enrollmentId: number; 
+export const postAttendance = (data: {
+  enrollmentId: number;
   sessionNumber: number;
   status: string;
   observations?: string;
@@ -236,10 +236,10 @@ export const postAttendance = (data: {
 }) => api.post<Attendance>('attendance', data);
 
 // --- Other Services ---
-export const postIncident = (data: { assignmentId: number; title: string; description: string }) => 
+export const postIncident = (data: { assignmentId: number; title: string; description: string }) =>
   api.post('assignments/incidents', data);
 
-export const getPhases = () => 
+export const getPhases = () =>
   api.get<Phase[]>('phases');
 
 export const getCalendar = (start?: string, end?: string) => {
@@ -247,10 +247,10 @@ export const getCalendar = (start?: string, end?: string) => {
   return api.get(`calendar${params}`);
 };
 
-export const getNotifications = () => 
+export const getNotifications = () =>
   api.get<Notification[]>('notifications');
 
-export const getMe = () => 
+export const getMe = () =>
   api.get('auth/me');
 
 export default api;

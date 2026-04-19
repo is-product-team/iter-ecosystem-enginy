@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert, Modal, Pressable, Image, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert, Modal, Pressable, Image, ActivityIndicator, useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter, Stack } from 'expo-router';
@@ -35,6 +35,8 @@ export default function NewIssueScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const tintColor = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
 
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
@@ -43,6 +45,13 @@ export default function NewIssueScreen() {
   const [attachments, setAttachments] = React.useState<any[]>([]);
   const [submitting, setSubmitting] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState<'category' | 'attachments' | null>(null);
+  const [hasIssues, setHasIssues] = React.useState(false);
+
+  React.useEffect(() => {
+    issueService.getAll().then(data => {
+      setHasIssues(data && data.length > 0);
+    }).catch(err => console.warn("Failed to check issues", err));
+  }, []);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -226,16 +235,22 @@ export default function NewIssueScreen() {
             headerTransparent: true,
             headerShadowVisible: false,
             headerBackTitle: t('Common.back'),
-            headerTintColor: '#4197CB',
-            headerRight: () => (
+            headerTintColor: tintColor,
+            headerRight: () => hasIssues ? (
               <TouchableOpacity 
                 onPress={() => router.push('/(professor)/issue')}
-                className="mr-4 p-2"
+                className="mr-2 flex-row items-center p-2"
                 activeOpacity={0.7}
               >
-                <Ionicons name="chatbubbles-outline" size={24} color="#4197CB" />
+                <Text 
+                  style={{ color: tintColor }}
+                  className="text-[17px] font-normal mr-1"
+                >
+                  {t('Issues.view_all')}
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color={tintColor} />
               </TouchableOpacity>
-            ),
+            ) : null,
           }} 
         />
         

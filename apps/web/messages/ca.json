@@ -1225,6 +1225,7 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "save": "Desar",
+    "send": "Enviar",
     "all_sectors": "Tots els sectors",
     "all_modalities": "Totes les modalitats",
     "modality_label": "Modalitat {modality}",

@@ -16,15 +16,15 @@ const Constants = ExpoConstants.default || ExpoConstants;
 const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
 
 // WhatsApp-style Setting Row
-const SettingItem = ({ 
-  icon, 
-  iconColor, 
-  title, 
-  subtitle, 
-  onPress, 
+const SettingItem = ({
+  icon,
+  iconColor,
+  title,
+  subtitle,
+  onPress,
   rightElement,
-  isLast = false 
-}: { 
+  isLast = false
+}: {
   icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
   title: string;
@@ -69,19 +69,19 @@ const SectionHeader = ({ title }: { title: string }) => (
 );
 
 // Generic Selection Modal (Simulating Dropdown)
-const SelectionModal = ({ 
-  visible, 
-  onClose, 
-  title, 
-  options, 
-  selectedValue, 
+const SelectionModal = ({
+  visible,
+  onClose,
+  title,
+  options,
+  selectedValue,
   onSelect,
   t
-}: { 
-  visible: boolean; 
-  onClose: () => void; 
-  title: string; 
-  options: { label: string; value: string; icon?: keyof typeof Ionicons.glyphMap }[]; 
+}: {
+  visible: boolean;
+  onClose: () => void;
+  title: string;
+  options: { label: string; value: string; icon?: keyof typeof Ionicons.glyphMap }[];
   selectedValue: string;
   onSelect: (value: any) => void;
   t: any;
@@ -92,8 +92,8 @@ const SelectionModal = ({
     animationType="fade"
     onRequestClose={onClose}
   >
-    <Pressable 
-      className="flex-1 bg-black/40 justify-center items-center px-10" 
+    <Pressable
+      className="flex-1 bg-black/40 justify-center items-center px-10"
       onPress={onClose}
     >
       <Pressable className="bg-background-surface w-full rounded-[28px] overflow-hidden shadow-2xl">
@@ -122,7 +122,7 @@ const SelectionModal = ({
             </TouchableOpacity>
           ))}
         </View>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={onClose}
           className="p-5 items-center border-t border-border-subtle"
         >
@@ -138,13 +138,13 @@ export default function PerfilScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colorScheme, setColorScheme } = useColorScheme();
-  
+
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await fetchUserProfile();
     setRefreshing(false);
   }, [fetchUserProfile]);
-  
+
   const handleThemeChange = (val: 'light' | 'dark' | 'system') => {
     setColorScheme(val);
   };
@@ -211,7 +211,7 @@ export default function PerfilScreen() {
       setLangModalVisible(true);
     }
   };
-  
+
   const [notifications, setNotifications] = React.useState(true);
   const [user, setUser] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
@@ -223,7 +223,7 @@ export default function PerfilScreen() {
       const response = await api.get('/auth/me');
       const updatedUser = response.data;
       setUser(updatedUser);
-      
+
       // Sync local storage
       if (Platform.OS === 'web') {
         localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -236,13 +236,12 @@ export default function PerfilScreen() {
       setLoading(false);
     }
   }, []);
-
   useFocusEffect(
     React.useCallback(() => {
       fetchUserProfile();
     }, [fetchUserProfile])
   );
-  
+
   // Modal States
   const [langModalVisible, setLangModalVisible] = React.useState(false);
   const [themeModalVisible, setThemeModalVisible] = React.useState(false);
@@ -251,13 +250,13 @@ export default function PerfilScreen() {
     async function loadUser() {
       try {
         let userData = null;
-        
+
         if (Platform.OS === 'web') {
           userData = localStorage.getItem('user');
         } else {
           userData = await SecureStore.getItemAsync('user');
         }
-        
+
         if (userData) {
           setUser(JSON.parse(userData));
         }
@@ -273,7 +272,7 @@ export default function PerfilScreen() {
       if (user.photoUrl.startsWith('http')) {
         return { uri: user.photoUrl };
       }
-      
+
       // Robust join of API_URL and photoUrl
       const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
       const path = user.photoUrl.startsWith('/') ? user.photoUrl : `/${user.photoUrl}`;
@@ -284,7 +283,7 @@ export default function PerfilScreen() {
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (status !== 'granted') {
       Alert.alert(
         t('Common.error'),
@@ -303,13 +302,13 @@ export default function PerfilScreen() {
     if (!result.canceled) {
       const uri = result.assets[0].uri;
       setLoadingImage(true);
-      
+
       try {
         // Prepare file for upload
         const formData = new FormData();
         const fileName = uri.split('/').pop() || 'profile.jpg';
         const fileType = fileName.split('.').pop();
-        
+
         // @ts-ignore - FormData needs this structure in React Native
         formData.append('photo', {
           uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
@@ -326,7 +325,7 @@ export default function PerfilScreen() {
         if (response.data.success) {
           const updatedUser = { ...user, photoUrl: response.data.photoUrl };
           setUser(updatedUser);
-          
+
           // Save updated user locally
           if (Platform.OS === 'web') {
             localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -335,7 +334,7 @@ export default function PerfilScreen() {
             await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
             await SecureStore.setItemAsync('user-avatar', response.data.photoUrl);
           }
-          
+
           Alert.alert(t('Common.success') || 'Èxit', t('Profile.photo_updated') || 'Foto de perfil actualizada.');
         }
       } catch (e) {
@@ -399,20 +398,20 @@ export default function PerfilScreen() {
   return (
     <View className="flex-1 bg-background-page">
       {loading ? (
-        <View 
+        <View
           className="items-center justify-center bg-background-page"
           style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
         >
           <ActivityIndicator size="large" color="#4197CB" />
         </View>
       ) : (
-        <ScrollView 
-          className="flex-1" 
+        <ScrollView
+          className="flex-1"
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl 
-              refreshing={refreshing} 
-              onRefresh={onRefresh} 
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
               tintColor="#4197CB"
               colors={['#4197CB']}
               progressViewOffset={insets.top + 40}
@@ -420,39 +419,39 @@ export default function PerfilScreen() {
           }
         >
           <PageHeader title={t('Tabs.profile')} subtitle={t('Profile.subtitle')} />
-          
+
           {/* Integrated Profile Identity */}
           <View className="px-6 py-6 flex-row items-center bg-background-surface border-b border-border-subtle">
-           <View className="relative">
-              <TouchableOpacity 
+            <View className="relative">
+              <TouchableOpacity
                 onPress={pickImage}
                 disabled={loadingImage}
                 activeOpacity={0.9}
                 className="w-20 h-20 rounded-full bg-primary items-center justify-center shadow-sm overflow-hidden"
               >
-                 {loadingImage ? (
-                   <ActivityIndicator color="white" />
-                 ) : getProfileImage() ? (
-                   <Image source={getProfileImage()!} className="w-full h-full" />
-                 ) : (
-                   <Text className="text-2xl font-black text-white">{getUserInitials()}</Text>
-                 )}
+                {loadingImage ? (
+                  <ActivityIndicator color="white" />
+                ) : getProfileImage() ? (
+                  <Image source={getProfileImage()!} className="w-full h-full" />
+                ) : (
+                  <Text className="text-2xl font-black text-white">{getUserInitials()}</Text>
+                )}
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={pickImage}
                 disabled={loadingImage}
                 className="absolute bottom-0 right-0 bg-secondary w-7 h-7 rounded-full items-center justify-center border-2 border-background-surface shadow-sm"
                 activeOpacity={0.8}
               >
-                 {loadingImage ? (
-                   <ActivityIndicator size="small" color="white" />
-                 ) : (
-                   <Ionicons name="camera" size={12} color="white" />
-                 )}
+                {loadingImage ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Ionicons name="camera" size={12} color="white" />
+                )}
               </TouchableOpacity>
-           </View>
-           
-           <View className="ml-5 flex-1">
+            </View>
+
+            <View className="ml-5 flex-1">
               <Text className="text-xl font-bold text-text-primary mb-0.5">
                 {user?.fullName || t('Common.loading')}
               </Text>
@@ -462,109 +461,109 @@ export default function PerfilScreen() {
                   {(user as any)?.role?.roleName === ROLES.TEACHER ? t('Profile.role_professor') : t('Profile.role_admin')}
                 </Text>
               </View>
-           </View>
-        </View>
+            </View>
+          </View>
 
-        {/* Profile Information Section */}
-        <SectionHeader title={t('Profile.information') || "Informació del compte"} />
-        <View className="border-t border-b border-border-subtle">
-           <SettingItem 
-              icon="person-outline" 
-              iconColor="#546E7A" 
+          {/* Profile Information Section */}
+          <SectionHeader title={t('Profile.information') || "Informació del compte"} />
+          <View className="border-t border-b border-border-subtle">
+            <SettingItem
+              icon="person-outline"
+              iconColor="#546E7A"
               title={t('Auth.login.name') || "Nom"}
               subtitle={user?.fullName}
-              onPress={() => {}}
-           />
-           <SettingItem 
-              icon="mail-outline" 
-              iconColor="#546E7A" 
+              onPress={() => { }}
+            />
+            <SettingItem
+              icon="mail-outline"
+              iconColor="#546E7A"
               title={t('Auth.login.email')}
               subtitle={user?.email || "---"}
               isLast
-           />
-        </View>
+            />
+          </View>
 
-        {/* Preferences Section */}
-        <SectionHeader title={t('Profile.preferences')} />
-        <View className="border-t border-b border-border-subtle">
-           <SettingItem 
-              icon="notifications-outline" 
-              iconColor="#FF9500" 
+          {/* Preferences Section */}
+          <SectionHeader title={t('Profile.preferences')} />
+          <View className="border-t border-b border-border-subtle">
+            <SettingItem
+              icon="notifications-outline"
+              iconColor="#FF9500"
               title={t('Profile.notifications')}
               rightElement={
-                <Switch 
+                <Switch
                   value={notifications}
                   onValueChange={setNotifications}
                   trackColor={{ false: '#E2E8F0', true: '#34C759' }}
                   thumbColor="white"
                 />
               }
-           />
-           
-           <SettingItem 
-              icon="color-palette-outline" 
-              iconColor="#5856D6" 
+            />
+
+            <SettingItem
+              icon="color-palette-outline"
+              iconColor="#5856D6"
               title={t('Profile.appearance')}
               subtitle={currentThemeLabel}
               onPress={showThemeSelection}
-           />
+            />
 
-           <SettingItem 
-              icon="language-outline" 
-              iconColor="#007AFF" 
+            <SettingItem
+              icon="language-outline"
+              iconColor="#007AFF"
               title={t('Profile.language')}
               subtitle={currentLangLabel}
               isLast
               onPress={showLanguageSelection}
-           />
-        </View>
+            />
+          </View>
 
-        {/* Security & Support */}
-        <SectionHeader title={t('Profile.security_support') || "Seguretat i Suport"} />
-        <View className="border-t border-b border-border-subtle">
-           <SettingItem 
-              icon="shield-checkmark-outline" 
-              iconColor="#34C759" 
+          {/* Security & Support */}
+          <SectionHeader title={t('Profile.security_support') || "Seguretat i Suport"} />
+          <View className="border-t border-b border-border-subtle">
+            <SettingItem
+              icon="shield-checkmark-outline"
+              iconColor="#34C759"
               title={t('Profile.security')}
-              onPress={() => {}}
-           />
-           <SettingItem 
-              icon="help-buoy-outline" 
-              iconColor="#007AFF" 
+              onPress={() => { }}
+            />
+            <SettingItem
+              icon="help-buoy-outline"
+              iconColor="#007AFF"
               title={t('Profile.help')}
               isLast
               onPress={() => router.push('/support')}
-           />
-        </View>
+            />
+          </View>
 
-        {/* Logout */}
-        <View className="mt-8 mb-12 border-t border-b border-border-subtle">
-           <TouchableOpacity
+          {/* Logout */}
+          <View className="mt-8 mb-12 border-t border-b border-border-subtle">
+            <TouchableOpacity
               onPress={handleLogout}
               activeOpacity={0.7}
               className="flex-row items-center py-4 px-6 bg-background-surface"
-           >
+            >
               <View className="w-8 items-center mr-4">
                 <Ionicons name="log-out-outline" size={22} color="#FF3B30" />
               </View>
               <Text className="text-[#FF3B30] text-[17px] font-medium" style={{ fontFamily: THEME.fonts.primary }}>
                 {t('Auth.logout.confirm')}
               </Text>
-           </TouchableOpacity>
-        </View>
+            </TouchableOpacity>
+          </View>
 
-        {/* Footer */}
-        <View className="items-center pb-12">
-           <Text className="text-[11px] font-bold text-text-muted opacity-40 uppercase tracking-widest">
-             Iter App v1.2.0
-           </Text>
-        </View>
+          {/* Footer */}
+          <View className="items-center pb-12">
+            <Text className="text-[11px] font-bold text-text-muted opacity-40 uppercase tracking-widest">
+              Iter App v1.2.0
+            </Text>
+          </View>
 
-      </ScrollView>
+        </ScrollView>
       )}
 
       {/* Language Selection Modal */}
-      <SelectionModal 
+      <SelectionModal
         visible={langModalVisible}
         onClose={() => setLangModalVisible(false)}
         title={t('Profile.language')}
@@ -578,7 +577,7 @@ export default function PerfilScreen() {
       />
 
       {/* Theme Selection Modal */}
-      <SelectionModal 
+      <SelectionModal
         visible={themeModalVisible}
         onClose={() => setThemeModalVisible(false)}
         title={t('Profile.appearance')}

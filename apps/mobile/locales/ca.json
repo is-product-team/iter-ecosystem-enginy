@@ -252,9 +252,10 @@
     "view_all": "Veure tot"
   },
   "Issues": {
-    "title": "Gestió d'Incidències",
+    "title": "Incidències",
     "subtitle": "Comunicació directa amb l'administració per a la resolució de problemes.",
     "new": "Nova Incidència",
+    "view_all": "Veure incidències",
     "details": "Detall de la Incidència",
     "no_incidents": "No hi ha incidències reportades.",
     "create_success": "Incidència creada correctament.",

@@ -22,8 +22,8 @@ const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com'
 
 function getContextualGreeting(t: any, name: string, hasTodaySession: boolean, nextDate?: string, i18n?: any): { greeting: string; subtitle: string } {
   const hour = new Date().getHours();
-  const greeting = hour < 14 
-    ? t('Dashboard.greeting_morning', { name }) 
+  const greeting = hour < 14
+    ? t('Dashboard.greeting_morning', { name })
     : t('Dashboard.greeting_afternoon', { name });
 
   let subtitle = t('Dashboard.no_upcoming_sessions');
@@ -85,18 +85,20 @@ export default function DashboardScreen() {
       if (userData) {
         const user = JSON.parse(userData);
         if (isMounted.current) {
-            if (user.firstName) setUserName(user.firstName);
-            else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
+          if (user.firstName) setUserName(user.firstName);
+          else if (user.fullName) setUserName(user.fullName.split(' ')[0]);
 
-            if (user.fullName) {
-              const initials = user.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
-              setUserInitials(initials);
-            }
+          if (user.fullName) {
+            const initials = user.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
+            setUserInitials(initials);
+          }
 
-            if (userImage) {
-              const fullUrl = userImage.startsWith('http') ? userImage : `${API_URL}${userImage}`;
-              setAvatar(fullUrl);
-            }
+          if (userImage) {
+            const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+            const path = userImage.startsWith('/') ? userImage : `/${userImage}`;
+            const fullUrl = userImage.startsWith('http') ? userImage : `${baseUrl}${path}`;
+            setAvatar(fullUrl);
+          }
         }
 
         const roleName = user.role?.roleName;
@@ -114,20 +116,17 @@ export default function DashboardScreen() {
         if (res.data && isMounted.current) {
           const profile = res.data;
           if (profile.photoUrl) {
-            const absoluteUrl = profile.photoUrl.startsWith('http') ? profile.photoUrl : `${API_URL}${profile.photoUrl}`;
+            const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+            const path = profile.photoUrl.startsWith('/') ? profile.photoUrl : `/${profile.photoUrl}`;
+            const absoluteUrl = profile.photoUrl.startsWith('http') ? profile.photoUrl : `${baseUrl}${path}`;
+
             setAvatar(absoluteUrl);
-            if (Platform.OS === 'web') {
-              localStorage.setItem('user-avatar', profile.photoUrl);
-            } else {
-              SecureStore.setItemAsync('user-avatar', profile.photoUrl);
-            }
           }
           if (profile.fullName) {
              setUserName(profile.fullName.split(' ')[0]);
           }
         }
       }).catch(err => console.warn("Silent profile sync failed", err));
-
       const [phasesRes, assignmentsRes, notifsRes] = await Promise.all([
         getPhases(),
         getMyAssignments(),
@@ -144,13 +143,13 @@ export default function DashboardScreen() {
     } catch (error: any) {
       console.error('Error fetching dashboard data:', error);
       if (isMounted.current) {
-          setPhases([]);
-          setAssignments([]);
+        setPhases([]);
+        setAssignments([]);
       }
     } finally {
       if (isMounted.current) {
-          setLoading(false);
-          setRefreshing(false);
+        setLoading(false);
+        setRefreshing(false);
       }
     }
   }, [router]);
@@ -171,11 +170,11 @@ export default function DashboardScreen() {
     if (assignments.length === 0) return [];
     const now = new Date();
     const all: any[] = [];
-    
+
     assignments.forEach(assign => {
       if (assign.sessions && assign.sessions.length > 0) {
         // Sort sessions of THIS assignment to get correct index
-        const sortedAssignmentSessions = [...assign.sessions].sort((a, b) => 
+        const sortedAssignmentSessions = [...assign.sessions].sort((a, b) =>
           new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime()
         );
 
@@ -188,13 +187,13 @@ export default function DashboardScreen() {
           const day = parseInt(dateParts[2], 10);
 
           const startDate = new Date(year, month, day);
-          
+
           // Parse time if available (e.g., "08:00")
           if (session.startTime) {
             const [hours, minutes] = session.startTime.split(':').map(Number);
             startDate.setHours(hours, minutes, 0, 0);
           }
-          
+
           const endDate = new Date(startDate);
           if (session.endTime) {
             const [hours, minutes] = session.endTime.split(':').map(Number);
@@ -243,7 +242,7 @@ export default function DashboardScreen() {
   const carouselSessions = getAllSessions();
   const initialCarouselIndex = React.useMemo(() => {
     if (carouselSessions.length === 0) return 0;
-    
+
     // 1. Prioritize any currently active session
     const currentIdx = carouselSessions.findIndex(s => s.isCurrent);
     if (currentIdx !== -1) return currentIdx;
@@ -257,7 +256,7 @@ export default function DashboardScreen() {
   }, [carouselSessions]);
 
   const nextWorkshop = carouselSessions[initialCarouselIndex];
-  
+
   const recentWorkshops = assignments
     .filter(a => !carouselSessions.some(s => s.assignmentId === a.assignmentId && !s.isPast))
     .slice(0, 3);
@@ -334,7 +333,7 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View 
+      <View
         className="items-center justify-center bg-background-page"
         style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
       >
@@ -371,8 +370,8 @@ export default function DashboardScreen() {
       iconColor: '#AF52DE',
       iconBg: '#AF52DE10',
       label: "SUPORT",
-      value: t('Issues.new'),
-      onPress: () => router.push('/(professor)/issue/new'), 
+      value: t('Issues.title'),
+      onPress: () => router.push('/(professor)/issue/new'),
     },
   ];
 
@@ -385,9 +384,9 @@ export default function DashboardScreen() {
         className="flex-1"
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
-            onRefresh={onRefresh} 
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
             tintColor={colorScheme === 'dark' ? '#4197CB' : THEME.colors.primary}
             colors={['#4197CB']}
             progressViewOffset={insets.top + 40}
@@ -395,9 +394,9 @@ export default function DashboardScreen() {
         }
       >
         {/* ── Standardized Header ── */}
-        <PageHeader 
-          title={greeting} 
-          subtitle={subtitle} 
+        <PageHeader
+          title={greeting}
+          subtitle={subtitle}
         />
 
         {/* ── Sessions Carousel ── */}

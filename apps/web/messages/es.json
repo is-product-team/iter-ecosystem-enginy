@@ -1235,6 +1235,7 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "save": "Guardar",
+    "send": "Enviar",
     "all_sectors": "Todos los sectores",
     "all_modalities": "Todas las modalidades",
     "modality_label": "Modalidad {modality}",

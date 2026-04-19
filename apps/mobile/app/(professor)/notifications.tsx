@@ -176,55 +176,48 @@ export default function NotificationsTabScreen() {
                 <View key={notif.notificationId}>
                   <TouchableOpacity 
                     activeOpacity={0.7}
-                    className={`p-5 flex-row items-center ${isRead ? 'opacity-50' : ''}`}
+                    className={`p-6 flex-row items-center ${isRead ? 'opacity-40' : ''}`}
                   >
-                    {/* Unread indicator dot */}
-                    <View className="w-2 h-full absolute left-0 justify-center items-center">
-                       {!isRead && <View className="w-2 h-2 rounded-full bg-[#4197CB] ml-4" />}
-                    </View>
-
-                    {/* Notification Icon - Apple Style Circle */}
-                    <View className="w-12 h-12 rounded-full bg-[#4197CB]/10 items-center justify-center mr-4 border border-[#4197CB]/20">
-                      <Ionicons name="notifications" size={20} color="#4197CB" />
-                    </View>
-                    
                     <View className="flex-1">
-                      <View className="flex-row justify-between items-start mb-1">
-                        <Text className="text-text-primary text-[17px] font-semibold flex-1 pr-2" numberOfLines={1}>
-                          {formatContent(notif.title, sharedParams)}
-                        </Text>
-                        <Text className="text-text-muted text-[11px] font-bold uppercase opacity-60">
+                      <View className="flex-row justify-between items-center mb-1">
+                         <View className="flex-row items-center flex-1 pr-4">
+                            {!isRead && (
+                              <View className="w-1.5 h-1.5 rounded-full bg-primary mr-2" />
+                            )}
+                            <Text className="text-text-primary text-[17px] font-bold" numberOfLines={1}>
+                              {formatContent(notif.title, sharedParams)}
+                            </Text>
+                         </View>
+                        <Text className="text-text-muted text-[10px] font-bold uppercase tracking-wider opacity-60">
                           {new Date(notif.createdAt).toLocaleDateString(i18n.language, { day: 'numeric', month: 'short' })}
                         </Text>
                       </View>
                       
-                      <Text className="text-text-secondary text-[14px] leading-snug mb-3" numberOfLines={2}>
+                      <Text className="text-text-secondary text-[14px] leading-relaxed mb-4" numberOfLines={2}>
                         {formatContent(notif.message, sharedParams)}
                       </Text>
 
-                      <View className="flex-row space-x-6">
+                      <View className="flex-row justify-end space-x-6">
                         {!isRead && (
                           <TouchableOpacity 
                             onPress={() => markRead(notif.notificationId)} 
-                            className="flex-row items-center"
+                            className="w-8 h-8 rounded-full bg-primary/5 items-center justify-center"
                           >
-                            <Ionicons name="checkmark-done-outline" size={16} color="#4197CB" />
-                            <Text className="text-[#4197CB] font-bold text-[12px] ml-1.5 uppercase tracking-tight">{t('Notifications.mark_read')}</Text>
+                            <Ionicons name="checkmark-done" size={18} color={THEME.colors.primary} />
                           </TouchableOpacity>
                         )}
                         <TouchableOpacity 
                           onPress={() => deleteNotif(notif.notificationId)} 
-                          className="flex-row items-center"
+                          className="w-8 h-8 rounded-full bg-red-500/5 items-center justify-center"
                         >
-                          <Ionicons name="trash-outline" size={15} color="#F26178" />
-                          <Text className="text-[#F26178] font-bold text-[12px] ml-1.5 uppercase tracking-tight">{t('Notifications.delete')}</Text>
+                          <Ionicons name="trash-outline" size={16} color="#F26178" />
                         </TouchableOpacity>
                       </View>
                     </View>
                   </TouchableOpacity>
 
                   {!isLast && (
-                    <View className="ml-20 h-[0.5px] bg-border-subtle" />
+                    <View className="mx-6 h-[0.5px] bg-border-subtle/50" />
                   )}
                 </View>
               );

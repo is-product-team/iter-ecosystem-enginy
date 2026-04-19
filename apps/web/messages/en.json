@@ -1267,6 +1267,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "save": "Save",
+    "send": "Send",
     "all_sectors": "All sectors",
     "all_modalities": "All modalities",
     "modality_label": "Modality {modality}",
