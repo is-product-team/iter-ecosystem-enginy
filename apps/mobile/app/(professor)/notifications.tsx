@@ -81,8 +81,8 @@ export default function NotificationsTabScreen() {
     try {
       const response = await getNotifications();
       setNotifications(response.data);
-    } catch (error) {
-      console.error("Error fetching notifications mobile:", error);
+    } catch (_error) {
+      console.error("Error fetching notifications mobile:", _error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -107,8 +107,8 @@ export default function NotificationsTabScreen() {
         }
         return n;
       }));
-    } catch (error) {
-      console.error("Error marking read mobile:", error);
+    } catch (_error) {
+      console.error("Error marking read mobile:", _error);
     }
   };
 
@@ -116,8 +116,8 @@ export default function NotificationsTabScreen() {
     try {
       await api.delete(`notifications/${id}`);
       setNotifications(prev => prev.filter(n => n.notificationId !== id));
-    } catch (error) {
-      console.error("Error deleting notification mobile:", error);
+    } catch (_error) {
+      console.error("Error deleting notification mobile:", _error);
     }
   };
 

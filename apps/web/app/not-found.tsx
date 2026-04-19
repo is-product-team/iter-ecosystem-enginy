@@ -3,6 +3,7 @@
 // during the Next.js static prerendering process.
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function GlobalNotFound() {
   const GIF_SRC = "/404.gif";
@@ -11,9 +12,6 @@ export default function GlobalNotFound() {
     <html lang="es">
       <head>
         <title>404 - Página no encontrada</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <style dangerouslySetInnerHTML={{ __html: `
           body { 
             margin: 0; padding: 0; font-family: 'Inter', sans-serif; 
@@ -50,7 +48,7 @@ export default function GlobalNotFound() {
           <h1>Página no encontrada</h1>
           <p>Lo sentimos, pero la página que estás buscando no existe o ha sido movida temporalmente.</p>
           <div className="gif-wrapper">
-            <img src={GIF_SRC} style={{ width: '100%', display: 'block' }} alt="404" />
+            <Image src={GIF_SRC} width={200} height={200} style={{ width: '100%', height: 'auto', display: 'block' }} alt="404" />
           </div>
           <Link href="/es" className="btn">Volver al inicio</Link>
 

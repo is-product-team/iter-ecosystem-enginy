@@ -17,7 +17,7 @@ describe('Button Component', () => {
   });
 
   it('should show loading indicator when loading is true', () => {
-    const { queryByText, getByTestId } = render(<Button label="Submit" loading />);
+    const { queryByText } = render(<Button label="Submit" loading />);
     
     // We can't easily query ActivityIndicator by text, but we know label should be gone
     expect(queryByText('Submit')).toBeNull();

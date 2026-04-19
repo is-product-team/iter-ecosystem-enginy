@@ -13,6 +13,12 @@ import DataTable, { Column } from '@/components/ui/DataTable';
 import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 import { ClipboardCheck } from 'lucide-react';
 
+const DOCUMENT_CONFIG = [
+  { id: 'pedagogical', field: 'isPedagogicalAgreementValidated', urlField: 'pedagogicalAgreementUrl', label: 'A', nameKey: 'doc_names.agreement' },
+  { id: 'mobility', field: 'isMobilityAuthorizationValidated', urlField: 'mobilityAuthorizationUrl', label: 'M', nameKey: 'doc_names.mobility' },
+  { id: 'image', field: 'isImageRightsValidated', urlField: 'imageRightsUrl', label: 'R', nameKey: 'doc_names.rights' }
+] as const;
+
 export default function DocumentVerificationPage() {
   const { user, loading: authLoading } = useAuth();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -43,12 +49,6 @@ export default function DocumentVerificationPage() {
   const router = useRouter();
   const params = useParams();
   const locale = params?.locale || 'ca';
-
-  const DOCUMENT_CONFIG = [
-    { id: 'pedagogical', field: 'isPedagogicalAgreementValidated', urlField: 'pedagogicalAgreementUrl', label: 'A', nameKey: 'doc_names.agreement' },
-    { id: 'mobility', field: 'isMobilityAuthorizationValidated', urlField: 'mobilityAuthorizationUrl', label: 'M', nameKey: 'doc_names.mobility' },
-    { id: 'image', field: 'isImageRightsValidated', urlField: 'imageRightsUrl', label: 'R', nameKey: 'doc_names.rights' }
-  ] as const;
 
   const flatEnrollments = useMemo(() => assignments.flatMap(assig =>
     (assig.enrollments || []).map(ins => ({
