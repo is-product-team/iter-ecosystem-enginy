@@ -1,6 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function NotFound() {
   const t = useTranslations('NotFound');
@@ -24,9 +25,11 @@ export default function NotFound() {
 
           {/* Simplified GIF Container */}
           <div className="w-48 mb-12">
-            <img 
+            <Image 
               src={GIF_SRC} 
               alt="Not Found" 
+              width={192}
+              height={192}
               className="w-full"
             />
           </div>

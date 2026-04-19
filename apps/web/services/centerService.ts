@@ -5,6 +5,7 @@ export interface Center {
   centerCode: string;
   name: string;
   address?: string;
+  photoUrl?: string;
   contactPhone?: string;
   contactEmail?: string;
 }
@@ -22,6 +23,7 @@ const centerService = {
         centerCode: c.centerCode,
         name: c.name,
         address: c.address,
+        photoUrl: c.photoUrl,
         contactPhone: c.contactPhone,
         contactEmail: c.contactEmail
       }));

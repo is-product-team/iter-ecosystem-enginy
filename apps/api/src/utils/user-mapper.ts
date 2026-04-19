@@ -21,7 +21,12 @@ export function mapUserResponse(prismaUser: any) {
     },
     center: (prismaUser.center || prismaUser.centre) ? {
       centerId: (prismaUser.center || prismaUser.centre).centerId || (prismaUser.center || prismaUser.centre).id_center || (prismaUser.center || prismaUser.centre).id_centre,
-      name: (prismaUser.center || prismaUser.centre).name || (prismaUser.center || prismaUser.centre).nom
+      name: (prismaUser.center || prismaUser.centre).name || (prismaUser.center || prismaUser.centre).nom,
+      centerCode: (prismaUser.center || prismaUser.centre).centerCode || (prismaUser.center || prismaUser.centre).codi_center,
+      photoUrl: (prismaUser.center || prismaUser.centre).photoUrl || (prismaUser.center || prismaUser.centre).url_foto,
+      address: (prismaUser.center || prismaUser.centre).address || (prismaUser.center || prismaUser.centre).adreca,
+      contactPhone: (prismaUser.center || prismaUser.centre).contactPhone || (prismaUser.center || prismaUser.centre).telefon_contacte,
+      contactEmail: (prismaUser.center || prismaUser.centre).contactEmail || (prismaUser.center || prismaUser.centre).email_contacte
     } : null,
     syncToken: prismaUser.syncToken || prismaUser.sync_token
   };

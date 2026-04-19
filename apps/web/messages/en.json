@@ -402,7 +402,7 @@
       "subtitle": "Review of the impact and results of the workshops."
     },
     "Monitoring": {
-      "title": "Operational Monitoring (Phase 3)",
+      "title": "Operational Monitoring",
       "subtitle": "Status of workshop execution and attendance at your center.",
       "description": "Control attendance, milestones, and the status of all your active workshops.",
       "KPI": {
@@ -485,6 +485,10 @@
         "description": "Aggregate metrics from conducted sessions",
         "responses_count": "{count} RESPONSES"
       }
+    },
+    "Closure": {
+      "title": "Closure and Certification",
+      "description": "Finalize your workshops and download the official certificates for your students."
     }
   },
   "Calendar": {
@@ -650,6 +654,9 @@
     "contact_info_label": "Contact Details",
     "email_label": "Email Address",
     "center_referent_label": "Referent Center",
+    "center_address": "Center Address",
+    "center_phone": "Center Phone",
+    "center_email": "Center Email",
     "no_center_assigned": "No center assigned",
     "center_usage_hint": "Used for managing workshops and requests.",
     "security_label": "Security",
@@ -669,7 +676,18 @@
     "email_notifications_title": "Email Notifications",
     "email_notifications_desc": "Receive an email for every important notice or phase change.",
     "notifications_updated": "Preferences updated",
-    "notifications_error": "Error saving preferences"
+    "notifications_error": "Error saving preferences",
+    "edit_modal": {
+      "title": "Edit your profile",
+      "subtitle": "Personal and contact information",
+      "fullname_label": "Full name",
+      "email_label": "Email address",
+      "phone_label": "Phone (Optional)",
+      "phone_placeholder": "Ex: 600 000 000",
+      "save_btn": "Save changes",
+      "success_message": "Profile updated successfully",
+      "error_message": "Error updating profile"
+    }
   },
   "Navigation": {
     "home": "Home",
@@ -687,7 +705,8 @@
     "assignments": "Assignments",
     "sessions": "Sessions",
     "profile": "Profile",
-    "monitoring": "Monitoring"
+    "monitoring": "Monitoring",
+    "issues": "Issues"
   },
   "Dashboards": {
     "admin": {
@@ -1032,7 +1051,7 @@
   },
   "AssignmentWorkshopsPage": {
     "title_prefix": "WORKSHOP MANAGEMENT: ",
-    "modality_prefix": "MODALITY ",
+    "modality_prefix": "MODALIDAD ",
     "referent_label": "Referent Teaching Team",
     "center_label": "Educational Center",
     "students_title": "Participating Students",
@@ -1050,22 +1069,22 @@
       "PUBLISHED": "PUBLISHED",
       "DATA_ENTRY": "PENDING MANAGEMENT",
       "DATA_SUBMITTED": "DATA SUBMITTED",
-      "VALIDATED": "CONFIRMED",
+      "VALIDATED": "CONFIRMADO",
       "READY_TO_START": "READY TO START",
-      "VACANT": "VACANT",
+      "VACANT": "VACANTE",
       "IN_PROGRESS": "IN EXECUTION",
       "COMPLETED": "COMPLETED",
-      "CANCELLED": "CANCELLED",
+      "CANCELLED": "CANCELADO",
       "provisional": "Provisional",
       "published": "Published",
       "data_entry": "Pending management",
       "data_submitted": "Data submitted",
-      "validated": "Confirmed",
+      "validated": "Confirmado",
       "ready_to_start": "Ready to start",
-      "vacant": "Vacant",
+      "vacant": "Vacante",
       "in_progress": "In execution",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelado"
     },
     "docs": {
       "pedagogical_agreement": "Pedagogical Agreement",
@@ -1089,9 +1108,6 @@
       "pending_evals_error": "Cannot close assignment. There are {count} pending evaluations.",
       "success": "Workshop closed and certificates generated successfully!",
       "error": "Error closing the workshop."
-    },
-    "Monitoring": {
-      "no_assignments": "No active workshops in execution for now."
     },
     "ia_matcher_btn": "IA Matcher",
     "ia_matcher_close_btn": "Close IA Matcher",
@@ -1257,8 +1273,8 @@
     "table_course": "Course",
     "clear": "Clear",
     "upload_success": "{label} uploaded successfully.",
-    "error_upload": "Error uploading the document.",
-    "only_pdf_allowed": "Only PDF files are allowed.",
+    "error_upload": "Error al pujar el document.",
+    "only_pdf_allowed": "Només es permeten fitxers PDF.",
     "ai_mismatch": "AI detects a different type: {type}.",
     "ai_no_signatures": "AI has not detected the required signatures.",
     "ai_error": "Error processing AI. You can force the upload.",
@@ -1290,12 +1306,12 @@
       "PUBLISHED": "Published",
       "DATA_ENTRY": "Pending Management",
       "DATA_SUBMITTED": "Data Submitted",
-      "VALIDATED": "Confirmed",
+      "VALIDATED": "Confirmado",
       "READY_TO_START": "Ready to Start",
-      "VACANT": "Vacant",
+      "VACANT": "Vacante",
       "IN_PROGRESS": "In Execution",
       "COMPLETED": "Completed",
-      "CANCELLED": "Cancelled"
+      "CANCELLED": "Cancelado"
     }
   },
   "Notifications": {
@@ -1360,23 +1376,22 @@
     }
   },
   "DesignateTeachersPage": {
-    "page_title": "Designate Teachers: {title}",
-    "page_subtitle": "Designate the two referring teachers who will be responsible for monitoring.",
-    "selection_of_referents": "Selection of Referents",
-    "main_teacher": "Main Teacher",
-    "select": "Select...",
-    "second_teacher": "Second Teacher",
-    "saving": "Saving...",
-    "confirm_designation": "Confirm Designation",
-    "mandatory_requirement": "Mandatory Requirement",
-    "mandatory_description": "It is necessary to designate two teachers to ensure that there is always a referent available for students and for communications with the CEB.",
-    "teacher_designation_not_active": "The teacher designation period is not active.",
-    "assignment_not_found": "Assignment not found.",
-    "designate_two_teachers": "You must designate two referring teachers.",
-    "teachers_must_be_different": "The two teachers must be different people.",
-    "teachers_designated_correctly": "Teachers designated correctly.",
-    "error_saving_designation": "Error saving designation.",
-    "loading_designation": "Loading designation..."
+    "page_subtitle": "Designa al equipo docente responsable que se encargará del seguimiento y la asistencia.",
+    "selection_of_referents": "Equipo Docente (Practicantes)",
+    "main_teacher": "Docente Principal",
+    "select": "Seleccionar...",
+    "second_teacher": "Segundo Docente (Opcional)",
+    "saving": "Guardando...",
+    "confirm_designation": "Confirmar Equipo Docente",
+    "mandatory_requirement": "Equipo Responsable",
+    "mandatory_description": "Se recomienda designar a dos docentes para garantizar la continuidad del taller, aunque solo uno es estrictamente obligatorio.",
+    "teacher_designation_not_active": "El periodo de designación de docentes no está activo.",
+    "assignment_not_found": "Asignación no encontrada.",
+    "designate_two_teachers": "Debes designar al menos a un docente responsable.",
+    "teachers_must_be_different": "Si designas a dos docentes, deben ser personas diferentes.",
+    "teachers_designated_correctly": "Docentes designados correctamente.",
+    "error_saving_designation": "Error al guardar la designación.",
+    "loading_designation": "Cargando designación..."
   },
   "AssignmentEvaluationsPage": {
     "page_title": "Competence Evaluation: {title}",
@@ -1442,5 +1457,54 @@
     "footer_note": "Anonymous feedback for the center. Be honest!",
     "submit_button": "Submit Survey",
     "submitting": "Submitting..."
-  }
-}
+    },
+    "Issues": {
+    "title": "Incident Management",
+    "subtitle": "Direct communication with administration for problem resolution.",
+    "new": "New Incident",
+    "details": "Incident Details",
+    "no_incidents": "No incidents reported.",
+    "create_success": "Incident created successfully.",
+    "message_success": "Message sent.",
+    "status_open": "Open",
+    "status_in_progress": "In Progress",
+    "status_resolved": "Resolved",
+    "status_closed": "Closed",
+    "priority_low": "Low",
+    "priority_medium": "Medium",
+    "priority_high": "High",
+    "priority_critical": "Critical",
+    "filter_status": "Filter by status",
+    "filter_priority": "Filter by priority",
+    "filter_category": "Filter by category",
+    "form": {
+      "title": "Incident Title",
+      "category": "Category",
+      "priority": "Priority",
+      "description": "Detailed description",
+      "submit": "Open Incident"
+    },
+    "chat": {
+      "placeholder": "Write a message...",
+      "system_msg": "System message",
+      "admin_reply": "Administration Reply"
+    },
+    "table": {
+      "id": "ID",
+      "title": "Subject",
+      "status": "Status",
+      "priority": "Priority",
+      "category": "Category",
+      "date": "Date",
+      "center": "Center"
+    },
+    "categories": {
+      "DOCUMENTATION": "Documentation",
+      "MATERIAL": "Material",
+      "TECHNICAL": "Technical",
+      "ABSENCE": "Absence",
+      "FACILITIES": "Space",
+      "OTHER": "Other"
+    }
+    }
+    }

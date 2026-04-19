@@ -1,13 +1,18 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Modal, Pressable, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Modal, Pressable, Image, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME, ROLES } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
+import api from '@/services/api';
+import * as ExpoConstants from 'expo-constants';
+
+const Constants = ExpoConstants.default || ExpoConstants;
+const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
 
 // WhatsApp-style Setting Row
 const SettingItem = ({ 
@@ -139,34 +144,62 @@ export default function PerfilScreen() {
   
   const [notifications, setNotifications] = React.useState(true);
   const [user, setUser] = React.useState<any>(null);
-  const [image, setImage] = React.useState<string | null>(null);
+  const [loadingImage, setLoadingImage] = React.useState(false);
+
+  const fetchUserProfile = React.useCallback(async () => {
+    try {
+      const response = await api.get('/profile/me');
+      const updatedUser = response.data;
+      setUser(updatedUser);
+      
+      // Sync local storage
+      if (Platform.OS === 'web') {
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } else {
+        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+      }
+    } catch (e) {
+      console.error("Error refreshing user profile", e);
+    }
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserProfile();
+    }, [fetchUserProfile])
+  );
   
   // Modal States
   const [langModalVisible, setLangModalVisible] = React.useState(false);
   const [themeModalVisible, setThemeModalVisible] = React.useState(false);
 
   React.useEffect(() => {
-    async function loadUserAndImage() {
+    async function loadUser() {
       try {
         let userData = null;
-        let userImage = null;
         
         if (Platform.OS === 'web') {
           userData = localStorage.getItem('user');
-          userImage = localStorage.getItem('user-avatar');
         } else {
           userData = await SecureStore.getItemAsync('user');
-          userImage = await SecureStore.getItemAsync('user-avatar');
         }
         
-        if (userData) setUser(JSON.parse(userData));
-        if (userImage) setImage(userImage);
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
       } catch (e) {
-        console.error("Error loading user or image", e);
+        console.error("Error loading user", e);
       }
     }
-    loadUserAndImage();
+    loadUser();
   }, []);
+
+  const getProfileImage = () => {
+    if (user?.photoUrl) {
+      return { uri: user.photoUrl.startsWith('http') ? user.photoUrl : `${API_URL}${user.photoUrl}` };
+    }
+    return null;
+  };
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -188,16 +221,45 @@ export default function PerfilScreen() {
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
-      setImage(uri);
+      setLoadingImage(true);
       
       try {
-        if (Platform.OS === 'web') {
-          localStorage.setItem('user-avatar', uri);
-        } else {
-          await SecureStore.setItemAsync('user-avatar', uri);
+        // Prepare file for upload
+        const formData = new FormData();
+        const fileName = uri.split('/').pop() || 'profile.jpg';
+        const fileType = fileName.split('.').pop();
+        
+        // @ts-ignore - FormData needs this structure in React Native
+        formData.append('photo', {
+          uri: Platform.OS === 'ios' ? uri.replace('file://', '') : uri,
+          name: fileName,
+          type: `image/${fileType === 'jpg' ? 'jpeg' : fileType}`,
+        });
+
+        const response = await api.post(`/upload/profile/user/${user.userId}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        if (response.data.success) {
+          const updatedUser = { ...user, photoUrl: response.data.photoUrl };
+          setUser(updatedUser);
+          
+          // Save updated user locally
+          if (Platform.OS === 'web') {
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          } else {
+            await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+          }
+          
+          Alert.alert(t('Common.success') || 'Èxit', t('Profile.photo_updated') || 'Foto de perfil actualizada.');
         }
       } catch (e) {
-        console.error("Error saving avatar URI", e);
+        console.error("Error uploading avatar", e);
+        Alert.alert(t('Common.error'), t('Profile.upload_error') || "Error en pujar la imatge.");
+      } finally {
+        setLoadingImage(false);
       }
     }
   };
@@ -260,21 +322,29 @@ export default function PerfilScreen() {
            <View className="relative">
               <TouchableOpacity 
                 onPress={pickImage}
+                disabled={loadingImage}
                 activeOpacity={0.9}
                 className="w-28 h-28 rounded-full bg-primary items-center justify-center shadow-md overflow-hidden"
               >
-                 {image ? (
-                   <Image source={{ uri: image }} className="w-full h-full" />
+                 {loadingImage ? (
+                   <ActivityIndicator color="white" />
+                 ) : getProfileImage() ? (
+                   <Image source={getProfileImage()!} className="w-full h-full" />
                  ) : (
                    <Text className="text-4xl font-black text-white">{getUserInitials()}</Text>
                  )}
               </TouchableOpacity>
               <TouchableOpacity 
                 onPress={pickImage}
+                disabled={loadingImage}
                 className="absolute bottom-0 right-0 bg-secondary w-9 h-9 rounded-full items-center justify-center border-4 border-background-surface shadow-sm"
                 activeOpacity={0.8}
               >
-                 <Ionicons name="image-outline" size={16} color="white" />
+                 {loadingImage ? (
+                   <ActivityIndicator size="small" color="white" />
+                 ) : (
+                   <Ionicons name="image-outline" size={16} color="white" />
+                 )}
               </TouchableOpacity>
            </View>
            

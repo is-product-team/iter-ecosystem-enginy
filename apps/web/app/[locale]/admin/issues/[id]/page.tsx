@@ -1,21 +1,25 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
-import issueService, { Issue, IssueMessage } from '@/services/issueService';
+import issueService, { Issue } from '@/services/issueService';
 import Loading from '@/components/Loading';
 import { format } from 'date-fns';
 import { ca, es } from 'date-fns/locale';
 import { ISSUE_PRIORITIES, ISSUE_STATUSES } from '@iter/shared';
+import Button from '@/components/ui/Button';
+import getApi from '@/services/api';
+import { Paperclip, X, Image as ImageIcon, Film, FileText, ExternalLink, Clock } from 'lucide-react';
+import { toast } from 'sonner';
+import Image from 'next/image';
 
 export default function AdminIssueDetailPage() {
   const t = useTranslations('Issues');
   const tCommon = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const params = useParams();
   const id = params?.id ? Number(params.id) : null;
   const locale = params?.locale || 'ca';
@@ -25,9 +29,13 @@ export default function AdminIssueDetailPage() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
 
-  const loadIssue = async () => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const loadIssue = useCallback(async () => {
     if (!id) return;
     try {
       const data = await issueService.getById(id);
@@ -37,38 +45,71 @@ export default function AdminIssueDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     if (user && id) {
       loadIssue();
     }
-  }, [user, id]);
+  }, [user, id, loadIssue]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [issue?.messages]);
+  }, [issue?.messages, scrollToBottom]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setSelectedFiles(prev => [...prev, ...newFiles].slice(0, 5));
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !id || sending) return;
+    if ((!newMessage.trim() && selectedFiles.length === 0) || !id || sending) return;
 
     setSending(true);
     try {
-      const msg = await issueService.addMessage(id, { content: newMessage });
+      let uploadedAttachmentUrls: any[] = [];
+      
+      if (selectedFiles.length > 0) {
+        setUploadingFiles(true);
+        const formData = new FormData();
+        selectedFiles.forEach(file => formData.append('files', file));
+        
+        const api = getApi();
+        const res = await api.post('/upload/multimedia', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        uploadedAttachmentUrls = res.data.files;
+      }
+
+      const msg = await issueService.addMessage(id, { 
+        content: newMessage || 'Adjunt multimedia',
+        attachments: uploadedAttachmentUrls
+      });
+
       setIssue(prev => prev ? {
         ...prev,
         messages: [...(prev.messages || []), msg]
       } : null);
+      
       setNewMessage('');
+      setSelectedFiles([]);
     } catch (err) {
       console.error(err);
+      toast.error(tCommon('error'));
     } finally {
       setSending(false);
+      setUploadingFiles(false);
     }
   };
 
@@ -76,7 +117,7 @@ export default function AdminIssueDetailPage() {
     if (!id) return;
     try {
        await issueService.updateStatus(id, status);
-       loadIssue(); // Refresh to get the system message
+       loadIssue();
     } catch (err) {
        console.error(err);
     }
@@ -86,7 +127,7 @@ export default function AdminIssueDetailPage() {
     if (!id) return;
     try {
        await issueService.updatePriority(id, priority);
-       loadIssue(); // Refresh to get the system message
+       loadIssue();
     } catch (err) {
        console.error(err);
     }
@@ -96,29 +137,67 @@ export default function AdminIssueDetailPage() {
     return <Loading fullScreen />;
   }
 
+  const renderAttachments = (attachments: any[]) => {
+    if (!attachments || attachments.length === 0) return null;
+    return (
+      <div className="flex flex-wrap gap-2 mt-4">
+        {attachments.map((att, idx) => {
+          const isImage = att.fileType.startsWith('image/');
+          const isPdf = att.fileType === 'application/pdf';
+          const fullUrl = `${process.env.NEXT_PUBLIC_API_URL}${att.fileUrl}`;
+          
+          return (
+            <div key={idx} className="group relative w-24 h-24 bg-background-page border border-border-subtle rounded-xl overflow-hidden flex items-center justify-center transition-all hover:shadow-md">
+              {isImage ? (
+                <Image 
+                  src={fullUrl} 
+                  className="w-full h-full object-cover" 
+                  alt={att.fileName}
+                  width={96}
+                  height={96}
+                  unoptimized
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-1 p-2">
+                  {isPdf ? <FileText size={20} className="text-red-500/70" /> : <Film size={20} className="text-purple-500/70" />}
+                  <span className="text-[9px] font-medium text-center truncate w-full px-1 uppercase text-text-muted">{att.fileName.split('.').pop()}</span>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                 <a href={fullUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/90 shadow-sm rounded-full text-text-primary hover:text-consorci-darkBlue transition-colors">
+                    <ExternalLink size={14} />
+                 </a>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <DashboardLayout
       title={t('details')}
       subtitle={issue.title}
     >
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-180px)] gap-6 animate-in fade-in duration-500">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-180px)] gap-8 animate-in fade-in duration-700 font-sans">
         
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-background-surface border border-border-subtle">
+        {/* Main Chat Area - Style Apple */}
+        <div className="flex-1 flex flex-col bg-background-surface border border-border-subtle shadow-sm overflow-hidden rounded-2xl">
            {/* Chat Header Info Mobile */}
-           <div className="p-4 border-b border-border-subtle bg-background-subtle flex justify-between items-center sm:px-8 lg:hidden">
-              <span className="table-tag-muted capitalize">{t(`categories.${issue.category}`)}</span>
-              <span className="text-[10px] font-bold text-consorci-darkBlue uppercase">{issue.center?.name}</span>
+           <div className="p-5 border-b border-border-subtle bg-background-subtle/50 flex justify-between items-center sm:px-8 lg:hidden">
+              <span className="px-3 py-1 bg-background-surface border border-border-subtle rounded-full text-[10px] font-medium text-text-muted uppercase tracking-wider">{t(`categories.${issue.category}`)}</span>
+              <span className="text-[11px] font-medium text-consorci-darkBlue uppercase tracking-tight">{issue.center?.name}</span>
            </div>
 
-           <div className="flex-1 overflow-y-auto p-6 space-y-6 sm:p-10 custom-scrollbar">
-            {issue.messages?.map((msg, idx) => {
+           <div className="flex-1 overflow-y-auto p-6 space-y-10 sm:p-10 custom-scrollbar">
+            {issue.messages?.map((msg) => {
               const isMe = msg.senderId === user?.userId;
               
               if (msg.isSystem) {
                 return (
-                  <div key={msg.messageId} className="flex justify-center my-4">
-                    <span className="px-4 py-1.5 bg-background-subtle border border-border-subtle rounded-full text-[10px] font-bold text-text-muted uppercase tracking-widest">
+                  <div key={msg.messageId} className="flex justify-center my-6">
+                    <span className="px-5 py-1.5 bg-background-subtle border border-border-subtle rounded-full text-[10px] font-medium text-text-muted/60 uppercase tracking-[0.15em]">
                       {msg.content}
                     </span>
                   </div>
@@ -126,22 +205,25 @@ export default function AdminIssueDetailPage() {
               }
 
               return (
-                <div key={msg.messageId} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-bold text-text-muted uppercase">
+                <div key={msg.messageId} className={`flex ${isMe ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-400`}>
+                  <div className={`max-w-[80%] lg:max-w-[70%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                    <div className="flex items-center gap-2 mb-1.5 px-2">
+                      <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider opacity-60">
                         {isMe ? 'Administració' : msg.sender?.fullName}
                       </span>
-                      <span className="text-[9px] text-text-muted">
+                      <span className="text-[10px] text-text-muted opacity-40">
                         {format(new Date(msg.createdAt), 'HH:mm', { locale: dateLocale })}
                       </span>
                     </div>
-                    <div className={`p-4 text-sm leading-relaxed ${
+                    <div className={`p-5 rounded-[22px] ${
                       isMe 
-                        ? 'bg-consorci-darkBlue text-white rounded-l-2xl rounded-tr-lg shadow-sm border border-consorci-darkBlue/20' 
-                        : 'bg-background-subtle text-text-primary rounded-r-2xl rounded-tl-lg border border-border-subtle shadow-sm'
+                        ? 'bg-consorci-darkBlue text-white rounded-tr-md shadow-sm' 
+                        : 'bg-background-subtle text-text-primary rounded-tl-md border border-border-subtle/50 shadow-sm'
                     }`}>
-                      {msg.content}
+                      <p className="text-[15px] leading-relaxed font-normal whitespace-pre-wrap">{msg.content}</p>
+                      
+                      {/* Attachments */}
+                      {renderAttachments(msg.attachments as any[])}
                     </div>
                   </div>
                 </div>
@@ -150,46 +232,103 @@ export default function AdminIssueDetailPage() {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Selected Files Row */}
+          {selectedFiles.length > 0 && (
+            <div className="px-6 py-4 bg-background-surface border-t border-border-subtle flex gap-4 animate-in slide-in-from-bottom-2 duration-200">
+               {selectedFiles.map((file, idx) => (
+                 <div key={idx} className="relative w-16 h-16 bg-background-subtle border border-border-subtle rounded-xl flex items-center justify-center overflow-hidden group">
+                    {file.type.startsWith('image/') ? (
+                      <Image 
+                        src={URL.createObjectURL(file)} 
+                        className="w-full h-full object-cover" 
+                        alt="preview" 
+                        width={64}
+                        height={64}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center">
+                         {file.type === 'application/pdf' ? <FileText size={18} className="text-red-500/60" /> : <Film size={18} className="text-purple-500/60" />}
+                      </div>
+                    )}
+                    <button 
+                      onClick={() => removeFile(idx)}
+                      className="absolute top-0.5 right-0.5 bg-black/60 text-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X size={10} />
+                    </button>
+                 </div>
+               ))}
+            </div>
+          )}
+
           {/* Message Input */}
-          <div className="p-6 border-t border-border-subtle bg-background-surface">
-            <form onSubmit={handleSendMessage} className="flex gap-4">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder={t('chat.placeholder')}
-                className="flex-1 px-6 py-4 bg-background-subtle border border-border-subtle text-sm font-medium focus:border-consorci-darkBlue outline-none transition-all"
-              />
+          <div className="p-6 border-t border-border-subtle bg-background-surface sm:px-10 sm:py-8">
+            <form onSubmit={handleSendMessage} className="flex gap-4 items-end max-w-5xl mx-auto">
               <button
-                type="submit"
-                disabled={!newMessage.trim() || sending}
-                className="px-8 py-4 bg-consorci-darkBlue text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black transition-all active:scale-95"
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="p-3.5 bg-background-subtle text-text-muted hover:text-consorci-darkBlue hover:bg-background-page transition-all rounded-full mb-1 border border-border-subtle/50"
+                title="Adjuntar fitxer"
+                disabled={issue.status === 'CLOSED'}
               >
-                {sending ? '...' : tCommon('send')}
+                <Paperclip size={18} />
               </button>
+              <input 
+                type="file" 
+                multiple 
+                className="hidden" 
+                ref={fileInputRef} 
+                onChange={handleFileSelect}
+                accept="image/*,video/*,application/pdf"
+              />
+              
+              <div className="flex-1 relative">
+                <textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder={t('chat.placeholder')}
+                  className="w-full px-6 py-4 bg-background-subtle border border-border-subtle text-[15px] font-normal focus:border-consorci-darkBlue outline-none transition-all resize-none min-h-[52px] max-h-[160px] leading-relaxed rounded-2xl"
+                  disabled={issue.status === 'CLOSED'}
+                  rows={1}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                  }}
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={(!newMessage.trim() && selectedFiles.length === 0) || sending || issue.status === 'CLOSED'}
+                loading={sending || uploadingFiles}
+                variant="primary"
+                className="px-8 h-[52px] font-medium !text-[11px] uppercase tracking-[0.15em] shadow-md mb-1 rounded-full"
+              >
+                {tCommon('send')}
+              </Button>
             </form>
           </div>
         </div>
 
-        {/* Sidebar Controls */}
+        {/* Sidebar Controls - Clean Apple Style */}
         <div className="w-full lg:w-80 space-y-6">
            {/* Center Card */}
-           <div className="bg-background-surface border border-border-subtle p-6">
-              <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-4">{t('table.center')}</h4>
-              <div className="flex flex-col">
-                 <span className="text-sm font-bold text-text-primary">{issue.center?.name}</span>
-                 <span className="text-xs text-text-muted">{issue.creator?.fullName}</span>
+           <div className="bg-background-surface border border-border-subtle p-8 rounded-2xl shadow-sm">
+              <h4 className="text-[10px] font-medium text-text-muted uppercase tracking-[0.2em] mb-6">{t('table.center')}</h4>
+              <div className="flex flex-col gap-1">
+                 <span className="text-lg font-medium text-text-primary tracking-tight">{issue.center?.name}</span>
+                 <span className="text-[13px] font-normal text-text-muted opacity-60">{issue.creator?.fullName}</span>
               </div>
            </div>
 
            {/* Controls Card */}
-           <div className="bg-background-surface border border-border-subtle p-6 space-y-8">
-              <div className="space-y-3">
-                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest block">{t('table.status')}</label>
+           <div className="bg-background-surface border border-border-subtle p-8 space-y-10 rounded-2xl shadow-sm">
+              <div className="space-y-4">
+                 <label className="text-[10px] font-medium text-text-muted uppercase tracking-[0.2em] block">{t('table.status')}</label>
                  <select 
                    value={issue.status}
                    onChange={(e) => handleUpdateStatus(e.target.value)}
-                   className="w-full p-3 bg-background-subtle border border-border-subtle text-[11px] font-bold uppercase tracking-widest outline-none focus:border-consorci-darkBlue"
+                   className="w-full p-4 bg-background-subtle border border-border-subtle text-[11px] font-medium uppercase tracking-[0.1em] outline-none focus:border-consorci-darkBlue cursor-pointer transition-all hover:bg-background-page rounded-xl appearance-none"
                  >
                     {Object.values(ISSUE_STATUSES).map(s => (
                        <option key={s} value={s}>{t(`status_${s.toLowerCase()}` as any)}</option>
@@ -197,28 +336,27 @@ export default function AdminIssueDetailPage() {
                  </select>
               </div>
 
-              <div className="space-y-3">
-                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest block">{t('table.priority')}</label>
-                 <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-4">
+                 <label className="text-[10px] font-medium text-text-muted uppercase tracking-[0.2em] block">{t('table.priority')}</label>
+                 <div className="grid grid-cols-2 gap-3">
                     {Object.values(ISSUE_PRIORITIES).map(p => (
-                       <button
+                       <Button
                          key={p}
                          onClick={() => handleUpdatePriority(p)}
-                         className={`px-3 py-2 text-[9px] font-bold uppercase tracking-widest border transition-all ${
-                            issue.priority === p 
-                              ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue shadow-md' 
-                              : 'bg-background-surface text-text-muted border-border-subtle hover:border-text-muted'
-                         }`}
+                         variant={issue.priority === p ? 'primary' : 'outline'}
+                         size="sm"
+                         className="!py-3 !text-[9px] font-medium uppercase tracking-widest transition-all rounded-xl shadow-none"
                        >
                           {p}
-                       </button>
+                       </Button>
                     ))}
                  </div>
               </div>
 
-              <div className="pt-4 border-t border-border-subtle">
-                 <div className="text-[9px] text-text-muted uppercase tracking-wider">
-                    {t('table.date')}: {format(new Date(issue.createdAt), 'PPp', { locale: dateLocale })}
+              <div className="pt-6 border-t border-border-subtle">
+                 <div className="text-[10px] font-normal text-text-muted uppercase tracking-wider flex items-center gap-2 opacity-50">
+                    <Clock size={12} />
+                    {t('table.date')}: {format(new Date(issue.createdAt), 'PP', { locale: dateLocale })}
                  </div>
               </div>
            </div>

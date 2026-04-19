@@ -392,8 +392,10 @@
       "subtitle": "مراجعة الأثر ونتائج الورش."
     },
     "Monitoring": {
-      "title": "المراقبة التشغيلية (المرحلة 3)",
+      "title": "المراقبة التشغيلية",
       "subtitle": "حالة تنفيذ الورش والحضور في مركزك.",
+      "description": "مراقبة تنفيذ ورش العمل والحضور والحوادث في الوقت الفعلي.",
+      "no_assignments": "لا توجد ورش عمل نشطة في الوقت الحالي.",
       "KPI": {
         "sessions_today": "جلسات اليوم",
         "pending_attendance": "قوائم معلقة",
@@ -410,21 +412,21 @@
         "attendance_warning": "قوائم ناقصة"
       },
       "tabs": {
-        "active": "Talleres en Ejecución",
-        "completed": "Resultados y Certificados (Fase 4)"
+        "active": "ورش قيد التنفيذ",
+        "completed": "النتائج والشهادات (المرحلة 4)"
       },
-      "no_active_assignments": "No hay talleres activos en este momento.",
-      "no_completed_assignments": "No hay talleres finalizados recientemente.",
-      "finished_on": "Finalizado el {date}",
-      "view_analytics": "Ver Analítica",
-      "certificates_zip": "Certificados (ZIP)",
-      "quality_report": "Informe de Calidad",
-      "close": "Cerrar",
-      "loading_analytics": "Cargando análisis...",
-      "incident_id": "Incidencia #{id}",
-      "error_load_analytics": "No se ha podido cargar la analítica.",
-      "success_download_zip": "¡Descarga iniciada correctamente!",
-      "error_download_zip": "Error al generar el archivo ZIP.",
+      "no_active_assignments": "لا توجد ورش عمل نشطة حالياً.",
+      "no_completed_assignments": "لا توجد ورش عمل مكتملة مؤخراً.",
+      "finished_on": "اكتمل في {date}",
+      "view_analytics": "عرض التحليلات",
+      "certificates_zip": "الشهادات (ZIP)",
+      "quality_report": "تقرير الجودة",
+      "close": "إغلاق",
+      "loading_analytics": "جاري تحميل التحليلات...",
+      "incident_id": "حادث #{id}",
+      "error_load_analytics": "تعذر تحميل التحليلات.",
+      "success_download_zip": "بدأ التحميل بنجاح!",
+      "error_download_zip": "خطأ في إنشاء ملف ZIP.",
       "Today": {
         "title": "أجندة اليوم",
         "no_sessions": "لا توجد جلسات مبرمجة لليوم."
@@ -442,6 +444,10 @@
         "success_download": "¡Descarga iniciada correctamente!",
         "error_zip": "Error al generar el archivo ZIP."
       }
+    },
+    "Closure": {
+      "title": "الإغلاق والشهادات",
+      "description": "قم بإنهاء ورش العمل الخاصة بك وتنزيل الشهادات الرسمية لطلابك."
     }
   },
   "Calendar": {
@@ -607,6 +613,9 @@
     "contact_info_label": "بيانات الاتصال",
     "email_label": "البريد الإلكتروني",
     "center_referent_label": "المركز المرجعي",
+    "center_address": "عنوان المركز",
+    "center_phone": "هاتف المركز",
+    "center_email": "بريد المركز",
     "no_center_assigned": "لا يوجد مركز معين",
     "center_usage_hint": "يستخدم لإدارة الورش والطلبات.",
     "security_label": "الأمان",
@@ -842,7 +851,7 @@
     "save_changes": "حفظ التغييرات",
     "request_approve_title": "الموافقة على الطلب",
     "request_approve_msg": "هل أنت متأكد أنك تريد الموافقة على هذا الطلب وتوليد التعيين فوراً؟",
-    "request_reject_title": "رفض الطلب",
+    "request_reject_title": "الرفض الطلب",
     "request_reject_msg": "هل أنت متأكد أنك تريد رفض هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
     "run_tetris_title": "تشغيل التعيين التلقائي",
     "run_tetris_msg": "سيقوم هذا الإجراء بمعالجة جميع الطلبات المعتمدة المعلقة وتوليد التعيينات لجميع المراكز. هل تريد المتابعة؟",
@@ -1041,9 +1050,6 @@
       "success": "¡Taller cerrado y certificados generados correctamente!",
       "error": "Error al cerrar el taller."
     },
-    "Monitoring": {
-      "no_assignments": "No hay talleres activos en ejecución por ahora."
-    },
     "ia_matcher_btn": "IA Matcher",
     "ia_matcher_close_btn": "Cerrar IA Matcher",
     "bulk_upload": {
@@ -1091,7 +1097,7 @@
       "error_unavailable": "El motor de visión de IA local no está disponible actualmente."
     },
     "AutoAssignment": {
-      "no_requests": "No se encontraron solicitudes para procesar.",
+      "no_requests": "No se encontraron solicitudes para procesار.",
       "success": "Asignados {count} estudiantes al Centro {center} para el Taller {workshop}"
     }
   },
@@ -1165,7 +1171,7 @@
     "places_label": "{count} مقاعد",
     "duration_label": "{hours}ساعة",
     "clear_filters": "مسح الفلاتر",
-    "no_results": "لم يتم العثور على نتائج",
+    "no_results": "لم يتم العور على نتائج",
     "try_other_terms": "حاول باستخدام مصطلحات بحث أخرى.",
     "search_by_title": "البحث بالعنوان",
     "filter_by_sector": "تصفية حسب القطاع",
@@ -1228,19 +1234,19 @@
       "PUBLISHED": "Published",
       "DATA_ENTRY": "Pending Management",
       "DATA_SUBMITTED": "Data Submitted",
-      "VALIDATED": "Confirmed",
+      "VALIDATED": "Confirmado",
       "READY_TO_START": "Ready to Start",
-      "VACANT": "Vacant",
+      "VACANT": "Vacante",
       "IN_PROGRESS": "In Execution",
       "COMPLETED": "Completed",
-      "CANCELLED": "Cancelled"
+      "CANCELLED": "Cancelado"
     }
   },
   "Notifications": {
     "title_user": "التنبيهات والإشعارات",
     "subtitle_user": "ابق على اطلاع بتغييرات المراحل، وقرارات الطلبات والبلاغات الرسمية.",
     "title_admin": "Control de Alertas del Sistema",
-    "subtitle_admin": "Gestión global de comunicaciones y alertas para todos los usuarios.",
+    "subtitle_admin": "Gestión global de comunicaciones and alertas para todos los usuarios.",
     "loading": "جاري تحميل التنبيهات الرسمية...",
     "Application": "Solicitud y Pre-inscripción",
     "Planning": "Planificación y Asignación",
@@ -1294,39 +1300,38 @@
     }
   },
   "DesignateTeachersPage": {
-    "page_title": "تعيين المدرسين: {title}",
-    "page_subtitle": "تعيين المدرسين المرجعيين اللذين سيكونان مسؤولين عن المتابعة.",
-    "selection_of_referents": "اختيار المراجع",
-    "main_teacher": "المدرس الرئيسي",
-    "select": "اختر...",
-    "second_teacher": "المدرس الثاني",
-    "saving": "جاري الحفظ...",
-    "confirm_designation": "تأكيد التعيين",
-    "mandatory_requirement": "متطلب إلزامي",
-    "mandatory_description": "من الضروري تعيين مدرسين لضمان وجود مرجع متاح دائماً للطلاب وللتواصل مع CEB.",
-    "teacher_designation_not_active": "فترة تعيين المدرسين غير نشطة.",
-    "assignment_not_found": "التعيين غير موجود.",
-    "designate_two_teachers": "يجب عليك تعيين مدرسين مرجعيين.",
-    "teachers_must_be_different": "يجب أن يكون المدرسان شخصين مختلفين.",
-    "teachers_designated_correctly": "تم تعيين المدرسين بنجاح.",
-    "error_saving_designation": "خطأ في حفظ التعيين.",
-    "loading_designation": "جاري تحميل التعيين..."
+    "page_subtitle": "Designa al equipo docente responsable que se encargará del seguimiento y la asistencia.",
+    "selection_of_referents": "Equipo Docente (Practicantes)",
+    "main_teacher": "Docente Principal",
+    "select": "Seleccionar...",
+    "second_teacher": "Segundo Docente (Opcional)",
+    "saving": "Guardando...",
+    "confirm_designation": "Confirmar Equipo Docente",
+    "mandatory_requirement": "Equipo Responsable",
+    "mandatory_description": "Se recomienda designar a dos docentes para garantizar la continuidad del taller, aunque solo uno es estrictamente obligatorio.",
+    "teacher_designation_not_active": "El periodo de designación de docentes no está activo.",
+    "assignment_not_found": "Asignación no encontrada.",
+    "designate_two_teachers": "Debes designar al menos a un docente responsable.",
+    "teachers_must_be_different": "Si designas a dos docentes, deben ser personas diferentes.",
+    "teachers_designated_correctly": "Docentes designados correctamente.",
+    "error_saving_designation": "Error al guardar la designación.",
+    "loading_designation": "Cargando designación..."
   },
   "AssignmentEvaluationsPage": {
-    "page_title": "تقييم الكفاءة: {title}",
-    "page_subtitle": "تقييم أداء الطلاب المشاركين في الورشة.",
-    "back_to_assignments": "العودة إلى التعيينات",
-    "list_of_enrollments": "قائمة التسجيلات",
-    "no_enrollments": "لم يتم العثور على تسجيلات لهذا التعيين.",
+    "page_title": "Evaluación Competencial: {title}",
+    "page_subtitle": "Califica el desempeño de los alumnos participantes en el taller.",
+    "back_to_assignments": "Volver a Asignaciones",
+    "list_of_enrollments": "Lista de Matriculaciones",
+    "no_enrollments": "No se han encontrado matriculaciones para esta asignación.",
     "idalu": "IDALU:",
-    "status_completed": "مكتمل",
-    "status_pending": "معلق",
-    "btn_view_edit": "عرض / تعديل",
-    "btn_evaluate": "تقييم",
-    "instructions_title": "تعليمات التقييم",
-    "instructions_desc": "تذكر أن تقييم الكفاءة هو متطلب لا غنى عنه لاعتماد الاهتمام التعليمي للطالب. يجب عليك تقييم كل من الكفاءات الفنية والمستعرضة.",
-    "assignment_not_found": "التعيين غير موجود.",
-    "loading_enrollments": "جاري تحميل التسجيلات..."
+    "status_completed": "Completado",
+    "status_pending": "Pendiente",
+    "btn_view_edit": "Ver / Editar",
+    "btn_evaluate": "Evaluar",
+    "instructions_title": "Instrucciones de Evaluación",
+    "instructions_desc": "Recuerda que la evaluación competencial es un requisito indispensable para la certificación de la atención educativa del alumno. Debes valorar tanto las competencias técnicas como las transversales.",
+    "assignment_not_found": "Asignación no encontrada.",
+    "loading_enrollments": "Cargando matriculaciones..."
   },
   "AttendancePage": {
     "error_loading_attendance": "خطأ في تحميل قائمة الحضور",

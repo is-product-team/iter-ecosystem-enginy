@@ -1,6 +1,15 @@
 import getApi from './api';
 import { IssueInput, IssueMessageInput } from '@iter/shared';
 
+export interface Attachment {
+  attachmentId: number;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize: number;
+  createdAt: string;
+}
+
 export interface IssueMessage {
   messageId: number;
   issueId: number;
@@ -12,6 +21,7 @@ export interface IssueMessage {
     fullName: string;
     role: { roleName: string };
   };
+  attachments?: Attachment[];
 }
 
 export interface Issue {
@@ -28,6 +38,7 @@ export interface Issue {
   center?: { name: string };
   creator?: { fullName: string; role?: any };
   messages?: IssueMessage[];
+  attachments?: Attachment[];
   _count?: { messages: number };
 }
 

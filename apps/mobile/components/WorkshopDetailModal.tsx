@@ -41,7 +41,7 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
         Animated.timing(slideAnim, { toValue: SCREEN_HEIGHT, duration: 300, useNativeDriver: true })
       ]).start();
     }
-  }, [visible]);
+  }, [visible, fadeAnim, slideAnim]);
 
   if (!event) return null;
 

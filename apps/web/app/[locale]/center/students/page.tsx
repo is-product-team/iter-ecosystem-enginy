@@ -376,33 +376,13 @@ export default function StudentsCRUD() {
                     id={editingStudent.studentId}
                     type="student"
                     size="xl"
+                    editable
+                    onUpload={(newUrl) => {
+                        loadStudents();
+                        setEditingStudent({ ...editingStudent, photoUrl: newUrl });
+                    }}
                   />
-                  <label className="cursor-pointer bg-background-subtle border border-border-subtle px-6 py-2 text-[11px] font-medium text-text-primary hover:bg-background-surface transition-all active:scale-95">
-                    {t('change_photo')}
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        if (e.target.files?.[0]) {
-                          const file = e.target.files[0];
-                          const formData = new FormData();
-                          formData.append('foto', file);
-                          try {
-                            const api = getApi();
-                            const res = await api.post(`/upload/profile/student/${editingStudent.studentId}`, formData, {
-                              headers: { 'Content-Type': 'multipart/form-data' }
-                            });
-                            toast.success(t('photo_success'));
-                            loadStudents();
-                            setEditingStudent({ ...editingStudent, photoUrl: res.data.photoUrl });
-                          } catch (err: unknown) {
-                            toast.error(t('photo_error'));
-                          }
-                        }
-                      }}
-                    />
-                  </label>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Clica la foto per canviar-la</p>
                 </div>
               )}
 

@@ -11,6 +11,9 @@ import api from '@/services/api';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 import { useRouter, usePathname } from '@/i18n/routing';
+import Button from '@/components/ui/Button';
+import EditProfileModal from '@/components/profile/EditProfileModal';
+import { MapPin, Phone, Mail } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -25,6 +28,15 @@ export default function ProfilePage() {
   const { theme, setTheme } = useTheme();
   const [emailNotifications, setEmailNotifications] = useState((user as any)?.emailNotificationsEnabled ?? true);
   const [updatingNotifications, setUpdatingNotifications] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { updateUser } = useAuth();
+
+  // Synchronize notification state if user updates
+  useEffect(() => {
+    if (user) {
+      setEmailNotifications((user as any).emailNotificationsEnabled ?? true);
+    }
+  }, [user]);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -83,6 +95,10 @@ export default function ProfilePage() {
     }
   };
 
+  const handleUserUpdate = (updatedUserData: any) => {
+    updateUser(updatedUserData);
+  };
+
 
 
   if (!mounted || authLoading || !user) {
@@ -106,7 +122,7 @@ export default function ProfilePage() {
             type="user" 
             size="xl" 
             email={user.email}
-            className="border-2 border-border-subtle"
+            className="border-2 border-border-subtle shadow-lg"
           />
           <div className="text-center md:text-left flex-1">
             <h2 className="text-3xl font-medium text-text-primary mb-2 tracking-tight">{user.fullName}</h2>
@@ -121,13 +137,20 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
-          <button 
-            onClick={() => toast.info(t('coming_soon'))}
-            className="px-8 py-3 bg-consorci-darkBlue hover:bg-black text-white text-[13px] font-medium transition-all active:scale-[0.95]"
+          <Button 
+            onClick={() => setIsEditModalOpen(true)}
+            variant="primary"
           >
             {t('edit_profile')}
-          </button>
+          </Button>
         </div>
+
+        <EditProfileModal 
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          user={user}
+          onUpdate={handleUserUpdate}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Column 1: Info */}
@@ -144,15 +167,72 @@ export default function ProfilePage() {
                   <p className="text-[14px] text-text-primary font-medium">{user.email}</p>
                 </div>
                 
-                <div>
-                  <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-2">{t('center_referent_label')}</label>
-                  <p className="text-[14px] text-text-primary font-medium">
-                    {user.center ? user.center.name : t('no_center_assigned')}
-                  </p>
-                  <p className="text-[12px] text-text-muted mt-2 leading-relaxed">
-                    {t('center_usage_hint')}
-                  </p>
-                </div>
+                {user.role.name !== 'ADMIN' && (
+                  <div>
+                    <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">{t('center_referent_label')}</label>
+                    <div className="flex items-center gap-4 p-4 bg-background-subtle border border-border-subtle rounded-xl">
+                      <Avatar 
+                        url={user.center?.photoUrl} 
+                        name={user.center?.name || 'Center'} 
+                        size="lg" 
+                        type="center" 
+                        className="border border-border-subtle shadow-sm"
+                      />
+                      <div>
+                        <p className="text-[15px] text-text-primary font-bold tracking-tight">
+                          {user.center ? user.center.name : t('no_center_assigned')}
+                        </p>
+                        <p className="text-[11px] text-text-muted font-medium uppercase tracking-widest">
+                          {user.center?.centerCode || '---'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {user.center && (user.center.address || user.center.contactPhone || user.center.contactEmail) && (
+                      <div className="mt-4 p-5 bg-background-surface border border-border-subtle rounded-xl space-y-4">
+                        {user.center.address && (
+                          <div className="flex items-start gap-3 group">
+                            <div className="p-2 bg-background-subtle rounded-lg text-text-muted group-hover:text-text-primary transition-colors">
+                              <MapPin className="w-3.5 h-3.5" />
+                            </div>
+                            <div>
+                               <p className="text-[9px] font-bold text-text-muted uppercase tracking-[0.1em] mb-0.5">{t('center_address')}</p>
+                               <p className="text-[13px] text-text-primary font-medium leading-relaxed">{user.center.address}</p>
+                            </div>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {user.center.contactPhone && (
+                            <div className="flex items-start gap-3 group">
+                              <div className="p-2 bg-background-subtle rounded-lg text-text-muted group-hover:text-text-primary transition-colors">
+                                <Phone className="w-3.5 h-3.5" />
+                              </div>
+                              <div>
+                                <p className="text-[9px] font-bold text-text-muted uppercase tracking-[0.1em] mb-0.5">{t('center_phone')}</p>
+                                <p className="text-[13px] text-text-primary font-medium">{user.center.contactPhone}</p>
+                              </div>
+                            </div>
+                          )}
+                          {user.center.contactEmail && (
+                            <div className="flex items-start gap-3 group">
+                              <div className="p-2 bg-background-subtle rounded-lg text-text-muted group-hover:text-text-primary transition-colors">
+                                <Mail className="w-3.5 h-3.5" />
+                              </div>
+                              <div>
+                                <p className="text-[9px] font-bold text-text-muted uppercase tracking-[0.1em] mb-0.5">{t('center_email')}</p>
+                                <p className="text-[13px] text-text-primary font-medium break-all">{user.center.contactEmail}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <p className="text-[12px] text-text-muted mt-4 leading-relaxed italic opacity-70">
+                      {t('center_usage_hint')}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -163,12 +243,13 @@ export default function ProfilePage() {
               </div>
               
               <div className="bg-background-surface border border-border-subtle p-8 shadow-sm">
-                <button 
+                <Button 
                   onClick={() => toast.info(t('coming_soon'))}
-                  className="w-full py-3 bg-background-subtle border border-border-subtle text-text-primary hover:border-text-primary text-[13px] font-medium transition-all"
+                  variant="outline"
+                  fullWidth
                 >
                   {t('change_password')}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -185,25 +266,16 @@ export default function ProfilePage() {
                 {/* Theme Selection */}
                 <div>
                   <label className="block text-[11px] font-bold text-text-muted uppercase tracking-widest mb-4">{t('appearance_label')}</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { id: 'system', label: t('themes.system') },
-                      { id: 'light', label: t('themes.light') },
-                      { id: 'dark', label: t('themes.dark') }
-                    ].map((option) => (
-                      <button
-                        key={option.id}
-                        onClick={() => setTheme(option.id)}
-                        className={`px-4 py-2 text-[12px] font-medium border transition-all ${
-                          mounted && theme === option.id 
-                            ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' 
-                            : 'bg-background-subtle border-border-subtle text-text-primary hover:border-text-primary'
-                        }`}
+                    {['system', 'light', 'dark'].map((id) => (
+                      <Button
+                        key={id}
+                        onClick={() => setTheme(id)}
+                        variant={mounted && theme === id ? 'primary' : 'outline'}
+                        size="sm"
                       >
-                        {option.label}
-                      </button>
+                        {t(`themes.${id}`)}
+                      </Button>
                     ))}
-                  </div>
                 </div>
 
                 {/* Language Selection */}

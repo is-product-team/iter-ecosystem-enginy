@@ -33,7 +33,6 @@ apps/mobile/ios/
 *.keystore
 
 # --- Assets y Subidas (No subir archivos dinámicos) ---
-**/uploads/
 **/storage/
 *.log
 npm-debug.log*

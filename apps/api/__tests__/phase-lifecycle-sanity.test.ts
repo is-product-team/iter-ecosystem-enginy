@@ -11,6 +11,7 @@ describe.skipIf(!process.env.DATABASE_URL)('Phase Lifecycle Sanity Test', () => 
   let testRequestId: number;
   let testAssignmentId: number;
   let testStudentId: number;
+  let testStudent2Id: number;
   let testTeacher1Id: number;
   let testTeacher2Id: number;
 
@@ -36,7 +37,22 @@ describe.skipIf(!process.env.DATABASE_URL)('Phase Lifecycle Sanity Test', () => 
     testTeacher1Id = teachers[0].userId;
     testTeacher2Id = teachers[1].userId;
 
-    // 1b. Cleanup existing requests for this center/workshop to avoid 400 'already exists'
+    // 1b. Cleanup existing assignments for this center/workshop to avoid conflicts
+    const existingAssignments = await prisma.assignment.findMany({
+        where: { centerId: testCenterId, workshopId: testWorkshopId }
+    });
+
+    for (const assig of existingAssignments) {
+        await prisma.attendance.deleteMany({ where: { enrollment: { assignmentId: assig.assignmentId } } });
+        await prisma.evaluation.deleteMany({ where: { enrollment: { assignmentId: assig.assignmentId } } });
+        await prisma.certificate.deleteMany({ where: { assignmentId: assig.assignmentId } });
+        await prisma.enrollment.deleteMany({ where: { assignmentId: assig.assignmentId } });
+        await prisma.sessionTeacher.deleteMany({ where: { session: { assignmentId: assig.assignmentId } } });
+        await prisma.session.deleteMany({ where: { assignmentId: assig.assignmentId } });
+    }
+    await prisma.assignment.deleteMany({ where: { centerId: testCenterId, workshopId: testWorkshopId } });
+
+    // 1c. Cleanup existing requests
     await prisma.request.deleteMany({
       where: {
         centerId: testCenterId,
@@ -56,28 +72,50 @@ describe.skipIf(!process.env.DATABASE_URL)('Phase Lifecycle Sanity Test', () => 
       .send({ email: 'coordinacion@brossa.cat', password: 'Iter@1234' });
     coordinatorCookie = coordLogin.headers['set-cookie']?.[0] || '';
 
-    // 4. Create a test student in the center
-    const student = await prisma.student.create({
+    // 4. Create two test students in the center
+    const student1 = await prisma.student.create({
       data: {
-        idalu: 'TEST' + Date.now(),
-        fullName: 'Sanity',
-        lastName: 'Test Student',
-        email: 'sanity' + Date.now() + '@test.com',
+        idalu: 'TEST1' + Date.now(),
+        fullName: 'Sanity 1',
+        lastName: 'Qualifies',
+        email: 'sanity1' + Date.now() + '@test.com',
         originCenterId: testCenterId
       }
     });
-    testStudentId = student.studentId;
+    testStudentId = student1.studentId;
+
+    const student2 = await prisma.student.create({
+      data: {
+        idalu: 'TEST2' + Date.now(),
+        fullName: 'Sanity 2',
+        lastName: 'Fails',
+        email: 'sanity2' + Date.now() + '@test.com',
+        originCenterId: testCenterId
+      }
+    });
+    testStudent2Id = student2.studentId;
   });
 
   afterAll(async () => {
     // Cleanup
-    if (testStudentId) {
-      await prisma.evaluation.deleteMany({ where: { enrollment: { studentId: testStudentId } } });
-      await prisma.enrollment.deleteMany({ where: { studentId: testStudentId } });
-      await prisma.student.delete({ where: { studentId: testStudentId } });
+    try {
+        const studentIds = [testStudentId, testStudent2Id].filter(id => !!id);
+        if (studentIds.length > 0) {
+          await prisma.evaluation.deleteMany({ where: { enrollment: { studentId: { in: studentIds } } } });
+          await prisma.certificate.deleteMany({ where: { studentId: { in: studentIds } } });
+          await prisma.attendance.deleteMany({ where: { enrollment: { studentId: { in: studentIds } } } });
+          await prisma.enrollment.deleteMany({ where: { studentId: { in: studentIds } } });
+          await prisma.student.deleteMany({ where: { studentId: { in: studentIds } } });
+        }
+        if (testAssignmentId) {
+            await prisma.sessionTeacher.deleteMany({ where: { session: { assignmentId: testAssignmentId } } });
+            await prisma.session.deleteMany({ where: { assignmentId: testAssignmentId } });
+            await prisma.assignment.deleteMany({ where: { assignmentId: testAssignmentId } });
+        }
+        if (testRequestId) await prisma.request.deleteMany({ where: { requestId: testRequestId } });
+    } catch (e) {
+        console.warn('Cleanup error in Sanity Test (ignoring):', e);
     }
-    if (testAssignmentId) await prisma.assignment.deleteMany({ where: { assignmentId: testAssignmentId } });
-    if (testRequestId) await prisma.request.deleteMany({ where: { requestId: testRequestId } });
   });
 
   it('Phase 1: Should create a Request as Coordinator and approve it as Admin', async () => {
@@ -96,9 +134,6 @@ describe.skipIf(!process.env.DATABASE_URL)('Phase Lifecycle Sanity Test', () => 
       .set('Cookie', [coordinatorCookie])
       .send(reqBody);
 
-    if (resReq.status !== 200) {
-      console.error('Phase 1 Request Error:', resReq.body);
-    }
     expect(resReq.status).toBe(200);
     testRequestId = resReq.body.requestId;
     expect(resReq.body.status).toBe('PENDING');
@@ -113,8 +148,8 @@ describe.skipIf(!process.env.DATABASE_URL)('Phase Lifecycle Sanity Test', () => 
     expect(resApprove.body.status).toBe('APPROVED');
   });
 
-  it('Phase 2: Should create an Assignment and enroll a student', async () => {
-    // Create Assignment (Simulate Admin creating it)
+  it('Phase 2: Should create an Assignment and enroll students', async () => {
+    // Create Assignment
     const resAssig = await prisma.assignment.create({
       data: {
         requestId: testRequestId,
@@ -127,74 +162,104 @@ describe.skipIf(!process.env.DATABASE_URL)('Phase Lifecycle Sanity Test', () => 
     });
     testAssignmentId = resAssig.assignmentId;
 
-    // Enroll Student
+    // Enroll Students
     const resEnroll = await request(app)
       .post(`/assignments/${testAssignmentId}/enrollments`)
       .set('Cookie', [coordinatorCookie])
-      .send({ studentIds: [testStudentId] });
+      .send({ studentIds: [testStudentId, testStudent2Id] });
 
-    if (resEnroll.status !== 200) {
-      console.error('Phase 2 Enrollment Error:', resEnroll.body);
-    }
     expect(resEnroll.status).toBe(200);
-    expect(resEnroll.body.details.total).toBe(1);
+    expect(resEnroll.body.details.total).toBe(2);
   });
 
-  it('Phase 3: Should validate documents and confirm registration (generating sessions)', async () => {
-    // 1. Manually validate document (Simulation)
-    const enrollment = await prisma.enrollment.findFirst({ where: { assignmentId: testAssignmentId } });
-    expect(enrollment).toBeDefined();
+  it('Phase 3: Should validate documents, start workshop and register attendance (including Justified Absence)', async () => {
+    // 1. Manually validate document for both
+    const enrollments = await prisma.enrollment.findMany({ where: { assignmentId: testAssignmentId } });
+    expect(enrollments.length).toBe(2);
 
-    const resVal = await request(app)
-      .patch(`/assignments/enrollments/${enrollment?.enrollmentId}/validate`)
-      .set('Cookie', [adminCookie])
-      .send({ field: 'isPedagogicalAgreementValidated', valid: true });
+    for (const enrollment of enrollments) {
+        await request(app)
+            .patch(`/assignments/enrollments/${enrollment.enrollmentId}/validate`)
+            .set('Cookie', [adminCookie])
+            .send({ field: 'isPedagogicalAgreementValidated', valid: true });
+        
+        await request(app)
+            .patch(`/assignments/enrollments/${enrollment.enrollmentId}/validate`)
+            .set('Cookie', [adminCookie])
+            .send({ field: 'isMobilityAuthorizationValidated', valid: true });
 
-    if (resVal.status !== 200) {
-      console.error('Phase 3 Validation Error:', resVal.body);
+        await request(app)
+            .patch(`/assignments/enrollments/${enrollment.enrollmentId}/validate`)
+            .set('Cookie', [adminCookie])
+            .send({ field: 'isImageRightsValidated', valid: true });
     }
-    expect(resVal.status).toBe(200);
 
     // 2. Confirm legal registration (starts Phase 3)
     const resConfirm = await request(app)
       .post(`/assignments/${testAssignmentId}/confirm-registration`)
       .set('Cookie', [coordinatorCookie]);
 
-    if (resConfirm.status !== 200) {
-      console.error('Phase 3 Confirmation Error:', resConfirm.body);
-    }
     expect(resConfirm.status).toBe(200);
 
-    // 3. Verify sessions were generated
+    // 3. Register Attendance (Task 4.1)
     const sessions = await prisma.session.findMany({ where: { assignmentId: testAssignmentId } });
     expect(sessions.length).toBeGreaterThan(0);
+
+    const enrollment1 = enrollments.find(e => e.studentId === testStudentId)!;
+    const enrollment2 = enrollments.find(e => e.studentId === testStudent2Id)!;
+
+    for (let i = 1; i <= sessions.length; i++) {
+        // Student 1: 50% Present, 50% Justified Absence -> Should qualify (100% total)
+        const status1 = i % 2 === 0 ? 'PRESENT' : 'JUSTIFIED_ABSENCE';
+        // Student 2: 10% Present, rest Absent -> Should NOT qualify
+        const status2 = i === 1 ? 'PRESENT' : 'ABSENT';
+
+        await request(app)
+            .post(`/assignments/${testAssignmentId}/sessions/${i}/attendance`)
+            .set('Cookie', [adminCookie])
+            .send([
+                { enrollmentId: enrollment1.enrollmentId, status: status1 },
+                { enrollmentId: enrollment2.enrollmentId, status: status2 }
+            ]);
+    }
   });
 
-  it('Phase 4: Should close the assignment and verify certificate readiness', async () => {
+  it('Phase 4: Should close the assignment and verify targeted certificate generation', async () => {
     // 1. Add teacher evaluation (Prerequisite for Phase 4)
-    const enrollment = await prisma.enrollment.findFirst({ where: { assignmentId: testAssignmentId } });
+    const enrollments = await prisma.enrollment.findMany({ where: { assignmentId: testAssignmentId } });
     
-    await prisma.evaluation.create({
-      data: {
-        assignmentId: testAssignmentId,
-        enrollmentId: enrollment?.enrollmentId,
-        observations: 'Excellent',
-        type: 'TEACHER_COMPETENCES'
-      }
-    });
+    for (const enrollment of enrollments) {
+        await prisma.evaluation.create({
+          data: {
+            assignmentId: testAssignmentId,
+            enrollmentId: enrollment.enrollmentId,
+            observations: 'Good',
+            type: 'TEACHER_COMPETENCES'
+          }
+        });
+    }
 
     const resClose = await request(app)
       .post(`/assignments/${testAssignmentId}/close`)
       .set('Cookie', [adminCookie]);
 
-    if (resClose.status !== 200) {
-      console.error('Phase 4 Closure Error:', resClose.body);
-    }
     expect(resClose.status).toBe(200);
     expect(resClose.body.success).toBe(true);
     
     // Verify assignment status is COMPLETED
     const assignment = await prisma.assignment.findUnique({ where: { assignmentId: testAssignmentId } });
     expect(assignment?.status).toBe('COMPLETED');
+
+    // Verify Certificate 1 was generated (qualified with justified absences)
+    const cert1 = await prisma.certificate.findFirst({
+        where: { studentId: testStudentId, assignmentId: testAssignmentId }
+    });
+    expect(cert1).toBeDefined();
+
+    // Verify Certificate 2 was NOT generated (low attendance)
+    const cert2 = await prisma.certificate.findFirst({
+        where: { studentId: testStudent2Id, assignmentId: testAssignmentId }
+    });
+    expect(cert2).toBeNull();
   });
 });

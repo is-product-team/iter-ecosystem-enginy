@@ -113,7 +113,7 @@ export const formatNotificationMessage = (rawMessage: string, locale: string = '
       return t(data.key, data.params || {}, locale);
     }
     return rawMessage;
-  } catch (e) {
+  } catch (_e) {
     return rawMessage;
   }
 };

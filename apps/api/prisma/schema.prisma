@@ -55,6 +55,7 @@ model Center {
   centerCode   String  @unique @map("codi_center")
   name         String  @map("nom")
   address      String? @map("adreca")
+  photoUrl     String? @map("url_foto")
   contactPhone String? @map("telefon_contacte")
   contactEmail String? @map("email_contacte")
 
@@ -427,11 +428,13 @@ model Issue {
   assignmentId Int?          @map("id_assignacio")
   assignment   Assignment?   @relation(fields: [assignmentId], references: [assignmentId], onDelete: SetNull)
   sessionId    Int?          @map("id_sessio")
-  session      Session?      @relation(fields: [sessionId], references: [sessionId], onDelete: SetNull)
+  session      Session?      @relation(fields: [sessionId], references: [sessionId])
 
-  messages     IssueMessage[]
-  
-  createdAt    DateTime      @default(now()) @map("data_creacio")
+  messages    IssueMessage[]
+  attachments Attachment[]
+
+  createdAt   DateTime       @default(now()) @map("data_creacio")
+
   resolvedAt   DateTime?     @map("data_resolucio")
 
   @@map("incidencies")
@@ -443,9 +446,12 @@ model IssueMessage {
   issue        Issue    @relation(fields: [issueId], references: [issueId], onDelete: Cascade)
   senderId     Int?     @map("id_sender")
   sender       User?    @relation(fields: [senderId], references: [userId])
-  content      String   @db.Text @map("contingut")
-  isSystem     Boolean  @default(false) @map("es_sistema")
-  createdAt    DateTime @default(now()) @map("data_creacio")
+  content     String   @map("contingut") @db.Text
+  isSystem    Boolean  @default(false) @map("es_sistema")
+
+  attachments Attachment[]
+
+  createdAt   DateTime @default(now()) @map("data_creacio")
 
   @@map("missatges_incidencia")
 }
@@ -566,4 +572,22 @@ model StudentSelfConsultation {
   createdAt           DateTime @default(now()) @map("data_creacio")
 
   @@map("autoconsultes_alumne")
+}
+
+model Attachment {
+  attachmentId Int      @id @default(autoincrement()) @map("id_adjunt")
+  fileName     String   @map("nom_fitxer")
+  fileUrl      String   @map("url_fitxer")
+  fileType     String   @map("tipus_fitxer")
+  fileSize     Int      @map("mida_fitxer")
+
+  issueId      Int?     @map("id_incidencia")
+  issue        Issue?   @relation(fields: [issueId], references: [issueId], onDelete: Cascade)
+
+  messageId    Int?     @map("id_missatge")
+  message      IssueMessage? @relation(fields: [messageId], references: [messageId], onDelete: Cascade)
+
+  createdAt    DateTime @default(now()) @map("data_creacio")
+
+  @@map("adjunts_incidencies")
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
-import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
+import { useLocalSearchParams, Stack, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -14,12 +14,10 @@ export default function SessionScreen() {
   const params = useLocalSearchParams();
   const id = params.id as string;
   const paramNum = params.sessionNum as string;
-  const paramId = params.sessionId as string;
   
   const insets = useSafeAreaInsets();
 
   const num = paramNum ? parseInt(paramNum) : 1;
-  const sessionId = paramId ? parseInt(paramId) : null;
 
   const [loading, setLoading] = React.useState(true);
   const [submitting, setSubmitting] = React.useState(false);

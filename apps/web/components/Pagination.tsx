@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
+import Button from './ui/Button';
 
 interface PaginationProps {
   currentPage: number;
@@ -32,25 +33,29 @@ const Pagination: React.FC<PaginationProps> = ({
           {itemName || t('items')}
         </div>
         <div className="flex items-center gap-4">
-          <button
+          <Button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="p-1 hover:text-consorci-darkBlue disabled:opacity-30 disabled:hover:text-text-muted transition-colors"
+            variant="subtle"
+            size="sm"
+            className="!p-1 h-auto border-none"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-          </button>
+          </Button>
           <div className="flex items-center gap-2">
             <span className="text-text-primary font-bold">{currentPage}</span>
             <span className="opacity-40">/</span>
             <span>{totalPages}</span>
           </div>
-          <button
+          <Button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="p-1 hover:text-consorci-darkBlue disabled:opacity-30 disabled:hover:text-text-muted transition-colors"
+            variant="subtle"
+            size="sm"
+            className="!p-1 h-auto border-none"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -62,27 +67,27 @@ const Pagination: React.FC<PaginationProps> = ({
         {t('showing')} <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{currentItemsCount}</span> {t('of')} <span className="text-consorci-darkBlue dark:text-consorci-lightBlue">{totalItems}</span> {itemName}
       </div>
       <div className="flex items-center gap-2">
-        <button
+        <Button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className={`px-4 py-2 text-[12px] font-medium border border-border-subtle transition-all outline-none ${currentPage === 1
-            ? 'opacity-30 cursor-not-allowed'
-            : 'text-text-primary bg-background-surface hover:bg-background-subtle active:scale-[0.98]'}`}
+          variant="outline"
+          size="sm"
+          className="bg-background-surface hover:!bg-background-subtle"
         >
           {t('previous')}
-        </button>
-        <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-bold text-consorci-darkBlue dark:text-consorci-lightBlue tracking-[0.2em]">
+        </Button>
+        <div className="px-4 py-2 bg-background-surface border border-border-subtle text-[10px] font-bold text-consorci-darkBlue dark:text-consorci-lightBlue tracking-[0.2em] h-[34px] flex items-center">
           {t('page')} {currentPage} {t('of')} {totalPages}
         </div>
-        <button
+        <Button
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className={`px-4 py-2 text-[12px] font-medium border border-border-subtle transition-all outline-none ${currentPage === totalPages
-            ? 'opacity-30 cursor-not-allowed'
-            : 'text-text-primary bg-background-surface hover:bg-background-subtle active:scale-[0.98]'}`}
+          variant="outline"
+          size="sm"
+          className="bg-background-surface hover:!bg-background-subtle"
         >
           {t('next')}
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import workshopService, { Workshop } from "../services/workshopService";
 import sectorService, { Sector } from "../services/sectorService";
 import WorkshopIcon, { SVG_ICONS } from "./WorkshopIcon";
 import Loading from "./Loading";
+import Button from "./ui/Button";
 import { useTranslations } from "next-intl";
 
 type CreateWorkshopModalProps = {
@@ -165,9 +166,13 @@ const CreateWorkshopModal = ({
               {t('workshop_config_subtitle')}
             </p>
           </div>
-          <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
+          <Button 
+            variant="subtle" 
+            onClick={onClose} 
+            className="!p-2 !h-auto !bg-transparent !text-text-muted hover:!text-text-primary"
+          >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -310,12 +315,15 @@ const CreateWorkshopModal = ({
                       <input type="time" value={tempEnd} onChange={(e) => setTempEnd(e.target.value)} className="w-full px-3 py-2 text-sm font-medium text-text-primary border border-border-subtle bg-background-subtle focus:border-consorci-darkBlue outline-none" />
                     </div>
                   </div>
-                  <button
+                  <Button
                     onClick={addScheduleSlot}
-                    className="w-full py-3 bg-consorci-darkBlue text-white text-[11px] font-medium hover:bg-consorci-actionBlue transition-all active:scale-95"
+                    variant="primary"
+                    size="sm"
+                    fullWidth
+                    className="!py-3 !text-[11px]"
                   >
                     + {t('add_day')}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -351,21 +359,23 @@ const CreateWorkshopModal = ({
           )}
 
           <div className="flex gap-4">
-            <button onClick={onClose} className="px-6 py-3 text-[12px] font-medium text-text-muted hover:text-text-primary transition-colors">
+            <Button 
+              variant="subtle" 
+              onClick={onClose} 
+              className="!text-text-muted hover:!text-text-primary"
+            >
               {tCommon('cancel')}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSubmit}
               disabled={loading}
-              className="px-10 py-3 bg-consorci-darkBlue text-white text-[12px] font-medium hover:bg-consorci-actionBlue disabled:opacity-50 transition-all active:scale-[0.98]"
+              loading={loading}
+              variant="primary"
+              size="md"
+              className="px-10"
             >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <Loading size="sm" white message="" />
-                  {t('saving')}
-                </div>
-              ) : t('save_workshop')}
-            </button>
+              {t('save_workshop')}
+            </Button>
           </div>
         </div>
       </div>

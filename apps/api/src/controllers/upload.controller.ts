@@ -34,6 +34,10 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
       const user = await prisma.user.findUnique({ where: { userId: targetId } });
       if (!user) return res.status(404).json({ error: 'User not found.' });
       targetName = sanitizeFileName(user.fullName);
+    } else if (type === 'center') {
+      const center = await prisma.center.findUnique({ where: { centerId: targetId } });
+      if (!center) return res.status(404).json({ error: 'Center not found.' });
+      targetName = sanitizeFileName(center.name);
     } else {
       return res.status(400).json({ error: 'Invalid profile type.' });
     }
@@ -56,6 +60,11 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
         where: { studentId: targetId },
         data: { photoUrl: url }
       });
+    } else if (type === 'center') {
+      await prisma.center.update({
+        where: { centerId: targetId },
+        data: { photoUrl: url }
+      });
     } else {
       await prisma.user.update({
         where: { userId: targetId },
@@ -67,5 +76,41 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error uploading profile photo:", error);
     res.status(500).json({ error: 'Error processing the photo upload.' });
+  }
+};
+
+export const uploadMultimedia = async (req: Request, res: Response) => {
+  const files = req.files as Express.Multer.File[];
+  
+  if (!files || files.length === 0) {
+    return res.status(400).json({ error: 'No files uploaded.' });
+  }
+
+  try {
+    const multimediaDir = path.join('uploads', 'multimedia');
+    if (!fs.existsSync(multimediaDir)) {
+      fs.mkdirSync(multimediaDir, { recursive: true });
+    }
+
+    const uploadedFiles = files.map(file => {
+      const fileExt = path.extname(file.originalname);
+      const baseName = sanitizeFileName(path.basename(file.originalname, fileExt));
+      const fileName = `media_${baseName}_${Date.now()}${fileExt}`;
+      const filePath = path.join(multimediaDir, fileName);
+
+      fs.writeFileSync(filePath, file.buffer);
+
+      return {
+        fileName: file.originalname,
+        fileUrl: `/uploads/multimedia/${fileName}`,
+        fileType: file.mimetype,
+        fileSize: file.size
+      };
+    });
+
+    res.json({ success: true, files: uploadedFiles });
+  } catch (error) {
+    console.error("Error uploading multimedia:", error);
+    res.status(500).json({ error: 'Error processing the multimedia upload.' });
   }
 };

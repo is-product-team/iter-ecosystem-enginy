@@ -80,7 +80,13 @@ export const addMessage = async (req: Request, res: Response) => {
 
   const { userId } = req.user!;
   try {
-    const message = await IssueService.addMessage(Number(id), result.data.content, userId, result.data.isSystem);
+    const message = await IssueService.addMessage(
+      Number(id), 
+      result.data.content, 
+      userId, 
+      result.data.isSystem,
+      result.data.attachments
+    );
     res.status(201).json(message);
   } catch (error) {
     console.error('❌ [API] Error adding message:', error);

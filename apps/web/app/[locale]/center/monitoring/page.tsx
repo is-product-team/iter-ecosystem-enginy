@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { ROLES } from '@iter/shared';
@@ -29,7 +29,11 @@ export default function MonitoringPage() {
   
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = useLocale();
+
+  // Tab management
+  const activeTab = searchParams.get('tab') || 'active';
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
@@ -55,14 +59,14 @@ export default function MonitoringPage() {
     }
   }, [user, tc]);
 
-  const fetchFeedback = async (assignmentId: number) => {
+  const fetchFeedback = useCallback(async (assignmentId: number) => {
     try {
         const data = await questionnaireService.getAssignmentEvaluation(assignmentId);
         setFeedbackData(data);
     } catch (_error) {
         setFeedbackData(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -75,7 +79,7 @@ export default function MonitoringPage() {
     } else {
         setFeedbackData(null);
     }
-  }, [feedbackAssignment]);
+  }, [feedbackAssignment, fetchFeedback]);
 
   useEffect(() => {
     if (selectedAssignment) {
@@ -121,10 +125,20 @@ export default function MonitoringPage() {
 
   if (authLoading || loading) return <Loading fullScreen message={tc('loading')} />;
 
-  // Filter assignments for the list (e.g., only those relevant for monitoring)
-  const monitorableAssignments = assignments.filter(a =>
-    a.status === 'IN_PROGRESS' || a.status === 'READY_TO_START' || a.status === 'VALIDATED'
-  );
+  // Filter assignments based on active tab
+  const filteredAssignments = assignments.filter(a => {
+    if (activeTab === 'completed') {
+      return a.status === 'COMPLETED';
+    }
+    // Default: Active ones
+    return a.status === 'IN_PROGRESS' || a.status === 'READY_TO_START' || a.status === 'VALIDATED';
+  });
+
+  const handleTabChange = (tab: string) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('tab', tab);
+    router.push(`/${locale}/center/monitoring?${newParams.toString()}`);
+  };
 
   return (
     <DashboardLayout
@@ -134,9 +148,36 @@ export default function MonitoringPage() {
       <div className="w-full pb-20">
         <KPIOverview stats={stats} />
 
-        <div className="flex flex-col gap-10 mt-12">
-          <div className="flex items-center justify-between border-b border-border-subtle pb-6">
-            <h3 className="text-xl font-medium text-text-primary tracking-tight">{t('tabs.active')}</h3>
+        <div className="flex flex-col gap-10">
+          <div className="flex items-center justify-between border-b border-border-subtle">
+            <div className="flex gap-8">
+              <button
+                onClick={() => handleTabChange('active')}
+                className={`pb-4 text-sm font-bold uppercase tracking-widest transition-all relative ${
+                  activeTab === 'active' 
+                    ? 'text-indigo-600' 
+                    : 'text-text-muted hover:text-text-primary'
+                }`}
+              >
+                {t('tabs.active')}
+                {activeTab === 'active' && (
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600" />
+                )}
+              </button>
+              <button
+                onClick={() => handleTabChange('completed')}
+                className={`pb-4 text-sm font-bold uppercase tracking-widest transition-all relative ${
+                  activeTab === 'completed' 
+                    ? 'text-indigo-600' 
+                    : 'text-text-muted hover:text-text-primary'
+                }`}
+              >
+                {t('tabs.completed')}
+                {activeTab === 'completed' && (
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600" />
+                )}
+              </button>
+            </div>
           </div>
 
           {selectedAssignment && (
@@ -172,16 +213,18 @@ export default function MonitoringPage() {
             </div>
           )}
 
-          {monitorableAssignments.length === 0 ? (
+          {filteredAssignments.length === 0 ? (
             <div className="p-20 text-center bg-background-surface border border-dashed border-border-subtle">
-              <p className="text-sm text-text-muted font-medium italic">{t('no_assignments')}</p>
+              <p className="text-sm text-text-muted font-medium italic">
+                {activeTab === 'active' ? t('no_assignments') : t('no_completed_assignments')}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {monitorableAssignments.map(a => (
-                <AssignmentMonitorCard
-                  key={a.assignmentId}
-                  assignment={a}
+              {filteredAssignments.map(a => (
+                <AssignmentMonitorCard 
+                  key={a.assignmentId} 
+                  assignment={a} 
                   onCloseClick={(clickedAssig) => {
                     setSelectedAssignment(clickedAssig);
                     window.scrollTo({ top: 0, behavior: 'smooth' });

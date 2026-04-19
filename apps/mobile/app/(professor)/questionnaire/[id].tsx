@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Alert, Dimensions, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';

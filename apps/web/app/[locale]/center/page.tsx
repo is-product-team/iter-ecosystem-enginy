@@ -66,11 +66,11 @@ export default function CenterDashboard() {
             {t('dashboard.status_title')}
           </h3>
 
-          <div className="relative pt-4">
-            {/* Connector line */}
-            <div className="absolute top-10 left-0 w-full h-[2px] bg-gray-100 hidden md:block z-0"></div>
+          <div className="relative pt-4 max-w-5xl mx-auto">
+            {/* Connector line - Uses subtle border color for better Dark Mode integration */}
+            <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[calc(100%-100px)] h-[1px] bg-border-subtle hidden md:block z-0 opacity-50"></div>
 
-            <div className="flex flex-col md:flex-row justify-between items-start gap-y-12 gap-x-8">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-y-12 md:gap-x-4">
               {loadingPhases ? (
                 <div className="w-full py-8 text-center text-[12px] font-medium text-text-muted">
                   {tc('loading_calendar')}
@@ -163,6 +163,14 @@ export default function CenterDashboard() {
               path: `/${locale}/center/monitoring`,
               active: isPhaseActive(PHASES.EXECUTION),
               phase: tc('phase_with_number', { number: 3 })
+            },
+            {
+              title: t('Closure.title'),
+              text: t('Closure.description'),
+              icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+              path: `/${locale}/center/monitoring?tab=completed`,
+              active: isPhaseActive(PHASES.CLOSURE),
+              phase: tc('phase_with_number', { number: 4 })
             },
           ].map((item, idx) => (
             <div

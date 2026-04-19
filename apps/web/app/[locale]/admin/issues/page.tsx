@@ -9,18 +9,21 @@ import DashboardLayout from '@/components/DashboardLayout';
 import issueService, { Issue } from '@/services/issueService';
 import Loading from '@/components/Loading';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 import { format } from 'date-fns';
 import { ca, es } from 'date-fns/locale';
+import { AlertCircle, Clock, CheckCircle2, XCircle } from 'lucide-react';
 
 export default function AdminIssuesPage() {
   const t = useTranslations('Issues');
-  const tCommon = useTranslations('Common');
+  const tc = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   const router = useRouter();
   const params = useParams();
@@ -34,7 +37,6 @@ export default function AdminIssuesPage() {
       setIssues(data);
     } catch (err) {
       console.error(err);
-      setError('Error carregant les incidències');
     } finally {
       setLoading(false);
     }
@@ -52,25 +54,30 @@ export default function AdminIssuesPage() {
   }, [user, authLoading, router, locale, loadIssues]);
 
   const filteredIssues = useMemo(() => {
-    if (!searchQuery) return issues;
-    const query = searchQuery.toLowerCase();
-    return issues.filter(issue => 
-      issue.title.toLowerCase().includes(query) || 
-      issue.description.toLowerCase().includes(query) ||
-      issue.center?.name.toLowerCase().includes(query) ||
-      issue.issueId.toString().includes(query)
-    );
-  }, [issues, searchQuery]);
+    return issues.filter(issue => {
+      const matchesSearch = !searchQuery || 
+        issue.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        issue.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        issue.center?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        issue.issueId.toString().includes(searchQuery);
+      
+      const matchesStatus = statusFilter === 'all' || issue.status === statusFilter;
+      const matchesPriority = priorityFilter === 'all' || issue.priority === priorityFilter;
+      const matchesCategory = categoryFilter === 'all' || issue.category === categoryFilter;
+
+      return matchesSearch && matchesStatus && matchesPriority && matchesCategory;
+    });
+  }, [issues, searchQuery, statusFilter, priorityFilter, categoryFilter]);
 
   const columns: Column<Issue>[] = [
     {
       header: t('table.id'),
       render: (item) => <span className="table-id">#{item.issueId}</span>,
-      width: 70,
+      width: 80,
     },
     {
       header: t('table.center'),
-      render: (item) => <span className="table-tag-muted">{item.center?.name || '---'}</span>,
+      render: (item) => <span className="table-tag-blue font-bold">{item.center?.name || '---'}</span>,
       width: 180,
     },
     {
@@ -103,7 +110,7 @@ export default function AdminIssuesPage() {
         };
         return (
           <span className={priorityColors[item.priority] || 'table-tag-muted'}>
-            {item.priority}
+            {t(`priority_${item.priority.toLowerCase()}` as any)}
           </span>
         );
       },
@@ -112,28 +119,30 @@ export default function AdminIssuesPage() {
     {
       header: t('table.status'),
       render: (item) => {
-        const statusColors: Record<string, string> = {
-          OPEN: 'text-orange-600',
-          IN_PROGRESS: 'text-blue-600',
-          RESOLVED: 'text-green-600',
-          CLOSED: 'text-text-muted',
+        const config: Record<string, { color: string, icon: any }> = {
+          OPEN: { color: 'text-blue-600', icon: AlertCircle },
+          IN_PROGRESS: { color: 'text-orange-600', icon: Clock },
+          RESOLVED: { color: 'text-green-600', icon: CheckCircle2 },
+          CLOSED: { color: 'text-text-muted', icon: XCircle },
         };
+        const { color, icon: Icon } = config[item.status] || config.OPEN;
         return (
-          <span className={`text-[10px] font-bold tracking-widest uppercase ${statusColors[item.status]}`}>
+          <div className={`flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase ${color}`}>
+            <Icon size={12} strokeWidth={3} />
             {t(`status_${item.status.toLowerCase()}` as any)}
-          </span>
+          </div>
         );
       },
-      width: 110,
+      width: 130,
     },
     {
       header: t('table.date'),
       render: (item) => (
         <span className="table-detail">
-          {format(new Date(item.createdAt), 'dd/MM/yy', { locale: dateLocale })}
+          {format(new Date(item.createdAt), 'dd MMM yyyy', { locale: dateLocale })}
         </span>
       ),
-      width: 100,
+      width: 120,
     },
   ];
 
@@ -146,15 +155,51 @@ export default function AdminIssuesPage() {
       title={t('title')}
       subtitle={t('subtitle')}
     >
-      <div className="space-y-6">
+      <div className="space-y-0">
         <DataTableToolbar
           search={{
             value: searchQuery,
             onChange: setSearchQuery,
-            placeholder: tCommon('search')
+            placeholder: tc('search')
           }}
+          onClear={() => {
+            setSearchQuery('');
+            setStatusFilter('all');
+            setPriorityFilter('all');
+            setCategoryFilter('all');
+          }}
+          filters={
+            <>
+              <FilterSelect
+                label={t('filter_status')}
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                  { label: tc('all_statuses'), value: 'all' },
+                  ...Object.values(ISSUE_STATUSES).map(s => ({
+                    label: t(`status_${s.toLowerCase()}` as any),
+                    value: s
+                  }))
+                ]}
+                icon={Clock}
+              />
+              <FilterSelect
+                label={t('filter_priority')}
+                value={priorityFilter}
+                onChange={setPriorityFilter}
+                options={[
+                  { label: tc('general'), value: 'all' },
+                  ...Object.values(ISSUE_PRIORITIES).map(p => ({
+                    label: t(`priority_${p.toLowerCase()}` as any),
+                    value: p
+                  }))
+                ]}
+                icon={AlertCircle}
+              />
+            </>
+          }
           resultsCount={filteredIssues.length}
-          itemName="incidències globals"
+          itemName="incidències"
         />
 
         <DataTable
@@ -164,6 +209,7 @@ export default function AdminIssuesPage() {
           emptyMessage={t('no_incidents')}
           onRowClick={(item) => router.push(`/${locale}/admin/issues/${item.issueId}`)}
           rowClassName="cursor-pointer hover:bg-background-subtle transition-colors"
+          hideTopBorder
         />
       </div>
     </DashboardLayout>

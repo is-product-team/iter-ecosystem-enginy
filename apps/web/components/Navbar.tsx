@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react';
 import logoImg from '../public/logo.png';
 import logoInversImg from '../public/logo-invers.png';
 
+import Button from '@/components/ui/Button';
+
 const Navbar: React.FC = () => {
   const t = useTranslations('Navigation');
   const metaT = useTranslations('Metadata');
@@ -53,7 +55,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { label: t('home'), path: getHomePath(), show: true },
     { label: t('notifications'), path: `/${locale}/center/notifications`, show: true, isNotifications: true },
-    { label: t('issues'), path: isAdmin ? `/${locale}/admin/issues` : `/${locale}/center/issues`, show: true },
+    { label: t.has('issues') ? t('issues') : 'Incidències', path: isAdmin ? `/${locale}/admin/issues` : `/${locale}/center/issues`, show: true },
     { label: t('calendar'), path: `/${locale}/calendar`, show: true },
     { label: t('profile'), path: `/${locale}/profile`, show: true },
   ];
@@ -67,14 +69,14 @@ const Navbar: React.FC = () => {
             <Link href={getHomePath()} className="flex items-center">
               <Image 
                 src={logoImg} 
-                alt={metaT('logo_alt')} 
+                alt={metaT.has('logo_alt') ? metaT('logo_alt') : 'Logo'} 
                 width={40}
                 height={40}
                 className="w-10 h-10 object-contain block dark:hidden" 
               />
               <Image 
                 src={logoInversImg} 
-                alt={metaT('logo_alt')} 
+                alt={metaT.has('logo_alt') ? metaT('logo_alt') : 'Logo'} 
                 width={40}
                 height={40}
                 className="w-10 h-10 object-contain hidden dark:block" 
@@ -116,18 +118,19 @@ const Navbar: React.FC = () => {
                   {user?.fullName || ''}
                 </span>
                 <span className="text-text-secondary text-[11px] font-normal">
-                  {user?.center?.name || commonT('educational_center')}
+                  {user?.center?.name || (commonT.has('educational_center') ? commonT('educational_center') : 'Centre educatiu')}
                 </span>
                 <span className="text-[11px] font-normal text-text-muted mt-0.5 truncate max-w-[180px]">
-                  {user?.role?.name ? commonT(`roles.${user.role.name}`) : ''} {user?.center?.centerCode ? `• ${user.center.centerCode}` : ''}
+                  {user?.role?.name && commonT.has(`roles.${user.role.name}`) ? commonT(`roles.${user.role.name}`) : (user?.role?.name || '')} {user?.center?.centerCode ? `• ${user.center.centerCode}` : ''}
                 </span>
               </div>
-              <button
+              <Button
                 onClick={logout}
-                className="bg-consorci-darkBlue hover:bg-consorci-actionBlue text-white text-[12px] font-medium px-5 py-2 transition-all active:scale-[0.98]"
+                variant="primary"
+                size="sm"
               >
-                {commonT('logout')}
-              </button>
+                {commonT.has('logout') ? commonT('logout') : 'Sortir'}
+              </Button>
             </div>
           </div>
         </div>

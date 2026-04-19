@@ -10,7 +10,11 @@ export interface User {
   center?: {
     centerId: number;
     name: string;
+    photoUrl?: string | null;
     centerCode?: string;
+    address?: string | null;
+    contactPhone?: string | null;
+    contactEmail?: string | null;
   };
   role: {
     name: RoleTag;

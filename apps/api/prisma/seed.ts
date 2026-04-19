@@ -107,6 +107,8 @@ async function seedUsers(roles: any, passDefault: string) {
       phone: '934 32 30 54',
       coordEmail: 'coordinacion@brossa.cat',
       coordName: 'Coord. Joan Brossa',
+      photoUrl: '/uploads/profile/centers/08014231.jpg',
+      coordPhotoUrl: '/uploads/profile/users/coord_brossa.jpg',
     },
     {
       code: '08013147',
@@ -116,6 +118,8 @@ async function seedUsers(roles: any, passDefault: string) {
       phone: '932 68 02 11',
       coordEmail: 'coordinacion@pauclaris.cat',
       coordName: 'Coord. Pau Claris',
+      photoUrl: '/uploads/profile/centers/08013147.jpg',
+      coordPhotoUrl: '/uploads/profile/users/coord_claris.jpg',
     },
   ];
 
@@ -123,26 +127,34 @@ async function seedUsers(roles: any, passDefault: string) {
   for (const c of centersData) {
     const center = await prisma.center.upsert({
       where: { centerCode: c.code },
-      update: { name: c.name },
+      update: { 
+        name: c.name,
+        photoUrl: c.photoUrl
+      },
       create: {
         centerCode: c.code,
         name: c.name,
         contactEmail: c.email,
         address: c.address,
         contactPhone: c.phone,
+        photoUrl: c.photoUrl,
       },
     });
     centers.push(center);
 
     await prisma.user.upsert({
       where: { email: c.coordEmail },
-      update: { passwordHash: passDefault },
+      update: { 
+        passwordHash: passDefault,
+        photoUrl: c.coordPhotoUrl
+      },
       create: {
         fullName: c.coordName,
         email: c.coordEmail,
         passwordHash: passDefault,
         roleId: roles.COORDINATOR.roleId,
         centerId: center.centerId,
+        photoUrl: (c as any).coordPhotoUrl,
       },
     });
   }

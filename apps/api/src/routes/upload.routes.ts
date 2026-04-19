@@ -9,16 +9,18 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB for videos
+  fileFilter: (_req, file, cb) => {
+    const allowedTypes = ['image/', 'video/', 'application/pdf'];
+    if (allowedTypes.some(type => file.mimetype.startsWith(type))) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed.'));
+      cb(new Error('File type not supported. Allowed: Images, Videos, PDFs.'));
     }
   }
 });
 
 router.post('/profile/:type/:id', authenticateToken, upload.single('photo'), uploadController.uploadProfilePicture);
+router.post('/multimedia', authenticateToken, upload.array('files', 5), uploadController.uploadMultimedia);
 
 export default router;

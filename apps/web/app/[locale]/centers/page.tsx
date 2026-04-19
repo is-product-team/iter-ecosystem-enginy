@@ -11,6 +11,7 @@ import DashboardLayout from "../../../components/DashboardLayout";
 import CreateCenterModal from "../../../components/CreateCenterModal";
 import centerService, { Center } from "../../../services/centerService";
 import Loading from "@/components/Loading";
+import Button from "@/components/ui/Button";
 import { toast } from "sonner";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import DataTable, { Column } from "@/components/ui/DataTable";
@@ -122,7 +123,7 @@ export default function CentersScreen() {
   const columns: Column<Center>[] = [
     {
       header: "",
-      render: (center) => <Avatar name={center.name} size="sm" type="center" />,
+      render: (center) => <Avatar url={center.photoUrl} name={center.name} size="sm" type="center" />,
       width: 50,
       align: 'center'
     },
@@ -166,20 +167,24 @@ export default function CentersScreen() {
       align: 'right',
       render: (center) => (
         <div className="flex justify-end items-center gap-2">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); handleEdit(center); }}
-            className="px-4 py-2 text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors"
+            variant="link"
+            size="sm"
+            className="!px-4 !py-2 !text-[12px] font-medium !text-consorci-darkBlue"
           >
             {tCommon('edit')}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => { e.stopPropagation(); handleDelete(center.centerId); }}
-            className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 transition-all"
+            variant="subtle"
+            size="sm"
+            className="!p-2 !text-text-muted hover:!text-red-600 hover:!bg-red-50"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-          </button>
+          </Button>
         </div>
       )
     }
@@ -190,19 +195,20 @@ export default function CentersScreen() {
   }
 
   const headerActions = (
-    <button
+    <Button
       onClick={() => {
         setEditingCenter(null);
         setModalVisible(true);
       }}
-      className="flex items-center gap-2 px-6 py-3 text-white font-medium transition-all hover:bg-black active:scale-[0.98]"
-      style={{ backgroundColor: 'var(--consorci-darkBlue)' }}
+      variant="primary"
+      size="md"
+      className="flex items-center gap-2 px-6 h-[49px]"
     >
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
       </svg>
       {t('new')}
-    </button>
+    </Button>
   );
 
   return (
