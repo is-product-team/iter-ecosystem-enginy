@@ -187,7 +187,14 @@ export default function NewIssuePage() {
                   {attachments.map((file, idx) => (
                     <div key={idx} className="group relative aspect-square bg-background-subtle border border-border-subtle rounded-xl flex flex-col items-center justify-center p-2 transition-all hover:border-consorci-darkBlue/40 overflow-hidden shadow-sm">
                        {file.type.startsWith('image/') ? (
-                         <img src={URL.createObjectURL(file)} className="w-full h-full object-cover rounded-lg" alt="preview" />
+                         <Image 
+                           src={URL.createObjectURL(file)} 
+                           className="w-full h-full object-cover rounded-lg" 
+                           alt="preview" 
+                           width={100} 
+                           height={100}
+                           unoptimized
+                         />
                        ) : (
                          <div className="flex flex-col items-center gap-2">
                             {getFileIcon(file.type)}
@@ -241,7 +248,7 @@ export default function NewIssuePage() {
         </form>
         
         <p className="text-center mt-10 text-[10px] text-text-muted font-bold uppercase tracking-widest opacity-50">
-          Qualsevol adjunt serà revisat per l'equip d'administració
+          Qualsevol adjunt serà revisat per l&apos;equip d&apos;administració
         </p>
       </div>
     </DashboardLayout>

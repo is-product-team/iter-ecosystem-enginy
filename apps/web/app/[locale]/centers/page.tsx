@@ -123,7 +123,7 @@ export default function CentersScreen() {
   const columns: Column<Center>[] = [
     {
       header: "",
-      render: (center) => <Avatar name={center.name} size="sm" type="center" />,
+      render: (center) => <Avatar url={center.photoUrl} name={center.name} size="sm" type="center" />,
       width: 50,
       align: 'center'
     },

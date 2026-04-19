@@ -655,6 +655,9 @@
     "contact_info_label": "Dades de Contacte",
     "email_label": "Correu Electrònic",
     "center_referent_label": "Centre Referent",
+    "center_address": "Adreça del Centre",
+    "center_phone": "Telèfon del Centre",
+    "center_email": "Correu del Centre",
     "no_center_assigned": "Cap centre assignat",
     "center_usage_hint": "Es fa servir per a la gestió de tallers i peticions.",
     "security_label": "Seguretat",
@@ -674,7 +677,18 @@
     "email_notifications_title": "Notificacions per correu",
     "email_notifications_desc": "Rebràs un correu per cada avís important o capmbi de fase.",
     "notifications_updated": "Preferències actualitzades",
-    "notifications_error": "Error en desar les preferències"
+    "notifications_error": "Error en desar les preferències",
+    "edit_modal": {
+      "title": "Editar el vostre perfil",
+      "subtitle": "Informació personal i de contacte",
+      "fullname_label": "Nom complet",
+      "email_label": "Correu electrònic",
+      "phone_label": "Telèfon (Opcional)",
+      "phone_placeholder": "Ex: 600 000 000",
+      "save_btn": "Desar canvis",
+      "success_message": "Perfil actualitzat correctament",
+      "error_message": "Error en actualitzar el perfil"
+    }
   },
   "Navigation": {
     "home": "Inici",

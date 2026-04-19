@@ -227,39 +227,16 @@ export default function TeachersCRUD() {
                     id={editingTeacher.user?.userId || editingTeacher.teacherId}
                     type="user"
                     size="xl"
+                    editable
+                    onUpload={(newUrl) => {
+                        loadTeachers();
+                        setEditingTeacher({
+                            ...editingTeacher,
+                            user: { ...editingTeacher.user, photoUrl: newUrl }
+                        } as Teacher);
+                    }}
                   />
-                  <label className="cursor-pointer bg-background-subtle border border-border-subtle px-6 py-2 text-[11px] font-medium text-text-primary hover:bg-background-surface transition-all active:scale-95">
-                    {t('change_photo')}
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        if (e.target.files?.[0] && editingTeacher.user?.userId) {
-                          const file = e.target.files[0];
-                          const formData = new FormData();
-                          formData.append('photo', file);
-                          try {
-                            const apiInstance = getApi();
-                            const res = await apiInstance.post(`/upload/profile/user/${editingTeacher.user.userId}`, formData, {
-                              headers: { 'Content-Type': 'multipart/form-data' }
-                            });
-                            toast.success(t("photo_success"));
-                            loadTeachers();
-                            // Update local state for immediate feedback
-                            setEditingTeacher({
-                              ...editingTeacher,
-                              user: { ...editingTeacher.user, photoUrl: res.data.photoUrl }
-                            } as Teacher);
-                          } catch (err) {
-                            toast.error(t("photo_error"));
-                          }
-                        } else if (!editingTeacher.user?.userId) {
-                          toast.error(t("no_user_photo_error"));
-                        }
-                      }}
-                    />
-                  </label>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">Clica la foto per canviar-la</p>
                 </div>
               )}
 

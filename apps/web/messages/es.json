@@ -655,6 +655,9 @@
     "contact_info_label": "Datos de Contacto",
     "email_label": "Correo Electrónico",
     "center_referent_label": "Centro Referente",
+    "center_address": "Dirección del Centro",
+    "center_phone": "Teléfono del Centro",
+    "center_email": "Correo del Centro",
     "no_center_assigned": "Ningún centro asignado",
     "center_usage_hint": "Se utiliza para la gestión de talleres y peticiones.",
     "security_label": "Seguridad",
@@ -674,7 +677,18 @@
     "email_notifications_title": "Notificaciones por correo",
     "email_notifications_desc": "Recibirás un correo por cada aviso importante o cambio de fase.",
     "notifications_updated": "Preferencias actualizadas",
-    "notifications_error": "Error al guardar las preferencias"
+    "notifications_error": "Error al guardar las preferencias",
+    "edit_modal": {
+      "title": "Editar vuestro perfil",
+      "subtitle": "Información personal y de contacto",
+      "fullname_label": "Nombre completo",
+      "email_label": "Correo electrónico",
+      "phone_label": "Teléfono (Opcional)",
+      "phone_placeholder": "Ej: 600 000 000",
+      "save_btn": "Guardar cambios",
+      "success_message": "Perfil actualizado correctamente",
+      "error_message": "Error al actualizar el perfil"
+    }
   },
   "Navigation": {
     "home": "Inicio",

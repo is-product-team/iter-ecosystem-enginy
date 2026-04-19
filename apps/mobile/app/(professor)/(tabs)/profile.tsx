@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Moda
 import { Ionicons } from '@expo/vector-icons';
 import { THEME, ROLES } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { useTranslation } from 'react-i18next';
@@ -141,6 +141,29 @@ export default function PerfilScreen() {
   const [notifications, setNotifications] = React.useState(true);
   const [user, setUser] = React.useState<any>(null);
   const [loadingImage, setLoadingImage] = React.useState(false);
+
+  const fetchUserProfile = React.useCallback(async () => {
+    try {
+      const response = await api.get('/profile/me');
+      const updatedUser = response.data;
+      setUser(updatedUser);
+      
+      // Sync local storage
+      if (Platform.OS === 'web') {
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } else {
+        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+      }
+    } catch (e) {
+      console.error("Error refreshing user profile", e);
+    }
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserProfile();
+    }, [fetchUserProfile])
+  );
   
   // Modal States
   const [langModalVisible, setLangModalVisible] = React.useState(false);

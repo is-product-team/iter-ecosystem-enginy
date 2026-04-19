@@ -654,6 +654,9 @@
     "contact_info_label": "Contact Details",
     "email_label": "Email Address",
     "center_referent_label": "Referent Center",
+    "center_address": "Center Address",
+    "center_phone": "Center Phone",
+    "center_email": "Center Email",
     "no_center_assigned": "No center assigned",
     "center_usage_hint": "Used for managing workshops and requests.",
     "security_label": "Security",
@@ -673,7 +676,18 @@
     "email_notifications_title": "Email Notifications",
     "email_notifications_desc": "Receive an email for every important notice or phase change.",
     "notifications_updated": "Preferences updated",
-    "notifications_error": "Error saving preferences"
+    "notifications_error": "Error saving preferences",
+    "edit_modal": {
+      "title": "Edit your profile",
+      "subtitle": "Personal and contact information",
+      "fullname_label": "Full name",
+      "email_label": "Email address",
+      "phone_label": "Phone (Optional)",
+      "phone_placeholder": "Ex: 600 000 000",
+      "save_btn": "Save changes",
+      "success_message": "Profile updated successfully",
+      "error_message": "Error updating profile"
+    }
   },
   "Navigation": {
     "home": "Home",
