@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from 'nativewind';
 import { CalendarEvent } from './EventDetailModal';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -17,6 +18,7 @@ interface WorkshopDetailModalProps {
 const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onClose, event }) => {
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  const { colorScheme } = useColorScheme();
   
   // Animaciones
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -85,36 +87,35 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
         <Animated.View 
           style={{ 
             maxHeight: SCREEN_HEIGHT * 0.90, 
-            backgroundColor: '#FFFFFF',
             borderTopLeftRadius: 40,
             borderTopRightRadius: 40,
             overflow: 'hidden',
             transform: [{ translateY: slideAnim }]
           }}
-          className="dark:bg-black"
+          className="bg-background-surface"
         >
           <View className="items-center pt-4 pb-1">
-             <View className="w-10 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full" />
+             <View className="w-10 h-1.5 bg-border-subtle rounded-full" />
           </View>
 
           {/* ── Header ── */}
           <View className="pt-2 pb-6 px-8 flex-row justify-between items-start">
              <View className="flex-1 mr-4">
                  <View className="mb-2">
-                    <Text className="text-[12px] font-medium text-gray-400 uppercase tracking-[2px]">
+                    <Text className="text-[12px] font-medium text-text-muted uppercase tracking-[2px]">
                        {event.type === 'assignment' ? t('Common.practical_workshop') : t('Common.session')}
                     </Text>
                  </View>
-                 <Text className="text-[38px] font-light text-black dark:text-white tracking-tighter leading-[42px]">
+                 <Text className="text-[38px] font-light text-text-primary tracking-tighter leading-[42px]">
                     {event.title}
                  </Text>
              </View>
              <TouchableOpacity 
                onPress={handleClose} 
                activeOpacity={0.7}
-               className="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-full items-center justify-center mt-2"
+               className="w-10 h-10 bg-background-subtle rounded-full items-center justify-center mt-2"
              >
-                <Ionicons name="close" size={20} color={THEME.colors.gray} />
+                <Ionicons name="close" size={20} color={colorScheme === 'dark' ? '#676767' : THEME.colors.gray} />
              </TouchableOpacity>
           </View>
 
@@ -125,55 +126,55 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
           >
              {/* Key Info Grid */}
              <View className="flex-row justify-between mb-6">
-                 <View className="w-[48%] bg-gray-50 dark:bg-gray-900 p-5 rounded-[28px] border border-gray-100 dark:border-gray-800">
+                 <View className="w-[48%] bg-background-subtle p-5 rounded-[28px] border border-border-subtle">
                     <View className="flex-row items-center mb-3">
                         <Ionicons name="time-outline" size={14} color="#F97316" />
-                        <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest ml-2">{t('Common.time')}</Text>
+                        <Text className="text-text-muted text-[10px] font-medium uppercase tracking-widest ml-2">{t('Common.time')}</Text>
                     </View>
-                    <Text className="text-black dark:text-white font-light text-[22px] tracking-tighter">
+                    <Text className="text-text-primary font-light text-[22px] tracking-tighter">
                         {metadata.time || t('Common.all_day')}
                     </Text>
                  </View>
 
-                 <View className="w-[48%] bg-gray-50 dark:bg-gray-900 p-5 rounded-[28px] border border-gray-100 dark:border-gray-800">
+                 <View className="w-[48%] bg-background-subtle p-5 rounded-[28px] border border-border-subtle">
                     <View className="flex-row items-center mb-3">
-                        <Ionicons name="location-outline" size={14} color={THEME.colors.primary} />
-                        <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest ml-2">{t('Common.room')}</Text>
+                        <Ionicons name="location-outline" size={14} color={colorScheme === 'dark' ? '#4197CB' : THEME.colors.primary} />
+                        <Text className="text-text-muted text-[10px] font-medium uppercase tracking-widest ml-2">{t('Common.room')}</Text>
                     </View>
-                    <Text className="text-black dark:text-white font-light text-[22px] tracking-tighter" numberOfLines={1}>
+                    <Text className="text-text-primary font-light text-[22px] tracking-tighter" numberOfLines={1}>
                         {metadata.center || t('Common.not_available')}
                     </Text>
                  </View>
              </View>
 
-             <View className="bg-gray-50 dark:bg-gray-900 px-6 py-5 rounded-[28px] border border-gray-100 dark:border-gray-800 flex-row items-center mb-6">
-                <View className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl items-center justify-center shadow-sm mr-4">
-                    <Ionicons name="people-outline" size={20} color={THEME.colors.secondary} />
+             <View className="bg-background-subtle px-6 py-5 rounded-[28px] border border-border-subtle flex-row items-center mb-6">
+                <View className="w-10 h-10 bg-background-surface rounded-xl items-center justify-center shadow-sm mr-4">
+                    <Ionicons name="people-outline" size={20} color={colorScheme === 'dark' ? '#4197CB' : THEME.colors.secondary} />
                 </View>
                 <View className="flex-1">
-                    <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest mb-0.5">{t('Common.assigned_group')}</Text>
-                    <Text className="text-black dark:text-white font-light text-[20px] tracking-tighter">{t('Common.practice_group')}</Text>
+                    <Text className="text-text-muted text-[10px] font-medium uppercase tracking-widest mb-0.5">{t('Common.assigned_group')}</Text>
+                    <Text className="text-text-primary font-light text-[20px] tracking-tighter">{t('Common.practice_group')}</Text>
                 </View>
              </View>
 
-             <View className="bg-gray-50 dark:bg-gray-900 px-6 py-5 rounded-[28px] border border-gray-100 dark:border-gray-800 flex-row items-center mb-6">
-                <View className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl items-center justify-center shadow-sm mr-4">
+             <View className="bg-background-subtle px-6 py-5 rounded-[28px] border border-border-subtle flex-row items-center mb-6">
+                <View className="w-10 h-10 bg-background-surface rounded-xl items-center justify-center shadow-sm mr-4">
                     <Ionicons name="calendar-outline" size={20} color="#14B8A6" />
                 </View>
                 <View className="flex-1">
-                    <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest mb-0.5">{t('Calendar.title')}</Text>
-                    <Text className="text-black dark:text-white font-light text-[20px] tracking-tighter">
+                    <Text className="text-text-muted text-[10px] font-medium uppercase tracking-widest mb-0.5">{t('Calendar.title')}</Text>
+                    <Text className="text-text-primary font-light text-[20px] tracking-tighter">
                         {new Date(event.date).toLocaleDateString(i18n.language || 'ca-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
                     </Text>
                 </View>
              </View>
 
              {event.description && (
-                 <View className="bg-gray-50 dark:bg-gray-900 p-6 rounded-[32px] border border-gray-100 dark:border-gray-800 mb-6">
-                     <Text className="text-gray-400 text-[10px] font-medium uppercase tracking-widest mb-3">
+                 <View className="bg-background-subtle p-6 rounded-[32px] border border-border-subtle mb-6">
+                     <Text className="text-text-muted text-[10px] font-medium uppercase tracking-widest mb-3">
                         {t('Common.session_objectives')}
                      </Text>
-                     <Text className="text-[17px] text-gray-700 dark:text-gray-300 leading-[24px] font-light tracking-tight">
+                     <Text className="text-[17px] text-text-secondary leading-[24px] font-light tracking-tight">
                         {event.description}
                      </Text>
                  </View>
@@ -182,7 +183,7 @@ const WorkshopDetailModal: React.FC<WorkshopDetailModalProps> = ({ visible, onCl
 
            {/* ── Action Bar ── */}
            {event.type === 'assignment' && metadata.assignmentId && (
-               <View className="absolute bottom-0 left-0 right-0 px-6 pt-4 pb-12 bg-white/95 dark:bg-black/95 border-t border-gray-100 dark:border-gray-800">
+               <View className="absolute bottom-0 left-0 right-0 px-6 pt-4 pb-12 bg-background-surface/95 border-t border-border-subtle">
                     <View className="flex-row gap-3">
                          {/* Button: Pasar lista (previously Manage Session) */}
                          <TouchableOpacity 

@@ -23,78 +23,35 @@ const StudentSessionCard: React.FC<StudentSessionCardProps> = ({
 
   return (
     <View 
-      style={{
-        backgroundColor: '#F9F9F9',
-        borderRadius: 20,
-        marginBottom: 12,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: '#E2E8F0',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 2,
-      }}
+      className="bg-[#F9F9F9] dark:bg-zinc-900 rounded-[20px] mb-3 p-4 border border-[#E2E8F0] dark:border-zinc-800 shadow-sm"
     >
       {/* Header Info */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-        <View style={{ 
-          width: 52, 
-          height: 52, 
-          backgroundColor: '#EBF2FF', 
-          borderRadius: 14, 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          marginRight: 14,
-          borderWidth: 1,
-          borderColor: '#D1E0FF'
-        }}>
-          <Text style={{ 
-            fontSize: 20, 
-            fontWeight: 'bold', 
-            color: '#00426B',
-            fontFamily: THEME.fonts.primary 
-          }}>
+      <View className="flex-row items-center mb-5">
+        <View className="w-[52px] h-[52px] bg-[#EBF2FF] dark:bg-zinc-800 rounded-[14px] items-center justify-center mr-[14px] border border-[#D1E0FF] dark:border-zinc-700">
+          <Text 
+            className="text-[20px] font-bold text-[#00426B] dark:text-blue-400"
+            style={{ fontFamily: THEME.fonts.primary }}
+          >
             {student.fullName?.charAt(0)}
           </Text>
         </View>
-        <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Text style={{ 
-              fontSize: 18, 
-              fontWeight: '800', 
-              color: '#000000', 
-              marginBottom: 2,
-              fontFamily: THEME.fonts.primary,
-            }}>
+        <View className="flex-1">
+          <View className="flex-row items-center gap-2">
+            <Text 
+              className="text-[18px] font-extrabold text-black dark:text-white mb-0.5"
+              style={{ fontFamily: THEME.fonts.primary }}
+            >
               {student.fullName} {student.lastName}
             </Text>
             {student.imageRightsValidated === false && (
-                <View style={{ 
-                    backgroundColor: '#FEE2E2', 
-                    paddingHorizontal: 6, 
-                    paddingVertical: 2, 
-                    borderRadius: 6, 
-                    flexDirection: 'row', 
-                    alignItems: 'center',
-                    gap: 3,
-                    borderWidth: 0.5,
-                    borderColor: '#FECACA'
-                }}>
+                <View className="bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded-md flex-row items-center gap-1 border border-red-200 dark:border-red-800">
                     <Ionicons name="camera-outline" size={10} color="#B91C1C" />
                     <Ionicons name="close" size={8} color="#B91C1C" style={{ marginLeft: -4 }} />
-                    <Text style={{ fontSize: 8, fontWeight: '900', color: '#B91C1C', textTransform: 'uppercase' }}>NO FOTOS</Text>
+                    <Text className="text-[8px] font-black text-[#B91C1C] dark:text-red-400 uppercase">NO FOTOS</Text>
                 </View>
             )}
           </View>
-          <Text style={{ 
-            fontSize: 12, 
-            fontWeight: 'bold', 
-            color: '#94A3B8', 
-            textTransform: 'uppercase',
-            letterSpacing: 0.5
-          }}>
+          <Text className="text-[12px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
             ID: {student.idalu}
           </Text>
         </View>

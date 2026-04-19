@@ -6,6 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from 'nativewind';
 import { getMyAssignments, getPhases, getNotifications } from '../../../services/api';
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
@@ -36,6 +37,7 @@ function getContextualGreeting(t: any, name: string, hasTodaySession: boolean, n
 
 export default function DashboardScreen() {
   const { t, i18n } = useTranslation();
+  const { colorScheme } = useColorScheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -305,8 +307,8 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background-subtle dark:bg-background-surface">
-        <ActivityIndicator size="large" color={THEME.colors.primary} />
+      <View className="flex-1 justify-center items-center bg-background-page">
+        <ActivityIndicator size="large" color={colorScheme === 'dark' ? '#4197CB' : THEME.colors.primary} />
       </View>
     );
   }
@@ -348,21 +350,21 @@ export default function DashboardScreen() {
 
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-subtle dark:bg-background-surface">
+    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.colors.primary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colorScheme === 'dark' ? '#4197CB' : THEME.colors.primary} />
         }
       >
         {/* ── Apple-style Header ── */}
         <View className="px-8 pt-6 pb-10 flex-row justify-between items-start">
           <View className="flex-1 mr-4">
-            <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
+            <Text className="text-[44px] font-light text-text-primary tracking-tight leading-[48px]">
               {greeting}
             </Text>
-            <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+            <Text className="text-[16px] font-normal text-text-secondary mt-2 leading-relaxed">
               {subtitle}
             </Text>
           </View>
@@ -393,7 +395,7 @@ export default function DashboardScreen() {
         {recentWorkshops.length > 0 && (
           <View className="mt-2">
             <View className="px-5 pb-3">
-              <Text className="text-[17px] font-bold text-text-primary dark:text-white">
+              <Text className="text-[17px] font-bold text-text-primary">
                 {t('Dashboard.recent_workshops')}
               </Text>
             </View>
@@ -406,17 +408,17 @@ export default function DashboardScreen() {
                   className="flex-row items-center py-4 px-5"
                 >
                   <View className="w-10 h-10 rounded-xl bg-background-subtle items-center justify-center mr-4">
-                    <Ionicons name="journal-outline" size={20} color={THEME.colors.primary} />
+                    <Ionicons name="journal-outline" size={20} color={colorScheme === 'dark' ? '#4197CB' : THEME.colors.primary} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-[15px] font-semibold text-text-primary dark:text-white" numberOfLines={1}>
+                    <Text className="text-[15px] font-semibold text-text-primary" numberOfLines={1}>
                       {item.workshop.title}
                     </Text>
                     <Text className="text-[12px] text-text-muted mt-0.5">
                       {item.center.name}
                     </Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={16} color="#D1D1D6" />
+                  <Ionicons name="chevron-forward" size={16} color={colorScheme === 'dark' ? '#424242' : '#D1D1D6'} />
                   {idx < recentWorkshops.length - 1 && (
                     <View className="absolute bottom-0 left-16 right-0 h-[0.5px] bg-border-subtle/40" />
                   )}

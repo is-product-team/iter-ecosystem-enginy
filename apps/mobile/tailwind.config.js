@@ -13,27 +13,31 @@ module.exports = {
       colors: {
         // Semantic Tokens
         background: {
-          page: "#f7f8f9",
-          surface: "#ffffff",
-          subtle: "#f3f4f6",
+          page: "var(--bg-page)",
+          surface: "var(--bg-surface)",
+          subtle: "var(--bg-subtle)",
+          brand: "var(--bg-brand)",
         },
         text: {
-          primary: "#111827",
-          secondary: "#374151",
-          muted: "#6b7280",
-          inverse: "#ffffff",
+          primary: "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          muted: "var(--text-muted)",
+          inverse: "var(--text-inverse)",
+          brand: "var(--text-brand)",
         },
         border: {
-          subtle: "#e5e7eb",
+          subtle: "var(--border-subtle)",
+          focus: "var(--border-focus)",
         },
         // Institutional / Brand
         consorci: {
-          darkBlue: "#00426b",
-          lightBlue: "#4197cb",
-          lightGray: "#cfd2d3",
-          pinkRed: "#f26178",
-          beige: "#e0c5ac",
-          yellow: "#f9c311",
+          darkBlue: "var(--consorci-dark-blue)",
+          lightBlue: "var(--consorci-light-blue)",
+          actionBlue: "var(--consorci-action-blue)",
+          lightGray: "var(--consorci-light-gray)",
+          pinkRed: "var(--consorci-pink-red)",
+          beige: "var(--consorci-beige)",
+          yellow: "var(--consorci-yellow)",
         },
         primary: {
           DEFAULT: "#00426b", 

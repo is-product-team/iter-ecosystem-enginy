@@ -7,11 +7,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import api from '../../../services/api';
 import { Button } from '../../../components/ui/Button';
+import { useColorScheme } from 'nativewind';
 
 
 // ── Components ──────────────────────────────────────────────────────────────
 
 const StarRating = ({ value = 0, onSelect }: { value?: number, onSelect: (val: number) => void }) => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
   return (
     <View style={styles.starRow}>
       {[1, 2, 3, 4, 5].map((star) => (
@@ -22,7 +26,7 @@ const StarRating = ({ value = 0, onSelect }: { value?: number, onSelect: (val: n
             styles.starButton,
             { 
               borderColor: value >= star ? "#007AFF" : "transparent",
-              backgroundColor: value >= star ? "white" : "rgba(249, 250, 251, 0.5)",
+              backgroundColor: value >= star ? "#007AFF" : (isDark ? "#27272a" : "white"),
               opacity: pressed ? 0.7 : 1,
               borderWidth: 2,
             }
@@ -31,7 +35,7 @@ const StarRating = ({ value = 0, onSelect }: { value?: number, onSelect: (val: n
           <Ionicons 
             name={value >= star ? "star" : "star-outline"} 
             size={28} 
-            color={value >= star ? "#007AFF" : "#AEAEB2"} 
+            color={value >= star ? "white" : "#AEAEB2"} 
           />
         </Pressable>
       ))}
@@ -39,6 +43,9 @@ const StarRating = ({ value = 0, onSelect }: { value?: number, onSelect: (val: n
   );
 };
 const ChoiceSelector = ({ options, selectedValue, onSelect }: { options: string[], selectedValue: string, onSelect: (val: string) => void }) => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
   return (
     <View style={styles.choiceGrid}>
       {options.map((option, index) => {
@@ -54,7 +61,7 @@ const ChoiceSelector = ({ options, selectedValue, onSelect }: { options: string[
               styles.choiceCard,
               { 
                 width: isFullWidth ? '100%' : '48%',
-                backgroundColor: isSelected ? "#007AFF" : "#FFFFFF",
+                backgroundColor: isSelected ? "#007AFF" : (isDark ? "#27272a" : "white"),
                 borderColor: isSelected ? "#007AFF" : "transparent",
                 borderWidth: 2,
                 opacity: pressed ? 0.8 : 1,
@@ -66,7 +73,7 @@ const ChoiceSelector = ({ options, selectedValue, onSelect }: { options: string[
               style={[
                 styles.choiceCardText,
                 { 
-                  color: isSelected ? "#FFFFFF" : "#1C1C1E",
+                  color: isSelected ? "#FFFFFF" : (isDark ? "#FFFFFF" : "#1C1C1E"),
                 }
               ]}
             >
@@ -184,7 +191,7 @@ export default function WorkshopQualityScreen() {
 
   if (loading) {
       return (
-          <View className="flex-1 justify-center items-center bg-white">
+          <View className="flex-1 justify-center items-center bg-white dark:bg-black">
               <ActivityIndicator size="large" color="#007AFF" />
           </View>
       );
@@ -193,8 +200,8 @@ export default function WorkshopQualityScreen() {
   if (!model) return null;
 
   return (
-    <View className="flex-1 bg-white">
-      <StatusBar style="dark" />
+    <View className="flex-1 bg-white dark:bg-black">
+      <StatusBar style="auto" />
       <ScrollView 
         className="flex-1" 
         showsVerticalScrollIndicator={false}
@@ -205,17 +212,17 @@ export default function WorkshopQualityScreen() {
         }}
       >
         <View className="mb-10 px-2">
-            <Text className="text-[40px] font-light text-black tracking-tight leading-[44px] mb-3">
+            <Text className="text-[40px] font-light text-black dark:text-white tracking-tight leading-[44px] mb-3">
               {t('Questionnaire.title')}
             </Text>
-            <Text className="text-[16px] font-normal text-gray-500 leading-relaxed max-w-[90%]">
+            <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 leading-relaxed max-w-[90%]">
               {t('Questionnaire.instruction')}
             </Text>
         </View>
 
         {model.questions.map((p: any) => (
             <View key={p.questionId} className="mb-10 px-2">
-                <Text className="text-[13px] font-bold text-gray-400 uppercase tracking-widest mb-4 ml-1">
+                <Text className="text-[13px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4 ml-1">
                     {p.text}
                 </Text>
                 
@@ -227,7 +234,7 @@ export default function WorkshopQualityScreen() {
                     />
                   ) : p.type === 'TEXT' ? (
                       <TextInput
-                          className="bg-gray-50 border border-gray-100 p-6 rounded-3xl min-h-[160px] text-black text-[17px] leading-relaxed"
+                          className="bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-6 rounded-3xl min-h-[160px] text-black dark:text-white text-[17px] leading-relaxed"
                           multiline
                           textAlignVertical="top"
                           placeholder={t('Questionnaire.placeholder')}
@@ -244,7 +251,7 @@ export default function WorkshopQualityScreen() {
                     />
                   ) : (
                       <TextInput
-                          className="bg-gray-50 border border-gray-100 p-5 rounded-2xl min-h-[120px] text-black text-[16px] leading-relaxed"
+                          className="bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-5 rounded-2xl min-h-[120px] text-black dark:text-white text-[16px] leading-relaxed"
                           multiline
                           textAlignVertical="top"
                           placeholder={t('Questionnaire.placeholder')}

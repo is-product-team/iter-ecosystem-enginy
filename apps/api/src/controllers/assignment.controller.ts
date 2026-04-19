@@ -1109,7 +1109,7 @@ export const getSessions = async (req: Request, res: Response) => {
   try {
     const sessions = await prisma.session.findMany({
       where: { assignmentId: parseInt(assignmentId as string) },
-      orderBy: { sessionDate: 'asc' }
+      orderBy: [{ sessionDate: 'asc' }, { sessionId: 'asc' }]
     });
     res.json(sessions);
   } catch (_error) {
@@ -1130,14 +1130,14 @@ export const getSessionAttendance = async (req: Request, res: Response) => {
     // 0. Sync sessions if they don't exist yet
     let sessions = await prisma.session.findMany({
       where: { assignmentId },
-      orderBy: { sessionDate: 'asc' }
+      orderBy: [{ sessionDate: 'asc' }, { sessionId: 'asc' }]
     });
 
     if (sessions.length === 0) {
       await SessionService.syncSessionsForAssignment(assignmentId);
       sessions = await prisma.session.findMany({
         where: { assignmentId },
-        orderBy: { sessionDate: 'asc' }
+        orderBy: [{ sessionDate: 'asc' }, { sessionId: 'asc' }]
       });
     }
 
@@ -1244,7 +1244,7 @@ export const registerAttendance = async (req: Request, res: Response) => {
       where: {
         assignmentId,
       },
-      orderBy: { sessionDate: 'asc' },
+      orderBy: [{ sessionDate: 'asc' }, { sessionId: 'asc' }],
       skip: num - 1,
       take: 1
     });

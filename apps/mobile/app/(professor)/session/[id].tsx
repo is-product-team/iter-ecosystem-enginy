@@ -49,7 +49,9 @@ export default function SessionScreen() {
       try {
         console.log("🔍 [SessionScreen] Checking existing attendance for assignment:", id, "session:", num);
         const existingRes = await api.get(`assignments/${id}/sessions/${num}`);
-        if (existingRes.data && existingRes.data.length > 0) {
+        console.log("🔍 [SessionScreen] Raw existingRes.data:", JSON.stringify(existingRes.data));
+        
+        if (existingRes.data && Array.isArray(existingRes.data) && existingRes.data.length > 0) {
             console.log("🔍 [SessionScreen] Existing attendance found:", existingRes.data.length, "records");
             existingRes.data.forEach((record: any) => {
                 const key = String(record.enrollmentId || record.studentId);
@@ -60,9 +62,11 @@ export default function SessionScreen() {
             }
             setIsSubmitted(true);
             setSessionMode('WORK');
+        } else {
+            console.log("🔍 [SessionScreen] No attendance records in existingRes.data");
         }
-      } catch {
-        console.log("🔍 [SessionScreen] No existing attendance found in DB");
+      } catch (err: any) {
+        console.error("❌ [SessionScreen] Error fetching existing attendance:", err.response?.data || err.message);
       }
 
       setAttendance(initialAttendance);
@@ -124,15 +128,15 @@ export default function SessionScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
+      <View className="flex-1 justify-center items-center bg-white dark:bg-black">
         <ActivityIndicator size="large" color="#007AFF" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-white">
-      <StatusBar style="dark" />
+    <View className="flex-1 bg-white dark:bg-black">
+      <StatusBar style="auto" />
       <Stack.Screen 
         options={{ 
           headerShown: true,
@@ -181,10 +185,10 @@ export default function SessionScreen() {
          
          {/* Apple-style Header (Matched with Login) */}
          <View className="mb-10 px-2">
-            <Text className="text-[40px] font-light text-black tracking-tight leading-[44px] mb-2">
+            <Text className="text-[40px] font-light text-black dark:text-white tracking-tight leading-[44px] mb-2">
                 {sessionMode === 'ATTENDANCE' ? t('Session.attendance_header') : t('Session.work_header')}
             </Text>
-            <Text className="text-[16px] font-normal text-gray-500 leading-relaxed max-w-[90%]">
+            <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 leading-relaxed max-w-[90%]">
                 {sessionMode === 'ATTENDANCE' 
                     ? t('Session.attendance_instruction') 
                     : t('Session.work_instruction')}
@@ -211,11 +215,11 @@ export default function SessionScreen() {
          {/* Observations */}
          {sessionMode === 'ATTENDANCE' && (
             <View className="mb-10">
-                <Text className="text-gray-400 font-medium text-[13px] mb-3 ml-1 uppercase tracking-widest">
+                <Text className="text-gray-400 dark:text-gray-500 font-medium text-[13px] mb-3 ml-1 uppercase tracking-widest">
                     {t('Session.observations_label')}
                 </Text>
                 <TextInput 
-                    className="bg-[#F2F2F7] p-5 rounded-2xl text-black h-32 leading-relaxed"
+                    className="bg-[#F2F2F7] dark:bg-zinc-900 p-5 rounded-2xl text-black dark:text-white h-32 leading-relaxed"
                     multiline
                     textAlignVertical="top"
                     placeholder={t('Session.observations_placeholder')}

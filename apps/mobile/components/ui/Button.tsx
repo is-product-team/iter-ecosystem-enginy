@@ -10,12 +10,12 @@ interface ButtonProps extends TouchableOpacityProps {
 export function Button({ label, loading, variant = 'primary', className = '', disabled, ...props }: ButtonProps) {
   const baseClass = "py-4 items-center justify-center rounded-xl flex-row";
   
-  let variantClass = "bg-[#4197CB]";
+  let variantClass = "bg-background-brand";
   let textClass = "text-white";
 
   if (variant === 'secondary') {
     variantClass = "bg-transparent border border-border-subtle";
-    textClass = "text-[#4197CB]";
+    textClass = "text-text-brand";
   } else if (variant === 'danger') {
     variantClass = "bg-[#FF3B30]";
   }
@@ -29,7 +29,7 @@ export function Button({ label, loading, variant = 'primary', className = '', di
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'secondary' ? '#F26178' : 'white'} />
+        <ActivityIndicator color={variant === 'secondary' ? '#4197CB' : 'white'} />
       ) : (
         <Text className={`${textClass} font-semibold text-[17px]`}>
           {label}

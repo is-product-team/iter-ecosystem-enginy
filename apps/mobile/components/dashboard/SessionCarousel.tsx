@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from 'nativewind';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 30; 
@@ -33,6 +34,7 @@ interface SessionCarouselProps {
 // ── Components ──────────────────────────────────────────────────────────────
 
 const PaginationDot = ({ index, scrollX, isPast, isEvaluated }: { index: number, scrollX: Animated.Value, isPast?: boolean, isEvaluated?: boolean }) => {
+  const { colorScheme } = useColorScheme();
   const inputRange = [(index - 1) * SCREEN_WIDTH, index * SCREEN_WIDTH, (index + 1) * SCREEN_WIDTH];
 
   const width = scrollX.interpolate({
@@ -48,7 +50,7 @@ const PaginationDot = ({ index, scrollX, isPast, isEvaluated }: { index: number,
   });
 
   // Traffic light logic
-  let activeColor = '#007AFF'; // Future/Current
+  let activeColor = colorScheme === 'dark' ? '#4197CB' : '#007AFF'; // Future/Current
   if (isPast) {
     activeColor = isEvaluated ? '#34C759' : '#FF3B30'; // Green if done, Red if pending
   }
@@ -82,6 +84,7 @@ function formatDate(dateStr: string, t: any, i18n: any): string {
 
 export function SessionCarousel({ sessions, initialIndex = 0, onPressSession }: SessionCarouselProps) {
   const { t, i18n } = useTranslation();
+  const { colorScheme } = useColorScheme();
   const flatListRef = React.useRef<FlatList>(null);
   const scrollX = React.useRef(new Animated.Value(initialIndex * SCREEN_WIDTH)).current;
   const [activeIndex, setActiveIndex] = React.useState(initialIndex);
@@ -147,15 +150,9 @@ export function SessionCarousel({ sessions, initialIndex = 0, onPressSession }: 
       <TouchableOpacity
         onPress={() => onPressSession(item)}
         activeOpacity={0.8}
+        className="bg-background-surface border border-border-subtle shadow-sm mx-[15px] mb-8 p-7 rounded-[32px]"
         style={{
           width: CARD_WIDTH,
-          backgroundColor: '#FFFFFF',
-          borderRadius: 32,
-          padding: 28,
-          marginHorizontal: 15,
-          marginBottom: 32,
-          borderWidth: 1,
-          borderColor: '#EFEFEF',
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.05,
@@ -181,23 +178,27 @@ export function SessionCarousel({ sessions, initialIndex = 0, onPressSession }: 
         </View>
 
         <Text 
-          style={{ color: '#000', fontSize: 28, fontWeight: '300', lineHeight: 34, marginBottom: 24, letterSpacing: -0.8 }}
+          className="text-text-primary"
+          style={{ fontSize: 28, fontWeight: '300', lineHeight: 34, marginBottom: 24, letterSpacing: -0.8 }}
           numberOfLines={2}
         >
           {item.workshop.title}
         </Text>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 20, borderTopWidth: 1, borderTopColor: '#F2F2F7' }}>
+        <View 
+          className="border-t border-border-subtle"
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 20 }}
+        >
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-            <Ionicons name="business" size={14} color="#8E8E93" />
-            <Text style={{ color: '#6B7280', fontSize: 13, fontWeight: '500', marginLeft: 8 }} numberOfLines={1}>
+            <Ionicons name="business" size={14} color={colorScheme === 'dark' ? '#676767' : '#8E8E93'} />
+            <Text className="text-text-secondary ml-2 flex-1" style={{ fontSize: 13, fontWeight: '500' }} numberOfLines={1}>
               {item.center.name}
             </Text>
           </View>
           
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="time" size={14} color={item.isCurrent ? "#34C759" : "#4197CB"} />
-            <Text style={{ color: item.isCurrent ? "#34C759" : "#4197CB", fontSize: 13, fontWeight: '700', marginLeft: 6 }}>
+            <Ionicons name="time" size={14} color={item.isCurrent ? "#34C759" : (colorScheme === 'dark' ? '#4197CB' : "#4197CB")} />
+            <Text style={{ color: item.isCurrent ? "#34C759" : (colorScheme === 'dark' ? '#4197CB' : "#4197CB"), fontSize: 13, fontWeight: '700', marginLeft: 6 }}>
               {timeLabel || dateLabel}
             </Text>
           </View>
@@ -208,35 +209,20 @@ export function SessionCarousel({ sessions, initialIndex = 0, onPressSession }: 
 
   if (sessions.length === 0) {
     return (
-      <View style={{ 
-        marginHorizontal: 16, 
-        marginBottom: 24, 
-        backgroundColor: '#FFFFFF', 
-        borderRadius: 24, 
-        padding: 24,
+      <View className="bg-background-surface border border-border-subtle shadow-sm mx-4 mb-6 p-6 rounded-[24px]" style={{
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
-        elevation: 2,
-        borderWidth: 1,
-        borderColor: '#F3F4F6'
+        elevation: 2
       }}>
-        <View style={{ 
-          width: 44, 
-          height: 44, 
-          borderRadius: 12, 
-          backgroundColor: '#F3F4F6', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          marginBottom: 16 
-        }}>
-          <Ionicons name="calendar-outline" size={22} color="#00426B" />
+        <View className="bg-background-subtle w-11 h-11 rounded-[12px] items-center justify-center mb-4">
+          <Ionicons name="calendar-outline" size={22} color={colorScheme === 'dark' ? '#4197CB' : "#00426B"} />
         </View>
-        <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827', letterSpacing: -0.3 }}>
+        <Text className="text-text-primary" style={{ fontSize: 16, fontWeight: '600', letterSpacing: -0.3 }}>
           {t('Dashboard.no_upcoming_sessions')}
         </Text>
-        <Text style={{ fontSize: 13, fontWeight: '400', color: '#6B7280', marginTop: 4, lineHeight: 18 }}>
+        <Text className="text-text-muted mt-1" style={{ fontSize: 13, fontWeight: '400', lineHeight: 18 }}>
           {t('Dashboard.no_upcoming_workshops')}
         </Text>
       </View>

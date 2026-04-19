@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, Pressable, Animated } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { THEME } from '@iter/shared';
+import { useColorScheme } from 'nativewind';
 
 interface AttendanceSegmentedControlProps {
   currentStatus: string;
@@ -13,6 +14,9 @@ const AttendanceSegmentedControl: React.FC<AttendanceSegmentedControlProps> = ({
   onStatusChange,
   disabled
 }) => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
   const options = [
     { label: 'Present', value: 'PRESENT' },
     { label: 'Absent', value: 'ABSENT' },
@@ -20,14 +24,16 @@ const AttendanceSegmentedControl: React.FC<AttendanceSegmentedControlProps> = ({
   ];
 
   return (
-    <View style={{ 
-      flexDirection: 'row', 
-      backgroundColor: '#F2F2F7', 
-      borderRadius: 12, 
-      padding: 2,
-      width: '100%',
-      height: 40,
-    }}>
+    <View 
+        style={{ 
+            flexDirection: 'row', 
+            backgroundColor: isDark ? '#27272a' : '#F2F2F7', 
+            borderRadius: 12, 
+            padding: 2, 
+            width: '100%', 
+            height: 40 
+        }}
+    >
       {options.map((opt) => {
         const isActive = currentStatus === opt.value;
         return (
@@ -41,8 +47,9 @@ const AttendanceSegmentedControl: React.FC<AttendanceSegmentedControlProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 10,
-              backgroundColor: isActive ? 'white' : 'transparent',
-              // Apple-style subtle shadow for the active item
+              backgroundColor: isActive 
+                ? (isDark ? '#52525b' : 'white') 
+                : 'transparent',
               shadowColor: isActive ? '#000' : 'transparent',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -54,7 +61,9 @@ const AttendanceSegmentedControl: React.FC<AttendanceSegmentedControlProps> = ({
               style={{
                 fontSize: 13,
                 fontWeight: isActive ? '600' : '500',
-                color: isActive ? '#000000' : '#8E8E93',
+                color: isActive 
+                    ? (isDark ? '#FFFFFF' : '#000000') 
+                    : (isDark ? '#71717a' : '#8E8E93'),
                 fontFamily: THEME.fonts.primary,
               }}
             >

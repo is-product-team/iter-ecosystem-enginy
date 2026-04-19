@@ -135,7 +135,15 @@ async function fetchEventsForUser(user: { userId: number, role: string, centerId
     }
 
     if (a.sessions) {
-      a.sessions.forEach((s: any) => {
+      // Ensure sessions are sorted by date and ID to reliably determine sessionNum
+      const sortedSessions = [...a.sessions].sort((s1, s2) => {
+        const d1 = new Date(s1.sessionDate).getTime();
+        const d2 = new Date(s2.sessionDate).getTime();
+        if (d1 !== d2) return d1 - d2;
+        return s1.sessionId - s2.sessionId;
+      });
+
+      sortedSessions.forEach((s: any, index: number) => {
         const isSessionStaff = s.staff?.some((sp: any) => sp.userId === user.userId);
         if (user.role === ROLES.TEACHER && !isSessionStaff) return;
 
@@ -148,6 +156,8 @@ async function fetchEventsForUser(user: { userId: number, role: string, centerId
             type: 'session',
             metadata: {
               assignmentId: a.assignmentId,
+              sessionId: s.sessionId,
+              sessionNum: index + 1,
               time: `${s.startTime || '09:00'} - ${s.endTime || '13:00'}`,
               center: a.center?.name || 'Iter Center'
             }

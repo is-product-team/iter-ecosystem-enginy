@@ -133,6 +133,10 @@ export default function PerfilScreen() {
   const insets = useSafeAreaInsets();
   const { colorScheme, setColorScheme } = useColorScheme();
   
+  const handleThemeChange = (val: 'light' | 'dark' | 'system') => {
+    setColorScheme(val);
+  };
+  
   const [notifications, setNotifications] = React.useState(true);
   const [user, setUser] = React.useState<any>(null);
   const [image, setImage] = React.useState<string | null>(null);
@@ -412,7 +416,7 @@ export default function PerfilScreen() {
         title={t('Profile.appearance')}
         t={t}
         selectedValue={colorScheme || 'system'}
-        onSelect={(val) => setColorScheme(val)}
+        onSelect={(val) => handleThemeChange(val)}
         options={[
           { label: t('Profile.appearance_options.light'), value: 'light', icon: 'sunny-outline' },
           { label: t('Profile.appearance_options.dark'), value: 'dark', icon: 'moon-outline' },

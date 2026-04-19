@@ -8,35 +8,49 @@
   }
   
   :root {
-    --bg-page: #f7f8f9;
-    --bg-surface: #ffffff;
-    --bg-subtle: #f3f4f6;
+    /* Semantic Backgrounds */
+    --bg-page: #F7F8F9;
+    --bg-surface: #FFFFFF;
+    --bg-subtle: #F3F4F6;
+    --bg-brand: #4197CB;
     
+    /* Semantic Text */
     --text-primary: #111827;
     --text-secondary: #374151;
-    --text-muted: #6b7280;
-    --text-inverse: #ffffff;
+    --text-muted: #6B7280;
+    --text-inverse: #FFFFFF;
+    --text-brand: #00426B;
     
-    --border-subtle: #e5e7eb;
+    /* Semantic Borders */
+    --border-subtle: #E5E7EB;
+    --border-focus: #4197CB;
 
-    --consorci-dark-blue: #00426b;
-    --consorci-light-blue: #4197cb;
-    --consorci-light-gray: #cfd2d3;
-    --consorci-pink-red: #f26178;
-    --consorci-beige: #e0c5ac;
-    --consorci-yellow: #f9c311;
+    /* Brand Colors (Primitives) */
+    --consorci-dark-blue: #00426B;
+    --consorci-light-blue: #4197CB;
+    --consorci-action-blue: #0775AB;
+    --consorci-light-gray: #CFD2D3;
+    --consorci-pink-red: #F26178;
+    --consorci-beige: #E0C5AC;
+    --consorci-yellow: #F9C311;
   }
 
   .dark {
+    /* Semantic Backgrounds */
     --bg-page: #171717;
     --bg-surface: #212121;
-    --bg-subtle: #2f2f2f;
+    --bg-subtle: #2F2F2F;
+    --bg-brand: #00426B;
     
-    --text-primary: #ececec;
-    --text-secondary: #b4b4b4;
+    /* Semantic Text */
+    --text-primary: #ECECEC;
+    --text-secondary: #B4B4B4;
     --text-muted: #676767;
-    --text-inverse: #ffffff;
+    --text-inverse: #FFFFFF;
+    --text-brand: #4197CB;
     
+    /* Semantic Borders */
     --border-subtle: #424242;
+    --border-focus: #4197CB;
   }
 }

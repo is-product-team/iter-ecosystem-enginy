@@ -28,7 +28,7 @@ function GridCard({ item, fullWidth = false }: { item: QuickAccessItem, fullWidt
       <View className="flex-row items-start justify-between">
         <View
           className="w-10 h-10 rounded-[14px] items-center justify-center"
-          style={{ backgroundColor: item.iconBg }}
+          style={{ backgroundColor: item.iconBg.endsWith('15') ? item.iconBg.replace('15', '25') : item.iconBg }}
         >
           <Ionicons name={item.icon} size={20} color={item.iconColor} />
         </View>
