@@ -8,6 +8,7 @@ import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService, { Assignment, Enrollment } from '@/services/assignmentService';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import Avatar from '@/components/Avatar';
@@ -158,22 +159,24 @@ export default function AssignmentDetailsPage() {
               </p>
             </div>
             <div className="flex gap-4">
-              <button
+              <Button
                 onClick={() => setIsBulkUploadOpen(!isBulkUploadOpen)}
-                className={`px-8 py-4 text-[13px] font-medium border transition-all flex items-center gap-3 ${
-                  isBulkUploadOpen ? 'bg-consorci-darkBlue text-white border-consorci-darkBlue' : 'bg-background-subtle border-border-subtle text-text-primary hover:bg-background-surface'
-                }`}
+                variant={isBulkUploadOpen ? 'primary' : 'outline'}
+                size="md"
+                className="!px-8 !py-4"
+                icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>}
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                 {isBulkUploadOpen ? t('ia_matcher_close_btn') : t('ia_matcher_btn')}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setIsDrawerOpen(true)}
-                className="bg-consorci-darkBlue text-white px-8 py-4 text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98] flex items-center gap-3"
+                variant="primary"
+                size="md"
+                className="!px-8 !py-4"
+                icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>}
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
                 {t('select_students_btn')}
-              </button>
+              </Button>
             </div>
           </div>
 

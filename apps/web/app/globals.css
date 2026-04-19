@@ -236,12 +236,12 @@ h6 {
 }
 
 .premium-table-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(128, 128, 128, 0.2);
   border-radius: 10px;
 }
 
 .premium-table-container {
-  @apply relative overflow-auto bg-white;
+  @apply relative overflow-auto bg-background-surface;
   max-height: calc(100vh - 280px); /* Height adjustment for sticky header context */
 }
 

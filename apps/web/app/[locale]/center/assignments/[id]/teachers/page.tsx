@@ -9,6 +9,7 @@ import assignmentService, { Assignment } from '@/services/assignmentService';
 import teacherService, { Teacher } from '@/services/teacherService';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -109,20 +110,20 @@ export default function DesignateTeachersPage({ params }: { params: Promise<{ id
       subtitle={t('page_subtitle')}
     >
       <div className="max-w-2xl mx-auto pb-20">
-        <div className="bg-white border shadow-sm p-10">
+        <div className="bg-background-surface border border-border-subtle shadow-sm p-10">
           <div className="mb-10">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-8 flex items-center gap-3">
-              <span className="w-6 h-px bg-gray-200"></span>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-8 flex items-center gap-3">
+              <span className="w-6 h-px bg-border-subtle"></span>
               {t('selection_of_referents')}
             </h3>
 
             <div className="space-y-8">
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{t('main_teacher')}</label>
+                <label className="block text-xs font-black text-text-muted uppercase tracking-widest mb-3">{t('main_teacher')}</label>
                 <select
                   value={teacher1Id}
                   onChange={(e) => setTeacher1Id(e.target.value)}
-                  className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 outline-none rounded-none transition-all font-bold text-gray-800"
+                  className="w-full px-6 py-4 bg-background-subtle border-2 border-transparent focus:border-consorci-darkBlue outline-none rounded-none transition-all font-bold text-text-primary"
                 >
                   <option value="">{t('select')}</option>
                   {teachers.map((p: Teacher) => (
@@ -132,11 +133,11 @@ export default function DesignateTeachersPage({ params }: { params: Promise<{ id
               </div>
 
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">{t('second_teacher')}</label>
+                <label className="block text-xs font-black text-text-muted uppercase tracking-widest mb-3">{t('second_teacher')}</label>
                 <select
                   value={teacher2Id}
                   onChange={(e) => setTeacher2Id(e.target.value)}
-                  className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-600 outline-none rounded-none transition-all font-bold text-gray-800"
+                  className="w-full px-6 py-4 bg-background-subtle border-2 border-transparent focus:border-consorci-darkBlue outline-none rounded-none transition-all font-bold text-text-primary"
                 >
                   <option value="">{t('select')}</option>
                   {teachers.map((p: Teacher) => (
@@ -148,20 +149,22 @@ export default function DesignateTeachersPage({ params }: { params: Promise<{ id
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
-            <button
+            <Button
               onClick={handleSave}
               disabled={loading}
-              className={`flex-1 py-5 font-black uppercase text-xs tracking-[0.2em] shadow-lg transition-all ${loading ? 'bg-gray-100 text-gray-300' : 'bg-blue-900 text-white hover:bg-black'
-                }`}
+              loading={loading}
+              variant="primary"
+              className="flex-1 !py-5 uppercase !text-xs tracking-[0.2em]"
             >
-              {loading ? t('saving') : t('confirm_designation')}
-            </button>
-            <button
+              {t('confirm_designation')}
+            </Button>
+            <Button
               onClick={() => router.back()}
-              className="px-10 bg-white text-gray-400 py-5 font-black uppercase text-xs tracking-widest border border-gray-100 hover:bg-gray-50 transition-all"
+              variant="outline"
+              className="px-10 !py-5 uppercase !text-xs tracking-widest"
             >
               {tCommon('cancel')}
-            </button>
+            </Button>
           </div>
         </div>
 

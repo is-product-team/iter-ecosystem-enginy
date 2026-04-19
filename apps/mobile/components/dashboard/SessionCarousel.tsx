@@ -161,16 +161,16 @@ export function SessionCarousel({ sessions, initialIndex = 0, onPressSession }: 
           opacity: (item.isPast && item.isEvaluated) ? 0.7 : 1,
         }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}>
-          <View style={{ backgroundColor: badgeColor, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10 }}>
-            <Text style={{ color: textColor, fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+          <View style={{ paddingVertical: 4 }}>
+            <Text style={{ color: textColor, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.5 }}>
               {badgeText}
             </Text>
           </View>
           {item.isPast && (
             <Ionicons 
               name={item.isEvaluated ? "checkmark-circle" : "alert-circle"} 
-              size={18} 
+              size={16} 
               color={item.isEvaluated ? "#34C759" : "#FF3B30"} 
               style={{ marginLeft: 8 }} 
             />

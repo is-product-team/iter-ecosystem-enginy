@@ -318,7 +318,7 @@ export default function DocumentVerificationPage() {
       title={t('title')}
       subtitle={t('subtitle')}
     >
-      <div className="space-y-6">
+      <div className="flex flex-col">
         <DataTableToolbar
           search={{
             value: searchTerm,
@@ -340,46 +340,47 @@ export default function DocumentVerificationPage() {
           }}
           filters={
             <FilterSelect
-              label={t('all_statuses') || 'Tots els estats'}
+              label={t('all_statuses')}
               value={statusFilter}
               onChange={setStatusFilter}
               options={[
-                { label: t('all_statuses') || 'Tots els estats', value: 'all' },
-                { label: t('pending_validation') || 'Pendents de Validar', value: 'pending' },
-                { label: t('fully_validated') || 'Tots Validats', value: 'validated' },
+                { label: t('all_statuses'), value: 'all' },
+                { label: t('pending_validation'), value: 'pending' },
+                { label: t('fully_validated'), value: 'validated' },
               ]}
               icon={ClipboardCheck}
             />
           }
           actions={
-            selectedDocs.length > 0 && (
-              <Button
-                onClick={handleBulkApprove}
-                disabled={loading}
-                loading={loading}
-                variant="primary"
-                className="px-8 h-full font-bold !text-[11px] uppercase tracking-widest"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                {t('btn_bulk_approve') || 'Validació Massiva'} ({selectedDocs.length})
-              </Button>
-            )
+            <div className="flex items-center gap-4 h-full">
+               <label className="hidden md:flex items-center gap-2 text-[10px] font-bold text-text-muted uppercase cursor-pointer hover:text-consorci-darkBlue transition-colors mr-2">
+                <input
+                  type="checkbox"
+                  checked={isAllPendingOnPageSelected}
+                  onChange={toggleAllSelection}
+                  className="w-3.5 h-3.5 border-border-subtle accent-consorci-darkBlue cursor-pointer"
+                />
+                {t('select_all_pending_page')}
+              </label>
+
+              {selectedDocs.length > 0 && (
+                <Button
+                  onClick={handleBulkApprove}
+                  disabled={loading}
+                  loading={loading}
+                  variant="primary"
+                  size="sm"
+                  className="px-6 !py-2.5 font-bold !text-[11px] uppercase tracking-widest h-full"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {t('btn_bulk_approve')} ({selectedDocs.length})
+                </Button>
+              )}
+            </div>
           }
         />
-
-        <div className="flex justify-start px-2">
-          <label className="flex items-center gap-2 text-[11px] font-bold text-text-muted uppercase cursor-pointer hover:text-consorci-darkBlue transition-colors">
-            <input
-              type="checkbox"
-              checked={isAllPendingOnPageSelected}
-              onChange={toggleAllSelection}
-              className="w-4 h-4 border-border-subtle accent-consorci-darkBlue cursor-pointer"
-            />
-            {t('select_all_pending_page') || 'Seleccionar tots los pendents de la pàgina'}
-          </label>
-        </div>
 
         <DataTable
           data={filteredEnrollments}

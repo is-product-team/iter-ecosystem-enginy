@@ -12,6 +12,7 @@ import teacherService, { Teacher } from '@/services/teacherService';
 import Loading from '@/components/Loading';
 import WorkshopIcon from '@/components/WorkshopIcon';
 import Pagination from "@/components/Pagination";
+import Button from '@/components/ui/Button';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar';
 
@@ -273,27 +274,33 @@ export default function RequestsPage() {
                  t('status_rejected')}
               </span>
               {isPending && (
-                <button
+                <Button
                   onClick={(e) => { e.stopPropagation(); handleEdit(existingRequest); }}
-                  className="px-4 py-1.5 bg-background-subtle hover:bg-consorci-darkBlue hover:text-white text-consorci-darkBlue font-bold text-[10px] uppercase tracking-wider border border-border-subtle transition-all active:scale-95"
+                  variant="subtle"
+                  size="sm"
+                  className="!px-4 !py-1.5 uppercase tracking-wider !text-consorci-darkBlue hover:!bg-consorci-darkBlue/10 !border-none !h-auto !min-h-0"
                 >
                   {tCommon('edit')}
-                </button>
+                </Button>
               )}
             </div>
           );
         }
 
         return (
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); setSelectedWorkshopId(w._id); }}
-            className={`px-4 py-2 bg-consorci-darkBlue text-white font-bold text-[10px] uppercase tracking-wider transition-all hover:bg-black active:scale-95 flex items-center gap-2 whitespace-nowrap`}
+            variant="subtle"
+            size="sm"
+            className="uppercase tracking-wider !text-consorci-darkBlue hover:!bg-consorci-darkBlue/10 !px-4 !py-2 !h-auto !min-h-0"
+            icon={
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+              </svg>
+            }
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
             {t('assign_places_btn')}
-          </button>
+          </Button>
         );
       },
       width: 150
@@ -370,12 +377,14 @@ export default function RequestsPage() {
                     }`}>
                     {tCommon('modality_label', { modality: workshopForModal.modality })}
                   </div>
-                  <button 
+                  <Button 
                     onClick={closeModal}
-                    className="p-2 text-text-muted hover:text-text-primary transition-colors border border-transparent hover:border-border-subtle"
+                    variant="subtle"
+                    size="sm"
+                    className="!p-2 text-text-muted hover:!text-text-primary"
                   >
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -475,30 +484,25 @@ export default function RequestsPage() {
                     </div>
 
                     <div className="flex justify-end gap-10 pt-8 border-t border-border-subtle mt-10">
-                      <button
+                      <Button
                         type="button"
                         onClick={cancelEdit}
-                        className="text-[11px] font-bold text-text-muted hover:text-text-primary uppercase tracking-[0.3em] transition-all"
+                        variant="subtle"
+                        size="md"
+                        className="!text-[11px] !font-bold !text-text-muted hover:!text-text-primary uppercase tracking-[0.3em]"
                       >
                         {t('cancel_btn')}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="submit"
                         disabled={submitting}
-                        className={`px-12 py-4 font-bold text-[11px] uppercase tracking-[0.3em] transition-all border ${submitting
-                          ? 'bg-background-subtle text-text-muted border-border-subtle cursor-not-allowed'
-                          : 'bg-consorci-darkBlue text-white border-consorci-darkBlue hover:bg-black hover:border-black'
-                          }`}
+                        loading={submitting}
+                        variant="primary"
+                        size="md"
+                        className="!px-12 !py-4 !text-[11px] uppercase tracking-[0.3em]"
                       >
-                        {submitting ? (
-                          <>
-                            <Loading size="mini" white />
-                            <span>{t('processing')}</span>
-                          </>
-                        ) : (
-                          <span>{editingRequestId ? t('update_btn') : t('send_btn')}</span>
-                        )}
-                      </button>
+                        {editingRequestId ? t('update_btn') : t('send_btn')}
+                      </Button>
                     </div>
                   </form>
                 </div>

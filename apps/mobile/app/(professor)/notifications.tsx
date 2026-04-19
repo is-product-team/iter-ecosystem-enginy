@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
 import { THEME } from '@iter/shared';
+import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import api, { getNotifications } from '../../services/api';
 import type { Notification } from '../../services/api';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTranslation } from 'react-i18next';
+import { PageHeader } from '../../components/ui/PageHeader';
 
 export default function NotificationsTabScreen() {
   const { t, i18n } = useTranslation();
@@ -123,14 +124,17 @@ export default function NotificationsTabScreen() {
 
   if (loading && !refreshing) {
     return (
-      <View className="flex-1 justify-center items-center bg-background-page">
+      <View 
+        className="items-center justify-center bg-background-page"
+        style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
+      >
         <ActivityIndicator size="large" color={THEME.colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={{ paddingTop: insets.top + 60 }} className="flex-1 bg-background-page">
+    <View className="flex-1 bg-background-page">
       <Stack.Screen 
         options={{ 
           headerShown: true, 
@@ -138,25 +142,27 @@ export default function NotificationsTabScreen() {
           headerTransparent: true,
           headerShadowVisible: false,
           headerBackTitle: t('Common.back'),
-          headerTintColor: '#4197CB',
         }} 
       />
       
-      {/* Apple-style Large Header */}
-      <View className="px-8 pb-6">
-         <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
-           {t('Notifications.tagline')}
-         </Text>
-         <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
-           {t('Notifications.title')}
-         </Text>
-      </View>
+      {/* Standardized Header */}
+      <PageHeader 
+        title={t('Notifications.title')} 
+        subtitle={t('Notifications.tagline')} 
+        hasNativeHeader={true} 
+      />
 
       <ScrollView 
         className="flex-1" 
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4197CB" />
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor="#4197CB" 
+            colors={['#4197CB']}
+            progressViewOffset={insets.top + 95}
+          />
         }
       >
         <View className="border-t border-b border-border-subtle bg-background-surface">

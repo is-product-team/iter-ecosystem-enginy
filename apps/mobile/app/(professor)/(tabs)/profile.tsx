@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Modal, Pressable, Image, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert, Modal, Pressable, Image, ActivityIndicator, StyleSheet, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { THEME, ROLES } from '@iter/shared';
 import * as SecureStore from 'expo-secure-store';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
 import api from '@/services/api';
 import * as ExpoConstants from 'expo-constants';
+import { PageHeader } from '../../../components/ui/PageHeader';
 
 const Constants = ExpoConstants.default || ExpoConstants;
 const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
@@ -138,17 +139,25 @@ export default function PerfilScreen() {
   const insets = useSafeAreaInsets();
   const { colorScheme, setColorScheme } = useColorScheme();
   
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await fetchUserProfile();
+    setRefreshing(false);
+  }, [fetchUserProfile]);
+  
   const handleThemeChange = (val: 'light' | 'dark' | 'system') => {
     setColorScheme(val);
   };
   
   const [notifications, setNotifications] = React.useState(true);
   const [user, setUser] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
   const [loadingImage, setLoadingImage] = React.useState(false);
 
   const fetchUserProfile = React.useCallback(async () => {
     try {
-      const response = await api.get('/profile/me');
+      const response = await api.get('/auth/me');
       const updatedUser = response.data;
       setUser(updatedUser);
       
@@ -160,6 +169,8 @@ export default function PerfilScreen() {
       }
     } catch (e) {
       console.error("Error refreshing user profile", e);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -249,8 +260,10 @@ export default function PerfilScreen() {
           // Save updated user locally
           if (Platform.OS === 'web') {
             localStorage.setItem('user', JSON.stringify(updatedUser));
+            localStorage.setItem('user-avatar', response.data.photoUrl);
           } else {
             await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+            await SecureStore.setItemAsync('user-avatar', response.data.photoUrl);
           }
           
           Alert.alert(t('Common.success') || 'Èxit', t('Profile.photo_updated') || 'Foto de perfil actualizada.');
@@ -314,47 +327,68 @@ export default function PerfilScreen() {
   }, [i18n.language, t]);
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        
-        {/* WhatsApp-Style Profile Identity Header */}
-        <View className="items-center py-10 px-6 bg-background-surface border-b border-border-subtle">
+    <View className="flex-1 bg-background-page">
+      {loading ? (
+        <View 
+          className="items-center justify-center bg-background-page"
+          style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
+        >
+          <ActivityIndicator size="large" color="#4197CB" />
+        </View>
+      ) : (
+        <ScrollView 
+          className="flex-1" 
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl 
+              refreshing={refreshing} 
+              onRefresh={onRefresh} 
+              tintColor="#4197CB"
+              colors={['#4197CB']}
+              progressViewOffset={insets.top + 40}
+            />
+          }
+        >
+          <PageHeader title={t('Tabs.profile')} subtitle={t('Profile.subtitle')} />
+          
+          {/* Integrated Profile Identity */}
+          <View className="px-6 py-6 flex-row items-center bg-background-surface border-b border-border-subtle">
            <View className="relative">
               <TouchableOpacity 
                 onPress={pickImage}
                 disabled={loadingImage}
                 activeOpacity={0.9}
-                className="w-28 h-28 rounded-full bg-primary items-center justify-center shadow-md overflow-hidden"
+                className="w-20 h-20 rounded-full bg-primary items-center justify-center shadow-sm overflow-hidden"
               >
                  {loadingImage ? (
                    <ActivityIndicator color="white" />
                  ) : getProfileImage() ? (
                    <Image source={getProfileImage()!} className="w-full h-full" />
                  ) : (
-                   <Text className="text-4xl font-black text-white">{getUserInitials()}</Text>
+                   <Text className="text-2xl font-black text-white">{getUserInitials()}</Text>
                  )}
               </TouchableOpacity>
               <TouchableOpacity 
                 onPress={pickImage}
                 disabled={loadingImage}
-                className="absolute bottom-0 right-0 bg-secondary w-9 h-9 rounded-full items-center justify-center border-4 border-background-surface shadow-sm"
+                className="absolute bottom-0 right-0 bg-secondary w-7 h-7 rounded-full items-center justify-center border-2 border-background-surface shadow-sm"
                 activeOpacity={0.8}
               >
                  {loadingImage ? (
                    <ActivityIndicator size="small" color="white" />
                  ) : (
-                   <Ionicons name="image-outline" size={16} color="white" />
+                   <Ionicons name="camera" size={12} color="white" />
                  )}
               </TouchableOpacity>
            </View>
            
-           <View className="mt-5 items-center">
-              <Text className="text-2xl font-bold text-text-primary mb-1">
+           <View className="ml-5 flex-1">
+              <Text className="text-xl font-bold text-text-primary mb-0.5">
                 {user?.fullName || t('Common.loading')}
               </Text>
               <View className="flex-row items-center">
                 <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                <Text className="text-text-muted text-[15px] font-medium">
+                <Text className="text-text-muted text-[14px] font-medium">
                   {(user as any)?.role?.roleName === ROLES.TEACHER ? t('Profile.role_professor') : t('Profile.role_admin')}
                 </Text>
               </View>
@@ -457,6 +491,7 @@ export default function PerfilScreen() {
         </View>
 
       </ScrollView>
+      )}
 
       {/* Language Selection Modal */}
       <SelectionModal 

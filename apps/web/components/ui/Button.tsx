@@ -58,6 +58,7 @@ const Button: React.FC<ButtonProps> = ({
     ${widthClass} 
     ${disabledClass} 
     ${linkSpecificClasses} 
+    ${loading ? 'relative !gap-0' : ''}
     ${className}
   `.replace(/\s+/g, ' ').trim();
 
@@ -67,17 +68,15 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
       {...props}
     >
-      {loading ? (
-        <>
-          <Loading size="mini" white={variant === 'primary'} />
-          <span className="opacity-0">{children}</span> {/* Keep space while loading */}
-        </>
-      ) : (
-        <>
-          {children}
-          {icon && <span className="shrink-0">{icon}</span>}
-        </>
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <Loading size="mini" white={variant === 'primary' || variant === 'danger'} />
+        </div>
       )}
+      <div className={`flex items-center justify-center gap-2 ${loading ? 'opacity-0' : 'opacity-100'}`}>
+        {children}
+        {icon && <span className="shrink-0">{icon}</span>}
+      </div>
     </button>
   );
 };

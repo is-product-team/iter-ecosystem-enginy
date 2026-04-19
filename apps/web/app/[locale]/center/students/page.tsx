@@ -9,6 +9,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 import studentService, { Student } from '@/services/studentService';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import Avatar from '@/components/Avatar';
@@ -262,17 +263,29 @@ export default function StudentsCRUD() {
       align: 'right',
       render: (a) => (
         <div className="flex justify-end items-center gap-4">
-          <button onClick={(e) => { e.stopPropagation(); handleEdit(a); }} className="text-[12px] font-medium text-consorci-darkBlue hover:underline transition-colors">{tc('edit')}</button>
-          <button onClick={(e) => { e.stopPropagation(); handleDelete(a.studentId); }} className="text-text-muted hover:text-red-500 transition-all">
+          <Button 
+            onClick={(e) => { e.stopPropagation(); handleEdit(a); }} 
+            variant="subtle" 
+            size="sm"
+          >
+            {tc('edit')}
+          </Button>
+          <Button 
+            onClick={(e) => { e.stopPropagation(); handleDelete(a.studentId); }} 
+            variant="subtle" 
+            size="sm"
+            className="hover:!text-red-500 hover:!bg-red-50"
+            title={tc('delete')}
+          >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-          </button>
+          </Button>
         </div>
       )
     }
   ];
 
   const headerActions = (
-    <button
+    <Button
       onClick={() => { 
         setEditingStudent(null); 
         setFormData({ 
@@ -291,11 +304,13 @@ export default function StudentsCRUD() {
         }); 
         setIsModalOpen(true); 
       }}
-      className="bg-consorci-darkBlue text-white px-6 py-3 font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
+      variant="primary"
+      size="md"
+      className="!px-6 !py-3"
+      icon={<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>}
     >
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
       {t('add')}
-    </button>
+    </Button>
   );
 
   return (
@@ -359,12 +374,14 @@ export default function StudentsCRUD() {
                   {editingStudent ? t('edit_subtitle') : t('add_subtitle')}
                 </p>
               </div>
-              <button
+              <Button
                 onClick={() => setIsModalOpen(false)}
-                className="text-text-muted hover:text-text-primary transition-colors mt-1"
+                variant="subtle"
+                size="sm"
+                className="mt-1 !p-1"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
+              </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -511,8 +528,8 @@ export default function StudentsCRUD() {
             </div>
 
             <div className="p-10 border-t border-border-subtle flex gap-4 bg-background-surface">
-              <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline transition-colors">{tc('cancel')}</button>
-              <button type="submit" form="student-form" className="flex-1 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]">{t('save_btn')}</button>
+              <Button type="button" onClick={() => setIsModalOpen(false)} variant="outline" className="flex-1 !py-3">{tc('cancel')}</Button>
+              <Button type="submit" form="student-form" variant="primary" className="flex-1 !py-3">{t('save_btn')}</Button>
             </div>
           </div>
         </div>

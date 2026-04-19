@@ -10,6 +10,7 @@ import assignmentService, { Assignment } from '@/services/assignmentService';
 import phaseService, { Phase } from '@/services/phaseService';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import DataTable, { Column } from '@/components/ui/DataTable';
@@ -193,35 +194,39 @@ export default function AssignmentsPage() {
       align: 'right',
       render: (a) => (
         <div className="flex justify-end gap-3">
-          <button
+          <Button
             onClick={(e) => { e.stopPropagation(); router.push(`/center/assignments/${a.assignmentId}`); }}
-            className="bg-background-subtle text-text-primary py-2 px-6 border border-border-subtle text-[12px] font-medium transition-all hover:bg-gray-100 active:scale-[0.98]"
+            variant="outline"
+            size="sm"
           >
             {t('manage_btn')}
-          </button>
+          </Button>
 
           {/* Phase 4: Closure Actions */}
           {isPhaseActive(PHASES.CLOSURE) && a.status === 'IN_PROGRESS' && (
-            <button
+            <Button
               onClick={(e) => { e.stopPropagation(); handleCloseAssignment(a.assignmentId); }}
               disabled={processingId === a.assignmentId}
-              className="bg-black text-white py-2 px-6 text-[12px] font-black uppercase tracking-widest transition-all hover:bg-consorci-darkBlue active:scale-[0.98] flex items-center gap-2"
+              variant="primary"
+              size="sm"
+              loading={processingId === a.assignmentId}
             >
-              {processingId === a.assignmentId && <Loading size="mini" white />}
               {t('close_group_btn')}
-            </button>
+            </Button>
           )}
 
           {/* Phase 4: Download Actions */}
           {a.status === 'COMPLETED' && (
-            <button
+            <Button
               onClick={(e) => { e.stopPropagation(); handleBulkDownload(a.assignmentId); }}
               disabled={processingId === a.assignmentId}
-              className="bg-[#00426B] text-white py-2 px-6 text-[12px] font-black uppercase tracking-widest transition-all hover:bg-[#0775AB] active:scale-[0.98] flex items-center gap-2"
+              variant="primary"
+              size="sm"
+              loading={processingId === a.assignmentId}
+              icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>}
             >
-              {processingId === a.assignmentId && <Loading size="mini" white />}
               {t('download_bulk_btn')}
-            </button>
+            </Button>
           )}
         </div>
       )
@@ -292,7 +297,7 @@ export default function AssignmentsPage() {
                 placeholder={t('incident_placeholder')}
                 className="flex-1 px-4 py-4 bg-background-subtle border border-border-subtle text-sm font-medium text-text-primary focus:border-consorci-darkBlue outline-none transition-all appearance-none"
               />
-              <button
+              <Button
                 onClick={async () => {
                   const input = document.getElementById('incident-input') as HTMLInputElement;
                   if (!input.value) return;
@@ -304,10 +309,12 @@ export default function AssignmentsPage() {
                   input.value = '';
                   toast.success(t('incident_success'));
                 }}
-                className="px-8 py-4 bg-[#F26178] text-white font-medium text-[13px] transition-all hover:bg-black active:scale-[0.98]"
+                variant="danger"
+                size="md"
+                className="!px-8"
               >
                 {t('report_btn')}
-              </button>
+              </Button>
             </div>
           </section>
         )}

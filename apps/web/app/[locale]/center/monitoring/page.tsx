@@ -15,6 +15,7 @@ import { AssignmentMonitorCard } from '@/components/monitoring/AssignmentMonitor
 import { CloseWorkshopSection } from '@/components/monitoring/CloseWorkshopSection';
 import { TeacherFeedback } from '@/components/monitoring/TeacherFeedback';
 import { toast } from 'sonner';
+import Button from '@/components/ui/Button';
 
 export default function MonitoringPage() {
   const t = useTranslations('Center.Monitoring');
@@ -192,12 +193,14 @@ export default function MonitoringPage() {
                         {selectedAssignment.workshop?.title}
                     </span>
                 </div>
-                <button 
+                <Button 
                   onClick={() => setSelectedAssignment(null)}
-                  className="text-white hover:text-blue-200 transition-colors"
+                  variant="subtle"
+                  size="sm"
+                  className="text-white hover:!text-blue-200 !p-1"
                 >
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+                </Button>
               </div>
 
               {/* Closure Section Only */}
@@ -267,12 +270,14 @@ export default function MonitoringPage() {
                         {feedbackAssignment.workshop?.title}
                     </span>
                 </div>
-                <button 
+                <Button 
                   onClick={() => setFeedbackAssignment(null)}
-                  className="text-blue-600 hover:text-blue-900 transition-colors"
+                  variant="subtle"
+                  size="sm"
+                  className="text-blue-600 hover:!text-blue-900 !p-1"
                 >
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+                </Button>
               </div>
 
               <div className="animate-in fade-in duration-700">

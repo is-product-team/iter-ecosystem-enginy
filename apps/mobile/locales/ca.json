@@ -125,7 +125,7 @@
     "pending_count_one": "{{count}} pendent",
     "pending_count_other": "{{count}} pendents",
     "no_upcoming_workshops": "No tens tallers propers",
-    "next_session_label": "Propera Sessió"
+    "chat_team": "Xat de l'equip"
   },
   "Evaluation": {
     "title": "Avaluació Competencial",
@@ -139,6 +139,31 @@
     "save_success_title": "Guardat",
     "save_success_message": "Avaluació guardada correctament",
     "load_error": "No s'han pogut carregar les dades."
+  },
+  "Profile": {
+    "subtitle": "Gestiona les teves dades i preferències",
+    "information": "Informació del compte",
+    "preferences": "Preferències",
+    "notifications": "Notificacions",
+    "appearance": "Apariència",
+    "appearance_options": {
+      "light": "Clar",
+      "dark": "Fosc",
+      "system": "Sistema"
+    },
+    "language": "Idioma",
+    "languages": {
+      "ca": "Català",
+      "es": "Castellano"
+    },
+    "security_support": "Seguretat i Suport",
+    "security": "Seguretat",
+    "help": "Ajuda i Suport",
+    "role_professor": "Professor Tècnic",
+    "role_admin": "Administrador",
+    "photo_updated": "Foto de perfil actualitzada correctament",
+    "upload_error": "Error en pujar la imatge",
+    "camera_permission_denied": "Es necessiten permisos de càmera i galeria"
   },
   "Questionnaire": {
     "title": "Valoració del Taller",
@@ -155,7 +180,7 @@
   },
   "Notifications": {
     "tagline": "Notificacions",
-    "title": "Avisos i Missatges",
+    "title": "Missatges",
     "mark_read": "Marcar com a llegit",
     "delete": "Eliminar",
     "empty": "No hi ha avisos nous",
@@ -225,20 +250,6 @@
     "title": "Recursos",
     "materials": "Materials i Guies",
     "view_all": "Veure tot"
-  },
-  "Session": {
-    "title_attendance": "Sessió - Asistència",
-    "title_work": "Sessió - Seguiment",
-    "attendance_header": "Registre de Sessió",
-    "attendance_instruction": "Marca l'assistència de cada alumne abans de començar el seguiment tècnic.",
-    "work_header": "Seguiment de Sessió",
-    "work_instruction": "Avalua el progrés de les competències durant el taller.",
-    "observations_label": "Observacions de la sessió",
-    "observations_placeholder": "Afegeix qualsevol incidència o comentari rellevant...",
-    "finish_and_send": "Finalitzar i Enviar Llista",
-    "attendance_sent_success": "Llista d'assistència enviada correctament",
-    "manage_session": "Gestionar Sessió",
-    "error_loading_students": "No s'ha pogut carregar la llista d'alumnes"
   },
   "Issues": {
     "title": "Gestió d'Incidències",

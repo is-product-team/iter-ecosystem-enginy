@@ -36,7 +36,7 @@ const darkVars = vars({
   "--bg-page": "#171717",
   "--bg-surface": "#212121",
   "--bg-subtle": "#2F2F2F",
-  "--bg-brand": "#00426B",
+  "--bg-brand": "#171717",
   "--text-primary": "#ECECEC",
   "--text-secondary": "#B4B4B4",
   "--text-muted": "#676767",

@@ -38,8 +38,7 @@ export default function AdminRequestsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCenterId, setSelectedCenterId] = useState<string>('');
   const [selectedModality, setSelectedModality] = useState<string>('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [groupBy, setGroupBy] = useState<string | null>(null);
 
   // Dialog states
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -201,7 +200,9 @@ export default function AdminRequestsPage() {
       header: "ID",
       render: (r) => <span className="table-id">{r.requestId}</span>,
       width: 60,
-      align: 'center'
+      align: 'center',
+      accessor: 'requestId' as any,
+      sortable: true
     },
     {
       header: "",
@@ -212,45 +213,38 @@ export default function AdminRequestsPage() {
     {
       header: "Centre",
       render: (r) => <span className="table-primary">{r.center?.name}</span>,
-      width: 200
+      width: 200,
+      accessor: 'centerName' as any,
+      sortable: true
     },
     {
       header: "Taller",
       render: (r) => <span className="table-detail font-semibold">{r.workshop?.title}</span>,
-      width: 250
+      width: 250,
+      accessor: 'workshopTitle' as any,
+      sortable: true
     },
     {
       header: "Data",
       render: (r) => <span className="table-detail">{new Date(r.createdAt).toLocaleDateString()}</span>,
       width: 100,
-      align: 'center'
+      align: 'center',
+      accessor: 'createdAt' as any,
+      sortable: true
     },
     {
       header: "Alumnes",
       render: (r) => <span className="table-detail font-bold">{r.studentsAprox}</span>,
       width: 80,
-      align: 'center'
-    },
-    {
-      header: "Estat",
-      render: (r) => {
-        const s = r.status.toUpperCase();
-        return (
-          <span className={
-            s === 'APPROVED' ? 'table-tag-green' :
-            s === 'PENDING' ? 'table-tag-orange' :
-            'table-tag-red'
-          }>
-            {t(`statuses.${r.status.toLowerCase()}`)}
-          </span>
-        );
-      },
-      width: 120,
-      align: 'center'
+      align: 'center',
+      accessor: 'studentsAprox' as any,
+      sortable: true
     },
     {
       header: t('table_status'),
       align: 'center',
+      accessor: 'status' as any,
+      sortable: true,
       render: (r) => (
         <div className="flex items-center justify-center gap-2">
           {r.status === REQUEST_STATUSES.APPROVED ? (
@@ -271,10 +265,11 @@ export default function AdminRequestsPage() {
             r.status === REQUEST_STATUSES.REJECTED ? 'text-red-600' :
             'text-orange-600'
           }`}>
-            {r.status === REQUEST_STATUSES.PENDING ? tc('pending') : r.status === REQUEST_STATUSES.APPROVED ? t('assigned') : t('rejected')}
+            {r.status === REQUEST_STATUSES.PENDING ? t('pending') : r.status === REQUEST_STATUSES.APPROVED ? t('assigned') : t('rejected')}
           </span>
         </div>
-      )
+      ),
+      width: 150
     },
     {
       header: tc('actions'),
@@ -284,9 +279,14 @@ export default function AdminRequestsPage() {
           {r.status === REQUEST_STATUSES.PENDING && (
             <Button
               onClick={(e) => { e.stopPropagation(); handleApprove(r.requestId); }}
-              variant="primary"
+              variant="subtle"
               size="sm"
-              className="!px-4 !py-2 uppercase tracking-wider"
+              className="!px-4 !py-2 uppercase tracking-wider !text-consorci-darkBlue hover:!bg-consorci-darkBlue/10 !border-none !h-auto !min-h-0"
+              icon={
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
             >
               Asignar plazas
             </Button>
@@ -295,7 +295,7 @@ export default function AdminRequestsPage() {
             onClick={(e) => { e.stopPropagation(); handleEditClick(r); }}
             variant="subtle"
             size="sm"
-            className="!p-1.5 hover:!text-consorci-darkBlue"
+            className="!p-1.5 hover:!text-consorci-darkBlue hover:!bg-consorci-darkBlue/10 !border-none"
             title={tc('edit')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -306,7 +306,7 @@ export default function AdminRequestsPage() {
             onClick={(e) => { e.stopPropagation(); handleReject(r.requestId); }}
             variant="subtle"
             size="sm"
-            className="!p-1.5 hover:!text-red-500 hover:!bg-red-50"
+            className="!p-1.5 hover:!text-red-500 hover:!bg-red-50 !border-none"
             title={t('reject_btn')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -320,51 +320,31 @@ export default function AdminRequestsPage() {
 
   ];
 
-  // Filtered Requests based on Center Selection
+  // Process and Filtered Requests
   const filteredRequests = useMemo(() => {
-    return requests.filter(r => {
-      const matchesCenter = !selectedCenterId || r.centerId === parseInt(selectedCenterId);
-      return matchesCenter;
-    });
-  }, [requests, selectedCenterId]);
-
-  // Grouped requests by workshop
-  const workshopRequests = useMemo(() => {
-    const map: Record<number, Request[]> = {};
-    filteredRequests.forEach(r => {
-      if (!map[r.workshopId]) map[r.workshopId] = [];
-      map[r.workshopId].push(r);
-    });
-    return map;
-  }, [filteredRequests]);
-
-  // Final filtered workshops
-  const filteredWorkshops = useMemo(() => {
-    const query = searchQuery.toLowerCase();
-
-    return workshops.filter(w => {
-      const matchesSearch = !searchQuery ||
-        w.title.toLowerCase().includes(query) ||
-        w.sector.toLowerCase().includes(query);
-
-      const matchesModality = !selectedModality || w.modality === selectedModality;
-
-      const hasRequestsAfterFilter = workshopRequests[parseInt(w._id)]?.length > 0;
-
-      return matchesSearch && matchesModality && hasRequestsAfterFilter;
-    });
-  }, [workshops, searchQuery, selectedModality, workshopRequests]);
-
-  const paginatedWorkshops = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return filteredWorkshops.slice(start, end);
-  }, [filteredWorkshops, currentPage]);
-
-  const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
+    return requests
+      .map(r => ({
+        ...r,
+        workshopTitle: r.workshop?.title || '',
+        centerName: r.center?.name || '',
+        modality: r.workshop?.modality || ''
+      }))
+      .filter(r => {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = !searchQuery || 
+          r.workshopTitle.toLowerCase().includes(query) ||
+          r.centerName.toLowerCase().includes(query) ||
+          r.requestId.toString().includes(query);
+          
+        const matchesCenter = !selectedCenterId || r.centerId === parseInt(selectedCenterId);
+        const matchesModality = !selectedModality || r.modality === selectedModality;
+        
+        return matchesSearch && matchesCenter && matchesModality;
+      });
+  }, [requests, searchQuery, selectedCenterId, selectedModality]);
 
   useEffect(() => {
-    setCurrentPage(1);
+    // No more current page for this view, it's a single flat table
   }, [searchQuery, selectedCenterId, selectedModality]);
 
   if (authLoading || !user) {
@@ -401,6 +381,7 @@ export default function AdminRequestsPage() {
           setSearchQuery('');
           setSelectedCenterId('');
           setSelectedModality('');
+          setGroupBy(null);
         }}
         filters={
           <>
@@ -412,7 +393,7 @@ export default function AdminRequestsPage() {
               icon={School}
             />
             <FilterSelect
-              label="Modalitat"
+              label={tc('modality')}
               value={selectedModality}
               onChange={setSelectedModality}
               options={[
@@ -424,6 +405,15 @@ export default function AdminRequestsPage() {
             />
           </>
         }
+        groups={{
+          value: groupBy || '',
+          onChange: setGroupBy,
+          options: [
+            { label: tc('workshop'), value: 'workshopTitle' },
+            { label: tc('educational_center'), value: 'centerName' },
+            { label: tc('status'), value: 'status' }
+          ]
+        }}
       />
 
       {loading ? (
@@ -432,59 +422,17 @@ export default function AdminRequestsPage() {
         <div className="bg-red-50 border-l-4 border-red-500 p-6">
           <p className="text-red-700 font-bold text-sm">{error}</p>
         </div>
-      ) : filteredWorkshops.length > 0 ? (
-        <div className="space-y-12">
-          {paginatedWorkshops.map(workshop => {
-            const workshopId = parseInt(workshop._id);
-            const currentRequests = workshopRequests[workshopId] || [];
-            return (
-              <section key={workshop._id} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center justify-between mb-6 pb-4 mt-16 border-b border-border-subtle/50">
-                  <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 bg-consorci-darkBlue/5 dark:bg-consorci-lightBlue/10 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-consorci-darkBlue dark:text-consorci-lightBlue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-semibold text-text-primary tracking-tight leading-tight">{workshop.title}</h3>
-                      <div className="flex items-center gap-3 mt-1.5 font-medium">
-                        <span className="text-[12px] text-text-muted">{workshop.sector}</span>
-                        <span className="w-1 h-1 bg-text-muted/30 rounded-full"></span>
-                        <span className={`text-[10px] uppercase tracking-wider font-bold ${workshop.modality === 'A' ? 'text-green-600' :
-                          workshop.modality === 'B' ? 'text-orange-600' :
-                            'text-consorci-darkBlue'
-                          }`}>{tc('modality_label', { modality: workshop.modality })}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <DataTable
-                  tableId={`requests_workshop_${workshopId}`}
-                  variant="simple"
-                  data={currentRequests}
-                  columns={columns}
-                  emptyMessage={t('no_requests')}
-                  hideTopBorder
-                />
-              </section>
-            );
-          })}
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalItems={filteredWorkshops.length}
-            currentItemsCount={paginatedWorkshops.length}
-            itemName={tc('workshops').toLowerCase()}
-          />
-        </div>
       ) : (
-        <div className="bg-background-surface border border-dashed border-border-subtle p-20 text-center">
-          <p className="text-text-muted text-xs font-black uppercase tracking-widest">{t('no_requests')}</p>
-        </div>
+        <DataTable
+          tableId="admin_requests_table"
+          data={filteredRequests}
+          columns={columns}
+          loading={loading}
+          emptyMessage={t('no_requests')}
+          hideTopBorder
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
+        />
       )}
       {/* Edit Modal */}
       {isEditModalOpen && (
@@ -497,7 +445,7 @@ export default function AdminRequestsPage() {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold text-text-primary tracking-tight">{t('edit_title')}</h3>
-              <p className="text-sm text-text-muted mt-2 font-medium">{tc('review_data')}</p>
+              <p className="text-sm text-text-muted mt-2 font-medium">{tForm('review_data')}</p>
             </div>
 
             <form onSubmit={handleEditSubmit} className="space-y-8">

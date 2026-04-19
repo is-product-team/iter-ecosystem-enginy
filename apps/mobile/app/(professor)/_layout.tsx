@@ -13,9 +13,9 @@ export default function ProfessorStackLayout() {
         headerShown: false,
         animation: 'slide_from_right',
         headerStyle: {
-          backgroundColor: isDark ? '#0f172a' : '#ffffff',
+          backgroundColor: isDark ? '#171717' : '#ffffff',
         },
-        headerTintColor: isDark ? '#E0C5AC' : '#00426B',
+        headerTintColor: isDark ? '#B4B4B4' : '#00426B',
         headerTitleStyle: {
           fontWeight: 'bold',
           fontFamily: 'Inter',

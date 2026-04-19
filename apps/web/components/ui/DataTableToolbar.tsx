@@ -3,6 +3,7 @@
 import React from 'react';
 import { Search, X, ChevronDown, LucideIcon, Layers } from 'lucide-react';
 import Button from './Button';
+import { useTranslations } from 'next-intl';
 
 interface FilterSelectProps {
   label: string;
@@ -78,13 +79,16 @@ export default function DataTableToolbar({
   title,
   icon,
   resultsCount,
-  itemName = 'items',
+  itemName,
   actions,
   search,
   filters,
   onClear,
   groups
 }: DataTableToolbarProps) {
+  const t = useTranslations('Common');
+  const displayItemName = itemName || t('items');
+
   return (
     <div className="flex flex-col w-full border-t border-l border-r border-border-subtle bg-background-surface transition-all animate-in fade-in duration-500">
       {/* Header Bar */}
@@ -99,7 +103,7 @@ export default function DataTableToolbar({
             {resultsCount !== undefined && (
               <div className="hidden sm:flex items-center gap-2">
                 <span className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em]">
-                  {resultsCount} {itemName}
+                  {resultsCount} {displayItemName}
                 </span>
               </div>
             )}
@@ -130,7 +134,7 @@ export default function DataTableToolbar({
           {groups && (
             <div className="xl:flex-1 border-b lg:border-r border-border-subtle h-[48px]">
               <FilterSelect
-                label="Agrupar per..."
+                label={t('group_by')}
                 value={groups.value}
                 onChange={groups.onChange}
                 options={groups.options}
@@ -148,7 +152,7 @@ export default function DataTableToolbar({
                 className="h-full w-full uppercase tracking-[0.2em] !text-text-muted hover:!text-red-500 font-bold"
               >
                 <X className="w-3.5 h-3.5" />
-                <span>Clear</span>
+                <span>{t('clear')}</span>
               </Button>
             </div>
           )}

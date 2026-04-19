@@ -21,31 +21,45 @@ function GridCard({ item, fullWidth = false }: { item: QuickAccessItem, fullWidt
   return (
     <TouchableOpacity
       onPress={item.onPress}
-      activeOpacity={0.75}
-      style={{ height: fullWidth ? 100 : 110 }}
-      className={`bg-background-surface rounded-[24px] p-4 justify-between shadow-sm ${fullWidth ? 'w-full' : 'flex-1'}`}
+      activeOpacity={0.8}
+      style={{ 
+        height: fullWidth ? 130 : 160, 
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 3,
+      }}
+      className={`bg-background-surface rounded-[32px] p-7 justify-between border border-border-subtle ${fullWidth ? 'w-full' : 'flex-1'}`}
     >
       <View className="flex-row items-start justify-between">
         <View
-          className="w-10 h-10 rounded-[14px] items-center justify-center"
-          style={{ backgroundColor: item.iconBg.endsWith('15') ? item.iconBg.replace('15', '25') : item.iconBg }}
+          className="w-11 h-11 rounded-[14px] items-center justify-center"
+          style={{ backgroundColor: item.iconBg }}
         >
-          <Ionicons name={item.icon} size={20} color={item.iconColor} />
+          <Ionicons name={item.icon} size={22} color={item.iconColor} />
         </View>
+        
         {item.badge !== undefined && item.badge > 0 && (
-          <View className="bg-[#FF3B30] rounded-full min-w-[22px] h-[22px] items-center justify-center px-1.5">
-            <Text className="text-white text-[12px] font-black">{item.badge > 99 ? '99+' : item.badge}</Text>
+          <View className="bg-[#FF3B30] rounded-full min-w-[20px] h-[20px] items-center justify-center px-1.5 border-2 border-background-surface">
+            <Text className="text-white text-[10px] font-black">{item.badge > 99 ? '99+' : item.badge}</Text>
           </View>
         )}
       </View>
 
-      <View className={fullWidth ? 'mt-0' : 'mt-3'}>
-        {item.value && (
-          <Text className="text-text-primary text-[15px] font-bold leading-tight mb-0.5" numberOfLines={1}>
-            {item.value}
-          </Text>
-        )}
-        <Text className="text-text-muted text-[12px] font-semibold uppercase tracking-wider opacity-60">{item.label}</Text>
+      <View>
+        <Text 
+          className="text-text-primary" 
+          style={{ 
+            fontSize: fullWidth ? 24 : 20, 
+            fontWeight: '300', 
+            lineHeight: fullWidth ? 30 : 24, 
+            letterSpacing: -0.6 
+          }}
+          numberOfLines={2}
+        >
+          {item.value || "---"}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -54,32 +68,23 @@ function GridCard({ item, fullWidth = false }: { item: QuickAccessItem, fullWidt
 export function QuickAccessGrid({ items }: QuickAccessGridProps) {
   if (items.length === 0) return null;
 
-  // The first item (Notifications) should be full width
   const firstItem = items[0];
-  // The rest (Coordination, Support) should be in rows of 2
   const restItems = items.slice(1);
-  const rows: QuickAccessItem[][] = [];
-  for (let i = 0; i < restItems.length; i += 2) {
-    rows.push(restItems.slice(i, i + 2));
-  }
 
   return (
-    <View className="mx-6 mb-10">
-      {/* First item - Full Width */}
+    <View className="mx-6 mb-12">
+      {/* 1 Large Top Card */}
       <GridCard item={firstItem} fullWidth={true} />
 
-      {/* Subsequent items - Rows of 2 */}
-      {rows.map((row, rowIdx) => (
-        <View
-          key={rowIdx}
-          className="flex-row gap-4 mt-4"
-        >
-          {row.map((item) => (
-            <GridCard key={item.id} item={item} />
-          ))}
-          {row.length === 1 && <View className="flex-1" />}
-        </View>
-      ))}
+      {/* 2 Small Cards Grid */}
+      {restItems.length > 0 && (
+         <View className="flex-row gap-5 mt-5">
+           {restItems.map((item) => (
+             <GridCard key={item.id} item={item} fullWidth={false} />
+           ))}
+           {restItems.length === 1 && <View className="flex-1" />}
+         </View>
+      )}
     </View>
   );
 }

@@ -8,6 +8,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { ROLES } from '@iter/shared';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -103,16 +104,16 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
       title={t('page_title', { title: assignment.workshop?.title || '' })}
       subtitle={t('page_subtitle')}
     >
-      <div className="mb-8 p-6 bg-white border border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="mb-8 p-6 bg-background-surface border border-border-subtle flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex flex-col gap-2">
-          <h3 className="text-lg font-black text-[#00426B] uppercase">{t('referent_team')}</h3>
+          <h3 className="text-lg font-black text-consorci-darkBlue uppercase">{t('referent_team')}</h3>
           <div className="flex gap-4 items-center">
             <div className="flex gap-2">
-              <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher1?.user?.fullName || tCommon('pending')}</span>
-              <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1 border border-gray-100">{assignment.teacher2?.user?.fullName || tCommon('pending')}</span>
+              <span className="text-xs font-bold text-text-muted bg-background-subtle px-3 py-1 border border-border-subtle">{assignment.teacher1?.user?.fullName || tCommon('pending')}</span>
+              <span className="text-xs font-bold text-text-muted bg-background-subtle px-3 py-1 border border-border-subtle">{assignment.teacher2?.user?.fullName || tCommon('pending')}</span>
             </div>
             {assignment.teacher1?.userId && (
-              <button
+              <Button
                 onClick={async () => {
                   try {
                     const api = getApi();
@@ -124,54 +125,60 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                     toast.error(t('bulk_assign_error') || 'Error al sincronitzar');
                   }
                 }}
-                className="text-[10px] font-black uppercase text-white bg-[#4197CB] hover:bg-black px-4 py-1.5 transition-all flex items-center gap-2"
+                variant="primary"
+                size="sm"
+                className="!text-[10px] !px-4 !py-1.5 uppercase"
+                icon={<svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>}
               >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                 {t('sync_team_btn') || 'Sincronitzar'}
-              </button>
+              </Button>
             )}
           </div>
         </div>
-        <button
+        <Button
           onClick={() => router.push('/center/sessions')}
-          className="text-xs font-bold text-[#4197CB] hover:text-[#00426B] uppercase tracking-widest flex items-center gap-2"
+          variant="subtle"
+          size="sm"
+          className="uppercase tracking-widest !text-[#4197CB] hover:!text-[#00426B]"
+          icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           {t('back_to_list')}
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
         {assignment.sessions?.map((session, idx: number) => (
-          <div key={session.sessionId} className="bg-white border border-gray-200 p-6 flex flex-col gap-4 group hover:border-[#4197CB] transition-all shadow-sm">
+          <div key={session.sessionId} className="bg-background-surface border border-border-subtle p-6 flex flex-col gap-4 group hover:border-consorci-lightBlue transition-all shadow-sm">
             <div className="flex justify-between items-start">
               <div className="flex flex-col">
-                <span className="text-[10px] font-black text-[#4197CB] uppercase tracking-widest">{t('session_n', { number: idx + 1 })}</span>
-                <span className="text-sm font-black text-[#00426B] uppercase">
+                <span className="text-[10px] font-black text-consorci-lightBlue uppercase tracking-widest">{t('session_n', { number: idx + 1 })}</span>
+                <span className="text-sm font-black text-consorci-darkBlue uppercase">
                   {new Date(session.sessionDate).toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
               </div>
-              <div className="text-[10px] font-bold text-gray-300">
+              <div className="text-[10px] font-bold text-text-muted opacity-50">
                 {session.startTime || '09:00'} - {session.endTime || '11:00'}
               </div>
             </div>
 
-            <div className="border-t border-gray-50 pt-4 flex flex-col gap-3">
-              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('specific_team')}</span>
+            <div className="border-t border-border-subtle pt-4 flex flex-col gap-3">
+              <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest">{t('specific_team')}</span>
               <div className="flex flex-wrap gap-2 min-h-[32px]">
                 {session.staff?.map((sp) => (
-                  <div key={sp.userId} className="flex items-center gap-2 bg-[#F8FAFC] border border-gray-100 pl-2 pr-1 py-1 group/chip">
-                    <span className="text-[10px] font-bold text-[#00426B] uppercase">{sp.user?.fullName}</span>
-                    <button
+                  <div key={sp.userId} className="flex items-center gap-2 bg-background-subtle border border-border-subtle pl-2 pr-1 py-1 group/chip">
+                    <span className="text-[10px] font-bold text-consorci-darkBlue uppercase">{sp.user?.fullName}</span>
+                    <Button
                       onClick={() => handleRemoveSessionStaff(session.sessionId, sp.userId)}
-                      className="hover:text-red-500 text-gray-300 transition-colors p-0.5"
+                      variant="subtle"
+                      size="sm"
+                      className="hover:!text-red-500 !text-gray-300 !p-0.5 h-auto border-none"
                     >
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
+                    </Button>
                   </div>
                 ))}
                 {(!session.staff || session.staff.length === 0) && (
-                  <div className="flex items-center gap-2 bg-orange-50 border border-orange-100 px-3 py-1 animate-pulse">
+                  <div className="flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 px-3 py-1 animate-pulse">
                     <svg className="w-3 h-3 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                     <span className="text-[10px] text-orange-600 font-bold uppercase tracking-tight">{t('use_referent_team')}</span>
                   </div>
@@ -187,7 +194,7 @@ export default function SessionManagementPage({ params }: { params: Promise<{ id
                     e.target.value = "";
                   }
                 }}
-                className="w-full text-[10px] font-bold uppercase tracking-widest bg-gray-50 border-none focus:ring-1 focus:ring-[#00426B] p-2 text-gray-500 cursor-pointer"
+                className="w-full text-[10px] font-bold uppercase tracking-widest bg-background-subtle border-none focus:ring-1 focus:ring-consorci-darkBlue p-2 text-text-muted cursor-pointer"
                 defaultValue=""
               >
                 <option value="" disabled>{t('modify_teacher')}</option>

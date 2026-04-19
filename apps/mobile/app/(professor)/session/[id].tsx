@@ -142,7 +142,6 @@ export default function SessionScreen() {
           headerBackTitle: t('Common.back'),
           headerShadowVisible: false,
           headerTransparent: true,
-          headerTintColor: '#007AFF',
         }} 
       />
       

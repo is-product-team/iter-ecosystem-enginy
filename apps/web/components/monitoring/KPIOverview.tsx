@@ -10,13 +10,13 @@ interface KPIProps {
   color: string;
 }
 
-const KPICard: React.FC<KPIProps> = ({ label, value, icon, color }) => (
-  <div className="bg-background-surface p-8 border border-border-subtle group hover:border-consorci-darkBlue transition-all duration-300">
+const KPICard: React.FC<KPIProps & { active?: boolean }> = ({ label, value, icon, color, active }) => (
+  <div className="bg-background-surface p-8 border border-border-subtle group transition-all duration-300">
     <div className="flex items-start justify-between mb-4">
-      <div className={`p-3 bg-background-subtle rounded-none border border-border-subtle group-hover:bg-consorci-darkBlue group-hover:text-white transition-all duration-300 ${color}`}>
+      <div className={`p-3 bg-background-subtle border border-border-subtle transition-all duration-300 ${active ? color : 'text-text-muted opacity-40'} ${active && color.includes('pinkRed') ? 'animate-pulse' : ''}`}>
         {icon}
       </div>
-      <span className="text-3xl font-medium text-text-primary tracking-tight">{value}</span>
+      <span className={`text-3xl font-medium tracking-tight ${active ? 'text-text-primary' : 'text-text-muted'}`}>{value}</span>
     </div>
     <h4 className="text-[11px] font-medium text-text-muted uppercase tracking-widest">{label}</h4>
   </div>
@@ -39,6 +39,7 @@ export const KPIOverview: React.FC<KPIOverviewProps> = ({ stats }) => {
       <KPICard
         label={t('sessions_today')}
         value={stats.sessionsToday}
+        active={stats.sessionsToday > 0}
         color="text-consorci-actionBlue"
         icon={
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,7 +50,8 @@ export const KPIOverview: React.FC<KPIOverviewProps> = ({ stats }) => {
       <KPICard
         label={t('pending_attendance')}
         value={stats.pendingAttendance}
-        color={stats.pendingAttendance > 0 ? "text-consorci-pinkRed" : "text-consorci-green"}
+        active={stats.pendingAttendance > 0}
+        color="text-consorci-pinkRed"
         icon={
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
@@ -59,6 +61,7 @@ export const KPIOverview: React.FC<KPIOverviewProps> = ({ stats }) => {
       <KPICard
         label={t('active_assignments')}
         value={stats.activeAssignments}
+        active={stats.activeAssignments > 0}
         color="text-consorci-darkBlue"
         icon={
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -69,7 +72,8 @@ export const KPIOverview: React.FC<KPIOverviewProps> = ({ stats }) => {
       <KPICard
         label={t('incidents')}
         value={stats.incidents}
-        color={typeof stats.incidents === 'number' && stats.incidents > 0 ? "text-consorci-pinkRed" : "text-text-muted"}
+        active={typeof stats.incidents === 'number' ? stats.incidents > 0 : stats.incidents !== '0'}
+        color="text-consorci-pinkRed"
         icon={
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

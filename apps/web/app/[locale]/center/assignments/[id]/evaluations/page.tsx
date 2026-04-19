@@ -8,6 +8,8 @@ import DashboardLayout from '@/components/DashboardLayout';
 import assignmentService, { Assignment, Enrollment } from '@/services/assignmentService';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
+import Avatar from '@/components/Avatar';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -61,12 +63,12 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                     {t('back_to_assignments')}
                 </button>
 
-                <div className="bg-white border shadow-sm overflow-hidden">
-                    <div className="bg-gray-50 px-8 py-4 border-b">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{t('list_of_enrollments')}</h3>
+                <div className="bg-background-surface border border-border-subtle shadow-sm overflow-hidden">
+                    <div className="bg-background-subtle px-8 py-4 border-b border-border-subtle">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-text-muted">{t('list_of_enrollments')}</h3>
                     </div>
 
-                    <div className="divide-y relative">
+                    <div className="divide-y divide-border-subtle relative">
                         {(!assignment.enrollments || assignment.enrollments.length === 0) ? (
                             <div className="p-20 text-center">
                                 <p className="text-sm text-gray-400 italic">{t('no_enrollments')}</p>
@@ -75,17 +77,15 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                             assignment.enrollments.map((ins: Enrollment) => (
                                 <div
                                     key={ins.enrollmentId}
-                                    className="px-8 py-6 flex justify-between items-center hover:bg-gray-50 transition-colors"
+                                    className="px-8 py-6 flex justify-between items-center hover:bg-background-subtle border-b border-border-subtle last:border-0 transition-colors"
                                 >
                                     <div className="flex items-center gap-6">
-                                        <div className="w-12 h-12 bg-blue-900 flex items-center justify-center font-black italic text-sm text-white shadow-lg">
-                                            {ins.student?.fullName?.charAt(0)}{ins.student?.lastName?.charAt(0)}
-                                        </div>
+                                        <Avatar name={ins.student?.fullName} type="user" size="lg" />
                                         <div>
-                                            <p className="font-bold text-gray-900">
+                                            <p className="font-bold text-text-primary">
                                                 {ins.student?.fullName} {ins.student?.lastName}
                                             </p>
-                                            <p className="text-[10px] font-black uppercase tracking-tighter text-gray-400">
+                                            <p className="text-[10px] font-black uppercase tracking-tighter text-text-muted">
                                                 {t('idalu')} {ins.student?.idalu}
                                             </p>
                                         </div>
@@ -94,17 +94,19 @@ export default function AssignmentEvaluationsPage({ params }: { params: Promise<
                                     <div className="flex items-center gap-6">
                                         <div className="hidden md:block text-right">
                                             {ins.hasTeacherEvaluation ? (
-                                                <span className="text-[10px] font-black uppercase px-3 py-1 bg-green-100 text-green-700">{t('status_completed')}</span>
+                                                <span className="text-[10px] font-black uppercase px-3 py-1 bg-green-500/10 text-consorci-green">{t('status_completed')}</span>
                                             ) : (
-                                                <span className="text-[10px] font-black uppercase px-3 py-1 bg-orange-100 text-orange-700">{t('status_pending')}</span>
+                                                <span className="text-[10px] font-black uppercase px-3 py-1 bg-orange-500/10 text-orange-700">{t('status_pending')}</span>
                                             )}
                                         </div>
-                                        <button
+                                        <Button
                                             onClick={() => router.push(`/center/assignments/${id}/evaluations/${ins.enrollmentId}`)}
-                                            className="bg-black hover:bg-blue-900 text-white px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95"
+                                            variant="primary"
+                                            size="sm"
+                                            className="uppercase tracking-widest !text-[10px]"
                                         >
                                             {ins.hasTeacherEvaluation ? t('btn_view_edit') : t('btn_evaluate')}
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             ))

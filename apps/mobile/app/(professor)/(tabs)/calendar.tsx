@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { THEME } from '@iter/shared';
 import { getCalendar } from '../../../services/api';
 import CalendarView, { CalendarEvent } from '../../../components/CalendarView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
+import { PageHeader } from '../../../components/ui/PageHeader';
 
 export default function CalendarTabScreen() {
   const { t } = useTranslation();
@@ -13,19 +14,23 @@ export default function CalendarTabScreen() {
   const router = useRouter();
   const [calendarEvents, setCalendarEvents] = React.useState<CalendarEvent[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
   const [isRangeFetching, setIsRangeFetching] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await fetchRangeData(new Date());
+    setRefreshing(false);
+  }, [fetchRangeData]);
 
   const fetchRangeData = React.useCallback(async (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
-    const start = new Date(year, month, 1 - 7);
-    const end = new Date(year, month + 1, 7);
-    const startStr = start.toISOString().split('T')[0];
-    const endStr = end.toISOString().split('T')[0];
-
+    
     setIsRangeFetching(true);
     try {
-      const calendarRes = await getCalendar(startStr, endStr);
+      // Fix: convert year and month to string as API expects strings
+      const calendarRes = await getCalendar(String(year), String(month + 1));
       setCalendarEvents(calendarRes.data);
     } catch (err) {
       console.error("Error fetching range data:", err);
@@ -39,46 +44,57 @@ export default function CalendarTabScreen() {
     fetchRangeData(new Date());
   }, [fetchRangeData]);
 
-  if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-background-page">
-        <ActivityIndicator size="large" color={THEME.colors.primary} />
-      </View>
-    );
-  }
-
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-white dark:bg-black">
-      {/* Apple-style Large Header */}
-      <View className="px-8 pb-10">
-         <Text className="text-[16px] font-normal text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
-           {t('Calendar.academic_agenda')}
-         </Text>
-         <Text className="text-[44px] font-light text-black dark:text-white tracking-tight leading-[48px]">
-           {t('Calendar.title')}
-         </Text>
-      </View>
+    <View className="flex-1 bg-background-page">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={true}
+        alwaysBounceVertical={true}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#4197CB"
+            colors={['#4197CB']}
+            progressViewOffset={insets.top + 40}
+          />
+        }
+      >
+        {/* Standardized Header */}
+        <PageHeader title={t('Calendar.title')} subtitle={t('Calendar.academic_agenda')} />
 
-      <View className="flex-1">
-        <CalendarView 
-          events={calendarEvents} 
-          isLoading={isRangeFetching}
-          onMonthChange={fetchRangeData}
-          onEventClick={(event) => {
-            if (event.type === 'session' && event.metadata?.assignmentId) {
-               router.push({
-                 pathname: `/(professor)/session/${event.metadata.assignmentId}`,
-                 params: { 
-                   sessionNum: event.metadata.sessionNum,
-                   sessionId: event.metadata.sessionId 
-                 }
-               } as any);
-            } else if (event.type === 'assignment' && event.metadata?.assignmentId) {
-               router.push(`/(professor)/session/${event.metadata.assignmentId}`);
-            }
-          }}
-        />
-      </View>
+        {loading && !calendarEvents.length ? (
+          <View 
+            className="items-center justify-center bg-background-page"
+            style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
+          >
+            <ActivityIndicator size="large" color="#4197CB" />
+          </View>
+        ) : (
+          <View className="flex-1">
+            <CalendarView 
+              events={calendarEvents} 
+              isLoading={isRangeFetching}
+              onMonthChange={fetchRangeData}
+              onEventClick={(event) => {
+                if (event.type === 'session' && event.metadata?.assignmentId) {
+                   router.push({
+                     pathname: `/(professor)/session/${event.metadata.assignmentId}`,
+                     params: { 
+                       sessionNum: event.metadata.sessionNum,
+                       sessionId: event.metadata.sessionId 
+                     }
+                   } as any);
+                } else if (event.type === 'assignment' && event.metadata?.assignmentId) {
+                   router.push(`/(professor)/session/${event.metadata.assignmentId}`);
+                }
+              }}
+            />
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 }

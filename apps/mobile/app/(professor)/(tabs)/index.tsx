@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, RefreshControl, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -7,11 +7,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { THEME } from '@iter/shared';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'nativewind';
-import { getMyAssignments, getPhases, getNotifications } from '../../../services/api';
+import { getMyAssignments, getPhases, getNotifications, getMe } from '../../../services/api';
 import { CalendarEvent } from '../../../components/EventDetailModal';
 import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
 import { SessionCarousel } from '../../../components/dashboard/SessionCarousel';
 import { QuickAccessGrid } from '../../../components/dashboard/QuickAccessGrid';
+import { PageHeader } from '../../../components/ui/PageHeader';
+import * as ExpoConstants from 'expo-constants';
+
+const Constants = ExpoConstants.default || ExpoConstants;
+const API_URL = Constants.expoConfig?.extra?.apiUrl || 'https://iter.kore29.com';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -88,7 +93,10 @@ export default function DashboardScreen() {
               setUserInitials(initials);
             }
 
-            if (userImage) setAvatar(userImage);
+            if (userImage) {
+              const fullUrl = userImage.startsWith('http') ? userImage : `${API_URL}${userImage}`;
+              setAvatar(fullUrl);
+            }
         }
 
         const roleName = user.role?.roleName;
@@ -100,6 +108,25 @@ export default function DashboardScreen() {
         if (isMounted.current) router.replace('/login');
         return;
       }
+
+      // Sync Profile Data (Async, no block)
+      getMe().then(res => {
+        if (res.data && isMounted.current) {
+          const profile = res.data;
+          if (profile.photoUrl) {
+            const absoluteUrl = profile.photoUrl.startsWith('http') ? profile.photoUrl : `${API_URL}${profile.photoUrl}`;
+            setAvatar(absoluteUrl);
+            if (Platform.OS === 'web') {
+              localStorage.setItem('user-avatar', profile.photoUrl);
+            } else {
+              SecureStore.setItemAsync('user-avatar', profile.photoUrl);
+            }
+          }
+          if (profile.fullName) {
+             setUserName(profile.fullName.split(' ')[0]);
+          }
+        }
+      }).catch(err => console.warn("Silent profile sync failed", err));
 
       const [phasesRes, assignmentsRes, notifsRes] = await Promise.all([
         getPhases(),
@@ -307,7 +334,10 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background-page">
+      <View 
+        className="items-center justify-center bg-background-page"
+        style={[StyleSheet.absoluteFill, { zIndex: 50 }]}
+      >
         <ActivityIndicator size="large" color={colorScheme === 'dark' ? '#4197CB' : THEME.colors.primary} />
       </View>
     );
@@ -320,29 +350,29 @@ export default function DashboardScreen() {
       id: 'notifications',
       icon: 'notifications' as const,
       iconColor: '#FF3B30',
-      iconBg: '#FF3B3015',
-      label: t('Notifications.title'),
+      iconBg: '#FF3B3010',
+      label: "AVISOS",
       badge: unreadCount,
-      value: unreadCount > 0 ? t('Dashboard.pending_count', { count: unreadCount }) : t('Dashboard.none_new'),
+      value: "Missatges i Avisos",
       onPress: () => router.push('/(professor)/notifications'),
     },
     {
       id: 'coordination',
       icon: 'people' as const,
       iconColor: '#34C759',
-      iconBg: '#34C75915',
-      label: t('Coordination.title'),
-      value: t('Coordination.collaboration'),
+      iconBg: '#34C75910',
+      label: "XAT",
+      value: "Xat de l'equip",
       onPress: () => router.push('/(professor)/coordination'),
     },
     {
-      id: 'support',
-      icon: 'chatbubble-ellipses' as const,
-      iconColor: '#FF9500',
-      iconBg: '#FF950015',
-      label: t('Support.title'),
-      value: t('Support.chat_admin'),
-      onPress: () => router.push('/(professor)/support'),
+      id: 'issues',
+      icon: 'alert-circle' as const,
+      iconColor: '#AF52DE',
+      iconBg: '#AF52DE10',
+      label: "SUPORT",
+      value: t('Issues.new'),
+      onPress: () => router.push('/(professor)/issue/new'), 
     },
   ];
 
@@ -350,36 +380,27 @@ export default function DashboardScreen() {
 
 
   return (
-    <View style={{ paddingTop: insets.top }} className="flex-1 bg-background-page">
+    <View className="flex-1 bg-background-page">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colorScheme === 'dark' ? '#4197CB' : THEME.colors.primary} />
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor={colorScheme === 'dark' ? '#4197CB' : THEME.colors.primary}
+            colors={['#4197CB']}
+            progressViewOffset={insets.top + 40}
+          />
         }
       >
-        {/* ── Apple-style Header ── */}
-        <View className="px-8 pt-6 pb-10 flex-row justify-between items-start">
-          <View className="flex-1 mr-4">
-            <Text className="text-[44px] font-light text-text-primary tracking-tight leading-[48px]">
-              {greeting}
-            </Text>
-            <Text className="text-[16px] font-normal text-text-secondary mt-2 leading-relaxed">
-              {subtitle}
-            </Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => router.push('/profile')}
-            activeOpacity={0.8}
-            className="w-12 h-12 rounded-full bg-primary items-center justify-center overflow-hidden mt-2"
-          >
-            {avatar ? (
-              <Image source={{ uri: avatar }} className="w-full h-full" />
-            ) : (
-              <Text className="text-sm font-black text-white">{userInitials}</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+        {/* ── Standardized Header ── */}
+        <PageHeader 
+          title={greeting} 
+          subtitle={subtitle} 
+          profileImage={avatar}
+          userInitials={userInitials}
+        />
 
         {/* ── Sessions Carousel ── */}
         <SessionCarousel

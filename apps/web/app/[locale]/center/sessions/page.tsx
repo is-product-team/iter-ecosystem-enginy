@@ -7,6 +7,7 @@ import { ROLES } from '@iter/shared';
 import DashboardLayout from '@/components/DashboardLayout';
 import getApi from '@/services/api';
 import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button';
 import { toast } from 'sonner';
 import Pagination from '@/components/Pagination';
 import { useTranslations, useLocale } from 'next-intl';
@@ -245,25 +246,27 @@ export default function SessionsListPage() {
           />
         }
         actions={
-          <button
+          <Button
             onClick={() => setShowModal(true)}
-            className="bg-consorci-darkBlue text-white px-6 py-2 text-[12px] font-bold uppercase tracking-widest transition-all hover:bg-black active:scale-[0.98] flex items-center gap-2"
+            variant="primary"
+            size="md"
+            className="!px-6 !py-2"
+            icon={<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             {t('assign_teacher')}
-          </button>
+          </Button>
         }
       />
 
       {/* Flat List */}
-      <div className="bg-white border border-border-subtle border-t-0 shadow-sm overflow-hidden">
+      <div className="bg-background-surface border border-border-subtle border-t-0 shadow-sm overflow-hidden">
         {paginatedSessions.length === 0 ? (
           <div className="p-20 text-center text-text-muted font-medium text-sm italic">
             {tc('no_results')}
           </div>
         ) : (
           <>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border-subtle">
               {paginatedSessions.map((session) => {
                 const dateObj = new Date(session.sessionDate);
                 const dateLocale = locale === 'ar' ? 'ar-SA' : locale === 'en' ? 'en-GB' : locale === 'ca' ? 'ca-ES' : 'es-ES';
@@ -331,20 +334,22 @@ export default function SessionsListPage() {
                                   <span className="text-[11px] font-medium text-text-primary group-hover/chip:text-red-500 transition-colors">
                                     {staffMember.user?.fullName || staffMember.name}
                                   </span>
-                                  <button
+                                  <Button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       if (staffMember.userId || staffMember.id) {
                                         handleRemoveStaff(Number(session.sessionId), (staffMember.userId || staffMember.id) as number);
                                       }
                                     }}
-                                    className="text-text-muted hover:text-red-500 focus:outline-none transition-colors"
+                                    variant="subtle"
+                                    size="sm"
+                                    className="!p-1 h-auto border-none hover:!text-red-500"
                                     title="Remove teacher"
                                   >
                                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
-                                  </button>
+                                  </Button>
                                 </div>
                               ))}
                             </div>
@@ -383,32 +388,36 @@ export default function SessionsListPage() {
                 <h3 className="text-xl font-medium text-text-primary tracking-tight">{t('assign_teacher')}</h3>
                 <p className="text-[12px] font-medium text-text-muted mt-2">{t('assign_teacher_desc')}</p>
               </div>
-              <button
+              <Button
                 onClick={() => setShowModal(false)}
-                className="text-text-muted hover:text-text-primary transition-colors mt-1"
+                variant="subtle"
+                size="sm"
+                className="mt-1 !p-1"
                 aria-label="Close"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
+              </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar">
               {/* Mode Selection */}
               <div className="flex bg-background-subtle p-1 border border-border-subtle">
-                <button
+                <Button
                   onClick={() => { setMode('single'); setSelectedSessionId(""); }}
-                  className={`flex-1 py-3 text-[12px] font-medium transition-all ${mode === 'single' ? 'bg-background-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
-                    }`}
+                  variant={mode === 'single' ? 'primary' : 'subtle'}
+                  size="sm"
+                  className={`flex-1 !py-3 !text-[12px] !font-medium ${mode === 'single' ? 'shadow-sm' : ''}`}
                 >
                   {t('specific_day')}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => { setMode('whole'); setSelectedSessionId(""); }}
-                  className={`flex-1 py-3 text-[12px] font-medium transition-all ${mode === 'whole' ? 'bg-background-surface text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
-                    }`}
+                  variant={mode === 'whole' ? 'primary' : 'subtle'}
+                  size="sm"
+                  className={`flex-1 !py-3 !text-[12px] !font-medium ${mode === 'whole' ? 'shadow-sm' : ''}`}
                 >
                   {t('whole_workshop')}
-                </button>
+                </Button>
               </div>
 
               {/* Workshop Select */}
@@ -474,18 +483,20 @@ export default function SessionsListPage() {
             </div>
 
             <div className="p-10 border-t border-border-subtle flex gap-4 bg-background-surface">
-              <button
+              <Button
                 onClick={() => setShowModal(false)}
-                className="flex-1 py-3 text-[13px] font-medium text-text-muted hover:text-text-primary hover:underline transition-colors"
+                variant="outline"
+                className="flex-1 !py-3"
               >
                 {tc('cancel')}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleAssign}
-                className="flex-1 py-3 bg-consorci-darkBlue text-white text-[13px] font-medium transition-all hover:bg-black active:scale-[0.98]"
+                variant="primary"
+                className="flex-1 !py-3"
               >
                 {tc('save')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

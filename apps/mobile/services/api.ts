@@ -250,4 +250,7 @@ export const getCalendar = (start?: string, end?: string) => {
 export const getNotifications = () => 
   api.get<Notification[]>('notifications');
 
+export const getMe = () => 
+  api.get('auth/me');
+
 export default api;

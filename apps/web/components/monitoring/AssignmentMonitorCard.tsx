@@ -58,13 +58,13 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
   const canBeClosed = assignment.status === 'IN_PROGRESS' && progress >= 100;
 
   return (
-    <div className="group relative bg-white transition-all duration-300 hover:shadow-xl hover:shadow-consorci-darkBlue/5 flex flex-col h-full border border-neutral-200 hover:border-consorci-darkBlue overflow-hidden">
+    <div className="group relative bg-background-surface transition-all duration-300 hover:shadow-xl hover:shadow-consorci-darkBlue/5 flex flex-col h-full border border-border-subtle hover:border-consorci-darkBlue overflow-hidden">
       
       <div className="p-6 flex flex-col h-full flex-1">
         {/* Header - Minimal */}
         <div className="flex justify-between items-start mb-4">
             <div className="flex-1 mr-2">
-                <h4 className="text-lg font-light text-black tracking-tight leading-snug truncate" title={assignment.workshop?.title}>
+                <h4 className="text-lg font-light text-text-primary tracking-tight leading-snug truncate" title={assignment.workshop?.title}>
                     {assignment.workshop?.title || 'Workshop'}
                 </h4>
                 <span className="text-[9px] font-normal text-consorci-darkBlue uppercase tracking-widest">
@@ -74,15 +74,15 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
         </div>
 
         {/* Main Data Row - Compact Split with Weighted Percentage */}
-        <div className="flex items-center justify-between py-4 border-y border-neutral-50 mb-4">
+        <div className="flex items-center justify-between py-4 border-y border-border-subtle mb-4">
             <div className="flex items-baseline gap-1">
                 <span className={`text-5xl font-light tracking-tighter tabular-nums ${getHealthColor(attendancePercentage)}`}>
                     {attendancePercentage}
                 </span>
-                <span className="text-base font-normal text-black">%</span>
+                <span className="text-base font-normal text-text-primary">%</span>
             </div>
             
-            <div className="flex gap-4 border-l border-neutral-100 pl-6">
+            <div className="flex gap-4 border-l border-border-subtle pl-6">
                 <StatItemMini label={t('present')} value={stats.present} color="text-consorci-green" />
                 <StatItemMini label={t('late')} value={stats.late} color="text-consorci-yellow" />
                 <StatItemMini label={t('absent')} value={stats.absent} color="text-consorci-pinkRed" />
@@ -92,10 +92,10 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
         {/* Progress Section - Tight */}
         <div className="mb-4">
             <div className="flex justify-between items-center mb-1.5">
-                <span className="text-[9px] font-normal text-neutral-400 uppercase tracking-widest">{t('progress')}</span>
-                <span className="text-[10px] font-normal text-black">{sessionsCompleted}/{totalSessions}</span>
+                <span className="text-[9px] font-normal text-text-muted uppercase tracking-widest">{t('progress')}</span>
+                <span className="text-[10px] font-normal text-text-primary">{sessionsCompleted}/{totalSessions}</span>
             </div>
-            <div className="w-full h-1 bg-neutral-100 overflow-hidden rounded-full">
+            <div className="w-full h-1 bg-background-subtle overflow-hidden rounded-full">
                 <div 
                     className="h-full bg-consorci-darkBlue transition-all duration-700" 
                     style={{ width: `${progress}%` }}
@@ -147,7 +147,7 @@ export const AssignmentMonitorCard: React.FC<AssignmentMonitorCardProps> = ({ as
 
 const StatItemMini = ({ label, value, color }: { label: string; value: number; color: string }) => (
     <div className="text-center">
-        <p className={`text-lg font-light tabular-nums leading-none mb-1 ${value > 0 ? color : 'text-neutral-200'}`}>{value}</p>
-        <p className="text-[8px] font-normal text-neutral-400 uppercase tracking-tighter">{label}</p>
+        <p className={`text-lg font-light tabular-nums leading-none mb-1 ${value > 0 ? color : 'text-text-muted opacity-30'}`}>{value}</p>
+        <p className="text-[8px] font-normal text-text-muted uppercase tracking-tighter">{label}</p>
     </div>
 );
