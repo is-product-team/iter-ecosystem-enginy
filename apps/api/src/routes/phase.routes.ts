@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 import prisma from '../lib/prisma.js';
 import { createNotificationInternal } from '../controllers/notification.controller.js';
+import { emitPhaseChanged } from '../io/emitters.js';
 
 const router = Router();
 
@@ -67,6 +68,9 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
       isBroadcast: true
     });
   }
+
+  // Emit real-time event
+  emitPhaseChanged(updatedPhase);
 
   res.json(updatedPhase);
 });

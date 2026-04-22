@@ -3,6 +3,7 @@ import { Inter, IBM_Plex_Sans_Arabic } from 'next/font/google';
 import '@/config/env';
 import '../globals.css';
 import { AuthProvider } from '@/context/AuthContext';
+import { SocketProvider } from '@/context/SocketContext';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { NextIntlClientProvider } from 'next-intl';
@@ -66,7 +67,9 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <AuthProvider>
-              {children}
+              <SocketProvider>
+                {children}
+              </SocketProvider>
               <Toaster 
                 position="top-right" 
                 offset={80}

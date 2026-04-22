@@ -14,6 +14,7 @@ import {
 } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme, vars } from 'nativewind';
+import { SocketProvider } from '../context/SocketContext';
 
 // @ts-ignore
 import "../global.css";
@@ -80,12 +81,14 @@ function RootLayout() {
       className={colorScheme === 'dark' ? 'dark flex-1' : 'flex-1'}
     >
       <SafeAreaProvider>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="(professor)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <SocketProvider>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="(professor)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </SocketProvider>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       </SafeAreaProvider>
     </View>

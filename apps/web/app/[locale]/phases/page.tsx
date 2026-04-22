@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
+import { useSocket } from "@/context/SocketContext";
 import { ROLES } from "@iter/shared";
 import DashboardLayout from "@/components/DashboardLayout";
 import getApi from "@/services/api";
@@ -23,6 +24,7 @@ interface Phase {
 
 export default function PhaseManagementPage() {
   const { user, loading: authLoading } = useAuth();
+  const { socket } = useSocket();
   const t = useTranslations('Admin.Phases');
   const tc = useTranslations('Common');
   const tp = useTranslations('ProgramPhases');
@@ -47,6 +49,24 @@ export default function PhaseManagementPage() {
       fetchPhases();
     }
   }, [user]);
+
+  // Real-time updates for phases
+  useEffect(() => {
+    if (socket) {
+      const handlePhaseChange = (data: any) => {
+        console.log('📡 [WEB] Phase change event received:', data);
+        fetchPhases();
+        
+        // Show a discrete toast if the user isn't the one who triggered it
+        // (Though in this case fetchPhases is enough)
+      };
+
+      socket.on('phase_changed', handlePhaseChange);
+      return () => {
+        socket.off('phase_changed', handlePhaseChange);
+      };
+    }
+  }, [socket]);
 
   const togglePhase = async (id: number, currentActive: boolean) => {
     if (currentActive) return; // Already active

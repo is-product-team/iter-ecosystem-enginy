@@ -8,6 +8,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import prisma from './lib/prisma.js';
 import { ReminderService } from './services/reminder.service.js';
 import { env } from './config/env.js';
+import { initIO, closeIO } from './io/index.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -97,15 +98,32 @@ if (env.NODE_ENV !== 'test') {
 
     // Start Background Services
     ReminderService.start();
+
+    // Initialize Socket.io
+    try {
+      await initIO(server);
+      logger.info('📡 Socket.io server initialized');
+    } catch (ioError) {
+      logger.error('📡 Failed to initialize Socket.io:', ioError);
+    }
   });
 }
 
-process.on('SIGINT', async () => {
-  logger.info('Shutting down server...');
+const shutdown = async (signal: string) => {
+  logger.info(`Shutting down server due to ${signal}...`);
   ReminderService.stop();
+  await closeIO();
   await prisma.$disconnect();
-  server.close(() => {
-    logger.info('Server closed');
+  
+  if (server) {
+    server.close(() => {
+      logger.info('HTTP Server closed');
+      process.exit(0);
+    });
+  } else {
     process.exit(0);
-  });
-});
+  }
+};
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
