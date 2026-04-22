@@ -73,7 +73,8 @@ app.use((req, res, next) => {
 });
 
 const API_PREFIX = env.API_PREFIX;
-app.use(`${API_PREFIX}/uploads`, express.static('uploads'));
+const absoluteUploadPath = path.resolve(process.cwd(), 'uploads');
+app.use(`${API_PREFIX}/uploads`, express.static(absoluteUploadPath));
 
 app.use(`${API_PREFIX}/`, routes);
 

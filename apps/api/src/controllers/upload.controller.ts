@@ -44,10 +44,13 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
 
     const fileExt = path.extname(req.file.originalname);
     fileName = `photo_${type}_${targetId}_${targetName}_${Date.now()}${fileExt}`;
-    const profileDir = path.join('uploads', 'profile');
+    
+    // Usar ruta absoluta para evitar problemas de contexto
+    const profileDir = path.resolve(process.cwd(), 'uploads', 'profile');
     const filePath = path.join(profileDir, fileName);
 
     if (!fs.existsSync(profileDir)) {
+      console.log(`📁 Creando directorio de perfiles: ${profileDir}`);
       fs.mkdirSync(profileDir, { recursive: true });
     }
 
@@ -74,8 +77,11 @@ export const uploadProfilePicture = async (req: Request, res: Response) => {
 
     res.json({ success: true, photoUrl: url });
   } catch (error) {
-    console.error("Error uploading profile photo:", error);
-    res.status(500).json({ error: 'Error processing the photo upload.' });
+    console.error("❌ [Upload Error] Detailed error:", error);
+    res.status(500).json({ 
+      error: 'Error processing the photo upload.',
+      details: error instanceof Error ? error.message : String(error)
+    });
   }
 };
 
