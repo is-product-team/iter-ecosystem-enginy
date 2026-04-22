@@ -11,6 +11,7 @@ import issueService, { Issue } from '@/services/issueService';
 import api from '@/services/api';
 import { THEME } from '@iter/shared';
 import * as ExpoConstants from 'expo-constants';
+import { useSocket } from '@/context/SocketContext';
 
 const Constants = ExpoConstants.default || ExpoConstants;
 const API_URL = Constants.expoConfig?.extra?.apiUrl;
@@ -22,6 +23,7 @@ export default function IssueDetailScreen() {
   const scrollViewRef = React.useRef<ScrollView>(null);
   const colorScheme = useColorScheme();
   const tintColor = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
+  const { socket } = useSocket();
 
   const [issue, setIssue] = React.useState<Issue | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -47,6 +49,35 @@ export default function IssueDetailScreen() {
   React.useEffect(() => {
     fetchIssue();
   }, [fetchIssue]);
+
+  // Real-time socket integration
+  React.useEffect(() => {
+    if (socket && id) {
+      socket.emit('join_room', `issue:${id}`);
+      
+      const handleNewMessage = (msg: any) => {
+        setIssue(prev => {
+          if (!prev) return null;
+          if (prev.messages?.some(m => m.messageId === msg.messageId)) return prev;
+          return { ...prev, messages: [...(prev.messages || []), msg] };
+        });
+        setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 300);
+      };
+
+      const handleStatusUpdate = (data: any) => {
+        setIssue(prev => prev ? { ...prev, status: data.status } : null);
+      };
+
+      socket.on('issue_message', handleNewMessage);
+      socket.on('issue_status_changed', handleStatusUpdate);
+      
+      return () => {
+        socket.emit('leave_room', `issue:${id}`);
+        socket.off('issue_message', handleNewMessage);
+        socket.off('issue_status_changed', handleStatusUpdate);
+      };
+    }
+  }, [socket, id]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({

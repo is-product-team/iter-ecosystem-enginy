@@ -33,6 +33,21 @@ services:
     networks:
       - iter-network
 
+  # Cache y Mensajería (Redis para WebSockets)
+  redis:
+    image: redis:7-alpine
+    container_name: iter_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - iter-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Service de Instalación y Setup
   setup:
     build:

@@ -13,6 +13,7 @@ import WorkshopDetailModal from '../../../components/WorkshopDetailModal';
 import { SessionCarousel } from '../../../components/dashboard/SessionCarousel';
 import { QuickAccessGrid } from '../../../components/dashboard/QuickAccessGrid';
 import { PageHeader } from '../../../components/ui/PageHeader';
+import { useSocket } from '../../../context/SocketContext';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -41,6 +42,7 @@ export default function DashboardScreen() {
   const { colorScheme } = useColorScheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { socket } = useSocket();
 
   const [phases, setPhases] = React.useState<any[]>([]);
   const [assignments, setAssignments] = React.useState<any[]>([]);
@@ -57,6 +59,23 @@ export default function DashboardScreen() {
     isMounted.current = true;
     return () => { isMounted.current = false; };
   }, []);
+
+  // Listen for real-time phase changes
+  React.useEffect(() => {
+    if (socket) {
+      const handlePhaseChange = (data: any) => {
+        console.log('📡 [SOCKET] Phase change event received:', data);
+        // Refresh all dashboard data to reflect new phase
+        checkRoleAndFetchData();
+      };
+
+      socket.on('phase_changed', handlePhaseChange);
+      
+      return () => {
+        socket.off('phase_changed', handlePhaseChange);
+      };
+    }
+  }, [socket, checkRoleAndFetchData]);
 
   const checkRoleAndFetchData = React.useCallback(async (isRefresh = false) => {
     try {

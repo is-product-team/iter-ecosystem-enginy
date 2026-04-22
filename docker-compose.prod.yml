@@ -1,4 +1,16 @@
 services:
+  # Cache y Mensajería (Redis para WebSockets)
+  redis:
+    image: redis:7-alpine
+    container_name: iter_redis_prod
+    restart: always
+    networks:
+      - red_proxy
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   # Backend API (Producción)
   api:
     image: ghcr.io/is-product-team/iter-ecosystem-enginy/api:latest

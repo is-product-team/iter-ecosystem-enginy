@@ -15,11 +15,13 @@ import getApi from '@/services/api';
 import { Paperclip, X, Image as ImageIcon, Film, FileText, ExternalLink, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { useSocket } from '@/context/SocketContext';
 
 export default function AdminIssueDetailPage() {
   const t = useTranslations('Issues');
   const tCommon = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
+  const { socket } = useSocket();
   const params = useParams();
   const id = params?.id ? Number(params.id) : null;
   const locale = params?.locale || 'ca';
@@ -60,6 +62,42 @@ export default function AdminIssueDetailPage() {
   useEffect(() => {
     scrollToBottom();
   }, [issue?.messages, scrollToBottom]);
+
+  // Real-time listeners
+  useEffect(() => {
+    if (socket && id) {
+      // Join the issue room
+      socket.emit('join_room', `issue:${id}`);
+      console.log(`📡 [SOCKET] Joining room: issue:${id}`);
+
+      const handleNewMessage = (msg: any) => {
+        console.log('📡 [SOCKET] New message received:', msg);
+        setIssue(prev => {
+          if (!prev) return null;
+          // Check if message already exists to avoid duplicates (from our own send)
+          if (prev.messages?.some(m => m.messageId === msg.messageId)) return prev;
+          return {
+            ...prev,
+            messages: [...(prev.messages || []), msg]
+          };
+        });
+      };
+
+      const handleStatusUpdate = (data: any) => {
+        console.log('📡 [SOCKET] Status updated:', data);
+        setIssue(prev => prev ? { ...prev, status: data.status } : null);
+      };
+
+      socket.on('issue_message', handleNewMessage);
+      socket.on('issue_status_changed', handleStatusUpdate);
+
+      return () => {
+        socket.emit('leave_room', `issue:${id}`);
+        socket.off('issue_message', handleNewMessage);
+        socket.off('issue_status_changed', handleStatusUpdate);
+      };
+    }
+  }, [socket, id]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {

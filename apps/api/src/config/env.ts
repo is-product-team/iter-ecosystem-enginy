@@ -40,6 +40,8 @@ const envSchema = z.object({
   POSTGRES_DB: z.string().optional(),
   // AI Config
   GOOGLE_AI_API_KEY: z.string().optional(),
+  // Redis Config
+  REDIS_URL: z.string().url().default('redis://redis:6379'),
 });
 
 function validateEnv() {
