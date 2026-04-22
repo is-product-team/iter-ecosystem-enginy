@@ -257,10 +257,13 @@ export default function PerfilScreen() {
         }
       } catch (e) {
         console.error("Error loading user", e);
+      } finally {
+        setLoading(false);
       }
     }
     loadUser();
-  }, []);
+    fetchUserProfile();
+  }, [fetchUserProfile]);
 
   const getProfileImage = () => {
     if (user?.photoUrl) {
