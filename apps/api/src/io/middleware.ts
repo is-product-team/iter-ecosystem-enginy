@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import cookie from 'cookie';
 import { env } from '../config/env.js';
 import prisma from '../lib/prisma.js';
 import logger from '../lib/logger.js';
@@ -8,15 +9,22 @@ const JWT_SECRET = env.JWT_SECRET;
 
 /**
  * Socket.io Middleware to authenticate connections via JWT
- * Token can be sent in handshake.auth.token or headers.authorization
+ * Supports:
+ * 1. handshake.auth.token (Mobile)
+ * 2. Authorization header (Standard)
+ * 3. Cookies (Web/Next.js)
  */
 export const socketAuthMiddleware = async (socket: Socket, next: (err?: Error) => void) => {
   try {
     const auth = socket.handshake.auth;
     const header = socket.handshake.headers.authorization;
+    const cookieHeader = socket.handshake.headers.cookie;
     
-    // Support both direct token and Bearer format
-    let token = auth.token || (header?.startsWith('Bearer ') ? header.slice(7) : header);
+    // Parse cookies if available
+    const cookies = cookie.parse(cookieHeader || '');
+    
+    // Support multiple token sources
+    let token = auth.token || cookies.token || (header?.startsWith('Bearer ') ? header.slice(7) : header);
 
     if (!token) {
       logger.warn(`🔌 Socket Auth: No token provided from ${socket.id}`);

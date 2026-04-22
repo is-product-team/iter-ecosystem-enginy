@@ -42,15 +42,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     // Avoid multiple connections
     if (socketRef.current?.connected) return;
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) return;
-
     const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     
     console.log('📡 [WEB SOCKET] Initializing connection to:', socketUrl);
     
     const socket = io(socketUrl, {
-      auth: { token },
+      // We rely on withCredentials: true to send the HttpOnly cookie
+      withCredentials: true,
       transports: ['websocket'],
       reconnectionAttempts: 5,
     });

@@ -9,6 +9,8 @@ import DashboardLayout from '@/components/DashboardLayout';
 import Loading from '@/components/Loading';
 
 import phaseService, { Phase } from '@/services/phaseService';
+import { useSocket } from '@/context/SocketContext';
+import { toast } from 'sonner';
 
 export default function CenterDashboard() {
   const t = useTranslations('Center');
@@ -17,9 +19,21 @@ export default function CenterDashboard() {
   const tp = useTranslations('ProgramPhases');
   const locale = useLocale();
   const { user, loading: authLoading } = useAuth();
+  const { socket } = useSocket();
   const [phases, setPhases] = useState<Phase[]>([]);
   const [loadingPhases, setLoadingPhases] = useState(true);
   const router = useRouter();
+
+  const fetchPhases = async () => {
+    try {
+      const data = await phaseService.getAll();
+      setPhases(data);
+    } catch (error) {
+      console.error('Error fetching phases:', error);
+    } finally {
+      setLoadingPhases(false);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && (!user || user.role.name !== ROLES.COORDINATOR)) {
@@ -28,21 +42,34 @@ export default function CenterDashboard() {
   }, [user, authLoading, router, locale]);
 
   useEffect(() => {
-    const fetchPhases = async () => {
-      try {
-        const data = await phaseService.getAll();
-        setPhases(data);
-      } catch (error) {
-        console.error('Error fetching phases:', error);
-      } finally {
-        setLoadingPhases(false);
-      }
-    };
-
     if (user && user.role.name === ROLES.COORDINATOR) {
       fetchPhases();
     }
   }, [user]);
+
+  // Real-time phase change listener
+  useEffect(() => {
+    if (socket) {
+      const handlePhaseChange = (data: any) => {
+        console.log('📡 [WEB] Phase change event received on Dashboard:', data);
+        fetchPhases();
+        
+        // Show notification
+        const phaseName = tp.has(`${data.name}.name`) ? tp(`${data.name}.name`) : data.name;
+        toast.info(t('dashboard.status_title'), {
+          description: data.isActive 
+            ? `La fase "${phaseName}" ahora está ACTIVA.`
+            : `La fase "${phaseName}" se ha desactivado.`,
+          duration: 5000,
+        });
+      };
+
+      socket.on('phase_changed', handlePhaseChange);
+      return () => {
+        socket.off('phase_changed', handlePhaseChange);
+      };
+    }
+  }, [socket, t, tp]);
 
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find((f) => f.name === phaseName);
