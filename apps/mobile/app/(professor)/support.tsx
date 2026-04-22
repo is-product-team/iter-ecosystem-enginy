@@ -6,11 +6,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import issueService, { Issue } from '@/services/issueService';
 import { THEME } from '@iter/shared';
+import { useSocket } from '@/context/SocketContext';
 
 export default function SupportScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { socket } = useSocket();
   
   const [issues, setIssues] = React.useState<Issue[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -31,6 +33,24 @@ export default function SupportScreen() {
   React.useEffect(() => {
     fetchIssues();
   }, []);
+
+  // Real-time listener for list updates
+  React.useEffect(() => {
+    if (socket) {
+      const handleRefresh = () => {
+        console.log('📡 [SOCKET] Refreshing mobile issues list...');
+        fetchIssues();
+      };
+      
+      socket.on('new_issue', handleRefresh);
+      socket.on('issue_updated', handleRefresh);
+      
+      return () => {
+        socket.off('new_issue', handleRefresh);
+        socket.off('issue_updated', handleRefresh);
+      };
+    }
+  }, [socket]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);

@@ -10,7 +10,6 @@ import Loading from '@/components/Loading';
 
 import phaseService, { Phase } from '@/services/phaseService';
 import { useSocket } from '@/context/SocketContext';
-import { toast } from 'sonner';
 
 export default function CenterDashboard() {
   const t = useTranslations('Center');
@@ -53,15 +52,6 @@ export default function CenterDashboard() {
       const handlePhaseChange = (data: any) => {
         console.log('📡 [WEB] Phase change event received on Dashboard:', data);
         fetchPhases();
-        
-        // Show notification
-        const phaseName = tp.has(`${data.name}.name`) ? tp(`${data.name}.name`) : data.name;
-        toast.info(t('dashboard.status_title'), {
-          description: data.isActive 
-            ? `La fase "${phaseName}" ahora está ACTIVA.`
-            : `La fase "${phaseName}" se ha desactivado.`,
-          duration: 5000,
-        });
       };
 
       socket.on('phase_changed', handlePhaseChange);
@@ -69,7 +59,7 @@ export default function CenterDashboard() {
         socket.off('phase_changed', handlePhaseChange);
       };
     }
-  }, [socket, t, tp]);
+  }, [socket]);
 
   const isPhaseActive = (phaseName: string) => {
     const phase = phases.find((f) => f.name === phaseName);

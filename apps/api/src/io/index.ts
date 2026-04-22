@@ -47,8 +47,24 @@ export async function initIO(httpServer: HttpServer) {
     // Join a room for the user to allow targeted events
     socket.join(`user:${user.userId}`);
     
-    // Join a room for their role
+    // Join a room for their role (e.g., role:ADMIN, role:COORDINATOR)
     socket.join(`role:${user.role}`);
+
+    // If they belong to a center, join the center room
+    if (user.centerId) {
+      socket.join(`center:${user.centerId}`);
+    }
+
+    // Dynamic room management
+    socket.on('join_room', (room) => {
+      socket.join(room);
+      logger.info(`👥 Socket ${socket.id} joined room: ${room}`);
+    });
+
+    socket.on('leave_room', (room) => {
+      socket.leave(room);
+      logger.info(`🏃 Socket ${socket.id} left room: ${room}`);
+    });
 
     socket.on('disconnect', (reason) => {
       logger.info(`❌ User disconnected: ${user.email} (${reason})`);

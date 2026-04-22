@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
 import { IssueService } from '../services/issue.service.js';
 import { IssueSchema, IssueMessageSchema, ROLES } from '@iter/shared';
+import { 
+  emitNewIssue, 
+  emitIssueMessage, 
+  emitIssueStatusChanged 
+} from '../io/issue-emitters.js';
 
 export const createIssue = async (req: Request, res: Response) => {
   const { userId, centerId: userCenterId } = req.user!;
@@ -18,6 +23,10 @@ export const createIssue = async (req: Request, res: Response) => {
 
   try {
     const issue = await IssueService.createIssue(result.data, userId);
+    
+    // Real-time broadcast
+    emitNewIssue(issue);
+    
     res.status(201).json(issue);
   } catch (error) {
     console.error('❌ [API] Error creating issue in service:', error);
@@ -87,6 +96,10 @@ export const addMessage = async (req: Request, res: Response) => {
       result.data.isSystem,
       result.data.attachments
     );
+    
+    // Real-time broadcast to the issue room
+    emitIssueMessage(Number(id), message);
+    
     res.status(201).json(message);
   } catch (error) {
     console.error('❌ [API] Error adding message:', error);
@@ -105,6 +118,10 @@ export const updateIssueStatus = async (req: Request, res: Response) => {
 
   try {
     const updated = await IssueService.updateStatus(Number(id), status, userId);
+    
+    // Real-time broadcast
+    emitIssueStatusChanged(Number(id), { status, issue: updated });
+    
     res.json(updated);
   } catch (error) {
     console.error('❌ [API] Error updating status:', error);

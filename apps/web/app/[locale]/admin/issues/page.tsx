@@ -13,11 +13,13 @@ import DataTableToolbar, { FilterSelect } from '@/components/ui/DataTableToolbar
 import { format } from 'date-fns';
 import { ca, es } from 'date-fns/locale';
 import { AlertCircle, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { useSocket } from '@/context/SocketContext';
 
 export default function AdminIssuesPage() {
   const t = useTranslations('Issues');
   const tc = useTranslations('Common');
   const { user, loading: authLoading } = useAuth();
+  const { socket } = useSocket();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,6 +54,24 @@ export default function AdminIssuesPage() {
       loadIssues();
     }
   }, [user, authLoading, router, locale, loadIssues]);
+
+  // Real-time listener for list updates
+  useEffect(() => {
+    if (socket) {
+      const handleRefresh = () => {
+        console.log('📡 [SOCKET] Refreshing issues list...');
+        loadIssues();
+      };
+
+      socket.on('new_issue', handleRefresh);
+      socket.on('issue_updated', handleRefresh);
+
+      return () => {
+        socket.off('new_issue', handleRefresh);
+        socket.off('issue_updated', handleRefresh);
+      };
+    }
+  }, [socket, loadIssues]);
 
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
