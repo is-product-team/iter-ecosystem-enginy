@@ -62,7 +62,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const socketUrl = getSocketURL();
         const url = new URL(socketUrl);
         
-        const socket = io(socketUrl, {
+        console.log('📡 [SOCKET] Connecting to origin:', url.origin, 'with path:', url.pathname);
+        
+        const socket = io(url.origin, {
           path: url.pathname === '/' ? '/socket.io' : `${url.pathname}/socket.io`,
           auth: { token },
           transports: ['websocket'],
