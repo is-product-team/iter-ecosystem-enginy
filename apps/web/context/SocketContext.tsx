@@ -43,11 +43,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (socketRef.current?.connected) return;
 
     const socketUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const url = new URL(socketUrl);
     
     console.log('📡 [WEB SOCKET] Initializing connection to:', socketUrl);
     
     const socket = io(socketUrl, {
-      // We rely on withCredentials: true to send the HttpOnly cookie
+      // Automatic path detection for sub-routes (e.g. /iter/api)
+      path: url.pathname === '/' ? '/socket.io' : `${url.pathname}/socket.io`,
       withCredentials: true,
       transports: ['websocket'],
       reconnectionAttempts: 5,

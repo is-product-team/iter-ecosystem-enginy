@@ -59,7 +59,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (!token || !isMounted) return;
 
         // Initialize socket with Bearer token in auth object
-        const socket = io(getSocketURL(), {
+        const socketUrl = getSocketURL();
+        const url = new URL(socketUrl);
+        
+        const socket = io(socketUrl, {
+          path: url.pathname === '/' ? '/socket.io' : `${url.pathname}/socket.io`,
           auth: { token },
           transports: ['websocket'],
           reconnectionAttempts: 5,
