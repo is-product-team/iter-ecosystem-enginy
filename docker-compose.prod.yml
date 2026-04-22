@@ -12,7 +12,7 @@ services:
       - OLLAMA_HOST=http://ollama:11434
       - AI_MODEL_VISION=moondream
     volumes:
-      - ./uploads:/app/uploads
+      - ./apps/api/uploads:/app/uploads
     networks:
       - red_proxy
     depends_on:

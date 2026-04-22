@@ -126,7 +126,7 @@ const getBaseURL = () => {
 };
 
 const api = axios.create({
-  baseURL: getBaseURL().endsWith('/') ? getBaseURL().slice(0, -1) : (getBaseURL() || 'http://localhost:3000'),
+  baseURL: getBaseURL().endsWith('/') ? getBaseURL() : `${getBaseURL()}/`,
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
