@@ -11,15 +11,23 @@ import { env } from './config/env.js';
 import fs from 'fs';
 import path from 'path';
 
-// Asegurar carpeta de uploads al arranque (de forma no bloqueante)
-const uploadDir = path.resolve(process.cwd(), 'uploads', 'documents');
-try {
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+// Asegurar carpetas de uploads al arranque (de forma no bloqueante)
+const requiredUploadDirs = [
+  path.resolve(process.cwd(), 'uploads', 'documents'),
+  path.resolve(process.cwd(), 'uploads', 'profile'),
+  path.resolve(process.cwd(), 'uploads', 'multimedia'),
+];
+
+requiredUploadDirs.forEach(dir => {
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      logger.info(`📁 Carpeta creada: ${dir}`);
+    }
+  } catch (error) {
+    logger.warn(`⚠️ No se pudo asegurar la carpeta: ${dir}. ${error instanceof Error ? error.message : ''}`);
   }
-} catch (_error) {
-  logger.warn(`⚠️ No se pudo asegurar la carpeta de uploads: ${uploadDir}. Puede ser normal si usas volúmenes de Docker.`);
-}
+});
 
 export const app = express();
 app.set('trust proxy', 1);

@@ -145,7 +145,10 @@ api.interceptors.request.use(
         token = await SecureStore.getItemAsync('token');
       }
 
-      if (token) {
+      // Skip token for auth routes to avoid issues with expired tokens being sent
+      const isAuthRoute = config.url?.includes('auth/login') || config.url?.includes('auth/register');
+
+      if (token && !isAuthRoute) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     } catch (error) {
@@ -165,17 +168,22 @@ api.interceptors.response.use(
   },
   async (error) => {
     if (error.response?.status === 401) {
-      console.warn('🔑 [API] 401 Unauthorized - Redirecting to login');
-      // Clear storage
-      if (Platform.OS === 'web') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      } else {
-        await SecureStore.deleteItemAsync('token');
-        await SecureStore.deleteItemAsync('user');
+      // Don't trigger redirect logic if the error comes from the login/register attempt itself
+      const isAuthRoute = error.config?.url?.includes('auth/login') || error.config?.url?.includes('auth/register');
+      
+      if (!isAuthRoute) {
+        console.warn('🔑 [API] 401 Unauthorized - Redirecting to login');
+        // Clear storage
+        if (Platform.OS === 'web') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        } else {
+          await SecureStore.deleteItemAsync('token');
+          await SecureStore.deleteItemAsync('user');
+        }
+        // Redirect to login
+        router.replace('/login');
       }
-      // Redirect to login
-      router.replace('/login');
     }
 
     return Promise.reject(error);

@@ -95,8 +95,8 @@ RUN sed -i 's/"main": ".\/index.ts"/"main": ".\/index.js"/g' ./node_modules/@ite
     sed -i 's/"import": ".\/index.ts"/"import": ".\/index.js"/g' ./node_modules/@iter/shared/package.json && \
     sed -i 's/"require": ".\/index.ts"/"require": ".\/index.js"/g' ./node_modules/@iter/shared/package.json
 
-# Crear la carpeta d'uploads y asegurar permisos
-RUN mkdir -p /app/uploads/perfil /app/uploads/documents && chown -R node:node /app/uploads
+# Crear las carpetas de uploads y asegurar permisos
+RUN mkdir -p /app/uploads/profile /app/uploads/documents /app/uploads/multimedia && chown -R node:node /app/uploads
 
 USER node
 EXPOSE 3000
